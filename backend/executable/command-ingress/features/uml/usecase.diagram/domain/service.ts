@@ -9,9 +9,16 @@ import {
   UseCaseDiagramService, // Giữ lại interface của bạn
 } from "../types";
 import { UserServiceImpl } from "../../../user/domain/service"; // Import service của bạn
+import { VersionService } from "../../../version/domain/service";
+import { LogService } from "../../../log/domain/service";
+import Version from "../../../../../../internal/model/version";
+import User from "../../../../../../internal/model/user";
 import mongoose from "mongoose";
+import { umlSocketService } from "../../domain/uml.socket.service";
 export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
   private geminiService: UsecaseDiagramGeminiService;
+  private versionService = new VersionService();
+  private logService = new LogService();
 
   constructor() {
     this.geminiService = new UsecaseDiagramGeminiService();
@@ -21,55 +28,129 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     payload: GenerateUsecaseDiagrambasePayload,
     userId: string
   ): Promise<UseCaseDiagramResponse> {
-    const { versionId, projectId, requirements, lang } = payload;
+    const { versionId, projectId, requirements, language } = payload;
 
-    const user = await new UserServiceImpl().getUserById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    try {
+      const user = await new UserServiceImpl().getUserById(userId);
+      if (!user) {
+        const errorMsg = "User not found";
+        if (umlSocketService && projectId && versionId && userId) {
+          umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'failed', false, [errorMsg]);
+        }
+        throw new Error(errorMsg);
+      }
 
-    if (!requirements || requirements.length === 0) {
-      throw new Error(
-        "There are no requirements to generate usecase diagrams."
+      if (!requirements || requirements.length === 0) {
+        const errorMsg = "There are no requirements to generate usecase diagrams.";
+        if (umlSocketService && projectId && versionId && userId) {
+          umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'failed', false, [errorMsg]);
+        }
+        throw new Error(errorMsg);
+      }
+      if (!projectId) {
+        const errorMsg = "Missing required field: 'projectId' is required.";
+        if (umlSocketService && projectId && versionId && userId) {
+          umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'failed', false, [errorMsg]);
+        }
+        throw new Error(errorMsg);
+      }
+
+      // Emit start event
+      if (umlSocketService && projectId && versionId && userId) {
+        umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 10, 'generating', true);
+      }
+
+      const geminiDiagramData = await this.geminiService.generateUsecaseDiagram(
+        requirements,
+        language, //"en-US, vi-VN"
+        userId,
+        projectId
       );
+
+      if (
+        !geminiDiagramData ||
+        !geminiDiagramData.name ||
+        geminiDiagramData.name === "Generation Failed" ||
+        !geminiDiagramData.actors ||
+        !geminiDiagramData.usecases
+      ) {
+        const errorMsg = "Failed to generate complete diagram data from Gemini. The response was invalid or empty.";
+        if (umlSocketService && projectId && versionId && userId) {
+          umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'failed', false, [errorMsg]);
+        }
+        throw new Error(errorMsg);
+      }
+
+      const newUsecaseDiagram = new UsecaseDiagramSchema({
+        project_id: projectId,
+        version_id: versionId,
+        name: geminiDiagramData.name,
+        actors: geminiDiagramData.actors,
+        usecases: geminiDiagramData.usecases,
+        associations: geminiDiagramData.associations || [],
+        relationships: geminiDiagramData.relationships || [],
+        description: geminiDiagramData.description || [],
+        created_by: user.id,
+      });
+
+      const savedDocument = await newUsecaseDiagram.save();
+
+      // ✅ Tạo preview change cho usecase diagram mới
+      if (userId && versionId) {
+        await this.versionService.createOrUpdatePreview(
+          versionId,
+          userId,
+          {
+            entity_type: "usecase_diagram",
+            entity_id: savedDocument._id.toString(),
+            change_type: "added",
+            before_snapshot: null,
+            after_snapshot: savedDocument.toObject()
+          }
+        );
+      }
+
+      // ✅ Ghi log cho generate usecase diagram
+      try {
+        const version = await Version.findById(versionId).lean();
+        if (version) {
+          const user = await User.findById(userId).lean();
+          const username = user?.name || "Unknown User";
+          await this.logService.createLog({
+            project_id: projectId,
+            user_id: userId,
+            action: "generate_output",
+            target_id: savedDocument._id.toString(),
+            target_type: "usecase_diagrams",
+            version_number: version.version_number,
+            affects_requirement: true,
+            level: "info",
+            performed_by_ai: true,
+            details: {
+              after: { name: savedDocument.name, requirement_count: requirements.length },
+              message: `${username} generated usecase diagram "${savedDocument.name}" from ${requirements.length} requirement(s)`
+            }
+          });
+        }
+      } catch (logError) {
+        console.error("❌ Error logging usecase diagram generation:", logError);
+      }
+
+      // Emit completion event
+      if (umlSocketService && projectId && versionId && userId) {
+        umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'completed', false);
+      }
+
+      return savedDocument.toObject({ getters: true }) as UseCaseDiagramResponse;
+    } catch (error: any) {
+      console.error('❌ Error generating usecase diagram:', error);
+      // Emit failed event với error message
+      if (umlSocketService && projectId && versionId && userId) {
+        const errorMsg = error.message || 'Failed to generate usecase diagram';
+        umlSocketService.emitProgress(projectId, versionId, userId, 'usecase', 100, 'failed', false, [errorMsg]);
+      }
+      throw error; // Re-throw để controller xử lý
     }
-    if (!projectId) {
-      throw new Error("Missing required field: 'projectId' is required.");
-    }
-
-    const geminiDiagramData = await this.geminiService.generateUsecaseDiagram(
-      requirements,
-      lang //"en-US, vi-VN"
-    );
-
-    if (
-      !geminiDiagramData ||
-      !geminiDiagramData.name ||
-      geminiDiagramData.name === "Generation Failed" ||
-      !geminiDiagramData.actors ||
-      !geminiDiagramData.usecases
-    ) {
-      throw new Error(
-        "Failed to generate complete diagram data from Gemini. The response was invalid or empty."
-      );
-    }
-
-    const newUsecaseDiagram = new UsecaseDiagramSchema({
-      project_id: projectId,
-      version_id: versionId,
-      lang: lang,
-      name: geminiDiagramData.name,
-      actors: geminiDiagramData.actors,
-      usecases: geminiDiagramData.usecases,
-      associations: geminiDiagramData.associations || [],
-      relationships: geminiDiagramData.relationships || [],
-      description: geminiDiagramData.description || [],
-      created_by: user.id,
-    });
-
-    const savedDocument = await newUsecaseDiagram.save();
-
-    return savedDocument.toObject({ getters: true }) as UseCaseDiagramResponse;
   }
   public async getUsecaseDiagrams(
     versionId: string
@@ -87,7 +168,6 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       relationships: ucd.relationships,
       diagram_svg: ucd.diagram_svg,
       related_requirements: ucd.related_requirements,
-      linked_testcases: ucd.linked_testcases,
       created_by: ucd.created_by,
     }));
   }
@@ -108,9 +188,34 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       relationships: ucd.relationships,
       diagram_svg: ucd.diagram_svg,
       related_requirements: ucd.related_requirements,
-      linked_testcases: ucd.linked_testcases,
       created_by: ucd.created_by,
     };
+  }
+  public async createActor(
+    ucId: string,
+    data: { name: string; description?: string; position?: { x: number; y: number } }
+  ): Promise<UseCaseDiagramResponse> {
+    const uc = await UsecaseDiagramSchema.findOne({ _id: ucId });
+    if (!uc) {
+      throw new Error("Usecase Diagram not found");
+    }
+
+    // Tính toán position mặc định dựa trên số lượng actors hiện có
+    const existingActorsCount = uc.actors.length;
+    const defaultPosition = data.position || {
+      x: 100 + (existingActorsCount % 3) * 200,
+      y: 100 + Math.floor(existingActorsCount / 3) * 150,
+    };
+
+    uc.actors.push({
+      name: data.name,
+      description: data.description || '',
+      position: defaultPosition,
+    });
+
+    uc.markModified('actors');
+    await uc.save();
+    return this.getUsecaseDiagramsById(ucId);
   }
   public async editActorById(
     ucId: string,
@@ -156,7 +261,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Usecase Diagram not found");
     }
     const usecaseIndex = uc.usecases.findIndex(
-      (usecase: any) => usecase.id === usecaseId
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === usecaseId
     );
     if (usecaseIndex === -1) {
       throw new Error("Usecase not found");
@@ -175,13 +280,39 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Usecase Diagram not found");
     }
     const usecaseIndex = uc.usecases.findIndex(
-      (usecase: any) => usecase.id === usecaseId
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === usecaseId
     );
     if (usecaseIndex === -1) {
       throw new Error("Usecase not found");
     }
     uc.usecases.splice(usecaseIndex, 1);
     await uc.save();
+  }
+  public async createUsecase(
+    ucId: string,
+    data: { title: string; description?: string; position?: { x: number; y: number } }
+  ): Promise<UseCaseDiagramResponse> {
+    const uc = await UsecaseDiagramSchema.findOne({ _id: ucId });
+    if (!uc) {
+      throw new Error("Usecase Diagram not found");
+    }
+
+    // Tính toán position mặc định dựa trên số lượng usecases hiện có
+    const existingUsecasesCount = uc.usecases.length;
+    const defaultPosition = data.position || {
+      x: 400 + (existingUsecasesCount % 4) * 150,
+      y: 300 + Math.floor(existingUsecasesCount / 4) * 100,
+    };
+
+    uc.usecases.push({
+      title: data.title,
+      description: data.description || '',
+      position: defaultPosition,
+    });
+
+    uc.markModified('usecases');
+    await uc.save();
+    return this.getUsecaseDiagramsById(ucId);
   }
   public async createRelationship(
     ucId: string,
@@ -193,14 +324,14 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     }
 
     const ucBySource = ucd.usecases.findIndex(
-      (usecase: any) => usecase.id === data.source
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.source
     );
     if (ucBySource === -1) {
       throw new Error("Source not found in usecase diagram");
     }
 
     const ucByTarget = ucd.usecases.findIndex(
-      (usecase: any) => usecase.id === data.target
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.target
     );
     if (ucByTarget === -1) {
       throw new Error("Target not found in usecase diagram");
@@ -244,7 +375,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     }
 
     const ucBySource = ucd.usecases.findIndex(
-      (usecase: any) => usecase.id === data.source
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.source
     );
     console.log(ucBySource);
     if (ucBySource === -1) {
@@ -252,7 +383,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     }
 
     const ucByTarget = ucd.usecases.findIndex(
-      (usecase: any) => usecase.id === data.target
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.target
     );
     if (ucByTarget === -1) {
       throw new Error("Target not found in usecase diagram");
@@ -303,7 +434,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     }
 
     const usecaseById = ucd.usecases.findIndex(
-      (usecase: any) => usecase.id === data.usecase_id
+      (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.usecase_id
     );
     if (usecaseById === -1) {
       throw new Error("Usecase not found in usecase diagram");
@@ -330,6 +461,58 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     ucd.associations.splice(associationIndex, 1);
     await ucd.save();
   }
+  public async createAssociation(
+    ucId: string,
+    data: { actor_id: string; usecase_id: string }
+  ): Promise<UseCaseDiagramResponse> {
+    const ucd = await UsecaseDiagramSchema.findOne({ _id: ucId });
+    if (!ucd) {
+      throw new Error("Usecase Diagram not found");
+    }
+
+    // Validate actor exists
+    const actorIndex = ucd.actors.findIndex(
+      (actor: any) => {
+        const actorId = actor._id ? String(actor._id) : String(actor.id || '');
+        return actorId === data.actor_id;
+      }
+    );
+    if (actorIndex === -1) {
+      throw new Error("Actor not found in usecase diagram");
+    }
+
+    // Validate usecase exists
+    const usecaseIndex = ucd.usecases.findIndex(
+      (usecase: any) => {
+        const usecaseId = usecase._id ? String(usecase._id) : String(usecase.id || '');
+        return usecaseId === data.usecase_id;
+      }
+    );
+    if (usecaseIndex === -1) {
+      throw new Error("Usecase not found in usecase diagram");
+    }
+
+    // Check if association already exists
+    const existingAssociation = ucd.associations.find(
+      (assoc: any) => {
+        const assocActorId = assoc.actor_id ? String(assoc.actor_id) : String(assoc.actor_id || '');
+        const assocUsecaseId = assoc.usecase_id ? String(assoc.usecase_id) : String(assoc.usecase_id || '');
+        return assocActorId === data.actor_id && assocUsecaseId === data.usecase_id;
+      }
+    );
+    if (existingAssociation) {
+      throw new Error("Association already exists");
+    }
+
+    ucd.associations.push({
+      actor_id: data.actor_id,
+      usecase_id: data.usecase_id,
+    });
+
+    ucd.markModified('associations');
+    await ucd.save();
+    return this.getUsecaseDiagramsById(ucId);
+  }
   public async updateActorPosition(
     ucId: string,
     actorId: string,
@@ -347,8 +530,10 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Actor not found");
     }
 
-    // Cập nhật position
+    // ✅ Cập nhật position
     uc.actors[actorIndex].position = position;
+    // ✅ Mark actors array as modified để đảm bảo Mongoose lưu thay đổi nested object
+    uc.markModified('actors');
     await uc.save();
 
     return this.getUsecaseDiagramsById(ucId);
@@ -370,8 +555,10 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Usecase not found");
     }
 
-    // Cập nhật position
+    // ✅ Cập nhật position
     uc.usecases[usecaseIndex].position = position;
+    // ✅ Mark usecases array as modified để đảm bảo Mongoose lưu thay đổi nested object
+    uc.markModified('usecases');
     await uc.save();
 
     return this.getUsecaseDiagramsById(ucId);
@@ -398,6 +585,8 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
           uc.actors[actorIndex].position = position;
         }
       });
+      // ✅ Mark actors array as modified để đảm bảo Mongoose lưu thay đổi nested object
+      uc.markModified('actors');
     }
 
     // Cập nhật positions cho usecases
@@ -410,6 +599,8 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
           uc.usecases[usecaseIndex].position = position;
         }
       });
+      // ✅ Mark usecases array as modified để đảm bảo Mongoose lưu thay đổi nested object
+      uc.markModified('usecases');
     }
 
     await uc.save();
@@ -469,11 +660,55 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Only owner or editor can delete usecase diagrams");
     }
 
+    // Lưu snapshot trước khi xóa
+    const beforeSnapshot = ucd.toObject();
+    const versionId = ucd.version_id?.toString();
+
     // Thực hiện xóa
     const result = await UsecaseDiagramSchema.deleteOne({ _id: ucId });
 
     if (result.deletedCount === 0) {
       throw new Error("Failed to delete Usecase Diagram");
+    }
+
+    // ✅ Tạo preview change cho usecase diagram đã xóa
+    if (versionId && userId) {
+      await this.versionService.createOrUpdatePreview(
+        versionId,
+        userId,
+        {
+          entity_type: "usecase_diagram",
+          entity_id: ucId,
+          change_type: "deleted",
+          before_snapshot: beforeSnapshot,
+          after_snapshot: null
+        }
+      );
+
+      // ✅ Ghi log cho delete usecase diagram
+      try {
+        const version = await Version.findById(versionId).lean();
+        if (version) {
+          const user = await User.findById(userId).lean();
+          const username = user?.name || "Unknown User";
+          await this.logService.createLog({
+            project_id: ucd.project_id?.toString() || project._id.toString(),
+            user_id: userId,
+            action: "delete_output",
+            target_id: ucId,
+            target_type: "usecase_diagrams",
+            version_number: version.version_number,
+            affects_requirement: false,
+            level: "warning",
+            details: {
+              before: beforeSnapshot,
+              message: `${username} deleted usecase diagram "${ucd.name}"`
+            }
+          });
+        }
+      } catch (logError) {
+        console.error("❌ Error logging usecase diagram deletion:", logError);
+      }
     }
   }
 }

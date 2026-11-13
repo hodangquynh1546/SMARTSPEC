@@ -14,6 +14,9 @@ export default function initActivityDiagramRoute(): Router {
     // requireAuthorizedUser, 
     controller.generateFromActor);
 
+  // CRUD
+  router.post('/', requireAuthorizedUser, controller.create);
+  
   // List & Read
   router.get('/:versionId', requireAuthorizedUser, controller.getListActivityDiagram);
   router.get('/:activityDiagramId', requireAuthorizedUser, controller.getActivityDiagramByID);
@@ -36,6 +39,33 @@ export default function initActivityDiagramRoute(): Router {
   router.post('/:activityDiagramId/validate', requireAuthorizedUser, controller.validateStructure);
   router.get('/:activityDiagramId/export', requireAuthorizedUser, controller.export);
   router.delete('/:activityDiagramId', requireAuthorizedUser, controller.deleteActivityDiagram); // Xóa một qua param
+
+  // Position adjustment methods
+  router.patch('/:activityDiagramId/nodes/:nodeId/position', requireAuthorizedUser, controller.updateNodePosition);
+  router.patch('/:activityDiagramId/nodes/positions', requireAuthorizedUser, controller.updateMultipleNodePositions);
+
+  // ==================== NODE CRUD ROUTES ====================
+  router
+    .route('/:activityDiagramId/nodes/:nodeId')
+    .patch(requireAuthorizedUser, controller.updateNode)
+    .delete(requireAuthorizedUser, controller.deleteNode);
+
+  // ==================== EDGE CRUD ROUTES ====================
+  router
+    .route('/:activityDiagramId/edges')
+    .post(requireAuthorizedUser, controller.createEdge);
+
+  router
+    .route('/:activityDiagramId/edges/:edgeId')
+    .patch(requireAuthorizedUser, controller.updateEdge)
+    .delete(requireAuthorizedUser, controller.deleteEdge);
+
+  // ==================== LANE CRUD ROUTES ====================
+  router
+    .route('/:activityDiagramId/lanes/:laneId')
+    .patch(requireAuthorizedUser, controller.updateLane)
+    .delete(requireAuthorizedUser, controller.deleteLane);
+
   return router;
 }
 

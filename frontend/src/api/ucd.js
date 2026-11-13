@@ -8,16 +8,22 @@ export const getUsecaseDiagrams = (versionId) =>
 export const getUsecaseDiagramById = (ucId) =>
     axiosClient.get(`/api/usecase-diagram/${ucId}`);
 
-export const generateUsecaseDiagram = (versionId, lang) =>
+export const generateUsecaseDiagram = (versionId, language) =>
     axiosClient.post(`/api/usecase-diagram/versions/${versionId}/generate-usecase-diagram`, {
-        lang
+        language
     });
+
+export const createActor = (ucId, data) =>
+    axiosClient.post(`/api/usecase-diagram/${ucId}/actors`, data);
 
 export const updateActor = (ucId, actorId, data) =>
     axiosClient.patch(`/api/usecase-diagram/${ucId}/actors/${actorId}`, data);
 
 export const deleteActor = (ucId, actorId) =>
     axiosClient.delete(`/api/usecase-diagram/${ucId}/actors/${actorId}`);
+
+export const createUsecase = (ucId, data) =>
+    axiosClient.post(`/api/usecase-diagram/${ucId}/usecases`, data);
 
 export const updateUsecase = (ucId, usecaseId, data) =>
     axiosClient.patch(`/api/usecase-diagram/${ucId}/usecases/${usecaseId}`, data);
@@ -33,6 +39,9 @@ export const updateRelationship = (ucId, relationshipId, data) =>
 
 export const deleteRelationship = (ucId, relationshipId) =>
     axiosClient.delete(`/api/usecase-diagram/${ucId}/relationships/${relationshipId}`);
+
+export const createAssociation = (ucId, data) =>
+    axiosClient.post(`/api/usecase-diagram/${ucId}/associations`, data);
 
 export const updateAssociation = (ucId, associationId, data) =>
     axiosClient.patch(`/api/usecase-diagram/${ucId}/associations/${associationId}`, data);

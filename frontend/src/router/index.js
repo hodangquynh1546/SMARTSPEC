@@ -4,7 +4,7 @@ import UsecaseManagement from '../views/UsecaseManagement.vue'
 import OutputManagement from '../views/OutputManagement.vue'
 import TestcaseManagement from '../views/TestcaseManagement.vue'
 import DatabaseManagement from '../views/DatabaseManagement.vue'
-import ActivityDiagramManagement from '../views/ActivityDiagramManagement.vue'
+// import ActivityDiagramManagement from '../views/ActivityDiagramManagement.vue'
 import UmlManagement from '../views/UmlManagement.vue'
 import Login from '../pages/login.vue'
 import OauthRedirect from '../pages/OauthRedirect.vue'
@@ -13,6 +13,7 @@ import VerifyEmail from '../pages/VerifyEmail.vue'
 import VerifyOtp from '../pages/VerifyOtp.vue'
 import ForgotPassword from '../pages/ForgotPassword.vue'
 import ResetPassword from '../pages/ResetPassword.vue'
+import ProjectLayout from '../layouts/ProjectLayout.vue'
 import adminRoutes from './admin'
 import { authGuard, adminGuard } from '../utils/authGuard'
 
@@ -28,90 +29,61 @@ const routes = [
   { path: '/reset-password', component: ResetPassword },
 
   { path: '/reset-password', component: ResetPassword },
-  {
-    path: '/project/:id/output',
-    name: 'OutputManagement',
-    component: OutputManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/project/:id/testcases',
-    name: 'TestcaseManagement',
-    component: TestcaseManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/project/:id/database',
-    name: 'DatabaseManagement',
-    component: DatabaseManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/project/:id/activity-diagrams',
-    name: 'ActivityDiagramManagement',
-    component: ActivityDiagramManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/project/:id/uml',
-    name: 'UmlManagement',
-    component: UmlManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
   { 
     path: '/dashboard', 
     name: 'Home', 
     component: Homepage,
     beforeEnter: authGuard
   },
+  // ✅ Project Layout với children routes - giữ ProjectHeader không bị reload
   {
-    path: '/editor/:id',
+    path: '/project/:id',
+    component: ProjectLayout,
+    props: true,
+    beforeEnter: authGuard,
+    children: [
+      {
+        path: '',
+        redirect: (to) => `/editor/${to.params.id}`
+      },
+      {
+        path: 'editor',
     name: 'Editor',
     component: UsecaseManagement,
     props: true,
-    beforeEnter: authGuard
   },
-  ...adminRoutes,
   {
-    path: '/project/:id/output',
+        path: 'output',
     name: 'OutputManagement',
     component: OutputManagement,
     props: true,
-    meta: { requiresAuth: true }
   },
   {
-    path: '/project/:id/testcases',
+        path: 'testcases',
     name: 'TestcaseManagement',
     component: TestcaseManagement,
     props: true,
-    meta: { requiresAuth: true }
   },
   {
-    path: '/project/:id/database',
+        path: 'database',
     name: 'DatabaseManagement',
     component: DatabaseManagement,
     props: true,
-    meta: { requiresAuth: true }
   },
   {
-    path: '/project/:id/activity-diagrams',
-    name: 'ActivityDiagramManagement',
-    component: ActivityDiagramManagement,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/project/:id/uml',
+        path: 'uml',
     name: 'UmlManagement',
     component: UmlManagement,
     props: true,
-    meta: { requiresAuth: true }
+      },
+    ]
   },
+  // ✅ Giữ route cũ để backward compatibility
+  {
+    path: '/editor/:id',
+    redirect: (to) => `/project/${to.params.id}/editor`
+  },
+  ...adminRoutes,
 ]
 
 

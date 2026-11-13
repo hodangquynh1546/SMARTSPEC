@@ -1,8 +1,8 @@
 import Project from '../../../../../internal/model/project';
 import Input from '../../../../../internal/model/input';
-import Output from '../../../../../internal/model/output';
 import Version from '../../../../../internal/model/version';
 import ProjectLog from '../../../../../internal/model/log';
+import Usecase from '../../../../../internal/model/usecase';
 import { OrchestratorService } from "../../orchestrator/domain/service";
 import { UploadedFile } from "express-fileupload";
 import { ServiceResponse, ResponseStatus } from '../../../services/serviceResponse';
@@ -55,6 +55,8 @@ export class ProjectService {
       const newVersionData = {
         project_id: newProject._id,
         version_number: 1,
+        status: "completed",
+        stage: "completed",
         created_by: ownerId
       };
       const createdVersions = await Version.create([newVersionData], { session });
@@ -222,7 +224,6 @@ export class ProjectService {
 
     await Promise.all([
       Input.deleteMany({ project_id: project._id }),
-      Output.deleteMany({ project_id: project._id }),
       Version.deleteMany({ project_id: project._id }),
       ProjectLog.deleteMany({ project_id: project._id }),
       Project.deleteOne({ _id: project._id }),
@@ -353,7 +354,6 @@ export class ProjectService {
         created_by: userId,
         status: "completed",
         affects_requirement: false,
-        requirement_model: [],
         pending_conflicts: [],
         processing_errors: [],
       });
@@ -373,23 +373,129 @@ export class ProjectService {
       });
     }
 
-    // Lấy danh sách versions (metadata)
+    // Lấy danh sách versions (metadata) - bao gồm pending_conflicts để frontend có thể check
     const versions = await Version.find({ project_id: project._id })
-      .select("_id version_number status created_at updated_at")
+      .select("_id version_number status created_at updated_at pending_conflicts")
       .sort({ version_number: -1 })
       .lean();
+    
+    // Populate usecases trong conflicts cho tất cả versions
+    if (versions && versions.length > 0) {
+      // Collect tất cả usecase IDs từ tất cả conflicts trong tất cả versions
+      const allUsecaseIds: Types.ObjectId[] = [];
+      versions.forEach((version: any) => {
+        if (version.pending_conflicts && Array.isArray(version.pending_conflicts)) {
+          version.pending_conflicts.forEach((conflict: any) => {
+            if (conflict.items && Array.isArray(conflict.items)) {
+              conflict.items.forEach((item: any) => {
+                const itemId = item?._id || item?.id || item;
+                if (itemId && Types.ObjectId.isValid(itemId)) {
+                  const objId = new Types.ObjectId(itemId);
+                  // Avoid duplicates
+                  if (!allUsecaseIds.some(id => id.toString() === objId.toString())) {
+                    allUsecaseIds.push(objId);
+                  }
+                }
+              });
+            }
+          });
+        }
+      });
+
+      // Fetch tất cả usecases một lần
+      if (allUsecaseIds.length > 0) {
+        const usecases = await Usecase.find({
+          _id: { $in: allUsecaseIds }
+        }).lean();
+
+        // Tạo map để lookup nhanh
+        const usecaseMap = new Map();
+        usecases.forEach((uc: any) => {
+          usecaseMap.set(uc._id.toString(), uc);
+        });
+
+        // Populate conflicts cho tất cả versions
+        versions.forEach((version: any) => {
+          if (version.pending_conflicts && Array.isArray(version.pending_conflicts)) {
+            version.pending_conflicts = version.pending_conflicts.map((conflict: any) => {
+              const populatedItems = (conflict.items || []).map((item: any) => {
+                const itemId = item?._id || item?.id || item;
+                const itemIdStr = itemId ? (itemId.toString ? itemId.toString() : String(itemId)) : null;
+                
+                if (itemIdStr && usecaseMap.has(itemIdStr)) {
+                  return usecaseMap.get(itemIdStr);
+                }
+                
+                // Fallback: return original item if not found
+                return item;
+              });
+
+              return {
+                ...conflict,
+                items: populatedItems
+              };
+            });
+          }
+        });
+      }
+    }
 
     // Lấy current version (đầy đủ tất cả field)
     const currentVersion = await Version.findById(project.current_version).lean();
 
     let inputs: any[] = [];
-    let outputs: any[] = [];
 
     if (currentVersion) {
-      [inputs, outputs] = await Promise.all([
-        Input.find({ version_id: currentVersion._id }).sort({ created_at: 1 }).lean(),
-        Output.find({ version_id: currentVersion._id }).sort({ created_at: 1 }).lean(),
-      ]);
+      inputs = await Input.find({ version_id: currentVersion._id }).sort({ created_at: 1 }).lean();
+      
+      // Populate usecases trong conflicts nếu có
+      if (currentVersion.pending_conflicts && currentVersion.pending_conflicts.length > 0) {
+        // Collect tất cả usecase IDs từ conflicts
+        const usecaseIds: Types.ObjectId[] = [];
+        currentVersion.pending_conflicts.forEach((conflict: any) => {
+          if (conflict.items && Array.isArray(conflict.items)) {
+            conflict.items.forEach((item: any) => {
+              const itemId = item?._id || item?.id || item;
+              if (itemId && Types.ObjectId.isValid(itemId)) {
+                usecaseIds.push(new Types.ObjectId(itemId));
+              }
+            });
+          }
+        });
+
+        // Fetch tất cả usecases một lần
+        if (usecaseIds.length > 0) {
+          const usecases = await Usecase.find({
+            _id: { $in: usecaseIds }
+          }).lean();
+
+          // Tạo map để lookup nhanh
+          const usecaseMap = new Map();
+          usecases.forEach((uc: any) => {
+            usecaseMap.set(uc._id.toString(), uc);
+          });
+
+          // Populate conflicts với usecase objects
+          currentVersion.pending_conflicts = (currentVersion.pending_conflicts || []).map((conflict: any) => {
+            const populatedItems = (conflict.items || []).map((item: any) => {
+              const itemId = item?._id || item?.id || item;
+              const itemIdStr = itemId ? (itemId.toString ? itemId.toString() : String(itemId)) : null;
+              
+              if (itemIdStr && usecaseMap.has(itemIdStr)) {
+                return usecaseMap.get(itemIdStr);
+              }
+              
+              // Fallback: return original item if not found
+              return item;
+            });
+
+            return {
+              ...conflict,
+              items: populatedItems
+            };
+          }) as any;
+        }
+      }
     }
 
     // Lấy logs của current version
@@ -401,13 +507,10 @@ export class ProjectService {
       .sort({ created_at: 1 })
       .lean();
 
-    // Enrich logs với input/output metadata
+    // Enrich logs với input metadata
     const chatLogs = logs.map((log: any) => {
       const input = log.input_id
         ? inputs.find((i: any) => i._id.toString() === log.input_id.toString())
-        : null;
-      const output = log.output_id
-        ? outputs.find((o: any) => o._id.toString() === log.output_id.toString())
         : null;
 
       return {
@@ -415,9 +518,7 @@ export class ProjectService {
         input_meta: input
           ? { id: input._id, name: input.name, type: input.type }
           : null,
-        output_meta: output
-          ? { id: output._id, name: output.name, type: output.type }
-          : null,
+        output_meta: null, // Output model đã bị xóa
       };
     });
 
@@ -426,7 +527,7 @@ export class ProjectService {
       current_version: currentVersion,
       versions,
       inputs,
-      outputs,
+      outputs: [], // Output model đã bị xóa
       chatLogs,
     };
 

@@ -1,30 +1,5 @@
 <template>
   <div class="uml-management-view">
-    <ProjectHeader
-      :project="project"
-      :versions="versions"
-      :selected-version-id="selectedVersionId"
-      :active-users="activeUsers"
-      @version-selected="handleVersionSelect"
-      @go-back="goBack"
-    />
-
-    <!-- Navigation Tabs -->
-    <div class="navigation-tabs">
-      <button class="tab-button" @click="navigateToUsecase">
-        <span class="material-symbols-outlined">list_alt</span>
-        Use Cases
-      </button>
-      <button class="tab-button" @click="navigateToOutput">
-        <span class="material-symbols-outlined">output</span>
-        Output
-      </button>
-      <button class="tab-button active">
-        <span class="material-symbols-outlined">schema</span>
-        UML Diagrams
-      </button>
-    </div>
-
     <div class="uml-content">
       <!-- Header với Actions -->
       <div class="content-header">
@@ -74,128 +49,256 @@
                 />
               </div>
               <div class="filter-controls">
-                <select v-model="sortFilters.usecase" class="sort-select">
-                  <option value="name">Sort by Name</option>
-                  <option value="date">Sort by Date</option>
-                  <option value="actors">Sort by Actors</option>
-                  <option value="usecases">Sort by Use Cases</option>
-                </select>
-                <select v-model="languageFilters.usecase" class="lang-select">
-                  <option value="all">All Languages</option>
-                  <option value="en-US">English</option>
-                  <option value="vi-VN">Vietnamese</option>
-                </select>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleSortDropdown('usecase')"
+                    :title="getSortLabel(globalSortFilter)"
+                  >
+                    <span class="material-symbols-outlined">sort</span>
+                  </button>
+                  <div 
+                    v-if="activeSortDropdown === 'usecase'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'name' }"
+                      @click="setSortFilter('name')"
+                    >
+                      <span class="material-symbols-outlined">text_fields</span>
+                      Sort by Name
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'date' }"
+                      @click="setSortFilter('date')"
+                    >
+                      <span class="material-symbols-outlined">schedule</span>
+                      Sort by Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'created' }"
+                      @click="setSortFilter('created')"
+                    >
+                      <span class="material-symbols-outlined">calendar_today</span>
+                      Sort by Created Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'actors' }"
+                      @click="setSortFilter('actors')"
+                    >
+                      <span class="material-symbols-outlined">person</span>
+                      Sort by Actors
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'usecases' }"
+                      @click="setSortFilter('usecases')"
+                    >
+                      <span class="material-symbols-outlined">task</span>
+                      Sort by Use Cases
+                    </button>
+                  </div>
+                </div>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleLangDropdown('usecase')"
+                    :title="getLangLabel(languageFilters.usecase)"
+                  >
+                    <span class="material-symbols-outlined">language</span>
+                  </button>
+                  <div 
+                    v-if="activeLangDropdown === 'usecase'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.usecase === 'all' }"
+                      @click="setLangFilter('usecase', 'all')"
+                    >
+                      <span class="material-symbols-outlined">public</span>
+                      All Languages
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.usecase === 'en-US' }"
+                      @click="setLangFilter('usecase', 'en-US')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      English
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.usecase === 'vi-VN' }"
+                      @click="setLangFilter('usecase', 'vi-VN')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      Vietnamese
+                    </button>
+                  </div>
+                </div>
+                <button 
+                  class="btn-refresh-section" 
+                  @click="refreshDiagramsByType('usecase')"
+                  :disabled="refreshingDiagrams.usecase"
+                  title="Refresh Use Case Diagrams"
+                >
+                  <span 
+                    v-if="refreshingDiagrams.usecase" 
+                    class="loading-spinner-small"
+                  ></span>
+                  <span 
+                    v-else 
+                    class="material-symbols-outlined"
+                  >refresh</span>
+                </button>
+                <button 
+                  class="btn-generate-section" 
+                  @click="generateSpecificDiagram('usecase')"
+                  title="Generate Use Case Diagram"
+                >
+                  <span class="material-symbols-outlined">auto_awesome</span>
+                  Generate
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="diagrams-scroll-container">
-            <div class="diagrams-scroll-content">
-              <div
-                v-for="diagram in filteredUsecaseDiagrams"
-                :key="diagram.id || diagram._id"
-                class="diagram-card"
-                @click="editDiagram(diagram)"
-              >
-                <div class="diagram-preview">
-                  <img
-                    v-if="diagram.previewImage"
-                    :src="diagram.previewImage"
-                    :alt="diagram.name || 'Use Case Diagram'"
-                    class="preview-image"
-                    @load="onPreviewImageLoad"
-                    @error="onPreviewImageError(diagram, $event)"
-                  />
-                  <div v-else class="preview-generator">
-                    <UCDRenderer
-                      :ref="`previewGenerator_${diagram.id || diagram._id}`"
-                      :diagram-data="diagram"
-                      :preview-mode="true"
-                      :auto-generate-preview="true"
-                      :optimize-for-preview="true"
-                      @preview-generated="handlePreviewGenerated(diagram, $event)"
-                      class="hidden-renderer"
+          <div class="diagrams-scroll-container-wrapper">
+            <!-- Scroll Arrow Left -->
+            <button 
+              v-if="scrollStates.usecase.canScrollLeft"
+              class="scroll-arrow scroll-arrow-left" 
+              @click="scrollDiagrams('usecase', 'left')"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            
+            <div class="diagrams-scroll-container" ref="usecaseScrollContainer">
+              <div class="diagrams-scroll-content" ref="usecaseScrollContent">
+
+                <div
+                  v-for="diagram in filteredUsecaseDiagrams"
+                  :key="diagram.id || diagram._id"
+                  class="diagram-card"
+                  @click="editDiagram(diagram)"
+                >
+                  <div class="diagram-preview">
+                    <img
+                      v-if="diagram.previewImage"
+                      :src="diagram.previewImage"
+                      :alt="diagram.name || 'Use Case Diagram'"
+                      class="preview-image"
+                      @load="onPreviewImageLoad"
+                      @error="onPreviewImageError(diagram, $event)"
                     />
-                    <div class="generating-preview">
+                    <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
                       <span>Generating preview...</span>
                     </div>
-                  </div>
-
-                  <div class="diagram-overlay">
-                    <div class="export-dropdown">
-                      <button
-                        class="btn-icon export-toggle"
-                        @click.stop="toggleExportDropdown(diagram)"
-                        title="Export"
-                      >
-                        <span class="material-symbols-outlined">download</span>
-                      </button>
-                      <div
-                        v-if="activeExportDropdown === (diagram.id || diagram._id)"
-                        class="export-options"
-                      >
-                        <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
-                          <span class="material-symbols-outlined">image</span>
-                          Export PNG
-                        </button>
-                        <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
-                          <span class="material-symbols-outlined">code</span>
-                          Export SVG
-                        </button>
-                      </div>
+                    <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
+                    <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
+                      <UCDRenderer
+                        :ref="`previewGenerator_${diagram.id || diagram._id}`"
+                        :diagram-data="diagram"
+                        :preview-mode="true"
+                        :auto-generate-preview="!diagram.previewImage"
+                        :optimize-for-preview="true"
+                        @preview-generated="handlePreviewGenerated(diagram, $event)"
+                        class="hidden-renderer"
+                      />
                     </div>
-                    <button
-                      class="btn-icon danger"
-                      @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                      title="Delete"
-                    >
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="diagram-info">
-                  <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
-                  <p class="diagram-description">
-                    {{ getSafeValue(diagram.description, 'No description') }}
-                  </p>
-                  <div class="diagram-meta">
-                    <span class="meta-item">
-                      <span class="material-symbols-outlined">language</span>
-                      {{ getLanguageCode(diagram.lang) }}
-                    </span>
-                    <span class="meta-item diagram-type-badge type-usecase"> Use Case </span>
-                  </div>
-                  <div class="diagram-stats">
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">person</span>
-                      {{ getSafeArrayLength(diagram.actors) }}
-                    </span>
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">task</span>
-                      {{ getSafeArrayLength(diagram.usecases) }}
-                    </span>
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">link</span>
-                      {{ getRelationshipCount(diagram) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Empty State for Use Case Diagrams -->
-              <div v-if="filteredUsecaseDiagrams.length === 0" class="empty-section">
-                <div class="empty-icon">
-                  <span class="material-symbols-outlined">account_tree</span>
+                    <div class="diagram-overlay">
+                      <div class="export-dropdown">
+                        <button
+                          class="btn-icon export-toggle"
+                          @click.stop="toggleExportDropdown(diagram)"
+                          title="Export"
+                        >
+                          <span class="material-symbols-outlined">download</span>
+                        </button>
+                        <div
+                          v-if="activeExportDropdown === (diagram.id || diagram._id)"
+                          class="export-options"
+                        >
+                          <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
+                            <span class="material-symbols-outlined">image</span>
+                            Export PNG
+                          </button>
+                          <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
+                            <span class="material-symbols-outlined">code</span>
+                            Export SVG
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        class="btn-icon danger"
+                        @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
+                        title="Delete"
+                      >
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="diagram-info">
+                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <p class="diagram-description">
+                      {{ getSafeValue(diagram.description, 'No description') }}
+                    </p>
+                    <div class="diagram-meta">
+                      <span class="meta-item">
+                        <span class="material-symbols-outlined">language</span>
+                        {{ getLanguageCode(diagram.lang) }}
+                      </span>
+                      <span class="meta-item diagram-type-badge type-usecase"> Use Case </span>
+                    </div>
+                    <div class="diagram-stats">
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">person</span>
+                        {{ getSafeArrayLength(diagram.actors) }}
+                      </span>
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">task</span>
+                        {{ getSafeArrayLength(diagram.usecases) }}
+                      </span>
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">link</span>
+                        {{ getRelationshipCount(diagram) }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <h4>No Use Case Diagrams</h4>
-                <p>Generate your first use case diagram to visualize system requirements.</p>
-                <button class="btn-primary small" @click="generateSpecificDiagram('usecase')">
-                  <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate Use Case
-                </button>
+
+                <!-- Empty State for Use Case Diagrams -->
+                <div v-if="filteredUsecaseDiagrams.length === 0" class="empty-section">
+                  <div class="empty-icon">
+                    <span class="material-symbols-outlined">account_tree</span>
+                  </div>
+                  <h4>No Use Case Diagrams</h4>
+                  <p>Generate your first use case diagram to visualize system requirements.</p>
+                  <button class="btn-primary small" @click="generateSpecificDiagram('usecase')">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    Generate Use Case
+                  </button>
+                </div>
               </div>
             </div>
+            
+            <!-- Scroll Arrow Right -->
+            <button 
+              v-if="scrollStates.usecase.canScrollRight"
+              class="scroll-arrow scroll-arrow-right" 
+              @click="scrollDiagrams('usecase', 'right')"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
         </div>
 
@@ -217,123 +320,244 @@
                 />
               </div>
               <div class="filter-controls">
-                <select v-model="sortFilters.activity" class="sort-select">
-                  <option value="name">Sort by Name</option>
-                  <option value="date">Sort by Date</option>
-                  <option value="nodes">Sort by Nodes</option>
-                </select>
-                <select v-model="languageFilters.activity" class="lang-select">
-                  <option value="all">All Languages</option>
-                  <option value="en-US">English</option>
-                  <option value="vi-VN">Vietnamese</option>
-                </select>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleSortDropdown('activity')"
+                    :title="getSortLabel(globalSortFilter)"
+                  >
+                    <span class="material-symbols-outlined">sort</span>
+                  </button>
+                  <div 
+                    v-if="activeSortDropdown === 'activity'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'name' }"
+                      @click="setSortFilter('name')"
+                    >
+                      <span class="material-symbols-outlined">text_fields</span>
+                      Sort by Name
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'date' }"
+                      @click="setSortFilter('date')"
+                    >
+                      <span class="material-symbols-outlined">schedule</span>
+                      Sort by Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'created' }"
+                      @click="setSortFilter('created')"
+                    >
+                      <span class="material-symbols-outlined">calendar_today</span>
+                      Sort by Created Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'nodes' }"
+                      @click="setSortFilter('nodes')"
+                    >
+                      <span class="material-symbols-outlined">play_arrow</span>
+                      Sort by Nodes
+                    </button>
+                  </div>
+                </div>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleLangDropdown('activity')"
+                    :title="getLangLabel(languageFilters.activity)"
+                  >
+                    <span class="material-symbols-outlined">language</span>
+                  </button>
+                  <div 
+                    v-if="activeLangDropdown === 'activity'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.activity === 'all' }"
+                      @click="setLangFilter('activity', 'all')"
+                    >
+                      <span class="material-symbols-outlined">public</span>
+                      All Languages
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.activity === 'en-US' }"
+                      @click="setLangFilter('activity', 'en-US')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      English
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.activity === 'vi-VN' }"
+                      @click="setLangFilter('activity', 'vi-VN')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      Vietnamese
+                    </button>
+                  </div>
+                </div>
+                <button 
+                  class="btn-refresh-section" 
+                  @click="refreshDiagramsByType('activity')"
+                  :disabled="refreshingDiagrams.activity"
+                  title="Refresh Activity Diagrams"
+                >
+                  <span 
+                    v-if="refreshingDiagrams.activity" 
+                    class="loading-spinner-small"
+                  ></span>
+                  <span 
+                    v-else 
+                    class="material-symbols-outlined"
+                  >refresh</span>
+                </button>
+                <button 
+                  class="btn-generate-section" 
+                  @click="generateSpecificDiagram('activity')"
+                  title="Generate Activity Diagram"
+                >
+                  <span class="material-symbols-outlined">auto_awesome</span>
+                  Generate
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="diagrams-scroll-container">
-            <div class="diagrams-scroll-content">
-              <div
-                v-for="diagram in filteredActivityDiagrams"
-                :key="diagram.id || diagram._id"
-                class="diagram-card"
-                @click="editDiagram(diagram)"
-              >
-                <div class="diagram-preview">
-                  <img
-                    v-if="diagram.previewImage"
-                    :src="diagram.previewImage"
-                    :alt="diagram.name || 'Activity Diagram'"
-                    class="preview-image"
-                    @load="onPreviewImageLoad"
-                    @error="onPreviewImageError(diagram, $event)"
-                  />
-                  <div v-else class="preview-generator">
-                    <ActivityDiagramRenderer
-                      :ref="`previewGenerator_${diagram.id || diagram._id}`"
-                      :diagram-data="diagram"
-                      :preview-mode="true"
-                      :auto-generate-preview="true"
-                      :optimize-for-preview="true"
-                      @preview-generated="handlePreviewGenerated(diagram, $event)"
-                      class="hidden-renderer"
+          <div class="diagrams-scroll-container-wrapper">
+            <!-- Scroll Arrow Left -->
+            <button 
+              v-if="scrollStates.activity.canScrollLeft"
+              class="scroll-arrow scroll-arrow-left" 
+              @click="scrollDiagrams('activity', 'left')"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            
+            <div class="diagrams-scroll-container" ref="activityScrollContainer">
+              <div class="diagrams-scroll-content" ref="activityScrollContent">
+
+                <div
+                  v-for="diagram in filteredActivityDiagrams"
+                  :key="diagram.id || diagram._id"
+                  class="diagram-card"
+                  @click="editDiagram(diagram)"
+                >
+                  <div class="diagram-preview">
+                    <img
+                      v-if="diagram.previewImage"
+                      :src="diagram.previewImage"
+                      :alt="diagram.name || 'Activity Diagram'"
+                      class="preview-image"
+                      @load="onPreviewImageLoad"
+                      @error="onPreviewImageError(diagram, $event)"
                     />
-                    <div class="generating-preview">
+                    <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
                       <span>Generating preview...</span>
                     </div>
-                  </div>
-
-                  <div class="diagram-overlay">
-                    <div class="export-dropdown">
-                      <button
-                        class="btn-icon export-toggle"
-                        @click.stop="toggleExportDropdown(diagram)"
-                        title="Export"
-                      >
-                        <span class="material-symbols-outlined">download</span>
-                      </button>
-                      <div
-                        v-if="activeExportDropdown === (diagram.id || diagram._id)"
-                        class="export-options"
-                      >
-                        <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
-                          <span class="material-symbols-outlined">image</span>
-                          Export PNG
-                        </button>
-                        <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
-                          <span class="material-symbols-outlined">code</span>
-                          Export SVG
-                        </button>
-                      </div>
+                    <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
+                    <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
+                      <ActivityDiagramRenderer
+                        :ref="`previewGenerator_${diagram.id || diagram._id}`"
+                        :diagram-data="diagram"
+                        :preview-mode="true"
+                        :auto-generate-preview="!diagram.previewImage"
+                        :optimize-for-preview="true"
+                        @preview-generated="handlePreviewGenerated(diagram, $event)"
+                        class="hidden-renderer"
+                      />
                     </div>
-                    <button
-                      class="btn-icon danger"
-                      @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                      title="Delete"
-                    >
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="diagram-info">
-                  <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
-                  <p class="diagram-description">
-                    {{ getSafeValue(diagram.description, 'No description') }}
-                  </p>
-                  <div class="diagram-meta">
-                    <span class="meta-item">
-                      <span class="material-symbols-outlined">language</span>
-                      {{ getLanguageCode(diagram.lang) }}
-                    </span>
-                    <span class="meta-item diagram-type-badge type-activity"> Activity </span>
-                  </div>
-                  <div class="diagram-stats">
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">play_arrow</span>
-                      {{ getSafeArrayLength(diagram.nodes) }}
-                    </span>
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">link</span>
-                      {{ getRelationshipCount(diagram) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Empty State for Activity Diagrams -->
-              <div v-if="filteredActivityDiagrams.length === 0" class="empty-section">
-                <div class="empty-icon">
-                  <span class="material-symbols-outlined">play_arrow</span>
+                    <div class="diagram-overlay">
+                      <div class="export-dropdown">
+                        <button
+                          class="btn-icon export-toggle"
+                          @click.stop="toggleExportDropdown(diagram)"
+                          title="Export"
+                        >
+                          <span class="material-symbols-outlined">download</span>
+                        </button>
+                        <div
+                          v-if="activeExportDropdown === (diagram.id || diagram._id)"
+                          class="export-options"
+                        >
+                          <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
+                            <span class="material-symbols-outlined">image</span>
+                            Export PNG
+                          </button>
+                          <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
+                            <span class="material-symbols-outlined">code</span>
+                            Export SVG
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        class="btn-icon danger"
+                        @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
+                        title="Delete"
+                      >
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="diagram-info">
+                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <p class="diagram-description">
+                      {{ getSafeValue(diagram.description, 'No description') }}
+                    </p>
+                    <div class="diagram-meta">
+                      <span class="meta-item">
+                        <span class="material-symbols-outlined">language</span>
+                        {{ getLanguageCode(diagram.lang) }}
+                      </span>
+                      <span class="meta-item diagram-type-badge type-activity"> Activity </span>
+                    </div>
+                    <div class="diagram-stats">
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                        {{ getSafeArrayLength(diagram.nodes) }}
+                      </span>
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">link</span>
+                        {{ getRelationshipCount(diagram) }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <h4>No Activity Diagrams</h4>
-                <p>Generate activity diagrams to visualize workflow processes.</p>
-                <button class="btn-primary small" @click="generateSpecificDiagram('activity')">
-                  <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate Activity
-                </button>
+
+                <!-- Empty State for Activity Diagrams -->
+                <div v-if="filteredActivityDiagrams.length === 0" class="empty-section">
+                  <div class="empty-icon">
+                    <span class="material-symbols-outlined">play_arrow</span>
+                  </div>
+                  <h4>No Activity Diagrams</h4>
+                  <p>Generate activity diagrams to visualize workflow processes.</p>
+                  <button class="btn-primary small" @click="generateSpecificDiagram('activity')">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    Generate Activity
+                  </button>
+                </div>
               </div>
             </div>
+            
+            <!-- Scroll Arrow Right -->
+            <button 
+              v-if="scrollStates.activity.canScrollRight"
+              class="scroll-arrow scroll-arrow-right" 
+              @click="scrollDiagrams('activity', 'right')"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
         </div>
 
@@ -355,123 +579,244 @@
                 />
               </div>
               <div class="filter-controls">
-                <select v-model="sortFilters.sequence" class="sort-select">
-                  <option value="name">Sort by Name</option>
-                  <option value="date">Sort by Date</option>
-                  <option value="lifelines">Sort by Lifelines</option>
-                </select>
-                <select v-model="languageFilters.sequence" class="lang-select">
-                  <option value="all">All Languages</option>
-                  <option value="en-US">English</option>
-                  <option value="vi-VN">Vietnamese</option>
-                </select>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleSortDropdown('sequence')"
+                    :title="getSortLabel(globalSortFilter)"
+                  >
+                    <span class="material-symbols-outlined">sort</span>
+                  </button>
+                  <div 
+                    v-if="activeSortDropdown === 'sequence'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'name' }"
+                      @click="setSortFilter('name')"
+                    >
+                      <span class="material-symbols-outlined">text_fields</span>
+                      Sort by Name
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'date' }"
+                      @click="setSortFilter('date')"
+                    >
+                      <span class="material-symbols-outlined">schedule</span>
+                      Sort by Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'created' }"
+                      @click="setSortFilter('created')"
+                    >
+                      <span class="material-symbols-outlined">calendar_today</span>
+                      Sort by Created Date
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: globalSortFilter === 'lifelines' }"
+                      @click="setSortFilter('lifelines')"
+                    >
+                      <span class="material-symbols-outlined">timeline</span>
+                      Sort by Lifelines
+                    </button>
+                  </div>
+                </div>
+                <div class="filter-dropdown">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleLangDropdown('sequence')"
+                    :title="getLangLabel(languageFilters.sequence)"
+                  >
+                    <span class="material-symbols-outlined">language</span>
+                  </button>
+                  <div 
+                    v-if="activeLangDropdown === 'sequence'" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.sequence === 'all' }"
+                      @click="setLangFilter('sequence', 'all')"
+                    >
+                      <span class="material-symbols-outlined">public</span>
+                      All Languages
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.sequence === 'en-US' }"
+                      @click="setLangFilter('sequence', 'en-US')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      English
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: languageFilters.sequence === 'vi-VN' }"
+                      @click="setLangFilter('sequence', 'vi-VN')"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      Vietnamese
+                    </button>
+                  </div>
+                </div>
+                <button 
+                  class="btn-refresh-section" 
+                  @click="refreshDiagramsByType('sequence')"
+                  :disabled="refreshingDiagrams.sequence"
+                  title="Refresh Sequence Diagrams"
+                >
+                  <span 
+                    v-if="refreshingDiagrams.sequence" 
+                    class="loading-spinner-small"
+                  ></span>
+                  <span 
+                    v-else 
+                    class="material-symbols-outlined"
+                  >refresh</span>
+                </button>
+                <button 
+                  class="btn-generate-section" 
+                  @click="generateSpecificDiagram('sequence')"
+                  title="Generate Sequence Diagram"
+                >
+                  <span class="material-symbols-outlined">auto_awesome</span>
+                  Generate
+                </button>
               </div>
             </div>
           </div>
 
-          <div class="diagrams-scroll-container">
-            <div class="diagrams-scroll-content">
-              <div
-                v-for="diagram in filteredSequenceDiagrams"
-                :key="diagram.id || diagram._id"
-                class="diagram-card"
-                @click="editDiagram(diagram)"
-              >
-                <div class="diagram-preview">
-                  <img
-                    v-if="diagram.previewImage"
-                    :src="diagram.previewImage"
-                    :alt="diagram.name || 'Sequence Diagram'"
-                    class="preview-image"
-                    @load="onPreviewImageLoad"
-                    @error="onPreviewImageError(diagram, $event)"
-                  />
-                  <div v-else class="preview-generator">
-                    <SequenceDiagramRenderer
-                      :ref="`previewGenerator_${diagram.id || diagram._id}`"
-                      :diagram-data="diagram"
-                      :preview-mode="true"
-                      :auto-generate-preview="true"
-                      :optimize-for-preview="true"
-                      @preview-generated="handlePreviewGenerated(diagram, $event)"
-                      class="hidden-renderer"
+          <div class="diagrams-scroll-container-wrapper">
+            <!-- Scroll Arrow Left -->
+            <button 
+              v-if="scrollStates.sequence.canScrollLeft"
+              class="scroll-arrow scroll-arrow-left" 
+              @click="scrollDiagrams('sequence', 'left')"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            
+            <div class="diagrams-scroll-container" ref="sequenceScrollContainer">
+              <div class="diagrams-scroll-content" ref="sequenceScrollContent">
+
+                <div
+                  v-for="diagram in filteredSequenceDiagrams"
+                  :key="diagram.id || diagram._id"
+                  class="diagram-card"
+                  @click="editDiagram(diagram)"
+                >
+                  <div class="diagram-preview">
+                    <img
+                      v-if="diagram.previewImage"
+                      :src="diagram.previewImage"
+                      :alt="diagram.name || 'Sequence Diagram'"
+                      class="preview-image"
+                      @load="onPreviewImageLoad"
+                      @error="onPreviewImageError(diagram, $event)"
                     />
-                    <div class="generating-preview">
+                    <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
                       <span>Generating preview...</span>
                     </div>
-                  </div>
-
-                  <div class="diagram-overlay">
-                    <div class="export-dropdown">
-                      <button
-                        class="btn-icon export-toggle"
-                        @click.stop="toggleExportDropdown(diagram)"
-                        title="Export"
-                      >
-                        <span class="material-symbols-outlined">download</span>
-                      </button>
-                      <div
-                        v-if="activeExportDropdown === (diagram.id || diagram._id)"
-                        class="export-options"
-                      >
-                        <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
-                          <span class="material-symbols-outlined">image</span>
-                          Export PNG
-                        </button>
-                        <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
-                          <span class="material-symbols-outlined">code</span>
-                          Export SVG
-                        </button>
-                      </div>
+                    <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
+                    <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
+                      <SequenceDiagramRenderer
+                        :ref="`previewGenerator_${diagram.id || diagram._id}`"
+                        :diagram-data="diagram"
+                        :preview-mode="true"
+                        :auto-generate-preview="!diagram.previewImage"
+                        :optimize-for-preview="true"
+                        @preview-generated="handlePreviewGenerated(diagram, $event)"
+                        class="hidden-renderer"
+                      />
                     </div>
-                    <button
-                      class="btn-icon danger"
-                      @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                      title="Delete"
-                    >
-                      <span class="material-symbols-outlined">delete</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="diagram-info">
-                  <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
-                  <p class="diagram-description">
-                    {{ getSafeValue(diagram.description, 'No description') }}
-                  </p>
-                  <div class="diagram-meta">
-                    <span class="meta-item">
-                      <span class="material-symbols-outlined">language</span>
-                      {{ getLanguageCode(diagram.lang) }}
-                    </span>
-                    <span class="meta-item diagram-type-badge type-sequence"> Sequence </span>
-                  </div>
-                  <div class="diagram-stats">
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">timeline</span>
-                      {{ getSafeArrayLength(diagram.lifelines) }}
-                    </span>
-                    <span class="stat-badge">
-                      <span class="material-symbols-outlined">link</span>
-                      {{ getRelationshipCount(diagram) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Empty State for Sequence Diagrams -->
-              <div v-if="filteredSequenceDiagrams.length === 0" class="empty-section">
-                <div class="empty-icon">
-                  <span class="material-symbols-outlined">timeline</span>
+                    <div class="diagram-overlay">
+                      <div class="export-dropdown">
+                        <button
+                          class="btn-icon export-toggle"
+                          @click.stop="toggleExportDropdown(diagram)"
+                          title="Export"
+                        >
+                          <span class="material-symbols-outlined">download</span>
+                        </button>
+                        <div
+                          v-if="activeExportDropdown === (diagram.id || diagram._id)"
+                          class="export-options"
+                        >
+                          <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
+                            <span class="material-symbols-outlined">image</span>
+                            Export PNG
+                          </button>
+                          <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
+                            <span class="material-symbols-outlined">code</span>
+                            Export SVG
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        class="btn-icon danger"
+                        @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
+                        title="Delete"
+                      >
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="diagram-info">
+                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <p class="diagram-description">
+                      {{ getSafeValue(diagram.description, 'No description') }}
+                    </p>
+                    <div class="diagram-meta">
+                      <span class="meta-item">
+                        <span class="material-symbols-outlined">language</span>
+                        {{ getLanguageCode(diagram.lang) }}
+                      </span>
+                      <span class="meta-item diagram-type-badge type-sequence"> Sequence </span>
+                    </div>
+                    <div class="diagram-stats">
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">timeline</span>
+                        {{ getSafeArrayLength(diagram.lifelines) }}
+                      </span>
+                      <span class="stat-badge">
+                        <span class="material-symbols-outlined">link</span>
+                        {{ getRelationshipCount(diagram) }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <h4>No Sequence Diagrams</h4>
-                <p>Generate sequence diagrams to visualize object interactions.</p>
-                <button class="btn-primary small" @click="generateSpecificDiagram('sequence')">
-                  <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate Sequence
-                </button>
+
+                <!-- Empty State for Sequence Diagrams -->
+                <div v-if="filteredSequenceDiagrams.length === 0" class="empty-section">
+                  <div class="empty-icon">
+                    <span class="material-symbols-outlined">timeline</span>
+                  </div>
+                  <h4>No Sequence Diagrams</h4>
+                  <p>Generate sequence diagrams to visualize object interactions.</p>
+                  <button class="btn-primary small" @click="generateSpecificDiagram('sequence')">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    Generate Sequence
+                  </button>
+                </div>
               </div>
             </div>
+            
+            <!-- Scroll Arrow Right -->
+            <button 
+              v-if="scrollStates.sequence.canScrollRight"
+              class="scroll-arrow scroll-arrow-right" 
+              @click="scrollDiagrams('sequence', 'right')"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
           </div>
         </div>
       </div>
@@ -488,22 +833,8 @@
 
           <div class="modal-body">
             <form @submit.prevent="generateDiagram">
-              <div class="form-group">
-                <label>Diagram Type</label>
-                <select v-model="generateForm.type" required>
-                  <option value="usecase">Use Case Diagram</option>
-                  <option value="activity">Activity Diagram</option>
-                  <option value="sequence">Sequence Diagram</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Language</label>
-                <select v-model="generateForm.lang" required>
-                  <option value="en-US">English</option>
-                  <option value="vi-VN">Vietnamese</option>
-                </select>
-              </div>
+              <!-- Diagram Type is now fixed based on which button was clicked -->
+              <!-- Language is automatically set from project settings -->
 
               <!-- Sequence Diagram Options -->
               <div class="form-group" v-if="generateForm.type === 'sequence'">
@@ -512,8 +843,8 @@
                   <option value="">Select Use Case</option>
                   <option
                     v-for="usecase in availableUsecases"
-                    :key="usecase.id"
-                    :value="usecase.id"
+                    :key="getUsecaseId(usecase)"
+                    :value="getUsecaseId(usecase)"
                   >
                     {{ usecase.name || usecase.title }}
                   </option>
@@ -542,8 +873,8 @@
                   <option value="">Select Use Case</option>
                   <option
                     v-for="usecase in availableUsecases"
-                    :key="usecase.id"
-                    :value="usecase.id"
+                    :key="getUsecaseId(usecase)"
+                    :value="getUsecaseId(usecase)"
                   >
                     {{ usecase.name || usecase.title }}
                   </option>
@@ -567,22 +898,21 @@
                 />
               </div>
 
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label>Description</label>
                 <textarea
                   v-model="generateForm.description"
                   rows="3"
                   placeholder="Enter diagram description"
                 ></textarea>
-              </div>
+              </div> -->
 
               <div class="modal-actions">
                 <button type="button" class="btn-secondary" @click="closeGenerateModal">
                   Cancel
                 </button>
-                <button type="submit" class="btn-primary" :disabled="generating || !canGenerate">
-                  <span v-if="generating" class="loading-spinner-small"></span>
-                  {{ generating ? 'Generating...' : `Generate ${getDiagramTypeName()}` }}
+                <button type="submit" class="btn-primary" :disabled="!canGenerate">
+                  {{ `Generate ${getDiagramTypeName()}` }}
                 </button>
               </div>
             </form>
@@ -613,9 +943,11 @@
                   :editable="true"
                   :show-labels="showElementLabels"
                   :zoom-level="zoomLevel"
+                  :project-language="project?.language || 'vi-VN'"
                   @element-selected="handleElementSelect"
                   @position-updated="handlePositionUpdate"
                   @element-dragged="handleElementDrag"
+                  @diagram-updated="handleDiagramUpdated"
                 />
               </div>
             </div>
@@ -623,6 +955,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Sharing Modal -->
+    <ProjectSharingModal
+      v-if="showSharingModal"
+      :project-id="project._id"
+      @close="showSharingModal = false"
+    />
   </div>
 </template>
 
@@ -631,28 +970,41 @@ import { getProjectDetail } from '@/api/project'
 import { usecaseApi } from '@/api/project'
 import {
   getUsecaseDiagrams,
+  getUsecaseDiagramById,
   generateUsecaseDiagram,
   deleteUsecaseDiagram,
   updateMultiplePositions,
 } from '@/api/ucd'
 import {
   getActivityDiagrams,
+  getActivityDiagramById,
   generateFromUsecase,
   generateFromActor,
   deleteActivityDiagram,
+  updateNodePosition,
+  updateMultipleNodePositions,
 } from '@/api/avd'
-import { getSequenceDiagrams, generateSequenceDiagram, deleteSequenceDiagram } from '@/api/sqd'
+
+import { getSequenceDiagrams, getSequenceDiagramById, generateSequenceDiagram, deleteSequenceDiagram } from '@/api/sqd'
 import { useToast } from 'vue-toastification'
-import ProjectHeader from '@/components/ProjectHeader.vue'
+import ProjectSharingModal from '@/components/ProjectSharingModal.vue'
 import UCDRenderer from '@/components/uml/usecase_diagram/UCDRenderer.vue'
 import ActivityDiagramRenderer from '@/components/uml/activity_diagram/ActivityDiagramRenderer.vue'
 import SequenceDiagramRenderer from '@/components/uml/sequence_diagram/SequenceDiagramRenderer.vue'
 import { useActiveMembers } from '@/utils/useActiveMembers'
+import {
+  saveSelectedVersion,
+  getSelectedOrDefaultVersion,
+  filterApprovedVersions,
+  isOwner as checkIsOwner,
+} from '@/utils/versionSync'
+import eventBus from '@/utils/eventBus'
+import { socket } from '@/utils/socket'
 
 export default {
   name: 'UmlManagement',
   components: {
-    ProjectHeader,
+    ProjectSharingModal,
     UCDRenderer,
     ActivityDiagramRenderer,
     SequenceDiagramRenderer,
@@ -676,8 +1028,8 @@ export default {
       sequenceDiagrams: [],
       loading: false,
       showGenerateModal: false,
+      showSharingModal: false,
       editingDiagram: null,
-      generating: false,
       generateForm: {
         type: 'usecase',
         lang: 'en-US',
@@ -698,6 +1050,8 @@ export default {
       previewCache: new Map(),
       generatingPreviews: new Set(),
       activeExportDropdown: null,
+      // Cache key prefix để tránh conflict giữa các projects/versions
+      cacheKeyPrefix: null,
       // Filter và search
       searchFilters: {
         usecase: '',
@@ -716,6 +1070,27 @@ export default {
       },
       toast: useToast(),
       saveTimeout: null,
+      // Track changed nodes for activity diagram (debounce save)
+      activityChangedNodes: null,
+      // Track if diagram has been modified
+      diagramHasChanges: false,
+      // Scroll handlers để cleanup
+      scrollHandlers: null,
+      // Scroll button states - track để reactive
+      scrollStates: {
+        usecase: { canScrollLeft: false, canScrollRight: false },
+        activity: { canScrollLeft: false, canScrollRight: false },
+        sequence: { canScrollLeft: false, canScrollRight: false },
+      },
+      // Dropdown states for sort and filter
+      activeSortDropdown: null,
+      activeLangDropdown: null,
+      // Track refreshing state for each diagram type
+      refreshingDiagrams: {
+        usecase: false,
+        activity: false,
+        sequence: false,
+      },
     }
   },
   computed: {
@@ -738,13 +1113,18 @@ export default {
       }
 
       // Sort
-      switch (this.sortFilters.usecase) {
+      switch (this.globalSortFilter) {
         case 'name':
           filtered = filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
           break
         case 'date':
           filtered = filtered.sort(
             (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+          )
+          break
+        case 'created':
+          filtered = filtered.sort(
+            (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
           )
           break
         case 'actors':
@@ -776,13 +1156,18 @@ export default {
       }
 
       // Sort
-      switch (this.sortFilters.activity) {
+      switch (this.globalSortFilter) {
         case 'name':
           filtered = filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
           break
         case 'date':
           filtered = filtered.sort(
             (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+          )
+          break
+        case 'created':
+          filtered = filtered.sort(
+            (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
           )
           break
         case 'nodes':
@@ -811,13 +1196,18 @@ export default {
       }
 
       // Sort
-      switch (this.sortFilters.sequence) {
+      switch (this.globalSortFilter) {
         case 'name':
           filtered = filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
           break
         case 'date':
           filtered = filtered.sort(
             (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+          )
+          break
+        case 'created':
+          filtered = filtered.sort(
+            (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
           )
           break
         case 'lifelines':
@@ -849,6 +1239,11 @@ export default {
     filteredUsecaseDiagrams: {
       handler(newDiagrams) {
         this.triggerPreviewGenerationForDiagrams(newDiagrams, 'usecase')
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.updateScrollButtons('usecase')
+          }, 150)
+        })
       },
       deep: true,
       immediate: false,
@@ -856,6 +1251,11 @@ export default {
     filteredActivityDiagrams: {
       handler(newDiagrams) {
         this.triggerPreviewGenerationForDiagrams(newDiagrams, 'activity')
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.updateScrollButtons('activity')
+          }, 150)
+        })
       },
       deep: true,
       immediate: false,
@@ -863,6 +1263,11 @@ export default {
     filteredSequenceDiagrams: {
       handler(newDiagrams) {
         this.triggerPreviewGenerationForDiagrams(newDiagrams, 'sequence')
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.updateScrollButtons('sequence')
+          }, 150)
+        })
       },
       deep: true,
       immediate: false,
@@ -875,16 +1280,48 @@ export default {
       await this.loadAvailableUsecases()
       await this.loadDiagrams()
       this.initSocketConnection(projectId)
+      this.initVersionSocketListeners(projectId)
     }
     document.addEventListener('click', this.handleClickOutside)
+
+    // Listen for version-approved event from PreviewModal
+    eventBus.on('version-approved', this.handleVersionApproved)
   },
   beforeUnmount() {
     if (this.project._id) {
       this.cleanupSocketConnection(this.project._id)
+      this.cleanupVersionSocketListeners()
     }
+
+    // Cleanup scroll event listeners
+    if (this.scrollHandlers) {
+      this.scrollHandlers.forEach(({ container, handler }) => {
+        container.removeEventListener('scroll', handler)
+      })
+      this.scrollHandlers.clear()
+    }
+
+    // Remove event listener
+    eventBus.off('version-approved', this.handleVersionApproved)
     document.removeEventListener('click', this.handleClickOutside)
   },
   methods: {
+    // Helper: Normalize ID (convert ObjectId to string)
+    normalizeId(id) {
+      if (!id) return null
+      if (typeof id === 'object' && id.$oid) {
+        return id.$oid
+      }
+      if (typeof id === 'object' && id.toString) {
+        return id.toString()
+      }
+      return String(id)
+    },
+    // Helper: Get usecase ID (support both _id and id for backward compatibility)
+    getUsecaseId(uc) {
+      if (!uc) return ''
+      return String(uc._id || uc.id || '')
+    },
     // Navigation
     navigateToUsecase() {
       this.$router.push({
@@ -905,9 +1342,20 @@ export default {
         const { data } = await getProjectDetail(projectId, userId)
         const result = data.data || data
         this.project = result.project || {}
-        this.versions = result.versions || []
-        if (this.versions.length > 0) {
-          this.selectedVersionId = this.versions[0]._id
+        // Lọc bỏ version tạm thời, chỉ giữ version đã được approve
+        const allVersions = result.versions || []
+        this.versions = filterApprovedVersions(allVersions)
+
+        // Sử dụng version sync utility
+        const currentVersionId = result.current_version?._id
+        this.selectedVersionId = getSelectedOrDefaultVersion(
+          projectId,
+          this.versions,
+          currentVersionId
+        )
+
+        if (this.selectedVersionId) {
+          saveSelectedVersion(projectId, this.selectedVersionId)
         }
       } catch (err) {
         console.error('Error fetching project details:', err)
@@ -1036,7 +1484,7 @@ export default {
     // Diagram actions
     generateNewDiagram() {
       this.generateForm.type = 'usecase'
-      this.generateForm.lang = 'en-US'
+      this.generateForm.lang = this.project?.language || 'vi-VN'
       this.generateForm.description = ''
       this.generateForm.usecaseId = ''
       this.generateForm.sourceType = 'usecase'
@@ -1047,7 +1495,7 @@ export default {
     },
     generateSpecificDiagram(type) {
       this.generateForm.type = type
-      this.generateForm.lang = 'en-US'
+      this.generateForm.lang = this.project?.language || 'vi-VN'
       this.generateForm.description = ''
       this.generateForm.usecaseId = ''
       this.generateForm.sourceType = 'usecase'
@@ -1064,6 +1512,8 @@ export default {
         return
       }
 
+      // Set type cố định và mở modal
+      this.generateForm.type = type
       this.showGenerateModal = true
     },
     closeGenerateModal() {
@@ -1082,24 +1532,34 @@ export default {
         return
       }
 
-      this.generating = true
+      // Lưu type và các giá trị cần thiết trước khi reset form
+      const diagramType = this.generateForm.type
+      const usecaseId = this.generateForm.usecaseId
+      const requirementId = this.generateForm.requirementId
+      const actor = this.generateForm.actor
+      const sourceType = this.generateForm.sourceType
+      const language = this.project?.language || this.generateForm.lang || 'vi-VN'
+
+      // Close modal immediately - loading will be shown in ProjectLayout
+      this.showGenerateModal = false // Chỉ đóng modal, không reset form
+      
       try {
         let newDiagram
 
-        switch (this.generateForm.type) {
+        switch (diagramType) {
           case 'activity':
-            if (this.generateForm.sourceType === 'usecase') {
+            if (sourceType === 'usecase') {
               const { data } = await generateFromUsecase(
                 this.selectedVersionId,
-                this.generateForm.requirementId,
-                this.generateForm.lang
+                requirementId,
+                language
               )
               newDiagram = data?.data || data
             } else {
               const { data } = await generateFromActor(
                 this.selectedVersionId,
-                this.generateForm.actor,
-                this.generateForm.lang
+                actor,
+                language
               )
               newDiagram = data?.data || data
             }
@@ -1107,8 +1567,8 @@ export default {
           case 'sequence':
             const { data: sequenceData } = await generateSequenceDiagram(
               this.selectedVersionId,
-              this.generateForm.usecaseId,
-              this.generateForm.lang
+              usecaseId,
+              language
             )
             newDiagram = sequenceData?.data || sequenceData
             break
@@ -1116,50 +1576,66 @@ export default {
           default:
             const { data: usecaseData } = await generateUsecaseDiagram(
               this.selectedVersionId,
-              this.generateForm.lang
+              language
             )
             newDiagram = usecaseData?.data || usecaseData
             break
         }
 
         if (newDiagram) {
-          // Add to appropriate array
-          newDiagram._type = this.generateForm.type
-          switch (this.generateForm.type) {
-            case 'activity':
-              this.activityDiagrams.unshift(newDiagram)
-              break
-            case 'sequence':
-              this.sequenceDiagrams.unshift(newDiagram)
-              break
-            case 'usecase':
-            default:
-              this.usecaseDiagrams.unshift(newDiagram)
-              break
+          // Lấy tên diagram type trước khi reset form
+          const diagramTypeNames = {
+            usecase: 'Use Case Diagram',
+            activity: 'Activity Diagram',
+            sequence: 'Sequence Diagram',
           }
+          const diagramTypeName = diagramTypeNames[diagramType] || 'Diagram'
+          
+          // Không gọi closeGenerateModal() ở đây vì sẽ reset form
+          // Chỉ đóng modal
+          this.showGenerateModal = false
+          
+          this.toast.success(`${diagramTypeName} generated successfully!`)
 
-          this.closeGenerateModal()
-          this.toast.success(`${this.getDiagramTypeName()} generated successfully!`)
+          // Refresh diagrams from server to ensure data consistency
+          await this.loadDiagrams()
 
-          setTimeout(() => {
-            this.triggerPreviewGeneration(newDiagram)
-          }, 1000)
+          // Find the newly created diagram and open editor
+          const diagramId = newDiagram._id || newDiagram.id
+          const diagrams = this.getDiagramsByType(diagramType)
+          const createdDiagram = diagrams.find((d) => (d._id || d.id) === diagramId)
 
-          setTimeout(() => {
-            this.editDiagram(newDiagram)
-          }, 500)
+          if (createdDiagram) {
+            setTimeout(() => {
+              this.triggerPreviewGeneration(createdDiagram)
+            }, 1000)
+
+            setTimeout(() => {
+              this.editDiagram(createdDiagram)
+            }, 500)
+          }
         } else {
           throw new Error('No diagram data returned')
         }
       } catch (err) {
         console.error('Error generating diagram:', err)
+        
+        // Lấy tên diagram type trước khi reset form
+        const diagramTypeNames = {
+          usecase: 'Use Case Diagram',
+          activity: 'Activity Diagram',
+          sequence: 'Sequence Diagram',
+        }
+        const diagramTypeName = diagramTypeNames[diagramType] || 'Diagram'
+        
         this.toast.error(
-          `Failed to generate ${this.getDiagramTypeName()}: ${
+          `Failed to generate ${diagramTypeName}: ${
             err.response?.data?.message || err.message
           }`
         )
       } finally {
-        this.generating = false
+        // Reset form sau khi hoàn thành (thành công hoặc lỗi)
+        this.resetGenerateForm()
       }
     },
     openManualEditor() {
@@ -1169,29 +1645,111 @@ export default {
       this.editingDiagram = { ...diagram }
       this.selectedElement = null
       this.zoomLevel = 1
+      // Reset activity changed nodes khi mở editor mới
+      this.activityChangedNodes = null
+      // Reset flag thay đổi
+      this.diagramHasChanges = false
     },
-    closeEditor() {
+    async closeEditor() {
       const editedDiagramId = this.editingDiagram
         ? this.editingDiagram.id || this.editingDiagram._id
         : null
       const diagramType = this.editingDiagram?._type
+      const hasChanges = this.diagramHasChanges
+
+      // Clear save timeout nếu có
+      if (this.saveTimeout) {
+        clearTimeout(this.saveTimeout)
+        this.saveTimeout = null
+      }
+
+      // Clear activity changed nodes
+      this.activityChangedNodes = null
+
+      // Reset flag thay đổi
+      this.diagramHasChanges = false
 
       this.editingDiagram = null
       this.selectedElement = null
 
-      if (editedDiagramId && diagramType) {
-        const diagrams = this.getDiagramsByType(diagramType)
-        const diagram = diagrams.find((d) => (d.id || d._id) === editedDiagramId)
-        if (diagram) {
-          console.log('🔄 Regenerating preview for edited diagram:', editedDiagramId)
-          this.regeneratePreview(diagram)
-          this.previewCache.delete(editedDiagramId)
+      // Chỉ refresh và regenerate preview nếu có thay đổi
+      if (hasChanges && editedDiagramId && diagramType) {
+        try {
+          // Refresh diagram từ API để lấy data mới nhất (name, description, nodes, etc.)
+          await this.refreshSingleDiagram(diagramType, editedDiagramId)
+          
+          // Đợi Vue reactivity cập nhật
+          await this.$nextTick()
+          
+          // Tìm lại diagram sau khi refresh để đảm bảo có data mới nhất
+          const diagrams = this.getDiagramsByType(diagramType)
+          const diagram = diagrams.find((d) => {
+            const dId = this.normalizeId(d.id || d._id)
+            const targetId = this.normalizeId(editedDiagramId)
+            return dId === targetId
+          })
+          
+          if (diagram) {
+            console.log('🔄 Regenerating preview for edited diagram:', editedDiagramId, {
+              name: diagram.name,
+              description: diagram.description,
+              hasNodes: !!diagram.nodes?.length,
+              nodesCount: diagram.nodes?.length || 0
+            })
+            
+            // Xóa preview cache và preview image để force regenerate với data mới
+            const normalizedId = this.normalizeId(editedDiagramId)
+            this.previewCache.delete(normalizedId)
+            delete diagram.previewImage
+            
+            // Force Vue reactivity update
+            this.$forceUpdate()
+            
+            // Đợi Vue cập nhật DOM và props của renderer component
+            await this.$nextTick()
+            await new Promise(resolve => setTimeout(resolve, 100))
+            
+            // Đảm bảo diagram object có đầy đủ data trước khi regenerate
+            const updatedDiagram = this.getDiagramsByType(diagramType).find((d) => {
+              const dId = this.normalizeId(d.id || d._id)
+              return dId === normalizedId
+            })
+            
+            if (updatedDiagram && updatedDiagram.name) {
+              // Regenerate preview với data mới
+              this.regeneratePreview(updatedDiagram)
+            } else {
+              console.warn('⚠️ Diagram data not ready, retrying...', updatedDiagram)
+              // Retry sau 200ms
+              setTimeout(() => {
+                const retryDiagram = this.getDiagramsByType(diagramType).find((d) => {
+                  const dId = this.normalizeId(d.id || d._id)
+                  return dId === normalizedId
+                })
+                if (retryDiagram) {
+                  this.regeneratePreview(retryDiagram)
+                }
+              }, 200)
+            }
+          } else {
+            console.warn('⚠️ Diagram not found after refresh:', editedDiagramId)
+          }
+        } catch (error) {
+          console.error('Error refreshing diagram on close:', error)
+          // Fallback: vẫn regenerate preview với data hiện tại
+          const diagrams = this.getDiagramsByType(diagramType)
+          const diagram = diagrams.find((d) => {
+            const dId = this.normalizeId(d.id || d._id)
+            const targetId = this.normalizeId(editedDiagramId)
+            return dId === targetId
+          })
+          if (diagram) {
+            this.previewCache.delete(editedDiagramId)
+            delete diagram.previewImage
+            this.regeneratePreview(diagram)
+          }
         }
       }
-
-      this.loadDiagrams().then(() => {
-        console.log('🔄 Diagrams reloaded after closing editor')
-      })
     },
     getDiagramsByType(type) {
       switch (type) {
@@ -1249,6 +1807,7 @@ export default {
             break
         }
 
+        // Xóa cache trong memory
         this.previewCache.delete(diagramId)
         this.generatingPreviews.delete(diagramId)
 
@@ -1262,9 +1821,7 @@ export default {
         this.toast.success(`Diagram deleted successfully`)
       } catch (err) {
         console.error('Error deleting diagram:', err)
-        this.toast.error(
-          (err.response?.data?.message || err.message)
-        )
+        this.toast.error(err.response?.data?.message || err.message)
       } finally {
         if (deleteButton) {
           deleteButton.innerHTML = originalHTML
@@ -1325,34 +1882,70 @@ export default {
       try {
         const diagramId = diagram.id || diagram._id
         const rendererRef = `previewGenerator_${diagramId}`
-        if (this.$refs[rendererRef] && this.$refs[rendererRef][0]) {
-          const renderer = this.$refs[rendererRef][0]
-          if (renderer.exportAsPNG) {
-            await renderer.exportAsPNG()
-            this.toast.success('Diagram exported as PNG successfully!')
+        
+        // Đợi renderer được mount nếu chưa có
+        await this.$nextTick()
+        
+        // Tìm renderer trong $refs (có thể là array hoặc object)
+        let renderer = null
+        if (this.$refs[rendererRef]) {
+          if (Array.isArray(this.$refs[rendererRef])) {
+            renderer = this.$refs[rendererRef][0]
+          } else {
+            renderer = this.$refs[rendererRef]
           }
+        }
+        
+        if (renderer && typeof renderer.exportAsPNG === 'function') {
+          await renderer.exportAsPNG()
+          this.toast.success('Diagram exported as PNG successfully!')
+        } else {
+          console.error('Renderer not found or exportAsPNG method not available', {
+            rendererRef,
+            hasRef: !!this.$refs[rendererRef],
+            renderer,
+          })
+          this.toast.error('Export function not available. Please try again.')
         }
         this.closeExportDropdown()
       } catch (err) {
         console.error('Error exporting PNG:', err)
-        this.toast.error('Failed to export PNG')
+        this.toast.error('Failed to export PNG: ' + (err.message || 'Unknown error'))
       }
     },
     async exportDiagramAsSVG(diagram) {
       try {
         const diagramId = diagram.id || diagram._id
         const rendererRef = `previewGenerator_${diagramId}`
-        if (this.$refs[rendererRef] && this.$refs[rendererRef][0]) {
-          const renderer = this.$refs[rendererRef][0]
-          if (renderer.exportAsSVG) {
-            renderer.exportAsSVG()
-            this.toast.success('Diagram exported as SVG successfully!')
+        
+        // Đợi renderer được mount nếu chưa có
+        await this.$nextTick()
+        
+        // Tìm renderer trong $refs (có thể là array hoặc object)
+        let renderer = null
+        if (this.$refs[rendererRef]) {
+          if (Array.isArray(this.$refs[rendererRef])) {
+            renderer = this.$refs[rendererRef][0]
+          } else {
+            renderer = this.$refs[rendererRef]
           }
+        }
+        
+        if (renderer && typeof renderer.exportAsSVG === 'function') {
+          renderer.exportAsSVG()
+          this.toast.success('Diagram exported as SVG successfully!')
+        } else {
+          console.error('Renderer not found or exportAsSVG method not available', {
+            rendererRef,
+            hasRef: !!this.$refs[rendererRef],
+            renderer,
+          })
+          this.toast.error('Export function not available. Please try again.')
         }
         this.closeExportDropdown()
       } catch (err) {
         console.error('Error exporting SVG:', err)
-        this.toast.error('Failed to export SVG')
+        this.toast.error('Failed to export SVG: ' + (err.message || 'Unknown error'))
       }
     },
     // Helper methods
@@ -1372,13 +1965,13 @@ export default {
       return codes[lang] || 'EN'
     },
     formatDate(dateString) {
-      if (!dateString) return 'N/A'
+      if (!dateString) return 'Not available'
       return new Date(dateString).toLocaleDateString()
     },
     resetGenerateForm() {
       this.generateForm = {
         type: 'usecase',
-        lang: 'en-US',
+        lang: this.project?.language || 'vi-VN',
         description: '',
         usecaseId: '',
         sourceType: 'usecase',
@@ -1387,9 +1980,97 @@ export default {
       }
     },
     handleVersionSelect(versionId) {
+      // Chỉ Owner mới được phép select version
+      if (!checkIsOwner(this.project)) {
+        this.toast.warning('Only project owner can switch versions')
+        return
+      }
+
+      const oldVersionId = this.selectedVersionId
       this.selectedVersionId = versionId
+
+      // Emit socket event để các thành viên khác biết version đã được switch
+      if (socket && socket.connected) {
+        socket.emit('version_event', {
+          type: 'VERSION_SWITCHED',
+          projectId: this.project._id,
+          toVersionId: versionId,
+          fromVersionId: oldVersionId,
+          timestamp: new Date(),
+        })
+        console.log('📡 Emitted VERSION_SWITCHED socket event')
+      }
+
       this.loadAvailableUsecases()
       this.loadDiagrams()
+    },
+
+    /**
+     * Xử lý khi version được approve thành công từ PreviewModal
+     */
+    async handleVersionApproved(event) {
+      // Chỉ xử lý nếu là project hiện tại
+      if (!event || event.projectId !== this.project._id) {
+        return
+      }
+
+      console.log('✅ Version approved event received:', event)
+
+      const { versionId, version, newVersion } = event
+
+      if (!versionId) {
+        console.warn('⚠️ Invalid version-approved event: missing versionId', event)
+        return
+      }
+
+      try {
+        // Đợi một chút để backend cập nhật xong
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        // Refresh project data để lấy version mới
+        await this.fetchProjectData(this.project._id)
+
+        // Đảm bảo version mới có trong danh sách (thêm vào nếu chưa có)
+        let newVersionObj = this.versions.find((v) => v._id === versionId)
+
+        if (!newVersionObj) {
+          // Nếu chưa có trong danh sách, thử fetch lại một lần nữa
+          console.log('🔄 Version not found, fetching project data again...')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await this.fetchProjectData(this.project._id)
+          newVersionObj = this.versions.find((v) => v._id === versionId)
+        }
+
+        // Nếu vẫn chưa có và có version object từ event, thêm vào
+        if (!newVersionObj && version) {
+          // Chỉ thêm nếu version đã được approve (version_temporary = false)
+          if (version.version_temporary === false || version.version_temporary === undefined) {
+            this.versions.push(version)
+            newVersionObj = version
+            console.log('✅ Added new approved version to list:', versionId)
+          }
+        }
+
+        // Force set selectedVersionId ngay cả khi chưa có trong danh sách
+        // Vì version đã được approve rồi, nên chắc chắn sẽ có
+        this.selectedVersionId = versionId
+
+        // Lưu vào localStorage để đồng bộ với các trang khác
+        saveSelectedVersion(this.project._id, versionId)
+
+        // Load cache cho version mới và refresh diagrams
+        this.loadPreviewCache()
+        await this.loadAvailableUsecases()
+        await this.loadDiagrams()
+
+        // Thông báo cho user
+        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+
+        this.$forceUpdate()
+      } catch (error) {
+        console.error('❌ Error handling version-approved event:', error)
+        this.toast.error('Failed to switch to approved version')
+      }
     },
     goBack() {
       this.$router.push('/dashboard')
@@ -1399,11 +2080,77 @@ export default {
       await this.loadDiagrams()
       this.toast.success('Diagrams refreshed')
     },
-    // Preview Image Management
+    async refreshDiagramsByType(type) {
+      if (!this.selectedVersionId) {
+        this.toast.error('Please select a version first')
+        return
+      }
+
+      // Set refreshing state
+      this.refreshingDiagrams[type] = true
+
+      try {
+        await this.loadAvailableUsecases()
+        
+        // Load only the specific diagram type
+        switch (type) {
+          case 'usecase':
+            const usecaseResponse = await getUsecaseDiagrams(this.selectedVersionId).catch(() => ({ data: { data: [] } }))
+            this.usecaseDiagrams = this.processDiagrams(usecaseResponse.data?.data || [], 'usecase')
+            break
+          case 'activity':
+            const activityResponse = await getActivityDiagrams(this.selectedVersionId).catch(() => ({ data: { data: [] } }))
+            this.activityDiagrams = this.processDiagrams(activityResponse.data?.data || [], 'activity')
+            break
+          case 'sequence':
+            const sequenceResponse = await getSequenceDiagrams(this.selectedVersionId).catch(() => ({ data: { data: [] } }))
+            this.sequenceDiagrams = this.processDiagrams(sequenceResponse.data?.data || [], 'sequence')
+            break
+        }
+
+        // Trigger preview generation for refreshed diagrams
+        this.$nextTick(() => {
+          setTimeout(() => {
+            const diagrams = this.getDiagramsByType(type)
+            this.triggerPreviewGenerationForDiagrams(diagrams, type)
+          }, 300)
+        })
+
+        const typeNames = {
+          usecase: 'Use Case',
+          activity: 'Activity',
+          sequence: 'Sequence',
+        }
+        this.toast.success(`${typeNames[type]} diagrams refreshed`)
+      } catch (err) {
+        console.error(`Error refreshing ${type} diagrams:`, err)
+        this.toast.error(`Failed to refresh ${type} diagrams`)
+      } finally {
+        this.refreshingDiagrams[type] = false
+      }
+    },
+    // Preview Image Management - removed getCacheKey as we no longer use localStorage
+
+    loadPreviewCache() {
+      // Removed localStorage cache loading
+    },
+
+    savePreviewToCache(diagramId, previewData) {
+      // Removed localStorage cache saving - only keep in-memory cache
+      this.previewCache.set(diagramId, previewData)
+    },
+
+    cleanupOldCache() {
+      // Removed localStorage cache cleanup
+    },
+
     handlePreviewGenerated(diagram, previewData) {
       if (previewData) {
         const diagramId = diagram.id || diagram._id
         this.previewCache.set(diagramId, previewData)
+        // Save to persistent cache
+        this.savePreviewToCache(diagramId, previewData)
+        
         const diagrams = this.getDiagramsByType(diagram._type)
         const diagramIndex = diagrams.findIndex((d) => (d.id || d._id) === diagramId)
         if (diagramIndex !== -1) {
@@ -1414,6 +2161,71 @@ export default {
     onPreviewImageLoad(event) {
       event.target.style.opacity = '1'
     },
+    // Socket methods for version events
+    initVersionSocketListeners(projectId) {
+      if (!socket) return
+      if (socket.connected) {
+        socket.emit('join_project', projectId)
+      }
+      socket.on('version_event', this.handleVersionEvent)
+      console.log('✅ Version socket listeners initialized for UmlManagement')
+    },
+
+    cleanupVersionSocketListeners() {
+      if (socket) {
+        socket.off('version_event', this.handleVersionEvent)
+      }
+    },
+
+    handleVersionEvent(event) {
+      const currentUserId = localStorage.getItem('userId')
+      if (event.userId === currentUserId) return
+
+      switch (event.type) {
+        case 'VERSION_SWITCHED':
+          this.handleRemoteVersionSwitched(event)
+          break
+        case 'VERSION_CREATED':
+          this.handleRemoteVersionCreated(event)
+          break
+      }
+    },
+
+    async handleRemoteVersionSwitched(event) {
+      if (event.projectId !== this.project._id) return
+      this.selectedVersionId = event.toVersionId
+      saveSelectedVersion(this.project._id, event.toVersionId)
+      // Load cache cho version mới
+      this.loadPreviewCache()
+      await this.loadAvailableUsecases()
+      await this.loadDiagrams()
+      const version = this.versions.find((v) => v._id === event.toVersionId)
+      if (version) {
+        this.toast.info(`Version switched to: ${version.version_number || event.toVersionId}`)
+      }
+    },
+
+    async handleRemoteVersionCreated(event) {
+      if (event.projectId !== this.project._id) return
+      await this.fetchProjectData(this.project._id)
+      if (
+        event.version &&
+        (event.version.version_temporary === false || event.version.version_temporary === undefined)
+      ) {
+        const exists = this.versions.find((v) => v._id === event.version._id)
+        if (!exists) {
+          this.versions.push(event.version)
+        }
+        this.selectedVersionId = event.version._id
+        saveSelectedVersion(this.project._id, event.version._id)
+        // Load cache cho version mới
+        this.loadPreviewCache()
+        await this.loadAvailableUsecases()
+        await this.loadDiagrams()
+        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+      }
+    },
+
     onPreviewImageError(diagram, event) {
       const diagramId = diagram.id || diagram._id
       event.target.style.display = 'none'
@@ -1423,15 +2235,71 @@ export default {
     },
     async regeneratePreview(diagram) {
       const diagramId = diagram.id || diagram._id
-      if (this.generatingPreviews.has(diagramId)) return
+      const normalizedId = this.normalizeId(diagramId)
+      
+      if (this.generatingPreviews.has(normalizedId)) return
 
-      this.previewCache.delete(diagramId)
+      // Xóa cache trong memory
+      this.previewCache.delete(normalizedId)
+      
+      // Tìm lại diagram từ list để đảm bảo có data mới nhất
       const diagrams = this.getDiagramsByType(diagram._type)
-      const diagramIndex = diagrams.findIndex((d) => (d.id || d._id) === diagramId)
+      const diagramIndex = diagrams.findIndex((d) => {
+        const dId = this.normalizeId(d.id || d._id)
+        return dId === normalizedId
+      })
+      
       if (diagramIndex !== -1) {
-        delete diagrams[diagramIndex].previewImage
+        // Cập nhật diagram object với data mới nhất từ list
+        const latestDiagram = diagrams[diagramIndex]
+        delete latestDiagram.previewImage
+        
+        // Đảm bảo diagram có đầy đủ data (name, description, nodes, etc.)
+        if (!latestDiagram.name && diagram.name) {
+          latestDiagram.name = diagram.name
+        }
+        if (!latestDiagram.description && diagram.description) {
+          latestDiagram.description = diagram.description
+        }
+        if (!latestDiagram.nodes && diagram.nodes) {
+          latestDiagram.nodes = diagram.nodes
+        }
+        if (!latestDiagram.edges && diagram.edges) {
+          latestDiagram.edges = diagram.edges
+        }
+        if (!latestDiagram.lanes && diagram.lanes) {
+          latestDiagram.lanes = diagram.lanes
+        }
+        
+        // Sử dụng latestDiagram thay vì diagram parameter
+        diagram = latestDiagram
+      } else {
+        // Nếu không tìm thấy, xóa preview image của diagram hiện tại
+        delete diagram.previewImage
       }
-      this.triggerPreviewGeneration(diagram)
+
+      // Đợi Vue cập nhật props của renderer component
+      await this.$nextTick()
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      // Gọi regeneratePreview trên renderer nếu có, nếu không thì gọi triggerPreviewGeneration
+      const rendererRef = `previewGenerator_${normalizedId}`
+      if (this.$refs[rendererRef] && this.$refs[rendererRef][0]) {
+        const renderer = this.$refs[rendererRef][0]
+        if (typeof renderer.regeneratePreview === 'function') {
+          // Gọi regeneratePreview trên renderer (tương tự sequence diagram)
+          renderer.regeneratePreview()
+        } else if (typeof renderer.generatePreviewImage === 'function') {
+          // Fallback: gọi generatePreviewImage nếu không có regeneratePreview
+          const previewData = await renderer.generatePreviewImage()
+          if (previewData) {
+            this.handlePreviewGenerated(diagram, previewData)
+          }
+        }
+      } else {
+        // Nếu renderer chưa được mount, trigger preview generation
+        this.triggerPreviewGeneration(diagram)
+      }
     },
     // Export dropdown methods
     toggleExportDropdown(diagram) {
@@ -1445,6 +2313,47 @@ export default {
       if (!event.target.closest('.export-dropdown')) {
         this.closeExportDropdown()
       }
+      if (!event.target.closest('.filter-dropdown')) {
+        this.activeSortDropdown = null
+        this.activeLangDropdown = null
+      }
+    },
+    // Sort and filter dropdown methods
+    toggleSortDropdown(type) {
+      this.activeSortDropdown = this.activeSortDropdown === type ? null : type
+      this.activeLangDropdown = null
+    },
+    toggleLangDropdown(type) {
+      this.activeLangDropdown = this.activeLangDropdown === type ? null : type
+      this.activeSortDropdown = null
+    },
+    setSortFilter(value) {
+      this.globalSortFilter = value
+      this.activeSortDropdown = null
+    },
+    setLangFilter(type, value) {
+      this.languageFilters[type] = value
+      this.activeLangDropdown = null
+    },
+    getSortLabel(value) {
+      const labels = {
+        name: 'Sort by Name',
+        date: 'Sort by Date',
+        created: 'Sort by Created Date',
+        actors: 'Sort by Actors',
+        usecases: 'Sort by Use Cases',
+        nodes: 'Sort by Nodes',
+        lifelines: 'Sort by Lifelines',
+      }
+      return labels[value] || 'Sort'
+    },
+    getLangLabel(value) {
+      const labels = {
+        all: 'All Languages',
+        'en-US': 'English',
+        'vi-VN': 'Vietnamese',
+      }
+      return labels[value] || 'Language'
     },
     // Editor Methods
     handleElementSelect(event) {
@@ -1459,6 +2368,9 @@ export default {
     handlePositionUpdate({ element, type, position }) {
       if (!this.editingDiagram) return
 
+      // Đánh dấu diagram có thay đổi
+      this.diagramHasChanges = true
+
       const diagramType = this.editingDiagram._type
 
       switch (diagramType) {
@@ -1467,6 +2379,24 @@ export default {
           break
         case 'activity':
           this.handleActivityPositionUpdate({ element, type, position })
+          // Lưu thông tin node đã thay đổi để debounce save
+          if (type === 'node') {
+            // Normalize ID để đảm bảo consistency
+            const nodeId = this.normalizeId(element._originalData?._id || element._originalData?.id || element.id)
+            if (nodeId) {
+              // Lưu node đã thay đổi vào map để debounce save
+              if (!this.activityChangedNodes) {
+                this.activityChangedNodes = new Map()
+              }
+              this.activityChangedNodes.set(nodeId, {
+                id: nodeId,
+                position: {
+                  x: Math.round(position.x),
+                  y: Math.round(position.y),
+                },
+              })
+            }
+          }
           break
         case 'sequence':
           this.handleSequencePositionUpdate({ element, type, position })
@@ -1560,37 +2490,474 @@ export default {
       await updateMultiplePositions(diagramId, updates)
     },
 
-    // Placeholder cho các loại diagram khác (cần implement sau)
+    // Activity diagram position update handler
     handleActivityPositionUpdate({ element, type, position }) {
-      // TODO: Implement for activity diagrams
-      console.log('Activity diagram position update:', { element, type, position })
+      if (type === 'node') {
+        // Normalize IDs để so sánh (giống sequence diagram)
+        const elementId = this.normalizeId(element._originalData?._id || element._originalData?.id || element.id)
+        const nodeIndex = this.editingDiagram.nodes.findIndex(
+          (n) => {
+            const nodeId = this.normalizeId(n._id || n.id)
+            return nodeId === elementId
+          }
+        )
+        if (nodeIndex !== -1) {
+          if (!this.editingDiagram.nodes[nodeIndex].position) {
+            this.editingDiagram.nodes[nodeIndex].position = { x: 0, y: 0 }
+          }
+          this.editingDiagram.nodes[nodeIndex].position.x = Math.round(position.x)
+          this.editingDiagram.nodes[nodeIndex].position.y = Math.round(position.y)
+        } else {
+          console.warn('⚠️ Node not found in editingDiagram:', {
+            elementId,
+            element: element._originalData,
+            availableNodes: this.editingDiagram.nodes.map((n, idx) => ({
+              index: idx,
+              _id: n._id,
+              id: n.id,
+              normalized: this.normalizeId(n._id || n.id),
+              type: n.type,
+              label: n.label
+            }))
+          })
+        }
+      }
     },
 
     handleSequencePositionUpdate({ element, type, position }) {
-      // TODO: Implement for sequence diagrams
-      console.log('Sequence diagram position update:', { element, type, position })
+      if (!this.editingDiagram) return
+
+      if (type === 'lifeline') {
+        // Normalize IDs để so sánh
+        const elementId = this.normalizeId(element._originalData?._id || element._originalData?.id || element.id)
+        const lifelineIndex = this.editingDiagram.lifelines.findIndex(
+          (ll) => {
+            const llId = this.normalizeId(ll._id || ll.id)
+            return llId === elementId
+          }
+        )
+        if (lifelineIndex !== -1) {
+          // Vue 3 không cần $set, chỉ cần assign trực tiếp
+          if (!this.editingDiagram.lifelines[lifelineIndex].position) {
+            this.editingDiagram.lifelines[lifelineIndex].position = { x: 0, y: 0 }
+          }
+          this.editingDiagram.lifelines[lifelineIndex].position = {
+            x: Math.round(position.x),
+            y: Math.round(position.y)
+          }
+        } else {
+          console.warn('⚠️ Lifeline not found in editingDiagram:', {
+            elementId,
+            element: element._originalData,
+            availableLifelines: this.editingDiagram.lifelines.map((ll, idx) => ({
+              index: idx,
+              _id: ll._id,
+              id: ll.id,
+              normalized: this.normalizeId(ll._id || ll.id),
+              name: ll.name
+            }))
+          })
+        }
+      } else if (type === 'message') {
+        const elementId = this.normalizeId(element._originalData?._id || element._originalData?.id || element.id)
+        const messageIndex = this.editingDiagram.messages.findIndex(
+          (msg) => {
+            const msgId = this.normalizeId(msg._id || msg.id)
+            return msgId === elementId
+          }
+        )
+        if (messageIndex !== -1) {
+          if (!this.editingDiagram.messages[messageIndex].position) {
+            this.editingDiagram.messages[messageIndex].position = {}
+          }
+          this.editingDiagram.messages[messageIndex].position.y = Math.round(position.y)
+        }
+      }
     },
 
     async saveActivityPositions(diagramId) {
-      // TODO: Implement for activity diagrams
-      console.log('Saving activity diagram positions:', diagramId)
+      // ✅ Tối ưu: Batch update tất cả nodes đã thay đổi trong một request
+      if (!this.activityChangedNodes || this.activityChangedNodes.size === 0) {
+        return
+      }
+
+      const nodesToSave = Array.from(this.activityChangedNodes.values())
+      
+      try {
+        // ✅ Batch update: Gửi tất cả nodes cùng lúc thay vì từng node một
+        const response = await updateMultipleNodePositions(diagramId, nodesToSave)
+        
+        // ✅ Cập nhật editingDiagram với dữ liệu mới từ server để UI cập nhật
+        if (response?.data?.data) {
+          const updatedDiagram = response.data.data
+          if (this.editingDiagram && (this.editingDiagram.id || this.editingDiagram._id) === diagramId) {
+            // Cập nhật nodes với position mới - sử dụng normalizeId để so sánh
+            if (updatedDiagram.nodes) {
+              updatedDiagram.nodes.forEach((updatedNode) => {
+                const updatedNodeId = this.normalizeId(updatedNode._id || updatedNode.id)
+                const localNodeIndex = this.editingDiagram.nodes.findIndex(
+                  (n) => {
+                    const nodeId = this.normalizeId(n._id || n.id)
+                    return nodeId === updatedNodeId
+                  }
+                )
+                if (localNodeIndex !== -1 && updatedNode.position) {
+                  // Vue 3 không cần $set, chỉ cần assign trực tiếp
+                  this.editingDiagram.nodes[localNodeIndex].position = {
+                    x: updatedNode.position.x,
+                    y: updatedNode.position.y,
+                  }
+                }
+              })
+            }
+          }
+        }
+      } catch (err) {
+        console.error('❌ Error saving activity diagram positions:', err)
+        throw err
+      }
+
+      // Clear changed nodes sau khi save xong
+      this.activityChangedNodes.clear()
     },
 
     async saveSequencePositions(diagramId) {
-      // TODO: Implement for sequence diagrams
-      console.log('Saving sequence diagram positions:', diagramId)
+      if (!this.editingDiagram || !this.editingDiagram.lifelines) return
+
+      try {
+        const { updateMultiplePositions } = await import('@/api/sqd')
+        
+        // ✅ Tối ưu: Batch update tất cả lifelines và messages trong một request
+        const lifelinesToSave = this.editingDiagram.lifelines
+          .filter((ll) => ll.position && typeof ll.position.x === 'number' && typeof ll.position.y === 'number')
+          .map((ll) => ({
+            id: this.normalizeId(ll._id || ll.id),
+            position: {
+              x: Math.round(ll.position.x),
+              y: Math.round(ll.position.y),
+            }
+          }))
+          .filter((ll) => ll.id) // Chỉ lấy những lifeline có ID hợp lệ
+
+        // Lấy messages có position đã thay đổi
+        const messagesToSave = this.editingDiagram.messages
+          ? this.editingDiagram.messages
+              .filter((msg) => msg.position && typeof msg.position.y === 'number')
+              .map((msg) => ({
+                id: this.normalizeId(msg._id || msg.id),
+                position: {
+                  y: Math.round(msg.position.y),
+                }
+              }))
+              .filter((msg) => msg.id) // Chỉ lấy những message có ID hợp lệ
+          : []
+
+        // Chỉ gửi request nếu có thay đổi
+        if (lifelinesToSave.length === 0 && messagesToSave.length === 0) {
+          return
+        }
+
+        const updates = {}
+        if (lifelinesToSave.length > 0) {
+          updates.lifelines = lifelinesToSave
+        }
+        if (messagesToSave.length > 0) {
+          updates.messages = messagesToSave
+        }
+
+        console.log('💾 Saving sequence diagram positions (batch):', {
+          diagramId,
+          lifelinesCount: lifelinesToSave.length,
+          messagesCount: messagesToSave.length,
+        })
+
+        await updateMultiplePositions(diagramId, updates)
+
+        console.log('💾 Sequence diagram positions saved successfully')
+      } catch (err) {
+        console.error('❌ Error saving sequence diagram positions:', err)
+        throw err
+      }
     },
     handleElementDrag({ element, type, newPosition }) {
       this.handlePositionUpdate({ element, type, position: newPosition })
+    },
+    async handleDiagramUpdated(updatedDiagramData) {
+      if (!this.editingDiagram) return
+
+      const diagramType = this.editingDiagram._type
+      const diagramId = this.editingDiagram.id || this.editingDiagram._id
+
+      try {
+        // Refresh the specific diagram type from API
+        await this.refreshDiagramsByType(diagramType)
+        
+        // If updated data is provided, use it directly
+        if (updatedDiagramData) {
+          if (diagramType === 'usecase') {
+            this.editingDiagram = {
+              ...this.processDiagrams([updatedDiagramData], 'usecase')[0],
+              _type: 'usecase',
+            }
+          } else {
+            // For other diagram types, update from refreshed list
+            const diagrams = this.getDiagramsByType(diagramType)
+            const updatedDiagram = diagrams.find((d) => (d.id || d._id) === diagramId)
+            if (updatedDiagram) {
+              this.editingDiagram = {
+                ...updatedDiagram,
+                _type: diagramType,
+              }
+            }
+          }
+        } else {
+          // Update editingDiagram with fresh data from refreshed list
+          const diagrams = this.getDiagramsByType(diagramType)
+          const updatedDiagram = diagrams.find((d) => (d.id || d._id) === diagramId)
+          if (updatedDiagram) {
+            this.editingDiagram = {
+              ...updatedDiagram,
+              _type: diagramType,
+            }
+          }
+        }
+
+        // Regenerate preview for the updated diagram in the list
+        this.$nextTick(() => {
+          const diagrams = this.getDiagramsByType(diagramType)
+          const updatedDiagram = diagrams.find((d) => (d.id || d._id) === diagramId)
+          if (updatedDiagram) {
+            // Xóa preview image cũ để trigger regenerate
+            delete updatedDiagram.previewImage
+            // Trigger preview generation
+            this.triggerPreviewGeneration(updatedDiagram)
+          }
+        })
+      } catch (error) {
+        console.error('Error refreshing diagram after update:', error)
+        this.toast.error('Failed to refresh diagram data')
+      }
     },
     debounceSave() {
       if (this.saveTimeout) {
         clearTimeout(this.saveTimeout)
       }
+      // ✅ Tối ưu: Giảm debounce time từ 1500ms xuống 800ms vì đã dùng batch update
+      // Batch update chỉ gửi 1 request thay vì nhiều requests, nên có thể giảm delay
       this.saveTimeout = setTimeout(() => {
         this.saveDiagramPositions()
-      }, 1500)
+      }, 800)
     },
+    async refreshSingleDiagram(diagramType, diagramId) {
+      if (!diagramId) return
+      
+      try {
+        let updatedDiagram = null
+        let response = null
+        
+        switch (diagramType) {
+          case 'usecase':
+            response = await getUsecaseDiagramById(diagramId)
+            updatedDiagram = response?.data?.data || response?.data
+            if (updatedDiagram) {
+              const index = this.usecaseDiagrams.findIndex((d) => (d.id || d._id) === diagramId)
+              if (index !== -1) {
+                this.usecaseDiagrams[index] = {
+                  ...this.processDiagrams([updatedDiagram], 'usecase')[0],
+                  previewImage: this.usecaseDiagrams[index].previewImage, // Giữ preview image cũ
+                }
+              } else {
+                // Nếu không tìm thấy trong list, thêm vào (trường hợp diagram mới được tạo)
+                this.usecaseDiagrams.push(this.processDiagrams([updatedDiagram], 'usecase')[0])
+              }
+            }
+            break
+          case 'activity':
+            response = await getActivityDiagramById(diagramId)
+            updatedDiagram = response?.data?.data || response?.data
+            if (updatedDiagram) {
+              const normalizedDiagramId = this.normalizeId(diagramId)
+              const index = this.activityDiagrams.findIndex((d) => {
+                const dId = this.normalizeId(d.id || d._id)
+                return dId === normalizedDiagramId
+              })
+              
+              if (index !== -1) {
+                // Process diagram với đầy đủ data (name, description, nodes, edges, lanes)
+                const processedDiagram = this.processDiagrams([updatedDiagram], 'activity')[0]
+                
+                // Đảm bảo processedDiagram có đầy đủ data
+                console.log('📝 Refreshing activity diagram:', {
+                  id: processedDiagram.id || processedDiagram._id,
+                  name: processedDiagram.name,
+                  description: processedDiagram.description,
+                  nodesCount: processedDiagram.nodes?.length || 0,
+                  edgesCount: processedDiagram.edges?.length || 0,
+                  lanesCount: processedDiagram.lanes?.length || 0
+                })
+                
+                // Cập nhật diagram với đầy đủ data - không giữ preview image để force regenerate
+                // Sử dụng Vue.set hoặc spread operator để đảm bảo reactivity
+                this.$set(this.activityDiagrams, index, {
+                  ...processedDiagram,
+                  // Không giữ preview image cũ - sẽ regenerate với data mới
+                })
+                
+                // Xóa preview cache để force regenerate
+                const diagramIdKey = processedDiagram.id || processedDiagram._id
+                this.previewCache.delete(diagramIdKey)
+                
+                // Regenerate preview sau khi cập nhật để có preview với data mới
+                // Không regenerate ở đây vì closeEditor sẽ handle
+              } else {
+                // Nếu không tìm thấy trong list, thêm vào (trường hợp diagram mới được tạo)
+                const newDiagram = this.processDiagrams([updatedDiagram], 'activity')[0]
+                this.activityDiagrams.push(newDiagram)
+                // Trigger preview generation cho diagram mới
+                this.$nextTick(() => {
+                  this.triggerPreviewGeneration(newDiagram)
+                })
+              }
+            }
+            break
+          case 'sequence':
+            response = await getSequenceDiagramById(diagramId)
+            updatedDiagram = response?.data?.data || response?.data
+            if (updatedDiagram) {
+              const index = this.sequenceDiagrams.findIndex((d) => (d.id || d._id) === diagramId)
+              if (index !== -1) {
+                this.sequenceDiagrams[index] = {
+                  ...this.processDiagrams([updatedDiagram], 'sequence')[0],
+                  previewImage: this.sequenceDiagrams[index].previewImage, // Giữ preview image cũ
+                }
+              } else {
+                // Nếu không tìm thấy trong list, thêm vào (trường hợp diagram mới được tạo)
+                this.sequenceDiagrams.push(this.processDiagrams([updatedDiagram], 'sequence')[0])
+              }
+            }
+            break
+        }
+      } catch (err) {
+        console.error('Error refreshing single diagram:', err)
+        // Không fallback về loadDiagrams() để tránh refresh tất cả
+        // Chỉ log error và giữ nguyên data hiện tại
+      }
+    },
+    // Scroll methods - FIXED VERSION
+    scrollDiagrams(type, direction) {
+      const container = this.getScrollContainer(type)
+      if (!container) return
+      
+      const scrollAmount = 400 // Scroll 400px mỗi lần
+      const currentScroll = container.scrollLeft
+      
+      if (direction === 'left') {
+        container.scrollTo({
+          left: Math.max(0, currentScroll - scrollAmount),
+          behavior: 'smooth'
+        })
+      } else {
+        const maxScroll = container.scrollWidth - container.clientWidth
+        container.scrollTo({
+          left: Math.min(maxScroll, currentScroll + scrollAmount),
+          behavior: 'smooth'
+        })
+      }
+      
+      // Update button states sau khi scroll - đợi scroll animation hoàn thành
+      setTimeout(() => {
+        this.updateScrollButtons(type)
+      }, 100)
+    },
+    
+    getScrollContainer(type) {
+      const refName = `${type}ScrollContainer`
+      const containerRef = this.$refs[refName]
+      if (!containerRef) return null
+      
+      // Handle both array and single ref
+      return Array.isArray(containerRef) ? containerRef[0] : containerRef
+    },
+    
+    updateScrollButtons(type) {
+      const container = this.getScrollContainer(type)
+      if (!container) {
+        // Nếu chưa có ref, set về false
+        this.scrollStates[type] = { canScrollLeft: false, canScrollRight: false }
+        return
+      }
+      
+      // Kiểm tra xem có thể scroll không (scrollWidth > clientWidth)
+      const scrollWidth = container.scrollWidth
+      const clientWidth = container.clientWidth
+      const canScroll = scrollWidth > clientWidth
+      
+      if (!canScroll) {
+        // Không thể scroll
+        this.scrollStates[type] = { canScrollLeft: false, canScrollRight: false }
+        return
+      }
+      
+      // Có thể scroll - kiểm tra vị trí hiện tại
+      const scrollLeft = container.scrollLeft
+      const maxScroll = scrollWidth - clientWidth
+      
+      // canScrollLeft: có thể scroll về trái nếu scrollLeft > threshold
+      const canScrollLeft = scrollLeft > 5
+      
+      // canScrollRight: có thể scroll về phải nếu chưa đến cuối
+      const canScrollRight = scrollLeft < (maxScroll - 5)
+      
+      // Update state
+      this.scrollStates[type] = {
+        canScrollLeft,
+        canScrollRight,
+      }
+    },
+  },
+  mounted() {
+    // Initialize scroll handlers map
+    this.scrollHandlers = new Map()
+    
+    // Update scroll buttons khi component mounted - đợi DOM render xong
+    this.$nextTick(() => {
+      // Đợi thêm một chút để đảm bảo refs đã được mount và có kích thước
+      setTimeout(() => {
+        ['usecase', 'activity', 'sequence'].forEach(type => {
+          this.updateScrollButtons(type)
+        })
+      }, 200)
+    })
+    
+    // Listen scroll events để update button states
+    this.$nextTick(() => {
+      setTimeout(() => {
+        ['usecase', 'activity', 'sequence'].forEach(type => {
+          const container = this.getScrollContainer(type)
+          if (container) {
+            const handleScroll = () => {
+              this.updateScrollButtons(type)
+            }
+            container.addEventListener('scroll', handleScroll)
+            // Store handler để có thể remove sau
+            this.scrollHandlers.set(`${type}ScrollContainer`, { container, handler: handleScroll })
+            
+            // Update buttons ngay sau khi add listener
+            this.updateScrollButtons(type)
+          }
+        })
+      }, 200)
+    })
+  },
+  updated() {
+    // Update scroll buttons khi component updated (có thể có thêm diagrams)
+    this.$nextTick(() => {
+      setTimeout(() => {
+        ['usecase', 'activity', 'sequence'].forEach(type => {
+          this.updateScrollButtons(type)
+        })
+      }, 100)
+    })
   },
 }
 </script>
@@ -1598,17 +2965,40 @@ export default {
 <style scoped>
 .uml-management-view {
   padding: 30px;
-  background: #f9fafb;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .uml-content {
   flex: 1;
   max-width: 1400px;
   margin: 0 auto;
+  margin-top: 24px;
   width: 100%;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Header */
@@ -1622,7 +3012,10 @@ export default {
 .header-left h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a365d;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0 0 8px 0;
 }
 
@@ -1641,18 +3034,50 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
-  background: #1a365d;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-primary:hover {
-  background: #2d4a8a;
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-primary.small {
@@ -1664,37 +3089,68 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 .btn-icon {
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 6px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
   cursor: pointer;
   color: #374151;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-icon:hover::before {
+  left: 100%;
 }
 
 .btn-icon:hover {
-  background: white;
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.15) translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-icon.danger:hover {
-  background: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
   color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
 }
 
 .btn-close {
@@ -1713,36 +3169,6 @@ export default {
 }
 
 /* Navigation Tabs */
-.navigation-tabs {
-  display: flex;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 2rem;
-}
-
-.tab-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: #6b7280;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-  color: #1a365d;
-  background: #f9fafb;
-}
-
-.tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
-}
 
 /* Diagrams Display */
 .diagrams-display {
@@ -1753,16 +3179,27 @@ export default {
 
 .diagram-section {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  margin-bottom: 32px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.diagram-section:hover {
+  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
+  position: relative;
+  gap: 16px;
 }
 
 .section-title {
@@ -1772,21 +3209,153 @@ export default {
 }
 
 .section-title h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  position: relative;
+  padding-left: 12px;
+}
+
+.section-title h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  border-radius: 2px;
 }
 
 .diagram-count {
-  color: #6b7280;
+  color: #64748b;
   font-size: 0.875rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  border-radius: 12px;
+  margin-left: 8px;
 }
 
 .section-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.btn-refresh-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-refresh-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.btn-refresh-section:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btn-refresh-section:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #1a365d;
+  color: #1a365d;
+  transform: translateY(-2px) rotate(180deg);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+}
+
+.btn-refresh-section:active:not(:disabled) {
+  transform: translateY(0) rotate(180deg);
+}
+
+.btn-refresh-section:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-refresh-section .material-symbols-outlined {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.btn-refresh-section:hover:not(:disabled) .material-symbols-outlined {
+  transform: rotate(180deg);
+}
+
+.btn-generate-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-generate-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-generate-section:hover::before {
+  left: 100%;
+}
+
+.btn-generate-section:hover {
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+}
+
+.btn-generate-section:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+}
+
+.btn-generate-section .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .search-box {
@@ -1797,23 +3366,33 @@ export default {
 
 .search-icon {
   position: absolute;
-  left: 12px;
-  color: #9ca3af;
-  font-size: 20px;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 18px;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.search-box:focus-within .search-icon {
+  color: #1a365d;
 }
 
 .search-input {
-  padding: 8px 12px 8px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 10px 12px 10px 40px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 0.875rem;
-  width: 250px;
-  transition: border-color 0.3s ease;
+  width: 280px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .search-input:focus {
   outline: none;
   border-color: #1a365d;
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  transform: translateY(-1px);
 }
 
 .filter-controls {
@@ -1821,45 +3400,89 @@ export default {
   gap: 8px;
 }
 
-.sort-select,
-.lang-select {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  font-size: 0.875rem;
-  min-width: 120px;
+/* Diagrams Scroll Container - FIXED */
+.diagrams-scroll-container-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
-/* Diagrams Scroll Container */
 .diagrams-scroll-container {
+  position: relative;
   overflow-x: auto;
   padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+  flex: 1;
+  min-width: 0;
+}
+
+.diagrams-scroll-container::-webkit-scrollbar {
+  height: 10px;
+}
+
+.diagrams-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.diagrams-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
+
+.diagrams-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
 }
 
 .diagrams-scroll-content {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   min-width: min-content;
+  padding: 4px 0; /* Add padding để không bị cắt border */
+  animation: fadeIn 0.5s ease;
 }
 
 /* Diagram Cards */
 .diagram-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   min-width: 300px;
   max-width: 300px;
   flex-shrink: 0;
+  position: relative;
+}
+
+.diagram-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.diagram-card:hover::before {
+  opacity: 1;
 }
 
 .diagram-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(26, 54, 93, 0.2);
+  border-color: #cbd5e1;
 }
 
 /* Diagram Preview với ảnh */
@@ -1904,10 +3527,22 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  color: #6b7280;
-  font-size: 14px;
-  background: #f8fafc;
+  gap: 12px;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  animation: fadeIn 0.3s ease;
+}
+
+.generating-preview .loading-spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #1a365d;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
 }
 
 .diagram-overlay {
@@ -1916,13 +3551,14 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.85) 0%, rgba(45, 74, 138, 0.9) 100%);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .diagram-card:hover .diagram-overlay {
@@ -1930,24 +3566,28 @@ export default {
 }
 
 .diagram-info {
-  padding: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
 }
 
 .diagram-info h4 {
-  margin: 0 0 8px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .diagram-description {
-  margin: 0 0 12px 0;
-  color: #6b7280;
+  margin: 0 0 16px 0;
+  color: #64748b;
   font-size: 0.875rem;
-  line-height: 1.4;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1958,39 +3598,65 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 0.75rem;
-  color: #9ca3af;
+  font-weight: 500;
+  color: #64748b;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.meta-item .material-symbols-outlined {
+  font-size: 16px;
 }
 
 /* Type Badges */
 .diagram-type-badge,
 .type-badge {
-  padding: 4px 8px;
+  padding: 6px 12px;
   border-radius: 12px;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .type-usecase {
-  background: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
   color: #1e40af;
 }
 
 .type-activity {
-  background: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
   color: #166534;
 }
 
 .type-sequence {
-  background: #fef3c7;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
   color: #92400e;
+}
+
+.diagram-type-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .diagram-stats {
@@ -2002,51 +3668,136 @@ export default {
 .stat-badge {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: #f3f4f6;
+  gap: 6px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 12px;
   font-size: 0.75rem;
-  color: #374151;
+  font-weight: 600;
+  color: #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.stat-badge:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-badge .material-symbols-outlined {
+  font-size: 16px;
 }
 
 /* Empty Section */
 .empty-section {
   text-align: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
   min-width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: #64748b;
+  animation: fadeInUp 0.6s ease;
 }
 
 .empty-icon {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 16px;
-  background: #f3f4f6;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: float 3s ease-in-out infinite;
+  position: relative;
+}
+
+.empty-icon::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a365d, #2d4a8a);
+  opacity: 0.1;
+  z-index: -1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
 }
 
 .empty-icon .material-symbols-outlined {
-  font-size: 30px;
-  color: #9ca3af;
+  font-size: 48px;
+  color: #64748b;
+  animation: spin 20s linear infinite;
 }
 
 .empty-section h4 {
-  margin: 0 0 8px 0;
-  color: #374151;
-  font-size: 1rem;
+  margin: 0 0 12px 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-section p {
-  margin: 0 0 16px 0;
-  font-size: 0.875rem;
+  margin: 0 0 24px 0;
+  font-size: 0.9rem;
+  color: #64748b;
+  max-width: 300px;
+  line-height: 1.6;
+}
+
+.empty-section.loading-section {
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px dashed #3b82f6;
+  border-radius: 12px;
+  margin: 20px;
+  min-height: 300px;
+}
+
+.empty-section.loading-section .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.empty-section.loading-section h4 {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.empty-section.loading-section p {
+  color: #6b7280;
 }
 
 /* Modal Styles */
@@ -2056,12 +3807,23 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(2, 6, 23, 0.55);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  animation: modalFade 0.2s ease;
+}
+
+@keyframes modalFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-overlay.large {
@@ -2070,11 +3832,24 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: 20px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .modal-content.fullscreen {
@@ -2086,17 +3861,21 @@ export default {
 }
 
 .modal-header {
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 24px;
+  border-bottom: 2px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
 }
 
 .modal-header h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
 }
 
@@ -2152,11 +3931,13 @@ export default {
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   font-size: 0.875rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .form-group input:focus,
@@ -2164,6 +3945,8 @@ export default {
 .form-group textarea:focus {
   outline: none;
   border-color: #1a365d;
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  transform: translateY(-1px);
 }
 
 .form-group textarea {
@@ -2184,18 +3967,23 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  color: #6b7280;
+  padding: 100px 40px;
+  color: #64748b;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  animation: fadeInUp 0.5s ease;
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #1a365d;
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #1a365d;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
 }
 
 .loading-spinner-small {
@@ -2229,33 +4017,53 @@ export default {
 
 .export-options {
   position: absolute;
-  top: 100%;
-  left: -100%;
+  top: calc(100% + 8px);
+  left: 0;
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   z-index: 10;
-  min-width: 140px;
-  margin-top: 4px;
+  min-width: 160px;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
 .export-option {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: none;
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
   color: #374151;
-  transition: background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.export-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  transition: width 0.3s ease;
+}
+
+.export-option:hover::before {
+  width: 100%;
 }
 
 .export-option:hover {
-  background: #f3f4f6;
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-left: 18px;
+  color: #1a365d;
 }
 
 .export-option:first-child {
@@ -2287,6 +4095,146 @@ export default {
   margin-right: 12px;
 }
 
+/* Scroll Arrows - FIXED POSITION */
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.scroll-arrow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.scroll-arrow:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.scroll-arrow:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  border-color: #1a365d;
+  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.scroll-arrow:hover:not(:disabled) .material-symbols-outlined {
+  color: white;
+}
+
+.scroll-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.scroll-arrow-left {
+  left: -22px;
+}
+
+.scroll-arrow-right {
+  right: -22px;
+}
+
+.scroll-arrow .material-symbols-outlined {
+  font-size: 24px;
+  color: #64748b;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Diagram Generating Overlay - Giản dị */
+.diagram-generating-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  animation: fadeInOverlay 0.3s ease-in;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.generating-content {
+  text-align: center;
+  padding: 40px 30px;
+  max-width: 350px;
+}
+
+.generating-spinner-wrapper {
+  margin: 0 0 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.generating-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spinLarge 1s linear infinite;
+}
+
+.generating-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e40af;
+  margin: 0;
+}
+
+.diagram-card.blurred {
+  filter: blur(3px);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spinLarge {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .uml-management-view {
@@ -2312,14 +4260,6 @@ export default {
     min-width: 120px;
   }
 
-  .navigation-tabs {
-    flex-direction: column;
-    padding: 0;
-  }
-
-  .tab-button {
-    justify-content: center;
-  }
 
   .section-header {
     flex-direction: column;
@@ -2342,11 +4282,6 @@ export default {
     justify-content: space-between;
   }
 
-  .sort-select,
-  .lang-select {
-    flex: 1;
-  }
-
   .diagram-card {
     min-width: 280px;
   }
@@ -2364,6 +4299,20 @@ export default {
 
   .diagram-preview {
     height: 160px;
+  }
+  
+  /* Adjust scroll arrows for mobile */
+  .scroll-arrow-left {
+    left: -18px;
+  }
+  
+  .scroll-arrow-right {
+    right: -18px;
+  }
+  
+  .scroll-arrow {
+    width: 36px;
+    height: 36px;
   }
 }
 
@@ -2387,5 +4336,178 @@ export default {
   .diagram-card {
     min-width: 260px;
   }
+  
+  .scroll-arrow-left {
+    left: -16px;
+  }
+  
+  .scroll-arrow-right {
+    right: -16px;
+  }
+  
+  .scroll-arrow {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .scroll-arrow .material-symbols-outlined {
+    font-size: 20px;
+  }
+}
+
+/* Filter Dropdown Styles */
+.filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-dropdown {
+  position: relative;
+}
+
+.filter-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-icon-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.filter-icon-btn:hover::before {
+  left: 100%;
+}
+
+.filter-icon-btn:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #1a365d;
+  color: #1a365d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+}
+
+.filter-icon-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.filter-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.filter-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  transition: width 0.3s ease;
+}
+
+.filter-option:hover {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-left: 20px;
+}
+
+.filter-option:hover::before {
+  width: 3px;
+}
+
+.filter-option.active {
+  background: linear-gradient(90deg, #e6f2ff 0%, #dbeafe 100%);
+  color: #1a365d;
+  font-weight: 600;
+  border-left-color: #1a365d;
+  padding-left: 20px;
+}
+
+.filter-option.active::before {
+  width: 3px;
+}
+
+.filter-option .material-symbols-outlined {
+  font-size: 18px;
+  color: inherit;
 }
 </style>

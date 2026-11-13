@@ -1,44 +1,6 @@
 <template>
   <div class="project-detail-view">
     <div class="project-detail-view">
-      <ProjectHeader
-        :project="project"
-        :versions="versions"
-        :selected-version-id="selectedVersionId"
-        :is-retrying="effectiveProcessingState.isRetrying"
-        :processing-progress="processingProgress"
-        :current-stage="currentStage"
-        :active-users="activeUsers"
-        @version-selected="handleVersionSelect"
-        @retry-analysis="handleRetry"
-        @go-back="goBack"
-        @show-sharing="showSharingModal = true"
-        @activeUsersUpdate="handleActiveUsersUpdate"
-      />
-
-      <!-- Navigation Tabs -->
-      <div class="navigation-tabs">
-        <button class="tab-button active" @click="navigateToUsecase">
-          <span class="material-symbols-outlined">list_alt</span>
-          Use Cases Management
-        </button>
-        <button class="tab-button" @click="navigateToOutput">
-          <span class="material-symbols-outlined">output</span>
-          Output Management
-        </button>
-      </div>
-
-      <!-- Incremental Analysis Component -->
-      <IncrementalAnalysis
-        :is-processing-incremental="effectiveProcessingState.isProcessingIncremental"
-        :is-processing-failed="isProcessingFailed"
-        :show-incremental-button="showIncrementalButton"
-        :unprocessed-inputs-count="unprocessedInputsCount"
-        :processing-progress="processingProgress"
-        :current-stage="currentStage"
-        @start-incremental-analysis="startIncrementalAnalysis"
-        @retry-incremental="retryIncrementalAnalysis"
-      />
 
       <!-- Conflict Resolution Section -->
       <HandleConflict
@@ -65,19 +27,37 @@
           :loading="isManagingUsecase"
           :available-use-cases="availableUseCases"
           :project-data="project"
+          :is-finding-conflicts="isFindingConflicts"
+          :new-use-case-ids="newUseCaseIds"
           @addUsecase="handleAddUsecase"
           @updateUsecase="handleUpdateUsecase"
           @deleteUsecase="handleDeleteUsecase"
+          @refresh="handleRefreshUsecases"
+          @find-conflicts="findAndHandleConflicts"
+          @remove-highlight="handleRemoveHighlight"
         />
         <!-- Trong template của UsecaseManagement.vue -->
         <InputSidebar
           :inputs="inputs"
           :is-deleting-input="isDeletingInput"
-          @add-input-click="showAddInputModal = true"
+          :is-processing-incremental="effectiveProcessingState.isProcessingIncremental"
+          :is-processing-failed="isProcessingFailed"
+          :show-incremental-button="showIncrementalButton"
+          :unprocessed-inputs-count="unprocessedInputsCount"
+          :is-adding-input="isAddingInput"
+          :is-version-processing="isVersionProcessing"
+          :estimate-info="estimateInfo"
+          :batch-progress="batchProgress"
+          :agent-state="agentState"
+          :agent-message="agentMessage"
+          :processing-progress="processingProgress"
           @delete-input="openDeleteSpecificModal"
           @input-added="handleInputAdded"
           @input-deleted="handleInputDeleted"
           @inputs-reloaded="handleInputsReloaded"
+          @add-inputs="handleAddInputs"
+          @start-incremental-analysis="startIncrementalAnalysis"
+          @retry-incremental="retryIncrementalAnalysis"
         />
       </div>
 
@@ -90,13 +70,6 @@
         @confirm="handleConfirm"
       />
 
-      <!-- Add Input Modal Component -->
-      <AddInputModal
-        v-if="showAddInputModal"
-        :is-adding-input="isAddingInput"
-        @close="showAddInputModal = false"
-        @add-inputs="handleAddInputs"
-      />
 
       <!-- Conflict Detail Modal -->
       <ConflictDetailModal
@@ -104,8 +77,11 @@
         :use-case="currentDetailUseCase"
         :show-skip-button="true"
         :is-skipping="isSkippingConflict"
+        :show-select-button="!!currentDetailUseCase.conflict_id"
+        :is-selected="isUsecaseSelected"
         @close="showConflictDetailModal = false"
         @skip-conflict="skipCurrentConflict"
+        @select-usecase="selectUsecaseFromModal"
       />
 
       <!-- Sharing Modal -->
@@ -128,33 +104,34 @@ import {
   startIncrementalAnalysis,
   findProjectConflicts,
   resolveProjectConflict,
-  skipConflict,
+  skipConflict as skipConflictApi,
   usecaseApi,
   switchCurrentVersion,
 } from '@/api/project'
 import { useToast } from 'vue-toastification'
 import AppModal from '@/components/AppModal.vue'
-import ProjectHeader from '@/components/ProjectHeader.vue'
 import UseCaseMainContent from '@/components/usecase/UseCaseMainContent.vue'
 import InputSidebar from '@/components/usecase/InputSidebar.vue'
 import HandleConflict from '@/components/usecase/HandleConflict.vue'
 import ConflictDetailModal from '@/components/usecase/ConflictDetailModal.vue'
-import AddInputModal from '@/components/usecase/AddInputModal.vue'
-import IncrementalAnalysis from '@/components/usecase/IncrementalAnalysis.vue'
 import ProjectSharingModal from '@/components/ProjectSharingModal.vue'
 import { socket } from '@/utils/socket'
+import eventBus from '@/utils/eventBus'
+import {
+  saveSelectedVersion,
+  getSelectedOrDefaultVersion,
+  filterApprovedVersions,
+  isOwner as checkIsOwner,
+} from '@/utils/versionSync'
 
 export default {
   name: 'ProjectDetailView',
   components: {
     AppModal,
-    ProjectHeader,
     UseCaseMainContent,
     InputSidebar,
     HandleConflict,
     ConflictDetailModal,
-    AddInputModal,
-    IncrementalAnalysis,
     ProjectSharingModal,
   },
   data() {
@@ -170,8 +147,6 @@ export default {
 
       // ========== RETRY STATE ==========
       isRetrying: false,
-      processingProgress: 0,
-      currentStage: 'Initializing...',
       pollingInterval: null,
       currentPollingVersionId: null,
 
@@ -180,6 +155,21 @@ export default {
       showIncrementalButton: false,
       unprocessedInputsCount: 0,
       currentVersionDetails: null,
+      incrementalFetchTimeout: null, // ✅ MỚI: Timeout để debounce incremental fetch
+      estimateInfo: {
+        estimated_count: 0,
+        summary: '',
+        estimated_batches: 0,
+        isEstimating: false
+      },
+      batchProgress: {
+        currentBatch: 0,
+        totalBatches: 0,
+        usecasesInBatch: 0
+      },
+      agentState: null, // ✅ Agent state từ backend
+      agentMessage: null, // ✅ Message từ agent
+      processingProgress: 0, // ✅ Progress percentage
 
       // ========== CONFLICT RESOLUTION STATE ==========
       hasConflicts: false,
@@ -192,7 +182,6 @@ export default {
       // ========== MODAL STATES ==========
       showConflictDetailModal: false,
       currentDetailUseCase: {},
-      showAddInputModal: false,
       showModal: false,
       modalTitle: '',
       modalMessage: '',
@@ -205,6 +194,8 @@ export default {
       // ========== USECASE =============
       isManagingUsecase: false,
       currentEditingUseCase: null,
+      previousUseCaseIds: new Set(), // Track usecase IDs để detect mới
+      newUseCaseIds: new Set(), // Track usecases mới để highlight
 
       // ========== REALTIME STATE ==========
       isSocketConnected: false,
@@ -225,6 +216,11 @@ export default {
     },
     processingVersion() {
       return this.versions.find((version) => version.status === 'processing')
+    },
+    isVersionProcessing() {
+      if (!this.selectedVersionId) return false
+      const currentVersion = this.versions.find((v) => v._id === this.selectedVersionId)
+      return currentVersion?.status === 'processing'
     },
 
     // ========== CONFLICT RESOLUTION COMPUTED ==========
@@ -273,7 +269,6 @@ export default {
       return (
         currentVersion &&
         currentVersion.status === 'failed' &&
-        this.processingProgress >= 95 &&
         // CHO PHÉP hiển thị ngay cả khi isRetrying là true (vì có thể cả 2 process cùng chạy)
         !this.isProcessingIncremental
         // BỎ: !this.isRetrying
@@ -297,12 +292,24 @@ export default {
       this.initSocketConnection(projectId)
     }
     document.addEventListener('click', this.handleClickOutside)
+
+    // Listen for version-approved event from PreviewModal
+    eventBus.on('version-approved', this.handleVersionApproved)
   },
 
   beforeUnmount() {
     this.cleanupPolling()
     this.cleanupSocketConnection()
     document.removeEventListener('click', this.handleClickOutside)
+
+    // Remove event listener
+    eventBus.off('version-approved', this.handleVersionApproved)
+    
+    // ✅ MỚI: Clear incremental fetch timeout khi unmount
+    if (this.incrementalFetchTimeout) {
+      clearTimeout(this.incrementalFetchTimeout)
+      this.incrementalFetchTimeout = null
+    }
   },
   watch: {
     activeUsers: {
@@ -321,6 +328,23 @@ export default {
         this.isProcessingFailed = newVal
       },
       immediate: true,
+    },
+    // Watch useCases to re-populate conflicts when usecases are loaded/updated
+    useCases: {
+      handler(newVal, oldVal) {
+        // Only re-populate if we have conflicts and usecases changed
+        if (this.hasConflicts && this.pendingConflicts.length > 0 && newVal && newVal.length > 0) {
+          console.log('🔄 Usecases changed, re-populating conflicts...')
+          const currentVersion = this.versions.find((v) => v._id === this.selectedVersionId)
+          const rawConflicts = currentVersion?.pending_conflicts || 
+                              this.currentVersionDetails?.pending_conflicts || 
+                              []
+          if (rawConflicts.length > 0) {
+            this.pendingConflicts = this.populateConflictsWithUsecases(rawConflicts)
+          }
+        }
+      },
+      deep: true,
     },
   },
   methods: {
@@ -351,6 +375,8 @@ export default {
 
         if (event.type === 'INCREMENTAL_PROGRESS') {
           this.handleIncrementalProgress(event)
+        } else if (event.type === 'ESTIMATE_RECEIVED') {
+          this.handleEstimateReceived(event)
         } else {
           this.handleInputEvent(event) // Tất cả input events khác qua đây
         }
@@ -376,25 +402,34 @@ export default {
     joinProjectRoom(projectId) {
       if (socket && projectId) {
         socket.emit('join_project', projectId)
-        console.log(`✅ Joined project room: project_${projectId}`)
       }
     },
 
     cleanupSocketConnection() {
       if (socket) {
+        // ✅ QUAN TRỌNG: Disconnect tất cả listeners trước khi leave room
         socket.off('connect')
         socket.off('disconnect')
         socket.off('usecase_event', this.handleUsecaseEvent)
         socket.off('input_event', this.handleInputEvent)
+        socket.off('ESTIMATE_RECEIVED')
 
         // ✅ THÊM: Presence cleanup
         socket.off('user_joined', this.handleUserJoined)
         socket.off('user_left', this.handleUserLeft)
 
         socket.off('version_event', this.handleVersionEvent)
+        
+        // ✅ THÊM: Cleanup incremental progress listener
+        socket.off('INCREMENTAL_PROGRESS')
+        
         // Leave project room
         if (this.project._id) {
+          try {
           socket.emit('leave_project', this.project._id)
+          } catch (error) {
+            console.warn('⚠️ Error leaving project room:', error)
+          }
         }
       }
     },
@@ -469,13 +504,90 @@ export default {
     async handleRemoteVersionBumped(event) {
       const version = event.version
       if (!version) return
-      this.toast.info(`New version created: ${version.version_number || version._id}`)
-      const exists = this.versions.find((v) => v._id === version._id)
-      if (!exists) this.versions.push(version)
+
+      // 1. Cập nhật danh sách version
+      await this.fetchProjectData(this.project._id)
+
+      // 2. Chuyển sang version mới
       this.selectedVersionId = version._id
       this.currentVersionDetails = version
-      await this.fetchProjectData(this.project._id)
-      this.$forceUpdate()
+
+      // 3. Fetch usecases cho version mới
+      await this.fetchUseCases()
+
+      // 4. Tải lại toàn bộ dữ liệu của version mới (nếu cần)
+      const res = await getProjectDetail(this.project._id, this.selectedVersionId)
+
+      this.toast.info(`Switched to new version: ${version.version_number || version._id}`)
+    },
+
+    /**
+     * Xử lý khi version được approve thành công từ PreviewModal
+     */
+    async handleVersionApproved(event) {
+      // Chỉ xử lý nếu là project hiện tại
+      if (!event || event.projectId !== this.project._id) {
+        return
+      }
+
+      console.log('✅ Version approved event received:', event)
+
+      const { versionId, version, newVersion } = event
+
+      if (!versionId) {
+        console.warn('⚠️ Invalid version-approved event: missing versionId', event)
+        return
+      }
+
+      try {
+        // Đợi một chút để backend cập nhật xong
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        // Refresh project data để lấy version mới
+        await this.fetchProjectData(this.project._id)
+
+        // Đảm bảo version mới có trong danh sách (thêm vào nếu chưa có)
+        let newVersionObj = this.versions.find((v) => v._id === versionId)
+
+        if (!newVersionObj) {
+          // Nếu chưa có trong danh sách, thử fetch lại một lần nữa
+          console.log('🔄 Version not found, fetching project data again...')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await this.fetchProjectData(this.project._id)
+          newVersionObj = this.versions.find((v) => v._id === versionId)
+        }
+
+        // Nếu vẫn chưa có và có version object từ event, thêm vào
+        if (!newVersionObj && version) {
+          // Chỉ thêm nếu version đã được approve (version_temporary = false)
+          if (version.version_temporary === false || version.version_temporary === undefined) {
+            this.versions.push(version)
+            newVersionObj = version
+            console.log('✅ Added new approved version to list:', versionId)
+          }
+        }
+
+        // Force set selectedVersionId ngay cả khi chưa có trong danh sách
+        // Vì version đã được approve rồi, nên chắc chắn sẽ có
+        this.selectedVersionId = versionId
+        if (newVersionObj) {
+          this.currentVersionDetails = newVersionObj
+        }
+
+        // Lưu vào localStorage để đồng bộ với các trang khác
+        saveSelectedVersion(this.project._id, versionId)
+
+        // Refresh use cases với version mới (từ API, không từ requirement_model)
+        await this.fetchUseCases()
+
+        // Thông báo cho user
+        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+
+        this.$forceUpdate()
+      } catch (error) {
+        console.error('❌ Error handling version-approved event:', error)
+        this.toast.error('Failed to switch to approved version')
+      }
     },
 
     async handleSwitchedVersion(event) {
@@ -490,6 +602,9 @@ export default {
       await this.fetchProjectData(this.project._id)
       this.selectedVersionId = version._id
       this.currentVersionDetails = version
+
+      // Fetch usecases cho version mới
+      await this.fetchUseCases()
 
       this.toast.info(`Switched to version: ${version.version_number || version._id}`)
       this.$forceUpdate()
@@ -633,8 +748,18 @@ export default {
       this.toast.info(`New usecase created by team: ${event.usecase.name}`)
 
       // Thêm usecase mới vào danh sách
-      if (!this.useCases.find((uc) => uc.id === event.usecase.id)) {
+      const usecaseId = String(event.usecase._id || event.usecase.id || '')
+      if (!this.useCases.find((uc) => {
+        const ucId = String(uc._id || uc.id || '')
+        return ucId === usecaseId
+      })) {
         this.useCases.push(event.usecase)
+        
+        // ✅ Thêm vào newUseCaseIds để highlight
+        if (usecaseId) {
+          this.newUseCaseIds.add(usecaseId)
+          console.log(`✨ Added new usecase to highlight: ${usecaseId}`)
+        }
 
         // Trigger UI update
         this.$forceUpdate()
@@ -680,11 +805,15 @@ export default {
       // Đã ở trang usecase management
     },
 
-    navigateToOutput() {
+    navigateToLog() {
       this.$router.push({
         name: 'OutputManagement',
         params: { id: this.project._id },
       })
+    },
+    // Trong methods của UsecaseManagement.vue
+    handleVersionRollbackCompleted() {
+      this.fetchProjectData(this.project._id)
     },
 
     // ========== DATA FETCHING ==========
@@ -694,20 +823,33 @@ export default {
         const { data } = await getProjectDetail(projectId, userId)
         const result = data.data || data
         this.project = result.project
-        this.versions = result.versions
+
+        // Lọc bỏ version tạm thời, chỉ giữ version đã được approve
+        const allVersions = result.versions || []
+        this.versions = filterApprovedVersions(allVersions)
+
         this.inputs = result.inputs
 
         this.currentVersionDetails = result.current_version || null
 
-        this.useCases = this.currentVersionDetails
-          ? this.currentVersionDetails.requirement_model
-          : []
+        // Sử dụng version sync utility để lấy selected version
+        const currentVersionId = this.currentVersionDetails?._id
+        this.selectedVersionId = getSelectedOrDefaultVersion(
+          this.project._id,
+          this.versions,
+          currentVersionId
+        )
 
-        if (this.currentVersionDetails) {
-          this.selectedVersionId = this.currentVersionDetails._id
-        } else if (this.versions.length > 0) {
-          this.selectedVersionId = this.versions[0]._id
+        // Lưu selected version vào localStorage
+        if (this.selectedVersionId) {
+          saveSelectedVersion(this.project._id, this.selectedVersionId)
+          // Fetch usecases từ API thay vì từ requirement_model
+          await this.fetchUseCases()
+        } else {
+          this.useCases = []
         }
+
+        // Check conflicts AFTER usecases are fetched so we can populate them
         this.checkConflictsOnLoad()
         this.checkUnprocessedInputs()
         this.checkConflicts()
@@ -721,15 +863,97 @@ export default {
     },
 
     async fetchUseCases() {
-      if (!this.selectedVersionId) return
+      if (!this.selectedVersionId) {
+        console.warn('⚠️ fetchUseCases: No selectedVersionId')
+        return
+      }
 
       try {
+        console.log(`📥 Fetching usecases for version: ${this.selectedVersionId}`)
         const response = await usecaseApi.getUsecases(this.selectedVersionId)
-        this.useCases = response.data.data || []
+        const newUseCases = response.data.data || []
+        console.log(`📥 Fetched ${newUseCases.length} usecases from API`)
+        
+        // ✅ Load previousUseCaseIds từ localStorage
+        const storageKey = `previousUseCaseIds_${this.selectedVersionId}`
+        const savedPreviousIds = localStorage.getItem(storageKey)
+        if (savedPreviousIds) {
+          try {
+            this.previousUseCaseIds = new Set(JSON.parse(savedPreviousIds))
+          } catch (e) {
+            console.warn('Failed to parse saved previousUseCaseIds:', e)
+            this.previousUseCaseIds = new Set()
+          }
+        }
+        
+        // ✅ Detect usecases mới
+        const currentIds = new Set(newUseCases.map(uc => String(uc._id || uc.id || '')))
+        
+        // Nếu previousUseCaseIds rỗng (lần đầu load), set nó = currentIds mà không highlight
+        if (this.previousUseCaseIds.size === 0) {
+          // Lần đầu load: set previousUseCaseIds = currentIds (không highlight)
+          const validCurrentIds = Array.from(currentIds).filter(id => id && id !== '')
+          this.previousUseCaseIds = new Set(validCurrentIds)
+          // Lưu vào localStorage
+          localStorage.setItem(storageKey, JSON.stringify(Array.from(this.previousUseCaseIds)))
+          console.log(`📝 Initialized previousUseCaseIds with ${validCurrentIds.length} usecases (no highlight)`)
+        } else {
+          // Tìm usecases mới (có trong current nhưng không có trong previous)
+          const newlyAddedIds = new Set()
+          currentIds.forEach(id => {
+            // Bỏ qua ID rỗng
+            if (!id) return
+            // So sánh với cả dạng string và number trong previousUseCaseIds
+            let found = false
+            for (const prevId of this.previousUseCaseIds) {
+              if (String(prevId) === String(id)) {
+                found = true
+                break
+              }
+            }
+            if (!found) {
+              newlyAddedIds.add(id)
+            }
+          })
+          
+          // Nếu có usecases mới, thêm vào newUseCaseIds để highlight
+          if (newlyAddedIds.size > 0) {
+            newlyAddedIds.forEach(id => {
+              if (id) {
+                this.newUseCaseIds.add(id)
+              }
+            })
+            console.log(`✨ Detected ${newlyAddedIds.size} new usecase(s):`, Array.from(newlyAddedIds))
+            console.log(`📊 Total highlighted usecases: ${this.newUseCaseIds.size}`)
+          }
+          
+          // ✅ QUAN TRỌNG: KHÔNG cập nhật previousUseCaseIds ngay sau khi detect
+          // Chỉ update khi user remove highlight (xử lý trong handleRemoveHighlight)
+          // Điều này đảm bảo usecases mới vẫn được highlight cho đến khi user hover để remove
+        }
+        
+        this.useCases = newUseCases
+        
+        // Re-populate conflicts with usecase objects after fetching usecases
+        // Get raw conflicts from source and re-populate
+        if (this.hasConflicts) {
+          const currentVersion = this.versions.find((v) => v._id === this.selectedVersionId)
+          const rawConflicts = currentVersion?.pending_conflicts || 
+                              this.currentVersionDetails?.pending_conflicts || 
+                              []
+          if (rawConflicts.length > 0) {
+            this.pendingConflicts = this.populateConflictsWithUsecases(rawConflicts)
+          }
+        }
       } catch (error) {
         console.error('Error fetching use cases:', error)
         this.toast.error('Failed to load use cases')
       }
+    },
+
+    async handleRefreshUsecases() {
+      await this.fetchUseCases()
+      await this.fetchProjectData(this.project._id)
     },
 
     // ========== USECASE MANAGEMENT ==========
@@ -744,32 +968,141 @@ export default {
           return
         }
 
-        // 🔥 VALIDATION PHÍA FE TRƯỚC KHI GỬI - CẬP NHẬT CHO ROLE MỚI
-        const requiredFields = ['name', 'goal', 'reason', 'priority']
+        // 🔥 VALIDATION PHÍA FE TRƯỚC KHI GỬI - CẬP NHẬT CHO SCHEMA MỚI
+        const requiredFields = ['name', 'goal', 'description', 'business_reason', 'priority']
         const missingFields = requiredFields.filter((field) => !data[field])
 
-        // Kiểm tra role riêng vì giờ là object
-        if (!data.role || !data.role.name || !data.role.name.trim()) {
-          missingFields.push('role')
+        // Kiểm tra actor (hỗ trợ cả actor và role - backward compatibility)
+        const actorOrRole = data.actor || data.role
+        if (!actorOrRole || (typeof actorOrRole === 'object' && !actorOrRole.name) || (typeof actorOrRole === 'string' && !actorOrRole.trim())) {
+          missingFields.push('actor')
+        }
+
+        // Kiểm tra main_flow (hỗ trợ cả main_flow và tasks - backward compatibility)
+        const mainFlow = data.main_flow || data.tasks
+        if (!mainFlow || !Array.isArray(mainFlow) || mainFlow.length === 0) {
+          missingFields.push('main_flow')
         }
 
         // if (missingFields.length > 0) {
         //   throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`)
         // }
 
-        // if (!data.tasks || data.tasks.length === 0 || !data.tasks[0]?.trim()) {
-        //   throw new Error('At least one task is required')
-        // }
-
-        // 🔥 ĐẢM BẢO ROLE CÓ CẤU TRÚC ĐÚNG TRƯỚC KHI GỬI
+        // 🔥 CHUẨN HÓA PAYLOAD CHO SCHEMA MỚI (hỗ trợ backward compatibility)
         const payload = {
           ...data,
-          role: {
-            id:
-              data.role?.id ||
-              `role_${data.role?.name?.toLowerCase().replace(/\s+/g, '_') || 'unknown'}`,
-            name: data.role?.name || '',
-          },
+        }
+
+        // Normalize actor (hỗ trợ cả actor và role)
+        if (data.actor) {
+          payload.actor = {
+            id: data.actor.id || `actor_${(data.actor.name || 'unknown').toLowerCase().replace(/\s+/g, '_')}`,
+            name: data.actor.name || '',
+            description: data.actor.description || ''
+          }
+        } else if (data.role) {
+          // Convert role (cũ) sang actor (mới)
+          if (typeof data.role === 'string') {
+            payload.actor = {
+              id: `actor_${data.role.toLowerCase().replace(/\s+/g, '_')}`,
+              name: data.role,
+              description: ''
+            }
+          } else {
+            payload.actor = {
+              id: data.role.id || `actor_${(data.role.name || 'unknown').toLowerCase().replace(/\s+/g, '_')}`,
+              name: data.role.name || '',
+              description: data.role.description || ''
+            }
+          }
+        }
+
+        // Normalize main_flow (hỗ trợ cả main_flow và tasks)
+        if (data.main_flow && Array.isArray(data.main_flow) && data.main_flow.length > 0) {
+          payload.main_flow = data.main_flow
+        } else if (data.tasks && Array.isArray(data.tasks) && data.tasks.length > 0) {
+          // Convert tasks (cũ) sang main_flow (mới)
+          payload.main_flow = data.tasks.map((task, index) => ({
+            step: index + 1,
+            actor: payload.actor?.name || 'User',
+            action: task,
+            expected_result: `Task ${index + 1} completed`
+          }))
+        }
+
+        // Normalize business_reason (hỗ trợ cả business_reason và reason)
+        if (!payload.business_reason && data.reason) {
+          payload.business_reason = data.reason
+        }
+
+        // Normalize description
+        if (!payload.description && data.name) {
+          payload.description = data.name
+        }
+
+        // Normalize context (hỗ trợ cả object và string)
+        if (!payload.context || typeof payload.context === 'string') {
+          payload.context = {
+            module: typeof payload.context === 'string' ? payload.context : '',
+            scope: '',
+            system: ''
+          }
+        }
+
+        // Normalize trigger (hỗ trợ cả trigger object và triggers array)
+        if (!payload.trigger || typeof payload.trigger !== 'object') {
+          if (data.triggers && Array.isArray(data.triggers) && data.triggers.length > 0) {
+            payload.trigger = {
+              event: data.triggers[0],
+              source: 'UI'
+            }
+          } else {
+            payload.trigger = {
+              event: 'User initiates action',
+              source: 'UI'
+            }
+          }
+        }
+
+        // Normalize non_functional_constraints (hỗ trợ cả non_functional_constraints và constraints)
+        if (!payload.non_functional_constraints && data.constraints) {
+          payload.non_functional_constraints = data.constraints
+        }
+
+        // Normalize inputs và outputs (hỗ trợ cả object array và string array)
+        if (payload.inputs && Array.isArray(payload.inputs) && payload.inputs.length > 0 && typeof payload.inputs[0] === 'string') {
+          payload.inputs = payload.inputs.map((input) => ({
+            name: input,
+            type: 'string',
+            required: true
+          }))
+        }
+
+        if (payload.outputs && Array.isArray(payload.outputs) && payload.outputs.length > 0 && typeof payload.outputs[0] === 'string') {
+          payload.outputs = payload.outputs.map((output) => ({
+            name: output,
+            type: 'string',
+            optional: false
+          }))
+        }
+
+        // Normalize rules (hỗ trợ cả object array và string array)
+        if (payload.rules && Array.isArray(payload.rules) && payload.rules.length > 0 && typeof payload.rules[0] === 'string') {
+          payload.rules = payload.rules.map((rule, index) => ({
+            id: `R${index + 1}`,
+            description: rule
+          }))
+        }
+
+        // Normalize exceptions (hỗ trợ cả object array và string array)
+        if (payload.exceptions && Array.isArray(payload.exceptions) && payload.exceptions.length > 0 && typeof payload.exceptions[0] === 'string') {
+          payload.exceptions = payload.exceptions.map((exc, index) => ({
+            id: `E${index + 1}`,
+            at_step: payload.main_flow?.length || 1,
+            type: 'System',
+            description: exc,
+            system_response: `Handle exception: ${exc}`
+          }))
         }
 
         // 🔥 FIX: Loại bỏ các trường không cần thiết
@@ -783,6 +1116,12 @@ export default {
         const response = await usecaseApi.createUsecase(this.selectedVersionId, payload)
 
         if (response.data && response.data.status === 'Success') {
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          if (response.data.data?.newVersionId) {
+            this.selectedVersionId = response.data.data.newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+          }
           this.toast.success('Use case created successfully')
           await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
@@ -798,8 +1137,8 @@ export default {
           console.error('🔍 BE Error details:', error.response.data)
         }
 
-        const errorMessage =
-          error.response?.data?.message || error.message || 'Failed to create use case'
+        const { formatErrorForDisplay } = require('@/utils/errorMessages')
+        const errorMessage = formatErrorForDisplay(error, 'Failed to create use case. Please try again.')
         this.toast.error(errorMessage)
       } finally {
         this.isManagingUsecase = false
@@ -812,6 +1151,12 @@ export default {
         const response = await usecaseApi.updateUsecase(this.selectedVersionId, usecaseId, data)
 
         if (response.data.status === 'Success') {
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          if (response.data.data?.newVersionId) {
+            this.selectedVersionId = response.data.data.newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+          }
           this.toast.success('Use case updated successfully')
           await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
@@ -835,7 +1180,14 @@ export default {
         const response = await usecaseApi.deleteUsecase(this.selectedVersionId, usecaseId)
 
         if (response.data.status === 'Success') {
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          if (response.data.data?.newVersionId) {
+            this.selectedVersionId = response.data.data.newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+          }
           this.toast.success('Use case deleted successfully')
+          await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
         } else {
           throw new Error(response.data.message || 'Failed to delete use case')
@@ -870,11 +1222,182 @@ export default {
       }
     },
 
+    // Helper: Normalize ID to string for comparison (handles ObjectId, string, object with _id/id)
+    normalizeId(id) {
+      if (!id) return ''
+      // If it's already a string, return as is
+      if (typeof id === 'string') return id
+      // If it's an object with _id or id property
+      if (typeof id === 'object' && id !== null) {
+        return String(id._id || id.id || id.toString() || '')
+      }
+      // Otherwise convert to string
+      return String(id)
+    },
+
+    // Helper: Populate conflict items with actual usecase objects
+    populateConflictsWithUsecases(conflicts) {
+      if (!conflicts || !Array.isArray(conflicts) || !this.useCases || this.useCases.length === 0) {
+        console.warn('⚠️ Cannot populate conflicts:', {
+          hasConflicts: !!conflicts,
+          conflictsIsArray: Array.isArray(conflicts),
+          hasUseCases: !!this.useCases,
+          useCasesLength: this.useCases?.length || 0
+        })
+        return conflicts || []
+      }
+
+      console.log('🔄 Populating conflicts with usecases:', {
+        conflictsCount: conflicts.length,
+        usecasesCount: this.useCases.length,
+        sampleConflict: conflicts[0],
+        sampleUsecase: this.useCases[0]
+      })
+
+      // Create a map of usecases by normalized ID for quick lookup
+      // Try multiple ID formats to ensure we can match
+      const usecaseMap = new Map()
+      this.useCases.forEach((uc) => {
+        // Get all possible ID representations
+        const _id = uc._id
+        const id = uc.id
+        const _idStr = _id ? String(_id) : ''
+        const idStr = id ? String(id) : ''
+        const normalizedId = this.normalizeId(_id || id)
+        
+        // Store with all possible formats
+        if (normalizedId) {
+          usecaseMap.set(normalizedId, uc)
+        }
+        if (_idStr && _idStr !== normalizedId) {
+          usecaseMap.set(_idStr, uc)
+        }
+        if (idStr && idStr !== normalizedId && idStr !== _idStr) {
+          usecaseMap.set(idStr, uc)
+        }
+        
+        // Also try with object _id if it exists
+        if (_id && typeof _id === 'object') {
+          const objIdStr = _id.toString ? _id.toString() : String(_id)
+          if (objIdStr && objIdStr !== normalizedId && objIdStr !== _idStr) {
+            usecaseMap.set(objIdStr, uc)
+          }
+        }
+      })
+
+      console.log('📋 Usecase map created with', usecaseMap.size, 'entries')
+      console.log('🔑 Sample map keys:', Array.from(usecaseMap.keys()).slice(0, 3))
+
+      // Populate each conflict's items with usecase objects
+      return conflicts.map((conflict, conflictIndex) => {
+        const populatedItems = (conflict.items || []).map((item, itemIndex) => {
+          console.log(`🔍 Processing conflict ${conflictIndex}, item ${itemIndex}:`, {
+            item,
+            itemType: typeof item,
+            itemIsObject: typeof item === 'object' && item !== null,
+            itemKeys: typeof item === 'object' && item !== null ? Object.keys(item) : []
+          })
+          
+          // Try multiple ways to extract the ID
+          let itemId = this.normalizeId(item?._id || item?.id || item)
+          
+          // If item is an object, try to get ID from various properties
+          if (typeof item === 'object' && item !== null) {
+            // Try $oid format (MongoDB extended JSON)
+            if (item.$oid) {
+              itemId = String(item.$oid)
+            }
+            // Try toString if it's an ObjectId-like object
+            else if (item.toString && typeof item.toString === 'function') {
+              const toStringResult = item.toString()
+              if (toStringResult && toStringResult !== '[object Object]') {
+                itemId = String(toStringResult)
+              }
+            }
+          }
+          
+          console.log(`🔑 Normalized item ID:`, itemId)
+          
+          // Try to find usecase by normalized ID
+          let usecase = usecaseMap.get(itemId)
+          
+          // If not found, try multiple string representations
+          if (!usecase && item) {
+            const attempts = [
+              String(item),
+              item.toString ? item.toString() : String(item),
+              item._id ? String(item._id) : null,
+              item.id ? String(item.id) : null,
+              item.$oid ? String(item.$oid) : null
+            ].filter(Boolean)
+            
+            for (const attempt of attempts) {
+              usecase = usecaseMap.get(attempt)
+              if (usecase) {
+                console.log(`✅ Found usecase with attempt:`, attempt)
+                break
+              }
+            }
+          }
+          
+          // Debug log if usecase not found
+          if (!usecase) {
+            console.error('❌ Could not find usecase for conflict item:', {
+              conflictIndex,
+              itemIndex,
+              itemId,
+              item,
+              itemType: typeof item,
+              availableUsecaseIds: Array.from(usecaseMap.keys()).slice(0, 10),
+              totalUsecases: this.useCases.length,
+              sampleUsecaseId: this.useCases[0]?._id,
+              sampleUsecaseIdType: typeof this.useCases[0]?._id
+            })
+          } else {
+            console.log(`✅ Successfully matched usecase:`, {
+              itemId,
+              usecaseName: usecase.name || usecase.goal,
+              usecaseId: usecase._id || usecase.id
+            })
+          }
+          
+          // If we found the usecase, return it; otherwise return the original item
+          return usecase || item
+        })
+
+        const populatedConflict = {
+          ...conflict,
+          items: populatedItems,
+        }
+        
+        console.log(`✅ Populated conflict ${conflictIndex}:`, {
+          conflictId: conflict.conflict_id,
+          itemsCount: populatedItems.length,
+          populatedItems: populatedItems.map(item => ({
+            isUsecase: !!(item && item.name),
+            name: item?.name || item?.goal || 'N/A',
+            id: item?._id || item?.id || item
+          }))
+        })
+
+        return populatedConflict
+      })
+    },
+
     checkConflictsOnLoad() {
       const currentVersion = this.versions.find((v) => v._id === this.selectedVersionId)
       if (currentVersion && currentVersion.pending_conflicts?.length > 0) {
+        console.log('🔍 Found conflicts on load:', {
+          conflictsCount: currentVersion.pending_conflicts.length,
+          usecasesCount: this.useCases.length,
+          rawConflicts: currentVersion.pending_conflicts
+        })
         this.hasConflicts = true
-        this.pendingConflicts = currentVersion.pending_conflicts
+        this.pendingConflicts = this.populateConflictsWithUsecases(currentVersion.pending_conflicts)
+        console.log('✅ Populated conflicts:', {
+          populatedCount: this.pendingConflicts.length,
+          sampleConflict: this.pendingConflicts[0]
+        })
         this.selectedResolutions = {}
       } else {
         this.hasConflicts = false
@@ -884,8 +1407,17 @@ export default {
 
     checkConflicts() {
       if (this.currentVersionDetails && this.currentVersionDetails.pending_conflicts?.length > 0) {
+        console.log('🔍 Found conflicts in currentVersionDetails:', {
+          conflictsCount: this.currentVersionDetails.pending_conflicts.length,
+          usecasesCount: this.useCases.length
+        })
         this.hasConflicts = true
-        this.pendingConflicts = this.currentVersionDetails.pending_conflicts
+        this.pendingConflicts = this.populateConflictsWithUsecases(
+          this.currentVersionDetails.pending_conflicts
+        )
+        console.log('✅ Populated conflicts from currentVersionDetails:', {
+          populatedCount: this.pendingConflicts.length
+        })
         this.selectedResolutions = {}
       } else {
         this.hasConflicts = false
@@ -894,15 +1426,61 @@ export default {
     },
 
     selectResolution(conflictId, useCaseId) {
-      this.selectedResolutions = {
-        ...this.selectedResolutions,
-        [conflictId]: useCaseId,
+      // If useCaseId is null, deselect (remove from selectedResolutions)
+      if (useCaseId === null || useCaseId === undefined) {
+        const newResolutions = { ...this.selectedResolutions }
+        delete newResolutions[conflictId]
+        this.selectedResolutions = newResolutions
+      } else {
+        // Select the usecase
+        this.selectedResolutions = {
+          ...this.selectedResolutions,
+          [conflictId]: useCaseId,
+        }
       }
     },
 
     showConflictDetail(useCase) {
-      this.currentDetailUseCase = useCase
+      // Find the conflict this usecase belongs to
+      const useCaseId = String(useCase._id || useCase.id || '')
+      let conflictId = null
+      
+      // Search through pendingConflicts to find which conflict contains this usecase
+      for (const conflict of this.pendingConflicts) {
+        const hasUsecase = conflict.items?.some(item => {
+          const itemId = String(item?._id || item?.id || item || '')
+          return itemId === useCaseId
+        })
+        if (hasUsecase) {
+          conflictId = conflict.conflict_id
+          break
+        }
+      }
+      
+      // Add conflict_id to usecase object for modal
+      this.currentDetailUseCase = {
+        ...useCase,
+        conflict_id: conflictId
+      }
       this.showConflictDetailModal = true
+    },
+
+    selectUsecaseFromModal() {
+      if (!this.currentDetailUseCase || !this.currentDetailUseCase.conflict_id) {
+        return
+      }
+      const useCaseId = String(this.currentDetailUseCase._id || this.currentDetailUseCase.id || '')
+      const conflictId = this.currentDetailUseCase.conflict_id
+      
+      // Toggle selection: if already selected, deselect; otherwise select
+      const currentSelection = this.selectedResolutions[conflictId]
+      if (currentSelection === useCaseId) {
+        // Deselect
+        this.selectResolution(conflictId, null)
+      } else {
+        // Select
+        this.selectResolution(conflictId, useCaseId)
+      }
     },
 
     async resolveAllConflicts() {
@@ -944,13 +1522,29 @@ export default {
 
       this.isSkippingConflict = true
       try {
-        await skipConflict(this.selectedVersionId, conflictId)
+        // Save current selectedResolutions before skipping (excluding the skipped conflict)
+        const savedResolutions = { ...this.selectedResolutions }
+        delete savedResolutions[conflictId]
+        
+        await skipConflictApi(this.selectedVersionId, conflictId)
         this.toast.success('Conflict skipped successfully')
 
         await this.fetchProjectData(this.project._id)
+        
+        // Restore selectedResolutions after fetching (excluding the skipped conflict)
+        // Only keep resolutions for conflicts that still exist
+        const existingConflictIds = new Set(this.pendingConflicts.map(c => c.conflict_id))
+        const restoredResolutions = {}
+        Object.keys(savedResolutions).forEach(id => {
+          if (existingConflictIds.has(id)) {
+            restoredResolutions[id] = savedResolutions[id]
+          }
+        })
+        this.selectedResolutions = restoredResolutions
       } catch (error) {
         console.error('Error skipping conflict:', error)
-        this.toast.error(error.response?.data?.error || 'Failed to skip conflict')
+        const { formatErrorForDisplay } = require('@/utils/errorMessages')
+        this.toast.error(formatErrorForDisplay(error, 'Failed to skip conflict. Please try again.'))
       } finally {
         this.isSkippingConflict = false
       }
@@ -971,6 +1565,13 @@ export default {
 
     async checkIncrementalProcessingStatus() {
       try {
+        // ✅ MỚI: Khôi phục state từ localStorage trước
+        const restored = this.restoreIncrementalState()
+        if (restored) {
+          console.log('✅ Restored incremental state, starting polling...')
+          this.startPolling(this.selectedVersionId, 'incremental')
+        }
+
         const response = await getVersionStatus(this.selectedVersionId)
         const { status, version } = response.data.data
 
@@ -978,10 +1579,12 @@ export default {
           // QUAN TRỌNG: Chỉ set incremental nếu KHÔNG có retry đang chạy
           if (!this.isRetrying) {
             this.isProcessingIncremental = true
-            this.processingProgress = version.progress || 0
-            this.currentStage = this.formatStageName(version.stage || 'initializing')
+            this.saveIncrementalState() // ✅ Lưu state
             this.startPolling(this.selectedVersionId, 'incremental')
           }
+        } else if (status !== 'processing') {
+          // ✅ Nếu không còn processing, xóa state đã lưu
+          this.clearIncrementalState()
         }
       } catch (error) {
         console.error('Error checking processing status:', error)
@@ -993,9 +1596,8 @@ export default {
 
       this.isProcessingIncremental = true
       this.isProcessingFailed = false
-      this.processingProgress = 0
-      this.currentStage = 'Initializing...'
       this.showIncrementalButton = false
+      this.saveIncrementalState() // ✅ Lưu state khi bắt đầu
 
       try {
         const response = await startIncrementalAnalysis(
@@ -1029,6 +1631,12 @@ export default {
           return
         }
 
+        // Chỉ Owner mới được phép select version
+        if (!checkIsOwner(this.project)) {
+          this.toast.warning('Only project owner can switch versions')
+          return
+        }
+
         const res = await switchCurrentVersion(this.project._id, versionId)
 
         if (!res?.data) throw new Error('No response from server')
@@ -1036,7 +1644,26 @@ export default {
           throw new Error(res.data.message || 'Failed to switch version')
         }
 
+        const oldVersionId = this.selectedVersionId
         this.selectedVersionId = versionId
+        // Fetch usecases cho version mới
+        await this.fetchUseCases()
+        // Lưu vào localStorage để đồng bộ giữa các trang
+        saveSelectedVersion(this.project._id, versionId)
+
+        // Emit socket event để các thành viên khác biết version đã được switch
+        if (socket && socket.connected) {
+          const userId = localStorage.getItem('userId')
+          socket.emit('version_event', {
+            type: 'VERSION_SWITCHED',
+            projectId: this.project._id,
+            userId: userId,
+            toVersionId: versionId,
+            fromVersionId: oldVersionId,
+            timestamp: new Date(),
+          })
+          console.log('📡 Emitted VERSION_SWITCHED socket event')
+        }
 
         await this.fetchProjectData(this.project._id)
         this.$forceUpdate()
@@ -1046,7 +1673,7 @@ export default {
         this.toast.error('Failed to switch version')
       }
     },
-    // ========== POLLING & PROGRESS MANAGEMENT ==========
+    // ========== POLLING & LOADING MANAGEMENT ==========
     startPolling(versionId, mode = 'retry') {
       this.cleanupPolling()
 
@@ -1055,22 +1682,25 @@ export default {
           const response = await getVersionStatus(versionId)
           const { status, version } = response.data.data
 
-          if (version) {
-            this.processingProgress = version.progress || this.processingProgress
-            this.currentStage = this.formatStageName(version.stage || 'initializing')
-
-            if (mode === 'incremental' && status === 'processing') {
+          if (version && mode === 'incremental' && status === 'processing') {
               this.isProcessingIncremental = true
-            }
           }
 
           if (mode === 'retry') {
             this.saveRetryState()
+          } else if (mode === 'incremental') {
+            // ✅ Lưu state khi đang polling
+            this.saveIncrementalState()
           }
 
           if (status !== 'processing') {
             this.stopPolling()
-            if (mode === 'retry') this.clearRetryState()
+            if (mode === 'retry') {
+              this.clearRetryState()
+            } else if (mode === 'incremental') {
+              // ✅ Xóa state khi không còn processing
+              this.clearIncrementalState()
+            }
 
             if (status === 'completed' || status === 'has_conflicts') {
               this.handleProcessingSuccess(mode)
@@ -1083,32 +1713,6 @@ export default {
           this.handlePollingError(mode)
         }
       }, 2000)
-    },
-
-    updateProgressFromStage(stage) {
-      const stageProgressMap = {
-        initializing: 15,
-        input: 25,
-        analyzing: 40,
-        normalization: 70,
-        finalizing: 90,
-        completed: 100,
-      }
-
-      this.currentStage = this.formatStageName(stage)
-      this.processingProgress = stageProgressMap[stage] || 0
-    },
-
-    formatStageName(stage) {
-      const stageNames = {
-        initializing: 'Initializing',
-        input: 'Processing Inputs',
-        analyzing: 'Analyzing Requirements',
-        normalization: 'Normalizing Data',
-        finalizing: 'Finalizing',
-        completed: 'Completed',
-      }
-      return stageNames[stage] || stage.charAt(0).toUpperCase() + stage.slice(1)
     },
 
     async checkAndRestorePolling() {
@@ -1129,13 +1733,6 @@ export default {
 
         this.currentPollingVersionId = processingVersion._id
         this.startPolling(processingVersion._id, isIncremental ? 'incremental' : 'retry')
-
-        if (processingVersion.progress) {
-          this.processingProgress = processingVersion.progress
-        }
-        if (processingVersion.stage) {
-          this.currentStage = this.formatStageName(processingVersion.stage)
-        }
       }
     },
 
@@ -1145,8 +1742,6 @@ export default {
         versionId: this.currentPollingVersionId,
         projectName: this.project.name,
         projectDescription: this.project.description,
-        processingProgress: this.processingProgress,
-        currentStage: this.currentStage,
         timestamp: new Date().getTime(),
         type: 'retry',
       }
@@ -1157,10 +1752,76 @@ export default {
       localStorage.removeItem(`retry_${this.project._id}`)
     },
 
+    saveIncrementalState() {
+      const incrementalState = {
+        projectId: this.project._id,
+        versionId: this.selectedVersionId,
+        isProcessing: this.isProcessingIncremental,
+        estimateInfo: { ...this.estimateInfo },
+        batchProgress: { ...this.batchProgress },
+        timestamp: new Date().getTime(),
+        type: 'incremental',
+      }
+      localStorage.setItem(`incremental_${this.project._id}`, JSON.stringify(incrementalState))
+      console.log('💾 Saved incremental state to localStorage:', incrementalState)
+    },
+
+    clearIncrementalState() {
+      localStorage.removeItem(`incremental_${this.project._id}`)
+      // ✅ Reset agent state và message
+      this.agentState = null
+      this.agentMessage = null
+      this.processingProgress = 0
+      console.log('🗑️ Cleared incremental state from localStorage')
+    },
+
+    restoreIncrementalState() {
+      try {
+        const savedState = localStorage.getItem(`incremental_${this.project._id}`)
+        if (!savedState) return false
+
+        const state = JSON.parse(savedState)
+        
+        // Chỉ restore nếu cùng project và version
+        if (state.projectId === this.project._id && state.versionId === this.selectedVersionId) {
+          // Kiểm tra xem state có còn hợp lệ không (không quá 1 giờ)
+          const now = new Date().getTime()
+          const stateAge = now - state.timestamp
+          const MAX_AGE = 60 * 60 * 1000 // 1 giờ
+
+          if (stateAge < MAX_AGE && state.isProcessing) {
+            console.log('🔄 Restoring incremental state from localStorage:', state)
+            this.isProcessingIncremental = state.isProcessing
+            this.estimateInfo = { ...state.estimateInfo }
+            this.batchProgress = { ...state.batchProgress }
+            return true
+          } else {
+            // State quá cũ, xóa đi
+            this.clearIncrementalState()
+            return false
+          }
+        }
+        return false
+      } catch (error) {
+        console.error('Error restoring incremental state:', error)
+        this.clearIncrementalState()
+        return false
+      }
+    },
+
     cleanupPolling() {
       if (this.pollingInterval) {
         clearInterval(this.pollingInterval)
         this.pollingInterval = null
+      }
+      // ✅ Đảm bảo reset state khi cleanup để tránh lỗi khi chuyển trang
+      this.isRetrying = false
+      this.isProcessingIncremental = false
+      this.currentPollingVersionId = null
+      // ✅ MỚI: Clear incremental fetch timeout
+      if (this.incrementalFetchTimeout) {
+        clearTimeout(this.incrementalFetchTimeout)
+        this.incrementalFetchTimeout = null
       }
     },
 
@@ -1172,10 +1833,13 @@ export default {
     },
 
     async handleProcessingSuccess(mode) {
-      this.processingProgress = 100
-      this.currentStage = 'Completed'
       this.stopPolling()
       this.isProcessingFailed = false // Reset failed state
+
+      // ✅ Xóa state khi hoàn thành
+      if (mode === 'incremental') {
+        this.clearIncrementalState()
+      }
 
       const fetchSuccess = await this.fetchProjectData(this.project._id)
       const currentVersion = this.versions.find((v) => v._id === this.selectedVersionId)
@@ -1187,7 +1851,7 @@ export default {
 
       const message =
         mode === 'incremental' ? 'Incremental analysis completed!' : 'Retry completed successfully!'
-      this.toast.success(message)
+      //this.toast.success(message)
     },
 
     handleProcessingFailure(mode) {
@@ -1197,7 +1861,8 @@ export default {
       if (mode === 'incremental') {
         this.isProcessingIncremental = false
         this.isProcessingFailed = true
-        this.processingProgress = 100 // Force 100% để hiển thị error banner
+        // ✅ Xóa state khi failed
+        this.clearIncrementalState()
       } else {
         this.isRetrying = false
         this.isProcessingFailed = false
@@ -1213,6 +1878,8 @@ export default {
     handleIncrementalError(message) {
       this.isProcessingIncremental = false
       this.showIncrementalButton = true
+      // ✅ Xóa state khi có lỗi
+      this.clearIncrementalState()
       this.toast.error(message)
     },
 
@@ -1232,8 +1899,6 @@ export default {
 
       this.isRetrying = true
       this.isProcessingFailed = false
-      this.processingProgress = 0
-      this.currentStage = 'Initializing...'
       this.currentPollingVersionId = this.failedVersion._id
 
       try {
@@ -1261,8 +1926,63 @@ export default {
     },
 
     // ========== INPUT MANAGEMENT ==========
-    async handleAddInputs(formData) {
+    async handleAddInputs(payload) {
       this.isAddingInput = true
+
+      // Xử lý cả trường hợp payload là object { formData, tempInputData } hoặc chỉ là formData (backward compatibility)
+      let formData, tempInputData
+      if (payload && payload.formData && payload.tempInputData) {
+        formData = payload.formData
+        tempInputData = payload.tempInputData
+      } else {
+        // Backward compatibility: nếu chỉ truyền formData
+        formData = payload
+        tempInputData = null
+      }
+
+      // Tạo input tạm thời với loading state
+      const tempInputs = []
+      if (tempInputData && tempInputData.files && tempInputData.files.length > 0) {
+        tempInputData.files.forEach((file) => {
+          const tempInput = {
+            _id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            _isLoading: true,
+            _isTemp: true,
+            type: this.getFileType(file.type || ''),
+            cleaned_text: file.name || 'Unknown file',
+            clean_text: file.name || 'Unknown file',
+            raw_text: file.name || 'Unknown file',
+            is_processed: false,
+            created_at: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            metadata: {
+              filename: file.name || 'Unknown file',
+              size: file.size || 0
+            }
+          }
+          tempInputs.push(tempInput)
+        })
+      }
+      if (tempInputData && tempInputData.rawText) {
+        const tempInput = {
+          _id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          _isLoading: true,
+          _isTemp: true,
+          type: 'text',
+          cleaned_text: tempInputData.rawText.substring(0, 100) + (tempInputData.rawText.length > 100 ? '...' : ''),
+          clean_text: tempInputData.rawText.substring(0, 100) + (tempInputData.rawText.length > 100 ? '...' : ''),
+          raw_text: tempInputData.rawText,
+          is_processed: false,
+          created_at: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        }
+        tempInputs.push(tempInput)
+      }
+
+      // Thêm inputs tạm thời vào đầu danh sách (chỉ nếu có tempInputs)
+      if (tempInputs.length > 0) {
+        this.inputs = [...tempInputs, ...this.inputs]
+      }
 
       try {
         const versionId = this.selectedVersionId
@@ -1276,18 +1996,86 @@ export default {
         const [_, response] = await Promise.all([minLoadingTime, apiCall])
 
         if (response.data && response.data.status === 'Success') {
-          this.toast.success('Input added successfully!')
-          this.showAddInputModal = false
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          if (response.data.data?.newVersionId) {
+            this.selectedVersionId = response.data.data.newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+          }
+          
+          // Xóa inputs tạm thời và fetch data mới
+          this.inputs = this.inputs.filter(input => !input._isTemp)
           await this.fetchProjectData(this.project._id)
+          this.toast.success('Input added successfully!')
         } else {
-          this.toast.error(response.data.message || 'Failed to add input')
+          // Đánh dấu inputs tạm thời là lỗi
+          tempInputs.forEach(tempInput => {
+            const index = this.inputs.findIndex(i => i._id === tempInput._id)
+            if (index !== -1) {
+              this.inputs[index]._isLoading = false
+              this.inputs[index]._isError = true
+            }
+          })
+          const { formatErrorForDisplay } = require('@/utils/errorMessages')
+          this.toast.error(formatErrorForDisplay({ response: { data: response.data } }, 'Failed to add input. Please try again.'))
+          
+          // Xóa inputs lỗi sau 5 giây
+          setTimeout(() => {
+            this.inputs = this.inputs.filter(input => !input._isTemp || !input._isError)
+          }, 5000)
         }
       } catch (error) {
         console.error('Error adding inputs:', error)
-        this.toast.error('Error adding input')
+        // Đánh dấu inputs tạm thời là lỗi
+        tempInputs.forEach(tempInput => {
+          const index = this.inputs.findIndex(i => i._id === tempInput._id)
+          if (index !== -1) {
+            this.inputs[index]._isLoading = false
+            this.inputs[index]._isError = true
+          }
+        })
+        
+        // Xử lý thông báo lỗi chi tiết
+        let errorMessage = 'Không thể thêm input. Vui lòng thử lại.'
+        
+        // Kiểm tra lỗi 409 (Conflict) - version đang processing
+        if (error.response?.status === 409) {
+          errorMessage = error.response?.data?.message || 
+                        error.response?.data?.data?.message ||
+                        'Không thể thêm input khi version đang được xử lý. Vui lòng đợi quá trình xử lý hoàn tất.'
+        } else if (error.response?.data?.message) {
+          errorMessage = error.response.data.message
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+        
+        // Sử dụng formatErrorForDisplay nếu có
+        try {
+          const { formatErrorForDisplay } = require('@/utils/errorMessages')
+          errorMessage = formatErrorForDisplay(error, errorMessage)
+        } catch (e) {
+          // Nếu không load được formatErrorForDisplay, dùng message đã xử lý
+        }
+        
+        this.toast.error(errorMessage)
+        
+        // Xóa inputs lỗi sau 5 giây
+        setTimeout(() => {
+          this.inputs = this.inputs.filter(input => !input._isTemp || !input._isError)
+        }, 5000)
       } finally {
         this.isAddingInput = false
       }
+    },
+    
+    getFileType(mimeType) {
+      if (!mimeType || typeof mimeType !== 'string') return 'text'
+      const lowerMimeType = mimeType.toLowerCase()
+      if (lowerMimeType.includes('pdf')) return 'pdf'
+      if (lowerMimeType.includes('word') || lowerMimeType.includes('document') || lowerMimeType.includes('msword') || lowerMimeType.includes('officedocument')) return 'docx'
+      if (lowerMimeType.includes('image')) return 'image'
+      if (lowerMimeType.includes('audio')) return 'audio'
+      return 'text'
     },
 
     openDeleteSpecificModal(inputId) {
@@ -1311,10 +2099,17 @@ export default {
 
         const response = await deleteSpecificInput(versionId, inputId)
         if (response.data?.status === 'Success') {
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          if (response.data.data?.newVersionId) {
+            this.selectedVersionId = response.data.data.newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+          }
           this.toast.success('Input deleted successfully!')
           await this.fetchProjectData(this.project._id)
         } else {
-          this.toast.error(response.data?.message || 'Delete failed')
+          const { formatErrorForDisplay } = require('@/utils/errorMessages')
+          this.toast.error(formatErrorForDisplay({ response: { data: response.data } }, 'Failed to delete input. Please try again.'))
         }
       } catch (err) {
         console.error(err)
@@ -1326,6 +2121,7 @@ export default {
 
     // ========== HELPER METHODS ==========
     handleClickOutside(e) {
+      if (!this.$el || !e || !e.target) return
       const dropdown = this.$el.querySelector('.dropdown')
       if (dropdown && !dropdown.contains(e.target)) {
         // Note: Dropdown logic is now handled in ProjectHeader component
@@ -1339,6 +2135,37 @@ export default {
       console.log('🔄 Active users updated in parent:', activeUsers)
       this.activeUsers = activeUsers
     },
+    handleEstimateReceived(event) {
+      console.log('📊 Received estimate event:', event)
+
+      // Chỉ xử lý nếu cùng versionId
+      if (event.versionId !== this.selectedVersionId) {
+        return
+      }
+
+      // Cập nhật estimate info (không bỏ qua events từ chính mình vì cần hiển thị)
+      this.estimateInfo = {
+        estimated_count: event.estimate.estimated_count,
+        summary: event.estimate.summary,
+        estimated_batches: event.estimate.estimated_batches,
+        isEstimating: false
+      }
+
+      // Reset batch progress khi nhận estimate
+      this.batchProgress = {
+        currentBatch: 0,
+        totalBatches: event.estimate.estimated_batches,
+        usecasesInBatch: 0,
+        savedCount: 0,
+        totalCount: event.estimate.estimated_count
+      }
+
+      // ✅ Lưu state khi nhận estimate
+      this.saveIncrementalState()
+
+      // Hiển thị toast với estimate
+    },
+
     handleIncrementalProgress(event) {
       console.log('📊 Received incremental progress event:', event)
 
@@ -1347,25 +2174,128 @@ export default {
         return
       }
 
-      // Bỏ qua events từ chính mình (đã có polling)
-      if (event.userId === this.currentUserId) {
-        console.log('🔕 Skipping own progress event')
-        return
-      }
+      // ✅ FIX: KHÔNG bỏ qua events từ chính mình cho INCREMENTAL_PROGRESS
+      // Vì đây là events từ backend broadcast, cần để fetch usecases ngay
+      // Polling chỉ check status, không fetch usecases realtime
 
       // Cập nhật UI state
-      this.processingProgress = event.progress
-      this.currentStage = this.formatStageName(event.stage)
       this.isProcessingIncremental = event.isProcessing
 
-      console.log(`🔄 Updated progress from realtime: ${event.progress}% - ${event.stage}`)
+      // ✅ Cập nhật agent state và message
+      if (event.agentState) {
+        this.agentState = event.agentState
+      }
+      if (event.message) {
+        this.agentMessage = event.message
+      }
+      if (event.progress !== undefined) {
+        this.processingProgress = event.progress
+      }
 
-      // Nếu hoàn thành, refresh data sau 1 giây
-      if (event.progress === 100 && !event.isProcessing) {
+      // Cập nhật estimate info nếu đang estimating
+      if (event.stage === 'estimating') {
+        this.estimateInfo.isEstimating = true
+      } else if (event.stage !== 'estimating') {
+        this.estimateInfo.isEstimating = false
+      }
+
+      // Cập nhật batch progress nếu có
+      if (event.batchInfo) {
+        this.batchProgress = {
+          currentBatch: event.batchInfo.currentBatch || this.batchProgress.currentBatch,
+          totalBatches: event.batchInfo.totalBatches || this.batchProgress.totalBatches || this.estimateInfo.estimated_batches,
+          usecasesInBatch: event.batchInfo.usecasesInBatch || 0,
+          savedCount: event.batchInfo.savedCount || this.batchProgress.savedCount || 0,
+          totalCount: this.estimateInfo.estimated_count || this.batchProgress.totalCount
+        }
+      }
+
+      // ✅ Lưu state mỗi khi có progress update
+      if (event.isProcessing) {
+        this.saveIncrementalState()
+      }
+
+      console.log(`🔄 Updated loading state from realtime: ${event.isProcessing ? 'processing' : 'completed'}`)
+
+      // ✅ MỚI: Refresh usecases ngay khi nhận progress update (trong lúc processing)
+      // Để user thấy usecases mới xuất hiện từng batch một
+      // ✅ QUAN TRỌNG: Refresh data khi có shouldRefresh flag hoặc khi đang processing
+      const shouldRefresh = event.shouldRefresh === true;
+      if (event.isProcessing || shouldRefresh) {
+        console.log(`🔄 Processing in progress${shouldRefresh ? ' (shouldRefresh flag)' : ''}, fetching new usecases...`)
+        // ✅ FIX: Giảm debounce từ 500ms xuống 200ms để fetch nhanh hơn
+        if (this.incrementalFetchTimeout) {
+          clearTimeout(this.incrementalFetchTimeout)
+        }
+        this.incrementalFetchTimeout = setTimeout(() => {
+          this.fetchUseCasesIncremental(event.versionId)
+        }, shouldRefresh ? 100 : 200) // Nếu có shouldRefresh flag, refresh nhanh hơn
+      }
+
+      // Nếu hoàn thành, refresh toàn bộ data ngay lập tức
+      if (!event.isProcessing) {
         console.log('✅ Incremental analysis completed via realtime, refreshing data...')
-        setTimeout(() => {
-          this.fetchProjectData(this.project._id)
-        }, 1000)
+        console.log(`📊 Current usecases count before refresh: ${this.useCases.length}`)
+        // ✅ Xóa state khi hoàn thành
+        this.clearIncrementalState()
+        if (this.incrementalFetchTimeout) {
+          clearTimeout(this.incrementalFetchTimeout)
+        }
+        // ✅ FIX: Gọi fetchUseCases trực tiếp để đảm bảo usecases được refresh ngay
+        // Sau đó mới fetch toàn bộ project data
+        this.fetchUseCases().then(() => {
+          console.log(`✅ Usecases refreshed after completion: ${this.useCases.length} usecases`)
+          // Fetch toàn bộ project data sau khi usecases đã được refresh
+          setTimeout(() => {
+            this.fetchProjectData(this.project._id)
+          }, 500)
+        }).catch(err => {
+          console.error('❌ Error fetching usecases after completion:', err)
+          // Fallback: vẫn fetch project data
+          setTimeout(() => {
+            this.fetchProjectData(this.project._id)
+          }, 500)
+        })
+      }
+    },
+
+    // ✅ MỚI: Fetch usecases mới trong lúc processing (incremental)
+    async fetchUseCasesIncremental(versionId) {
+      if (!versionId || versionId !== this.selectedVersionId) return
+
+      try {
+        const response = await usecaseApi.getUsecases(versionId)
+        if (response.data && response.data.data) {
+          const newUseCases = response.data.data || []
+          
+          // ✅ FIX: Khi đang processing, merge usecases mới vào list hiện tại (tránh duplicate)
+          // Khi completed, sẽ replace toàn bộ qua fetchUseCases()
+          const existingIds = new Set(this.useCases.map(uc => String(uc.id || uc._id)))
+          
+          let addedCount = 0
+          newUseCases.forEach(uc => {
+            const id = String(uc.id || uc._id)
+            if (!existingIds.has(id)) {
+              this.useCases.push(uc)
+              existingIds.add(id)
+              addedCount++
+            }
+          })
+          
+          if (addedCount > 0) {
+            console.log(`✅ Added ${addedCount} new usecases incrementally (total: ${this.useCases.length})`)
+            this.$forceUpdate()
+          } else if (newUseCases.length > 0 && newUseCases.length !== this.useCases.length) {
+            // ✅ FIX: Nếu số lượng khác nhau nhưng không có usecase mới, có thể có vấn đề với merge
+            // Replace toàn bộ để đảm bảo đồng bộ
+            console.log(`🔄 Usecases count mismatch (API: ${newUseCases.length}, Local: ${this.useCases.length}), replacing all...`)
+            this.useCases = newUseCases
+            this.$forceUpdate()
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error fetching incremental usecases:', error)
+        // Không hiển thị error toast để tránh spam
       }
     },
     stopPolling() {
@@ -1384,8 +2314,6 @@ export default {
 
       this.isProcessingFailed = false
       this.isProcessingIncremental = true
-      this.processingProgress = 0
-      this.currentStage = 'Initializing...'
 
       try {
         const response = await startIncrementalAnalysis(
@@ -1406,7 +2334,18 @@ export default {
         console.error('Error retrying incremental analysis:', error)
         this.isProcessingFailed = true
         this.isProcessingIncremental = false
-        this.toast.error(error.message || 'Failed to retry incremental analysis')
+        const { formatErrorForDisplay } = require('@/utils/errorMessages')
+        this.toast.error(formatErrorForDisplay(error, 'Failed to retry incremental analysis. Please try again.'))
+      }
+    },
+    // Handle remove highlight when user hovers
+    handleRemoveHighlight(usecaseId) {
+      this.newUseCaseIds.delete(usecaseId)
+      // ✅ QUAN TRỌNG: Thêm vào previousUseCaseIds và lưu vào localStorage
+      this.previousUseCaseIds.add(usecaseId)
+      if (this.selectedVersionId) {
+        const storageKey = `previousUseCaseIds_${this.selectedVersionId}`
+        localStorage.setItem(storageKey, JSON.stringify(Array.from(this.previousUseCaseIds)))
       }
     },
   },
@@ -1414,57 +2353,53 @@ export default {
 </script>
 
 <style scoped>
-/* CSS remains the same as original */
+/* Modern UI Styles */
 .project-detail-view {
-  padding: 15px;
-  background: #f9fafb;
+  padding: 20px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .view-body {
   display: flex;
   gap: 24px;
   flex: 1;
-}
-/* Navigation Tabs */
-.navigation-tabs {
-  display: flex;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-  padding: 0 2rem;
+  min-width: 0;
+  overflow-x: hidden;
+  transition: gap 0.3s ease;
 }
 
-.tab-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* Responsive */
+@media (max-width: 1024px) {
+  .project-detail-view {
+    padding: 15px;
+  }
+
+  .view-body {
+    gap: 16px;
+  }
 }
 
-.tab-button:hover {
-  color: #1a365d;
-  background: var(--background-color);
-}
+@media (max-width: 768px) {
+  .project-detail-view {
+    padding: 10px;
+  }
 
-.tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
-}
-
-.tab-button .material-symbols-outlined {
-  font-size: 20px;
-}
-
-.tab-button .material-symbols-outlined {
-  font-size: 20px;
+  .view-body {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 </style>

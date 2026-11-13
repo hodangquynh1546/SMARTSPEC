@@ -37,6 +37,27 @@
           </button>
         </div>
 
+        <!-- Drag Settings -->
+        <div class="toolbar-group">
+          <button 
+            class="toolbar-btn" 
+            :class="{ active: snapToGrid }"
+            @click="snapToGrid = !snapToGrid" 
+            title="Snap to Grid (Ctrl+G)"
+          >
+            <span class="material-symbols-outlined">grid_on</span>
+            Snap
+          </button>
+        </div>
+
+        <!-- CRUD Controls -->
+        <div class="toolbar-group">
+          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Manage Diagram">
+            <span class="material-symbols-outlined">settings</span>
+            Manage
+          </button>
+        </div>
+
         <!-- Export Controls -->
         <div class="toolbar-group">
           <button class="toolbar-btn" @click="exportAsSVG" title="Export as SVG">
@@ -155,12 +176,12 @@
         <!-- Swimlanes -->
         <g class="swimlanes-layer" v-if="showSwimlanes && computedLanes.length > 0">
           <g v-for="(lane, index) in computedLanes" :key="`lane-${lane.id}`">
-            <!-- Lane background -->
+            <!-- Lane background với chiều cao giới hạn -->
             <rect
               :x="getLaneX(index)"
-              :y="virtualSpace.minY"
+              :y="virtualSpace.minY + laneHeaderHeight"
               :width="getLaneWidth()"
-              :height="virtualSpace.height"
+              :height="laneMaxHeight"
               :class="['swimlane-bg', index % 2 === 0 ? 'swimlane-even' : 'swimlane-odd']"
             />
 
@@ -175,13 +196,25 @@
               {{ lane.name || `Lane ${index + 1}` }}
             </text>
 
+            <!-- Lane boundary (bottom) -->
+            <line
+              :x1="getLaneX(index)"
+              :y1="virtualSpace.minY + laneHeaderHeight + laneMaxHeight"
+              :x2="getLaneX(index) + getLaneWidth()"
+              :y2="virtualSpace.minY + laneHeaderHeight + laneMaxHeight"
+              class="swimlane-boundary"
+              stroke="#d1d5db"
+              stroke-width="2"
+              stroke-dasharray="5,5"
+            />
+
             <!-- Lane separator -->
             <line
               v-if="index > 0"
               :x1="getLaneX(index)"
-              :y1="virtualSpace.minY"
+              :y1="virtualSpace.minY + laneHeaderHeight"
               :x2="getLaneX(index)"
-              :y2="virtualSpace.maxY"
+              :y2="virtualSpace.minY + laneHeaderHeight + laneMaxHeight"
               class="swimlane-separator"
             />
           </g>
@@ -242,10 +275,18 @@
               filter="url(#activity-drop-shadow)"
             />
 
-            <!-- Decision/Merge Nodes -->
+            <!-- Decision Nodes -->
             <polygon
-              v-else-if="node.type === 'decision' || node.type === 'merge'"
+              v-else-if="node.type === 'decision'"
               :points="getDecisionPoints(node)"
+              :class="`activity-node node-${node.type}`"
+              filter="url(#activity-drop-shadow)"
+            />
+
+            <!-- Merge Nodes -->
+            <polygon
+              v-else-if="node.type === 'merge'"
+              :points="getMergePoints(node)"
               :class="`activity-node node-${node.type}`"
               filter="url(#activity-drop-shadow)"
             />
@@ -280,6 +321,7 @@
               :width="getNodeLabelSize(node).width"
               :height="getNodeLabelSize(node).height"
               class="node-content"
+              style="pointer-events: none;"
             >
               <div
                 class="node-label"
@@ -332,10 +374,20 @@
           <polygon
             v-else-if="
               draggingType === 'node' &&
-              (draggingElement.type === 'decision' || draggingElement.type === 'merge')
+              draggingElement.type === 'decision'
             "
             :points="
               getDecisionPoints({ ...draggingElement, x: dragPosition.x, y: dragPosition.y })
+            "
+            :class="`activity-node node-${draggingElement.type} drag-preview-element`"
+          />
+          <polygon
+            v-else-if="
+              draggingType === 'node' &&
+              draggingElement.type === 'merge'
+            "
+            :points="
+              getMergePoints({ ...draggingElement, x: dragPosition.x, y: dragPosition.y })
             "
             :class="`activity-node node-${draggingElement.type} drag-preview-element`"
           />
@@ -352,6 +404,26 @@
           />
         </g>
       </svg>
+    </div>
+
+    <!-- Auto-fix Suggestion Banner -->
+    <div
+      v-if="showAutoFixSuggestion && !previewMode && editable"
+      class="auto-fix-banner"
+    >
+      <div class="auto-fix-content">
+        <span class="material-symbols-outlined">info</span>
+        <span class="auto-fix-text">
+          Có {{ nodesOutsideLaneCount }} node đang nằm ngoài lane. Nhấp để tự động sắp xếp lại.
+        </span>
+        <button class="auto-fix-btn" @click="autoFixNodesInLanes">
+          <span class="material-symbols-outlined">auto_fix_high</span>
+          Sắp xếp tự động
+        </button>
+        <button class="auto-fix-close" @click="dismissAutoFixSuggestion">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
     </div>
 
     <!-- Status Bar - Ẩn trong preview mode và optimize mode -->
@@ -377,10 +449,359 @@
       </div>
       <div class="status-item">Zoom: {{ Math.round(internalZoom * 100) }}%</div>
     </div>
+
+    <!-- Management Modal -->
+    <div v-if="managementModal.visible" class="management-modal-overlay" @click="closeManagementModal">
+      <div class="management-modal-content" @click.stop>
+        <div class="management-modal-header">
+          <h2>Manage Activity Diagram</h2>
+          <button class="modal-close-btn" @click="closeManagementModal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="management-tabs">
+          <button
+            v-for="tab in managementTabs"
+            :key="tab.id"
+            class="tab-btn"
+            :class="{ active: managementModal.activeTab === tab.id }"
+            @click="managementModal.activeTab = tab.id"
+          >
+            <span class="material-symbols-outlined">{{ tab.icon }}</span>
+            {{ tab.label }}
+            <span class="tab-count">({{ getTabCount(tab.id) }})</span>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="management-tab-content">
+          <!-- Nodes Tab -->
+          <div v-if="managementModal.activeTab === 'nodes'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Nodes</h3>
+              <button class="btn-add-item" @click="openCreateForm('node')">
+                <span class="material-symbols-outlined">add</span>
+                Add Node
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="node in positionedNodes"
+                :key="node.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">{{ node.label || 'Unnamed Node' }}</div>
+                  <div class="item-meta">
+                    <span class="node-type-badge">{{ node.type }}</span>
+                    <span v-if="node.lane_id" class="lane-badge">
+                      Lane: {{ getLaneName(node.lane_id) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button 
+                    class="btn-edit" 
+                    @click="openEditForm('node', node)" 
+                    title="Edit"
+                    :disabled="isCrudLoading"
+                  >
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('node', node)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === node.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === node.id }"
+                    >
+                      {{ deletingElementId === node.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="positionedNodes.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">circle</span>
+                <p>No nodes yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edges Tab -->
+          <div v-if="managementModal.activeTab === 'edges'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Edges</h3>
+              <button 
+                class="btn-add-item" 
+                @click="openCreateForm('edge')"
+                :disabled="isCrudLoading"
+              >
+                <span class="material-symbols-outlined">add</span>
+                Add Edge
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="edge in computedEdges"
+                :key="edge.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">
+                    {{ edge.source?.label || 'Unknown' }} → {{ edge.target?.label || 'Unknown' }}
+                  </div>
+                  <div v-if="edge.condition || edge.guard || edge.trigger" class="item-description">
+                    <span v-if="edge.condition">Condition: {{ edge.condition }}</span>
+                    <span v-if="edge.guard">Guard: {{ edge.guard }}</span>
+                    <span v-if="edge.trigger">Trigger: {{ edge.trigger }}</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button 
+                    class="btn-edit" 
+                    @click="openEditForm('edge', edge)" 
+                    title="Edit"
+                    :disabled="isCrudLoading"
+                  >
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('edge', edge)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === edge.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === edge.id }"
+                    >
+                      {{ deletingElementId === edge.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedEdges.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">arrow_right_alt</span>
+                <p>No edges yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lanes Tab -->
+          <div v-if="managementModal.activeTab === 'lanes'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Lanes</h3>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="lane in computedLanes"
+                :key="lane.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">{{ lane.name || 'Unnamed Lane' }}</div>
+                  <div class="item-meta">
+                    <span>{{ getNodesInLane(lane.id).length }} nodes</span>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button 
+                    class="btn-edit" 
+                    @click="openEditForm('lane', lane)" 
+                    title="Edit"
+                    :disabled="isCrudLoading"
+                  >
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('lane', lane)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === lane.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === lane.id }"
+                    >
+                      {{ deletingElementId === lane.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedLanes.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">view_column</span>
+                <p>No lanes yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create/Edit Form Modal -->
+    <div v-if="formModal.visible" class="form-modal-overlay" @click="closeFormModal">
+      <div class="form-modal-content" @click.stop>
+        <div class="form-modal-header">
+          <h3>{{ formModal.isEdit ? 'Edit' : 'Create' }} {{ formModal.type }}</h3>
+          <button class="modal-close-btn" @click="closeFormModal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="form-modal-body">
+          <!-- Node Form -->
+          <div v-if="formModal.type === 'node'">
+            <div class="form-group">
+              <label>Node Label *</label>
+              <input
+                v-model="formModal.data.label"
+                type="text"
+                placeholder="Enter node label"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Node Type *</label>
+              <select v-model="formModal.data.type" class="form-input">
+                <option value="start">Start</option>
+                <option value="end">End</option>
+                <option value="action">Action</option>
+                <option value="decision">Decision</option>
+                <option value="merge">Merge</option>
+                <option value="fork">Fork</option>
+                <option value="join">Join</option>
+                <option value="object">Object</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Lane (Optional)</label>
+              <select v-model="formModal.data.lane_id" class="form-input">
+                <option :value="null">No Lane</option>
+                <option
+                  v-for="lane in computedLanes"
+                  :key="lane.id"
+                  :value="lane.id"
+                >
+                  {{ lane.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Edge Form -->
+          <div v-if="formModal.type === 'edge'">
+            <div class="form-group">
+              <label>From Node *</label>
+              <select v-model="formModal.data.from" class="form-input">
+                <option value="">Select From Node</option>
+                <option
+                  v-for="node in positionedNodes"
+                  :key="node.id"
+                  :value="node.id"
+                >
+                  {{ node.label }} ({{ node.type }})
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>To Node *</label>
+              <select v-model="formModal.data.to" class="form-input">
+                <option value="">Select To Node</option>
+                <option
+                  v-for="node in positionedNodes"
+                  :key="node.id"
+                  :value="node.id"
+                >
+                  {{ node.label }} ({{ node.type }})
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Condition</label>
+              <input
+                v-model="formModal.data.condition"
+                type="text"
+                placeholder="Enter condition (optional)"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Guard</label>
+              <input
+                v-model="formModal.data.guard"
+                type="text"
+                placeholder="Enter guard (optional)"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Trigger</label>
+              <input
+                v-model="formModal.data.trigger"
+                type="text"
+                placeholder="Enter trigger (optional)"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <!-- Lane Form -->
+          <div v-if="formModal.type === 'lane'">
+            <div class="form-group">
+              <label>Lane Name *</label>
+              <input
+                v-model="formModal.data.name"
+                type="text"
+                placeholder="Enter lane name"
+                class="form-input"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="form-modal-footer">
+          <button 
+            class="btn-secondary" 
+            @click="closeFormModal"
+            :disabled="isCrudLoading"
+          >
+            Cancel
+          </button>
+          <button 
+            class="btn-primary" 
+            @click="saveForm"
+            :disabled="isCrudLoading"
+          >
+            <span 
+              v-if="isCrudLoading" 
+              class="material-symbols-outlined spinning"
+              style="font-size: 18px; margin-right: 6px;"
+            >
+              sync
+            </span>
+            {{ isCrudLoading ? 'Saving...' : (formModal.isEdit ? 'Update' : 'Create') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import {
+  updateNode,
+  deleteNode,
+  createEdge,
+  updateEdge,
+  deleteEdge,
+  updateLane,
+  deleteLane,
+  getActivityDiagramById,
+} from '@/api/avd';
+
 export default {
   name: 'ActivityDiagramRenderer',
   props: {
@@ -447,12 +868,16 @@ export default {
       isExporting: false,
       isSaving: false,
       lastSaved: null,
+      // Drag settings
+      snapToGrid: false,
+      gridSize: 20,
+      dragSmoothness: 1, // 1 = immediate, higher = smoother but slower
 
       virtualSpace: {
         minX: 0,
         maxX: 1200,
         minY: 0,
-        maxY: 800,
+        maxY: 2060,
         get width() {
           return this.maxX - this.minX
         },
@@ -467,13 +892,47 @@ export default {
         },
       },
 
-      // Preview generation
       previewGenerated: false,
-
-      // Layout configuration
       nodeSpacing: 120,
       laneHeaderHeight: 60,
       horizontalSpacing: 200,
+      laneMaxHeight: 2000,
+      fixedLaneWidth: 600, // Kích thước cố định cho mỗi lane (tăng 1.5 lần từ 400)
+      showAutoFixSuggestion: false,
+      autoFixDismissed: false,
+
+      // Management Modal state
+      managementModal: {
+        visible: false,
+        activeTab: 'nodes',
+        hasChanges: false,
+      },
+      managementTabs: [
+        { id: 'nodes', label: 'Nodes', icon: 'circle' },
+        { id: 'edges', label: 'Edges', icon: 'arrow_right_alt' },
+        { id: 'lanes', label: 'Lanes', icon: 'view_column' },
+      ],
+      formModal: {
+        visible: false,
+        type: null, // 'node', 'edge', 'lane'
+        isEdit: false,
+        hasChanges: false,
+        data: {
+          label: '',
+          type: 'action',
+          lane_id: null,
+          from: '',
+          to: '',
+          condition: '',
+          guard: '',
+          trigger: '',
+          name: '',
+        },
+        element: null,
+      },
+      diagramId: null,
+      isCrudLoading: false,
+      deletingElementId: null,
     }
   },
   computed: {
@@ -486,7 +945,6 @@ export default {
         transformOrigin: '0 0',
       }
     },
-
     safeDiagramData() {
       return {
         nodes: Array.isArray(this.diagramData?.nodes) ? this.diagramData.nodes : [],
@@ -494,60 +952,232 @@ export default {
         lanes: Array.isArray(this.diagramData?.lanes) ? this.diagramData.lanes : [],
       }
     },
-
     computedLanes() {
-      return this.safeDiagramData.lanes
-    },
+      const lanes = this.safeDiagramData.lanes
+      if (!lanes || lanes.length === 0) return []
 
+      return lanes.map((lane, index) => ({
+        id: this.normalizeId(lane._id || lane.id || `lane-${index}`),
+        name: lane.name || `Lane ${index + 1}`,
+        _originalData: lane,
+      }))
+    },
     computedNodes() {
       const nodes = this.safeDiagramData.nodes
       if (!nodes || nodes.length === 0) return []
 
+      // Nhóm nodes theo lane để phân bố vị trí
+      const nodesByLane = {}
+      const nodesWithoutLane = []
+      
+      nodes.forEach((node) => {
+        // Normalize lane_id để hỗ trợ cả ObjectId và string
+        const rawLaneId = node.lane_id || null
+        const laneId = rawLaneId ? this.normalizeId(rawLaneId) : null
+        if (laneId) {
+          if (!nodesByLane[laneId]) {
+            nodesByLane[laneId] = []
+          }
+          nodesByLane[laneId].push(node)
+        } else {
+          nodesWithoutLane.push(node)
+        }
+      })
+
+      // Đếm số node trong mỗi lane để tính Y position
+      const laneNodeCounts = {}
+      Object.keys(nodesByLane).forEach(laneId => {
+        laneNodeCounts[laneId] = 0
+      })
+
+      let globalIndex = 0
       return nodes.map((node, index) => {
-        // Set dimensions based on node type
         const { width, height } = this.getNodeSize(node.type)
+        const nodeHalfWidth = width / 2
+        const nodeHalfHeight = height / 2
+        const safePadding = 20
+        
+        // Normalize node ID và lane_id
+        const rawLaneId = node.lane_id || null
+        const laneId = rawLaneId ? this.normalizeId(rawLaneId) : null
+        const nodeId = this.normalizeId(node._id || node.id || `node-${index}`)
+        const laneIndex = this.getLaneIndex(laneId)
+        
+        // Nếu node có position từ database, validate và điều chỉnh nếu cần
+        let x, y
+        const isStartOrEnd = node.type === 'start' || node.type === 'end'
+        
+        if (node.position && typeof node.position.x === 'number' && typeof node.position.y === 'number') {
+          x = node.position.x
+          y = node.position.y
+          
+          // ✅ Nếu node có lane_id và KHÔNG phải start/end, validate position có nằm trong lane không
+          // Start và end nodes có thể di chuyển tự do giữa các lanes
+          if (laneId && laneIndex !== -1 && this.computedLanes.length > 0 && !isStartOrEnd) {
+            const laneX = this.getLaneX(laneIndex)
+            const laneWidth = this.getLaneWidth()
+            const laneMinX = laneX + safePadding + nodeHalfWidth
+            const laneMaxX = laneX + laneWidth - safePadding - nodeHalfWidth
+            const laneMinY = this.virtualSpace.minY + this.laneHeaderHeight + nodeHalfHeight + safePadding
+            const laneMaxY = this.virtualSpace.minY + this.laneHeaderHeight + this.laneMaxHeight - nodeHalfHeight - safePadding
+            
+            // Kiểm tra xem position có nằm trong lane không
+            const isXInLane = x >= laneMinX && x <= laneMaxX
+            const isYInLane = y >= laneMinY && y <= laneMaxY
+            
+            // Nếu position nằm ngoài lane, điều chỉnh lại
+            if (!isXInLane || !isYInLane) {
+              // Điều chỉnh X về giữa lane
+              x = laneX + laneWidth / 2
+              
+              // Điều chỉnh Y: nếu Y quá nhỏ, đặt ở đầu lane; nếu quá lớn, đặt ở cuối lane
+              if (y < laneMinY) {
+                y = laneMinY
+              } else if (y > laneMaxY) {
+                y = laneMaxY
+              }
+              
+              // Nếu Y vẫn nằm ngoài, tính lại dựa trên thứ tự node trong lane
+              if (y < laneMinY || y > laneMaxY) {
+                const nodeIndexInLane = laneNodeCounts[laneId] || 0
+                laneNodeCounts[laneId] = nodeIndexInLane + 1
+                const yOffset = this.laneHeaderHeight + 100 + nodeIndexInLane * 120
+                y = this.virtualSpace.minY + yOffset
+              }
+            }
+          }
+        } else {
+          // Tính vị trí mặc định dựa trên lane
+          if (laneIndex !== -1 && this.computedLanes.length > 0) {
+            // Node có lane - đặt vào giữa lane
+            const laneX = this.getLaneX(laneIndex)
+            const laneWidth = this.getLaneWidth()
+            const laneCenterX = laneX + laneWidth / 2
+            
+            // Tính Y trong lane (bắt đầu từ sau header, phân bố theo thứ tự)
+            const nodeIndexInLane = laneNodeCounts[laneId] || 0
+            laneNodeCounts[laneId] = nodeIndexInLane + 1
+            const yOffset = this.laneHeaderHeight + 100 + nodeIndexInLane * 120
+            
+            x = laneCenterX
+            y = this.virtualSpace.minY + yOffset
+          } else {
+            // Node không có lane - phân bố tự do
+            x = this.virtualSpace.centerX + (globalIndex % 5) * 150
+            y = this.virtualSpace.centerY - 200 + Math.floor(globalIndex / 5) * 100
+            globalIndex++
+          }
+        }
+
+        // Tạo label mặc định dựa trên type nếu không có label
+        let defaultLabel = 'Unnamed'
+        if (!node.label || node.label.trim() === '') {
+          switch (node.type) {
+            case 'start':
+              defaultLabel = 'Start'
+              break
+            case 'end':
+              defaultLabel = 'End'
+              break
+            case 'decision':
+              defaultLabel = 'Decision'
+              break
+            case 'merge':
+              defaultLabel = 'Merge'
+              break
+            case 'fork':
+              defaultLabel = 'Fork'
+              break
+            case 'join':
+              defaultLabel = 'Join'
+              break
+            case 'action':
+              defaultLabel = 'Action'
+              break
+            case 'object':
+              defaultLabel = 'Object'
+              break
+            default:
+              defaultLabel = `Node ${index + 1}`
+          }
+        }
 
         return {
-          id: node.id || `node-${index}`,
+          id: nodeId,
           type: node.type || 'action',
-          label: node.label || 'Unnamed',
-          lane_id: node.lane_id || null,
+          label: node.label && node.label.trim() !== '' ? node.label : defaultLabel,
+          lane_id: laneId,
           width: width,
           height: height,
+          x: x,
+          y: y,
+          position: node.position ? { ...node.position } : { x, y },
           _originalData: node,
         }
       })
     },
-
     positionedNodes() {
-      if (this.computedNodes.length === 0) return []
-
-      // Tạo bản sao để không làm thay đổi dữ liệu gốc
-      const nodes = JSON.parse(JSON.stringify(this.computedNodes))
-      
-      // Tính toán layout
-      this.calculateNodeLayout(nodes)
-
-      return nodes
+      // Trả về nodes với vị trí đã tính toán
+      return this.computedNodes
     },
-
+    nodesOutsideLaneCount() {
+      if (!this.computedLanes.length || this.autoFixDismissed) return 0
+      
+      let count = 0
+      this.computedNodes.forEach((node) => {
+        // Bỏ qua start và end nodes vì chúng được phép di chuyển tự do
+        const isStartOrEnd = node.type === 'start' || node.type === 'end'
+        if (isStartOrEnd) return
+        
+        if (node.lane_id) {
+          const laneIndex = this.getLaneIndex(node.lane_id)
+          if (laneIndex !== -1) {
+            const laneX = this.getLaneX(laneIndex)
+            const laneWidth = this.getLaneWidth()
+            const nodeHalfWidth = node.width / 2
+            const nodeHalfHeight = node.height / 2
+            const safePadding = 20
+            
+            const laneMinX = laneX + safePadding + nodeHalfWidth
+            const laneMaxX = laneX + laneWidth - safePadding - nodeHalfWidth
+            const laneMinY = this.virtualSpace.minY + this.laneHeaderHeight + nodeHalfHeight + safePadding
+            const laneMaxY = this.virtualSpace.minY + this.laneHeaderHeight + this.laneMaxHeight - nodeHalfHeight - safePadding
+            
+            const isXInLane = node.x >= laneMinX && node.x <= laneMaxX
+            const isYInLane = node.y >= laneMinY && node.y <= laneMaxY
+            
+            if (!isXInLane || !isYInLane) {
+              count++
+            }
+          }
+        }
+      })
+      return count
+    },
     computedEdges() {
       const edges = this.safeDiagramData.edges
       if (!edges || edges.length === 0) return []
 
       return edges
         .map((edge, index) => {
-          const sourceNode = this.positionedNodes.find((n) => n.id === edge.from)
-          const targetNode = this.positionedNodes.find((n) => n.id === edge.to)
+          // Normalize edge IDs để hỗ trợ cả ObjectId và string
+          // edge.from và edge.to có thể là ObjectId hoặc string
+          const fromId = this.normalizeId(edge.from)
+          const toId = this.normalizeId(edge.to)
+          
+          const sourceNode = this.positionedNodes.find((n) => n.id === fromId)
+          const targetNode = this.positionedNodes.find((n) => n.id === toId)
+          
           return {
-            id: `edge-${index}`,
-            from: edge.from,
-            to: edge.to,
+            id: this.normalizeId(edge._id || edge.id || `edge-${index}`),
+            from: fromId,
+            to: toId,
             condition: edge.condition,
             guard: edge.guard,
             trigger: edge.trigger,
             source: sourceNode,
             target: targetNode,
+            _originalData: edge,
           }
         })
         .filter((edge) => edge.source && edge.target)
@@ -557,7 +1187,10 @@ export default {
     diagramData: {
       handler(newData, oldData) {
         this.updateVirtualSpace()
-
+        // Kiểm tra nodes nằm ngoài lane để hiển thị gợi ý
+        this.$nextTick(() => {
+          this.checkNodesOutsideLanes()
+        })
         if (this.autoGeneratePreview && !this.previewGenerated) {
           this.$nextTick(() => {
             setTimeout(() => {
@@ -574,6 +1207,16 @@ export default {
       deep: true,
       immediate: true,
     },
+    nodesOutsideLaneCount: {
+      handler(count) {
+        if (count > 0 && !this.autoFixDismissed) {
+          this.showAutoFixSuggestion = true
+        } else {
+          this.showAutoFixSuggestion = false
+        }
+      },
+      immediate: true,
+    },
     zoomLevel: {
       handler(newZoom) {
         this.internalZoom = newZoom
@@ -586,7 +1229,13 @@ export default {
     this.setupEventListeners()
     this.setupKeyboardShortcuts()
     this.setupFullscreenListener()
-    this.centerViewport()
+    
+    // Center viewport sau khi DOM đã render và computed properties đã được tính toán
+    // Sử dụng $nextTick để đảm bảo computed properties (computedNodes, computedLanes) đã được tính
+    this.$nextTick(() => {
+      this.updateVirtualSpace() // Update lại virtualSpace sau khi computed properties đã sẵn sàng
+      this.centerViewport()
+    })
 
     if (this.autoGeneratePreview) {
       this.$nextTick(() => {
@@ -606,192 +1255,19 @@ export default {
     this.cleanupFullscreenListener()
   },
   methods: {
-    // Thuật toán layout mới cho activity diagram
-    calculateNodeLayout(nodes) {
-      // Xây dựng đồ thị từ edges
-      const graph = this.buildGraph(nodes)
-      
-      // Tìm node start
-      const startNode = nodes.find(node => node.type === 'start')
-      if (!startNode) return
-
-      // Tính toán vị trí theo BFS với xử lý đặc biệt cho decision nodes
-      this.calculatePositionsBFS(nodes, graph, startNode)
-      
-      // Căn chỉnh vị trí theo lanes
-      this.adjustPositionsByLanes(nodes)
-    },
-
-    buildGraph(nodes) {
-      const graph = {}
-      const edges = this.safeDiagramData.edges
-
-      // Khởi tạo graph
-      nodes.forEach(node => {
-        graph[node.id] = { node, children: [], parents: [] }
-      })
-
-      // Thêm edges vào graph
-      edges.forEach(edge => {
-        if (graph[edge.from] && graph[edge.to]) {
-          graph[edge.from].children.push(graph[edge.to])
-          graph[edge.to].parents.push(graph[edge.from])
-        }
-      })
-
-      return graph
-    },
-
-    calculatePositionsBFS(nodes, graph, startNode) {
-      const visited = new Set()
-      const queue = [{ node: graph[startNode.id], depth: 0, horizontalOrder: 0 }]
-      const depthMap = new Map()
-      const horizontalOrders = new Map()
-      let maxDepth = 0
-
-      // BFS để tính depth và horizontal order
-      while (queue.length > 0) {
-        const current = queue.shift()
-        const currentNode = current.node.node
-        
-        if (visited.has(currentNode.id)) continue
-        visited.add(currentNode.id)
-
-        // Lưu depth và horizontal order
-        depthMap.set(currentNode.id, current.depth)
-        horizontalOrders.set(currentNode.id, current.horizontalOrder)
-        maxDepth = Math.max(maxDepth, current.depth)
-
-        // Xử lý đặc biệt cho decision nodes
-        if (currentNode.type === 'decision') {
-          this.layoutDecisionNode(currentNode, current.node.children, current.depth + 1, horizontalOrders)
-        }
-
-        // Thêm children vào queue
-        current.node.children.forEach((child, index) => {
-          if (!visited.has(child.node.id)) {
-            let horizontalOrder = current.horizontalOrder
-            
-            // Điều chỉnh horizontal order cho các nhánh từ decision
-            if (currentNode.type === 'decision') {
-              const condition = this.getEdgeCondition(currentNode.id, child.node.id)
-              if (condition === 'Yes') {
-                horizontalOrder = current.horizontalOrder - 1 // Nhánh Yes sang trái
-              } else if (condition === 'No') {
-                horizontalOrder = current.horizontalOrder + 1 // Nhánh No sang phải
-              }
-            } else {
-              // Các node khác giữ nguyên horizontal order
-              horizontalOrder = current.horizontalOrder + (index - (current.node.children.length - 1) / 2)
-            }
-            
-            queue.push({ 
-              node: child, 
-              depth: current.depth + 1,
-              horizontalOrder: horizontalOrder
-            })
-          }
-        })
+    // ============ UTILITY METHODS ============
+    normalizeId(id) {
+      if (!id) return null
+      if (typeof id === 'object' && id.$oid) {
+        return id.$oid
       }
-
-      // Tính toán vị trí thực tế dựa trên depth và horizontal order
-      this.calculateActualPositions(nodes, depthMap, horizontalOrders, maxDepth)
+      if (typeof id === 'object' && id.toString) {
+        return id.toString()
+      }
+      return String(id)
     },
 
-    layoutDecisionNode(decisionNode, children, depth, horizontalOrders) {
-      if (children.length === 0) return
-
-      // Phân bố các children của decision node
-      children.forEach((child, index) => {
-        const condition = this.getEdgeCondition(decisionNode.id, child.node.id)
-        let horizontalOrder = horizontalOrders.get(decisionNode.id) || 0
-        
-        if (condition === 'Yes') {
-          horizontalOrder = (horizontalOrders.get(decisionNode.id) || 0) - 1
-        } else if (condition === 'No') {
-          horizontalOrder = (horizontalOrders.get(decisionNode.id) || 0) + 1
-        }
-        
-        horizontalOrders.set(child.node.id, horizontalOrder)
-      })
-    },
-
-    getEdgeCondition(fromId, toId) {
-      const edge = this.safeDiagramData.edges.find(edge => 
-        edge.from === fromId && edge.to === toId
-      )
-      return edge ? edge.condition : null
-    },
-
-    calculateActualPositions(nodes, depthMap, horizontalOrders, maxDepth) {
-      // Tìm phạm vi horizontal order để căn chỉnh
-      let minOrder = Infinity
-      let maxOrder = -Infinity
-      
-      horizontalOrders.forEach(order => {
-        minOrder = Math.min(minOrder, order)
-        maxOrder = Math.max(maxOrder, order)
-      })
-
-      // Tính toán vị trí thực tế
-      nodes.forEach(node => {
-        const depth = depthMap.get(node.id) || 0
-        const horizontalOrder = horizontalOrders.get(node.id) || 0
-        
-        // Tính Y theo depth (start trên cùng, end dưới cùng)
-        if (node.type === 'start') {
-          node.y = this.laneHeaderHeight + 50
-        } else if (node.type === 'end') {
-          node.y = this.laneHeaderHeight + 50 + ((maxDepth + 1) * this.nodeSpacing)
-        } else {
-          node.y = this.laneHeaderHeight + 50 + (depth * this.nodeSpacing)
-        }
-
-        // Tính X theo horizontal order
-        const orderRange = maxOrder - minOrder
-        const availableWidth = this.virtualSpace.width - 200 // Padding 100 mỗi bên
-        
-        if (orderRange === 0) {
-          // Chỉ có một cột, căn giữa
-          node.x = this.virtualSpace.width / 2
-        } else {
-          // Phân bố đều theo horizontal order
-          const normalizedOrder = (horizontalOrder - minOrder) / orderRange
-          node.x = 100 + (normalizedOrder * availableWidth)
-        }
-      })
-
-      // Đảm bảo start và end node ở giữa
-      const startNode = nodes.find(node => node.type === 'start')
-      const endNode = nodes.find(node => node.type === 'end')
-      if (startNode) startNode.x = this.virtualSpace.width / 2
-      if (endNode) endNode.x = this.virtualSpace.width / 2
-    },
-
-    adjustPositionsByLanes(nodes) {
-      if (this.computedLanes.length === 0) return
-
-      const laneWidth = this.virtualSpace.width / this.computedLanes.length
-      
-      nodes.forEach(node => {
-        const laneIndex = this.computedLanes.findIndex(lane => lane.id === node.lane_id)
-        if (laneIndex !== -1) {
-          // Giới hạn node trong lane của nó, nhưng vẫn giữ vị trí tương đối
-          const laneCenter = (laneIndex * laneWidth) + (laneWidth / 2)
-          const laneMinX = laneIndex * laneWidth + 50
-          const laneMaxX = (laneIndex + 1) * laneWidth - 50
-          
-          node.x = Math.max(laneMinX, Math.min(laneMaxX, node.x))
-          
-          // Nếu node bị giới hạn, điều chỉnh để gần với center hơn
-          if (node.x === laneMinX || node.x === laneMaxX) {
-            node.x = laneCenter
-          }
-        }
-      })
-    },
-
-    // Node sizing
+    // ============ NODE METHODS ============
     getNodeSize(type) {
       switch (type) {
         case 'start':
@@ -813,164 +1289,44 @@ export default {
       }
     },
 
-    // Lane positioning
     getLaneX(index) {
-      const laneCount = Math.max(this.computedLanes.length, 1)
-      return this.virtualSpace.minX + index * (this.virtualSpace.width / laneCount)
+      // Sử dụng kích thước cố định cho lanes
+      return this.virtualSpace.minX + index * this.fixedLaneWidth
     },
 
     getLaneWidth() {
-      return this.virtualSpace.width / Math.max(this.computedLanes.length, 1)
+      // Trả về kích thước cố định
+      return this.fixedLaneWidth
     },
 
-    // Virtual Space Management
-    updateVirtualSpace() {
-      const allElements = [...this.positionedNodes]
-      if (allElements.length === 0) {
-        this.virtualSpace.minX = 0
-        this.virtualSpace.maxX = this.containerWidth
-        this.virtualSpace.minY = 0
-        this.virtualSpace.maxY = this.containerHeight
-        return
-      }
-
-      const bounds = allElements.reduce(
-        (acc, element) => ({
-          minX: Math.min(acc.minX, element.x - (element.width || 60)),
-          maxX: Math.max(acc.maxX, element.x + (element.width || 60)),
-          minY: Math.min(acc.minY, element.y - (element.height || 60)),
-          maxY: Math.max(acc.maxY, element.y + (element.height || 60)),
-        }),
-        { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
-      )
-
-      const padding = 100
-      this.virtualSpace.minX = Math.min(this.virtualSpace.minX, bounds.minX - padding)
-      this.virtualSpace.maxX = Math.max(this.virtualSpace.maxX, bounds.maxX + padding)
-      this.virtualSpace.minY = Math.min(this.virtualSpace.minY, bounds.minY - padding)
-      this.virtualSpace.maxY = Math.max(this.virtualSpace.maxY, bounds.maxY + padding)
-    },
-
-    centerViewport() {
-      const centerX = this.containerWidth / 2 - this.virtualSpace.centerX * this.internalZoom
-      const centerY = this.containerHeight / 2 - this.virtualSpace.centerY * this.internalZoom
-      this.viewport.x = centerX
-      this.viewport.y = centerY
-    },
-
-    // Node and Edge Methods
-    calculateEdgePath(edge) {
-      const { source, target } = edge
-      
-      // Xử lý đặc biệt cho edges từ decision node
-      if (source.type === 'decision') {
-        return this.calculateDecisionEdgePath(edge)
-      }
-      
-      const dx = target.x - source.x
-      const dy = target.y - source.y
-      const length = Math.sqrt(dx * dx + dy * dy)
-      if (length === 0) return ''
-
-      const nx = dx / length
-      const ny = dy / length
-
-      const startX = source.x + nx * this.getNodeOffset(source, nx, ny)
-      const startY = source.y + ny * this.getNodeOffset(source, nx, ny)
-      const endX = target.x - nx * this.getNodeOffset(target, -nx, -ny)
-      const endY = target.y - ny * this.getNodeOffset(target, -nx, -ny)
-
-      return `M ${startX} ${startY} L ${endX} ${endY}`
-    },
-
-    calculateDecisionEdgePath(edge) {
-      const { source, target, condition } = edge
-      const startOffset = this.getNodeOffset(source, 0, 1) // Xuống từ đáy
-      
-      let startX = source.x
-      let startY = source.y + startOffset
-      
-      let endX = target.x
-      let endY = target.y - this.getNodeOffset(target, 0, -1) // Vào từ trên
-
-      // Điều chỉnh cho Yes/No branches
-      if (condition === 'Yes') {
-        // Yes branch - cong sang trái
-        const controlX1 = source.x - this.horizontalSpacing / 3
-        const controlY1 = startY + (endY - startY) * 0.3
-        const controlX2 = target.x - this.horizontalSpacing / 3
-        const controlY2 = endY - (endY - startY) * 0.3
-        return `M ${startX} ${startY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${endX} ${endY}`
-      } else if (condition === 'No') {
-        // No branch - cong sang phải
-        const controlX1 = source.x + this.horizontalSpacing / 3
-        const controlY1 = startY + (endY - startY) * 0.3
-        const controlX2 = target.x + this.horizontalSpacing / 3
-        const controlY2 = endY - (endY - startY) * 0.3
-        return `M ${startX} ${startY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${endX} ${endY}`
-      }
-
-      // Mặc định đường thẳng
-      return `M ${startX} ${startY} L ${endX} ${endY}`
-    },
-
-    getNodeOffset(node, nx, ny) {
-      if (node.type === 'start' || node.type === 'end') {
-        return 20
-      } else if (node.type === 'decision' || node.type === 'merge') {
-        const size = 40
-        return Math.abs(nx * size) + Math.abs(ny * size)
-      } else if (['action', 'object', 'fork', 'join'].includes(node.type)) {
-        const rx = node.width / 2
-        const ry = node.height / 2
-        if (nx === 0) return ry
-        if (ny === 0) return rx
-
-        const angle = Math.atan2(ny, nx)
-        const cosAngle = Math.cos(angle)
-        const sinAngle = Math.sin(angle)
-        return Math.sqrt((rx * cosAngle) ** 2 + (ry * sinAngle) ** 2)
-      }
-      return 30
-    },
-
-    getEdgeLabel(edge) {
-      if (edge.guard) return `[${edge.guard}]`
-      if (edge.trigger) return `/${edge.trigger}`
-      if (edge.condition) return `[${edge.condition}]`
-      return ''
-    },
-
-    getEdgeLabelPosition(edge) {
-      const { source, target } = edge
-      
-      if (source.type === 'decision') {
-        // Đặt label ở vị trí cong cho decision edges
-        const midY = (source.y + target.y) / 2
-        let midX
-        if (edge.condition === 'Yes') {
-          midX = source.x - this.horizontalSpacing / 3
-        } else if (edge.condition === 'No') {
-          midX = source.x + this.horizontalSpacing / 3
-        } else {
-          midX = (source.x + target.x) / 2
-        }
-        return { x: midX, y: midY }
-      }
-      
-      const midX = (source.x + target.x) / 2
-      const midY = (source.y + target.y) / 2
-      return { x: midX, y: midY - 10 }
+    getLaneIndex(laneId) {
+      if (!laneId || this.computedLanes.length === 0) return -1
+      const normalizedLaneId = this.normalizeId(laneId)
+      return this.computedLanes.findIndex(lane => {
+        const laneNormalizedId = this.normalizeId(lane.id || lane._id)
+        return laneNormalizedId === normalizedLaneId
+      })
     },
 
     getDecisionPoints(node) {
+      if (!node || !isFinite(node.x) || !isFinite(node.y)) {
+        return ''
+      }
       const size = 40
-      return `
-        ${node.x},${node.y - size}
-        ${node.x + size},${node.y}
-        ${node.x},${node.y + size}
-        ${node.x - size},${node.y}
-      `
+      return `${node.x},${node.y - size} ${node.x + size},${node.y} ${node.x},${node.y + size} ${node.x - size},${node.y}`
+    },
+
+    getMergePoints(node) {
+      if (!node || !isFinite(node.x) || !isFinite(node.y)) {
+        return ''
+      }
+      // Hình thang ngược (inverted trapezoid) cho merge node
+      const width = node.width || 80
+      const height = node.height || 80
+      const topWidth = width * 0.6 // Đỉnh nhỏ hơn
+      const bottomWidth = width // Đáy rộng hơn
+      
+      return `${node.x - topWidth / 2},${node.y - height / 2} ${node.x + topWidth / 2},${node.y - height / 2} ${node.x + bottomWidth / 2},${node.y + height / 2} ${node.x - bottomWidth / 2},${node.y + height / 2}`
     },
 
     getNodeLabelPosition(node) {
@@ -1009,7 +1365,183 @@ export default {
       }
     },
 
-    // Drag and Drop
+    // ============ EDGE METHODS ============
+    calculateEdgePath(edge) {
+      const { source, target } = edge
+
+      if (source.type === 'decision') {
+        return this.calculateDecisionEdgePath(edge)
+      }
+
+      const condition = this.getEdgeCondition(source.id, target.id)
+      const normalizedCondition = this.normalizeCondition(condition)
+      if (normalizedCondition === 'yes' || normalizedCondition === 'no') {
+        return this.calculateBranchEdgePath(edge)
+      }
+
+      return this.calculateStraightEdgePath(edge)
+    },
+
+    calculateDecisionEdgePath(edge) {
+      const { source, target, condition } = edge
+      const normalizedCondition = this.normalizeCondition(condition)
+      const startOffset = this.getNodeOffset(source, 0, 1)
+      const endOffset = this.getNodeOffset(target, 0, -1)
+
+      const startX = source.x
+      const startY = source.y + startOffset
+      const endX = target.x
+      const endY = target.y - endOffset
+
+      // Làm thẳng thay vì cong - chỉ dùng đường thẳng L
+      return `M ${startX} ${startY} L ${endX} ${endY}`
+    },
+
+    calculateBranchEdgePath(edge) {
+      const { source, target, condition } = edge
+      const normalizedCondition = this.normalizeCondition(condition)
+      const startOffset = this.getNodeOffset(source, 0, 1)
+      const endOffset = this.getNodeOffset(target, 0, -1)
+
+      const startX = source.x
+      const startY = source.y + startOffset
+      const endX = target.x
+      const endY = target.y - endOffset
+
+      if (normalizedCondition === 'yes') {
+        const midX = (startX + endX) / 2 - 40
+        const midY = (startY + endY) / 2
+        return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`
+      } else if (normalizedCondition === 'no') {
+        const midX = (startX + endX) / 2 + 40
+        const midY = (startY + endY) / 2
+        return `M ${startX} ${startY} Q ${midX} ${midY}, ${endX} ${endY}`
+      }
+
+      return `M ${startX} ${startY} L ${endX} ${endY}`
+    },
+
+    calculateStraightEdgePath(edge) {
+      const { source, target } = edge
+      const dx = target.x - source.x
+      const dy = target.y - source.y
+      const length = Math.sqrt(dx * dx + dy * dy)
+      if (length === 0) return ''
+
+      const nx = dx / length
+      const ny = dy / length
+
+      const startX = source.x + nx * this.getNodeOffset(source, nx, ny)
+      const startY = source.y + ny * this.getNodeOffset(source, nx, ny)
+      const endX = target.x - nx * this.getNodeOffset(target, -nx, -ny)
+      const endY = target.y - ny * this.getNodeOffset(target, -nx, -ny)
+
+      return `M ${startX} ${startY} L ${endX} ${endY}`
+    },
+
+    getNodeOffset(node, nx, ny) {
+      if (node.type === 'start' || node.type === 'end') {
+        return 20
+      } else if (node.type === 'decision') {
+        const size = 40
+        return Math.abs(nx * size) + Math.abs(ny * size)
+      } else if (node.type === 'merge') {
+        // Tính offset cho hình thang ngược
+        const width = node.width || 80
+        const height = node.height || 80
+        const topWidth = width * 0.6
+        const bottomWidth = width
+        
+        // Tính offset dựa trên hướng
+        if (ny < 0) {
+          // Phía trên (đỉnh nhỏ)
+          return topWidth / 2
+        } else if (ny > 0) {
+          // Phía dưới (đáy rộng)
+          return bottomWidth / 2
+        } else {
+          // Bên trái/phải
+          return height / 2
+        }
+      } else if (['action', 'object', 'fork', 'join'].includes(node.type)) {
+        const rx = node.width / 2
+        const ry = node.height / 2
+        if (nx === 0) return ry
+        if (ny === 0) return rx
+
+        const angle = Math.atan2(ny, nx)
+        const cosAngle = Math.cos(angle)
+        const sinAngle = Math.sin(angle)
+        return Math.sqrt((rx * cosAngle) ** 2 + (ry * sinAngle) ** 2)
+      }
+      return 30
+    },
+
+    getEdgeLabel(edge) {
+      if (edge.guard) return `[${edge.guard}]`
+      if (edge.trigger) return `/${edge.trigger}`
+      if (edge.condition) return `[${edge.condition}]`
+      return ''
+    },
+
+    getEdgeLabelPosition(edge) {
+      const { source, target } = edge
+
+      const condition = this.getEdgeCondition(source.id, target.id)
+      const normalizedCondition = this.normalizeCondition(condition)
+
+      if (
+        source.type === 'decision' ||
+        normalizedCondition === 'yes' ||
+        normalizedCondition === 'no'
+      ) {
+        const midY = (source.y + target.y) / 2
+        let midX
+        if (normalizedCondition === 'yes') {
+          midX = (source.x + target.x) / 2 - 50
+        } else if (normalizedCondition === 'no') {
+          midX = (source.x + target.x) / 2 + 50
+        } else {
+          midX = (source.x + target.x) / 2
+        }
+        return { x: midX, y: midY }
+      }
+
+      const midX = (source.x + target.x) / 2
+      const midY = (source.y + target.y) / 2
+      return { x: midX, y: midY - 10 }
+    },
+
+    getEdgeCondition(fromId, toId) {
+      const normalizedFromId = this.normalizeId(fromId)
+      const normalizedToId = this.normalizeId(toId)
+      const edge = this.safeDiagramData.edges.find(
+        (edge) => {
+          const edgeFrom = this.normalizeId(edge.from)
+          const edgeTo = this.normalizeId(edge.to)
+          return edgeFrom === normalizedFromId && edgeTo === normalizedToId
+        }
+      )
+      return edge ? edge.condition : null
+    },
+
+    normalizeCondition(condition) {
+      if (!condition) return null
+
+      const lowerCondition = condition.toLowerCase().trim()
+      if (lowerCondition === 'yes' || lowerCondition === 'true' || lowerCondition === 'đúng') {
+        return 'yes'
+      } else if (
+        lowerCondition === 'no' ||
+        lowerCondition === 'false' ||
+        lowerCondition === 'sai'
+      ) {
+        return 'no'
+      }
+      return lowerCondition
+    },
+
+    // ============ DRAG AND DROP METHODS ============
     startDrag(element, type, event) {
       if (!this.editable || this.previewMode) return
 
@@ -1054,16 +1586,47 @@ export default {
       let newX = svgPoint.x - this.dragOffset.x
       let newY = svgPoint.y - this.dragOffset.y
 
-      // Giới hạn trong virtual space
+      // Giới hạn node trong lane nếu node có lane_id
+      // NHƯNG cho phép start và end nodes di chuyển tự do giữa các lanes
+      const nodeHalfWidth = (this.draggingElement.width || 60) / 2
+      const nodeHalfHeight = (this.draggingElement.height || 60) / 2
       const safePadding = 20
-      newX = Math.max(
-        this.virtualSpace.minX + safePadding,
-        Math.min(this.virtualSpace.maxX - safePadding, newX)
-      )
-      newY = Math.max(
-        this.virtualSpace.minY + safePadding,
-        Math.min(this.virtualSpace.maxY - safePadding, newY)
-      )
+      const isStartOrEnd = this.draggingElement.type === 'start' || this.draggingElement.type === 'end'
+
+      if (this.draggingElement.lane_id && this.computedLanes.length > 0 && !isStartOrEnd) {
+        // Node thuộc lane và không phải start/end - giới hạn trong lane
+        const laneIndex = this.getLaneIndex(this.draggingElement.lane_id)
+        if (laneIndex !== -1) {
+          const laneX = this.getLaneX(laneIndex)
+          const laneWidth = this.getLaneWidth()
+          const laneMinX = laneX + safePadding + nodeHalfWidth
+          const laneMaxX = laneX + laneWidth - safePadding - nodeHalfWidth
+          
+          // Giới hạn X trong lane
+          newX = Math.max(laneMinX, Math.min(laneMaxX, newX))
+          
+          // Giới hạn Y trong phạm vi lane (từ header đến maxHeight)
+          const laneMinY = this.virtualSpace.minY + this.laneHeaderHeight + nodeHalfHeight + safePadding
+          const laneMaxY = this.virtualSpace.minY + this.laneHeaderHeight + this.laneMaxHeight - nodeHalfHeight - safePadding
+          newY = Math.max(laneMinY, Math.min(laneMaxY, newY))
+        }
+      } else {
+        // Node không có lane HOẶC là start/end node - giới hạn trong virtual space (có thể di chuyển tự do)
+        newX = Math.max(
+          this.virtualSpace.minX + nodeHalfWidth + safePadding,
+          Math.min(this.virtualSpace.maxX - nodeHalfWidth - safePadding, newX)
+        )
+        newY = Math.max(
+          this.virtualSpace.minY + nodeHalfHeight + safePadding,
+          Math.min(this.virtualSpace.maxY - nodeHalfHeight - safePadding, newY)
+        )
+      }
+
+      // Snap to grid nếu được bật
+      if (this.snapToGrid) {
+        newX = Math.round(newX / this.gridSize) * this.gridSize
+        newY = Math.round(newY / this.gridSize) * this.gridSize
+      }
 
       this.dragPosition = { x: newX, y: newY }
 
@@ -1071,8 +1634,25 @@ export default {
         this.draggingElement.x = newX
         this.draggingElement.y = newY
 
+        // Cập nhật position để đồng bộ với database
+        if (!this.draggingElement.position) {
+          this.draggingElement.position = { x: 0, y: 0 }
+        }
+        this.draggingElement.position.x = newX
+        this.draggingElement.position.y = newY
+
+        // Cập nhật original data nếu có
+        if (this.draggingElement._originalData) {
+          if (!this.draggingElement._originalData.position) {
+            this.draggingElement._originalData.position = { x: 0, y: 0 }
+          }
+          this.draggingElement._originalData.position.x = newX
+          this.draggingElement._originalData.position.y = newY
+        }
+
         this.showSavingIndicator()
 
+        // Emit events để parent component biết có thay đổi
         this.$emit('position-updated', {
           element: this.draggingElement,
           type: this.draggingType,
@@ -1085,41 +1665,6 @@ export default {
           newPosition: this.dragPosition,
         })
       }
-    },
-
-    showSavingIndicator() {
-      this.isSaving = true
-      this.lastSaved = null
-    },
-
-    hideSavingIndicator() {
-      this.isSaving = false
-      this.lastSaved = new Date()
-    },
-
-    getSaveStatusText() {
-      if (this.isSaving) {
-        return 'Saving...'
-      } else if (this.lastSaved) {
-        return 'Saved'
-      } else {
-        return 'No changes'
-      }
-    },
-
-    formatLastSaved() {
-      if (!this.lastSaved) return ''
-
-      const now = new Date()
-      const diffMs = now - this.lastSaved
-      const diffSec = Math.floor(diffMs / 1000)
-      const diffMin = Math.floor(diffSec / 60)
-
-      if (diffSec < 5) return 'just now'
-      if (diffSec < 60) return `${diffSec}s ago`
-      if (diffMin < 60) return `${diffMin}m ago`
-
-      return this.lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     },
 
     handleMouseUp() {
@@ -1157,7 +1702,7 @@ export default {
       document.body.style.userSelect = ''
     },
 
-    // Viewport Methods
+    // ============ VIEWPORT METHODS ============
     startPan(event) {
       if (this.previewMode || !this.editable || this.isDragging) return
       this.isPanning = true
@@ -1201,7 +1746,7 @@ export default {
       }
     },
 
-    // Zoom and View Methods
+    // ============ ZOOM AND VIEW METHODS ============
     zoomIn() {
       this.internalZoom = Math.min(5, this.internalZoom + 0.1)
       this.$emit('zoom-changed', this.internalZoom)
@@ -1244,7 +1789,21 @@ export default {
       this.$emit('zoom-changed', this.internalZoom)
     },
 
-    // Selection Methods
+    centerViewport() {
+      // Cố định viewport ở vị trí (270, 74)
+      this.viewport.x = 270
+      this.viewport.y = 74
+    },
+
+    updateVirtualSpace() {
+      // Cố định virtualSpace ở kích thước 1200x2060
+      this.virtualSpace.minX = 0
+      this.virtualSpace.maxX = 1200
+      this.virtualSpace.minY = 0
+      this.virtualSpace.maxY = 2060
+    },
+
+    // ============ SELECTION METHODS ============
     selectElement(element, type) {
       if (this.isDragging) return
       this.selectedElement = element
@@ -1265,7 +1824,42 @@ export default {
       this.selectedElementType = null
     },
 
-    // Method để parent component gọi khi save hoàn thành
+    // ============ SAVE STATUS METHODS ============
+    showSavingIndicator() {
+      this.isSaving = true
+      this.lastSaved = null
+    },
+
+    hideSavingIndicator() {
+      this.isSaving = false
+      this.lastSaved = new Date()
+    },
+
+    getSaveStatusText() {
+      if (this.isSaving) {
+        return 'Saving...'
+      } else if (this.lastSaved) {
+        return 'Saved'
+      } else {
+        return 'No changes'
+      }
+    },
+
+    formatLastSaved() {
+      if (!this.lastSaved) return ''
+
+      const now = new Date()
+      const diffMs = now - this.lastSaved
+      const diffSec = Math.floor(diffMs / 1000)
+      const diffMin = Math.floor(diffSec / 60)
+
+      if (diffSec < 5) return 'just now'
+      if (diffSec < 60) return `${diffSec}s ago`
+      if (diffMin < 60) return `${diffMin}m ago`
+
+      return this.lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    },
+
     onSaveComplete(success = true) {
       if (success) {
         this.hideSavingIndicator()
@@ -1275,18 +1869,21 @@ export default {
       }
     },
 
-    // Method để parent component gọi khi bắt đầu save
     onSaveStart() {
       this.showSavingIndicator()
     },
 
-    // Preview Generation Methods
+    // ============ EXPORT AND PREVIEW METHODS ============
     async generatePreviewImage() {
       return new Promise((resolve) => {
         setTimeout(async () => {
           try {
+            console.log('🖼️ ActivityDiagramRenderer: Starting preview generation...')
             const allElements = [...this.positionedNodes]
+            console.log('🖼️ ActivityDiagramRenderer: Elements count:', allElements.length)
+            
             if (allElements.length === 0) {
+              console.log('🖼️ ActivityDiagramRenderer: No elements, returning null')
               resolve(null)
               return
             }
@@ -1301,45 +1898,122 @@ export default {
               { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity }
             )
 
+            // Bao gồm lanes trong bounds nếu có lanes
+            if (this.computedLanes.length > 0) {
+              const firstLaneX = this.getLaneX(0)
+              const lastLaneIndex = this.computedLanes.length - 1
+              const lastLaneX = this.getLaneX(lastLaneIndex)
+              const laneWidth = this.getLaneWidth()
+              const lanesMaxX = lastLaneX + laneWidth
+              const lanesMinY = this.virtualSpace.minY
+              const lanesMaxY = this.virtualSpace.minY + this.laneHeaderHeight + this.laneMaxHeight
+
+              bounds.minX = Math.min(bounds.minX, firstLaneX)
+              bounds.maxX = Math.max(bounds.maxX, lanesMaxX)
+              bounds.minY = Math.min(bounds.minY, lanesMinY)
+              bounds.maxY = Math.max(bounds.maxY, lanesMaxY)
+            }
+
+            // Validate bounds
+            if (!isFinite(bounds.minX) || !isFinite(bounds.maxX) || 
+                !isFinite(bounds.minY) || !isFinite(bounds.maxY) ||
+                bounds.minX >= bounds.maxX || bounds.minY >= bounds.maxY) {
+              console.error('🖼️ ActivityDiagramRenderer: Invalid bounds:', bounds)
+              resolve(null)
+              return
+            }
+
+            console.log('🖼️ ActivityDiagramRenderer: Bounds:', bounds)
+
             const padding = 80
             const contentWidth = Math.max(bounds.maxX - bounds.minX + padding * 2, 400)
             const contentHeight = Math.max(bounds.maxY - bounds.minY + padding * 2, 300)
 
+            // Validate content size
+            if (!isFinite(contentWidth) || !isFinite(contentHeight) || 
+                contentWidth <= 0 || contentHeight <= 0) {
+              console.error('🖼️ ActivityDiagramRenderer: Invalid content size:', contentWidth, contentHeight)
+              resolve(null)
+              return
+            }
+
+            console.log('🖼️ ActivityDiagramRenderer: Content size:', contentWidth, 'x', contentHeight)
+
             const svgString = this.generateExportSVG(bounds, padding, contentWidth, contentHeight)
+            
+            // Validate SVG string
+            if (!svgString || svgString.trim().length === 0) {
+              console.error('🖼️ ActivityDiagramRenderer: Empty SVG string')
+              resolve(null)
+              return
+            }
+
             const svgData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`
 
             const img = new Image()
             img.onload = () => {
-              const canvas = document.createElement('canvas')
-              const ctx = canvas.getContext('2d')
-              const scale = 1
+              try {
+                const canvas = document.createElement('canvas')
+                const ctx = canvas.getContext('2d')
+                const scale = 1
 
-              canvas.width = contentWidth * scale
-              canvas.height = contentHeight * scale
-              ctx.scale(scale, scale)
+                canvas.width = contentWidth * scale
+                canvas.height = contentHeight * scale
+                ctx.scale(scale, scale)
 
-              ctx.fillStyle = 'white'
-              ctx.fillRect(0, 0, contentWidth, contentHeight)
+                ctx.fillStyle = 'white'
+                ctx.fillRect(0, 0, contentWidth, contentHeight)
 
-              ctx.drawImage(img, 0, 0, contentWidth, contentHeight)
+                ctx.drawImage(img, 0, 0, contentWidth, contentHeight)
 
-              const base64 = canvas.toDataURL('image/png', 0.8)
-              resolve(base64)
+                const base64 = canvas.toDataURL('image/png', 0.8)
+                console.log('🖼️ ActivityDiagramRenderer: Preview generation completed successfully')
+                resolve(base64)
+              } catch (error) {
+                console.error('🖼️ ActivityDiagramRenderer: Error drawing image to canvas:', error)
+                resolve(null)
+              }
             }
-            img.onerror = () => resolve(null)
+            img.onerror = (error) => {
+              console.error('🖼️ ActivityDiagramRenderer: Image load error:', error)
+              console.error('🖼️ ActivityDiagramRenderer: SVG data length:', svgData.length)
+              // Log first 500 chars of SVG for debugging
+              console.error('🖼️ ActivityDiagramRenderer: SVG preview:', svgString.substring(0, 500))
+              resolve(null)
+            }
             img.src = svgData
           } catch (error) {
-            console.error('Error generating preview image:', error)
+            console.error('🖼️ ActivityDiagramRenderer: Error generating preview image:', error)
             resolve(null)
           }
         }, 100)
       })
     },
 
+    // Helper function to escape XML text
+    escapeXml(text) {
+      if (!text) return ''
+      const textStr = String(text)
+      return textStr
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;')
+    },
+
     generateExportSVG(bounds, padding, contentWidth, contentHeight) {
-      const viewBox = `${bounds.minX - padding} ${
-        bounds.minY - padding
-      } ${contentWidth} ${contentHeight}`
+      // Validate viewBox values
+      const viewBoxMinX = bounds.minX - padding
+      const viewBoxMinY = bounds.minY - padding
+      
+      if (!isFinite(viewBoxMinX) || !isFinite(viewBoxMinY) || 
+          !isFinite(contentWidth) || !isFinite(contentHeight)) {
+        console.error('🖼️ ActivityDiagramRenderer: Invalid viewBox values')
+        return ''
+      }
+
+      const viewBox = `${viewBoxMinX} ${viewBoxMinY} ${contentWidth} ${contentHeight}`
 
       return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${contentWidth}" height="${contentHeight}" viewBox="${viewBox}">
@@ -1350,63 +2024,91 @@ export default {
   </defs>
 
   <!-- Background trắng -->
-  <rect x="${bounds.minX - padding}" y="${bounds.minY - padding}" 
+  <rect x="${viewBoxMinX}" y="${viewBoxMinY}" 
         width="${contentWidth}" height="${contentHeight}" fill="white" />
 
   <!-- Render Swimlanes -->
-  ${this.computedLanes
+  ${this.computedLanes.length > 0 ? this.computedLanes
     .map((lane, index) => {
       const laneX = this.getLaneX(index) - bounds.minX + padding
       const laneWidth = this.getLaneWidth()
-      const laneName = lane.name || `Lane ${index + 1}`
+      const laneY = this.virtualSpace.minY - bounds.minY + padding
+      const laneHeight = this.laneHeaderHeight + this.laneMaxHeight
+      const laneName = this.escapeXml(lane.name || `Lane ${index + 1}`)
+
+      // Validate lane coordinates
+      if (!isFinite(laneX) || !isFinite(laneY) || !isFinite(laneWidth) || !isFinite(laneHeight)) {
+        return ''
+      }
 
       return `
-      <rect x="${laneX}" y="${padding}" 
-            width="${laneWidth}" height="${contentHeight - padding * 2}"
-            fill="${index % 2 === 0 ? '#f8fafc' : '#ffffff'}" 
+      <rect x="${laneX}" y="${laneY}" 
+            width="${laneWidth}" height="${laneHeight}"
+            fill="${index % 2 === 0 ? 'rgba(229, 231, 235, 0.8)' : 'rgba(243, 244, 246, 0.8)'}" 
             stroke="#e5e7eb" stroke-width="1" />
-      <text x="${laneX + laneWidth / 2}" y="${padding + 30}" 
+      <text x="${laneX + laneWidth / 2}" y="${laneY + 30}" 
             font-size="14" font-weight="600" fill="#6b7280" 
             text-anchor="middle" dominant-baseline="middle">
         ${laneName}
       </text>
       ${
         index > 0
-          ? `<line x1="${laneX}" y1="${padding}" x2="${laneX}" y2="${
-              contentHeight - padding
-            }" stroke="#e5e7eb" stroke-width="1" />`
+          ? `<line x1="${laneX}" y1="${laneY}" x2="${laneX}" y2="${
+              laneY + laneHeight
+            }" stroke="#d1d5db" stroke-width="2" />`
           : ''
       }
+      <line x1="${laneX}" y1="${laneY + laneHeight}" x2="${laneX + laneWidth}" y2="${
+        laneY + laneHeight
+      }" stroke="#d1d5db" stroke-width="2" stroke-dasharray="5,5" />
     `
     })
-    .join('')}
+    .join('') : ''}
 
   <!-- Render Edges -->
   ${this.computedEdges
     .map((edge) => {
+      if (!edge.source || !edge.target) return ''
+      
       const path = this.calculateEdgePath(edge)
-      const labelContent = this.getEdgeLabel(edge)
-        ? `<text x="${this.getEdgeLabelPosition(edge).x - bounds.minX + padding}" y="${
-            this.getEdgeLabelPosition(edge).y - bounds.minY + padding
-          }" font-size="10" fill="#6b7280" text-anchor="middle" dominant-baseline="middle">${this.getEdgeLabel(
-            edge
-          )}</text>`
+      if (!path || path.trim().length === 0) return ''
+      
+      const adjustedPath = this.adjustPathForExport(path, bounds, padding)
+      if (!adjustedPath || adjustedPath.trim().length === 0) return ''
+      
+      const edgeLabel = this.getEdgeLabel(edge)
+      const labelContent = edgeLabel
+        ? (() => {
+            const labelPos = this.getEdgeLabelPosition(edge)
+            if (!labelPos || !isFinite(labelPos.x) || !isFinite(labelPos.y)) return ''
+            const labelX = labelPos.x - bounds.minX + padding
+            const labelY = labelPos.y - bounds.minY + padding
+            if (!isFinite(labelX) || !isFinite(labelY)) return ''
+            return `<text x="${labelX}" y="${labelY}" font-size="10" fill="#6b7280" text-anchor="middle" dominant-baseline="middle">${this.escapeXml(edgeLabel)}</text>`
+          })()
         : ''
 
       return `
-        <path d="${this.adjustPathForExport(path, bounds, padding)}" 
+        <path d="${adjustedPath}" 
               stroke="#374151" stroke-width="2" fill="none" 
               marker-end="url(#activity-arrow-preview)" />
         ${labelContent}
       `
     })
+    .filter(html => html.trim().length > 0)
     .join('')}
 
   <!-- Render Nodes -->
   ${this.positionedNodes
     .map((node) => {
+      if (!node || !isFinite(node.x) || !isFinite(node.y)) return ''
+      
       const x = node.x - bounds.minX + padding
       const y = node.y - bounds.minY + padding
+      
+      if (!isFinite(x) || !isFinite(y)) return ''
+
+      const nodeLabel = this.escapeXml(node.label || '')
 
       if (node.type === 'start' || node.type === 'end') {
         return `
@@ -1420,51 +2122,103 @@ export default {
           </text>
         `
       } else if (node.type === 'action') {
+        const width = node.width || 120
+        const height = node.height || 60
         return `
-          <rect x="${x - node.width / 2}" y="${y - node.height / 2}" 
-                width="${node.width}" height="${node.height}" rx="8"
+          <rect x="${x - width / 2}" y="${y - height / 2}" 
+                width="${width}" height="${height}" rx="8"
                 fill="white" stroke="#3b82f6" stroke-width="2" />
           <text x="${x}" y="${y}" font-size="12" fill="#1e40af" 
-                text-anchor="middle" dominant-baseline="middle">${node.label}</text>
+                text-anchor="middle" dominant-baseline="middle">${nodeLabel}</text>
         `
-      } else if (node.type === 'decision' || node.type === 'merge') {
+      } else if (node.type === 'decision') {
         const points = this.getDecisionPoints({ ...node, x, y })
+        if (!points || points.trim().length === 0) return ''
         return `
           <polygon points="${points}" fill="white" stroke="#8b5cf6" stroke-width="2" />
           <text x="${x}" y="${y}" font-size="12" fill="#6b21a8" 
-                text-anchor="middle" dominant-baseline="middle">${node.label}</text>
+                text-anchor="middle" dominant-baseline="middle">${nodeLabel}</text>
+        `
+      } else if (node.type === 'merge') {
+        const points = this.getMergePoints({ ...node, x, y })
+        if (!points || points.trim().length === 0) return ''
+        return `
+          <polygon points="${points}" fill="white" stroke="#8b5cf6" stroke-width="2" />
+          <text x="${x}" y="${y}" font-size="12" fill="#6b21a8" 
+                text-anchor="middle" dominant-baseline="middle">${nodeLabel}</text>
         `
       } else if (node.type === 'fork' || node.type === 'join') {
+        const width = node.width || 100
+        const height = node.height || 20
         return `
-          <rect x="${x - node.width / 2}" y="${y - node.height / 2}" 
-                width="${node.width}" height="${node.height}"
+          <rect x="${x - width / 2}" y="${y - height / 2}" 
+                width="${width}" height="${height}"
                 fill="#6b7280" stroke="#374151" stroke-width="2" />
-          <text x="${x}" y="${y + node.height / 2 + 15}" font-size="10" fill="#374151" 
-                text-anchor="middle" dominant-baseline="middle">${node.label}</text>
+          <text x="${x}" y="${y + height / 2 + 15}" font-size="10" fill="#374151" 
+                text-anchor="middle" dominant-baseline="middle">${nodeLabel}</text>
         `
       } else if (node.type === 'object') {
+        const width = node.width || 120
+        const height = node.height || 60
         return `
-          <rect x="${x - node.width / 2}" y="${y - node.height / 2}" 
-                width="${node.width}" height="${node.height}" rx="8"
+          <rect x="${x - width / 2}" y="${y - height / 2}" 
+                width="${width}" height="${height}" rx="8"
                 fill="white" stroke="#f59e0b" stroke-width="2" />
           <text x="${x}" y="${y}" font-size="12" fill="#92400e" 
-                text-anchor="middle" dominant-baseline="middle" text-decoration="underline">${
-                  node.label
-                }</text>
+                text-anchor="middle" dominant-baseline="middle" text-decoration="underline">${nodeLabel}</text>
         `
       }
       return ''
     })
+    .filter(html => html.trim().length > 0)
     .join('')}
 </svg>`
     },
 
     adjustPathForExport(path, bounds, padding) {
-      return path.replace(/(M|L) (\d+) (\d+)/g, (match, command, x, y) => {
-        const adjustedX = parseInt(x) - bounds.minX + padding
-        const adjustedY = parseInt(y) - bounds.minY + padding
-        return `${command} ${adjustedX} ${adjustedY}`
-      })
+      if (!path || typeof path !== 'string' || path.trim().length === 0) return ''
+      
+      // Validate bounds
+      if (!bounds || !isFinite(bounds.minX) || !isFinite(bounds.minY) || 
+          !isFinite(padding)) {
+        console.error('🖼️ ActivityDiagramRenderer: Invalid bounds or padding in adjustPathForExport')
+        return ''
+      }
+      
+      try {
+        // Xử lý tất cả các lệnh SVG path: M, L, C, Q, S, T, Z
+        return path.replace(/([MmLlCcQqSsTtZz])\s*([-\d.]+(?:\s+[-\d.]+)*)/g, (match, command, coords) => {
+          if (command.toLowerCase() === 'z') {
+            return command // Z không có tọa độ
+          }
+          
+          if (!coords || coords.trim().length === 0) {
+            return command
+          }
+          
+          const numbers = coords.trim().split(/\s+/).map(Number)
+          const adjusted = numbers.map((num, index) => {
+            if (!isFinite(num)) {
+              return 0 // Replace NaN/Infinity with 0
+            }
+            
+            if (index % 2 === 0) {
+              // X coordinate
+              const adjustedX = num - bounds.minX + padding
+              return isFinite(adjustedX) ? adjustedX : 0
+            } else {
+              // Y coordinate
+              const adjustedY = num - bounds.minY + padding
+              return isFinite(adjustedY) ? adjustedY : 0
+            }
+          })
+          
+          return `${command} ${adjusted.join(' ')}`
+        })
+      } catch (error) {
+        console.error('🖼️ ActivityDiagramRenderer: Error adjusting path for export:', error)
+        return ''
+      }
     },
 
     regeneratePreview() {
@@ -1479,7 +2233,6 @@ export default {
       }
     },
 
-    // Export Methods
     async exportAsPNG() {
       try {
         this.isExporting = true
@@ -1590,7 +2343,7 @@ export default {
       URL.revokeObjectURL(url)
     },
 
-    // Fullscreen Methods
+    // ============ FULLSCREEN METHODS ============
     toggleFullscreen() {
       if (!this.isFullscreen) this.enterFullscreen()
       else this.exitFullscreen()
@@ -1629,7 +2382,111 @@ export default {
       )
     },
 
-    // Utility Methods
+    // ============ AUTO-FIX METHODS ============
+    checkNodesOutsideLanes() {
+      // Logic này được xử lý trong computed nodesOutsideLaneCount
+      // Chỉ cần trigger để computed được tính lại
+      this.$forceUpdate()
+    },
+    
+    autoFixNodesInLanes() {
+      if (!this.editable || this.previewMode) return
+      
+      const nodesToFix = []
+      const safePadding = 20
+      
+      this.computedNodes.forEach((node) => {
+        // Bỏ qua start và end nodes vì chúng được phép di chuyển tự do
+        const isStartOrEnd = node.type === 'start' || node.type === 'end'
+        if (isStartOrEnd) return
+        
+        if (node.lane_id) {
+          const laneIndex = this.getLaneIndex(node.lane_id)
+          if (laneIndex !== -1) {
+            const laneX = this.getLaneX(laneIndex)
+            const laneWidth = this.getLaneWidth()
+            const nodeHalfWidth = node.width / 2
+            const nodeHalfHeight = node.height / 2
+            
+            const laneMinX = laneX + safePadding + nodeHalfWidth
+            const laneMaxX = laneX + laneWidth - safePadding - nodeHalfWidth
+            const laneMinY = this.virtualSpace.minY + this.laneHeaderHeight + nodeHalfHeight + safePadding
+            const laneMaxY = this.virtualSpace.minY + this.laneHeaderHeight + this.laneMaxHeight - nodeHalfHeight - safePadding
+            
+            const isXInLane = node.x >= laneMinX && node.x <= laneMaxX
+            const isYInLane = node.y >= laneMinY && node.y <= laneMaxY
+            
+            if (!isXInLane || !isYInLane) {
+              // Tính vị trí mới trong lane
+              const newX = laneX + laneWidth / 2
+              
+              // Tìm Y phù hợp - đặt ở đầu lane hoặc giữa các node khác
+              let newY = laneMinY
+              
+              // Tìm node gần nhất trong cùng lane để đặt phía dưới
+              const normalizedLaneId = this.normalizeId(node.lane_id)
+              const normalizedNodeId = this.normalizeId(node.id)
+              const nodesInSameLane = this.computedNodes.filter(n => {
+                const nLaneId = this.normalizeId(n.lane_id)
+                const nId = this.normalizeId(n.id)
+                return nLaneId === normalizedLaneId && nId !== normalizedNodeId && n.type !== 'start' && n.type !== 'end'
+              })
+              
+              if (nodesInSameLane.length > 0) {
+                const maxY = Math.max(...nodesInSameLane.map(n => n.y))
+                newY = Math.min(maxY + 120, laneMaxY)
+              }
+              
+              nodesToFix.push({
+                node,
+                newPosition: { x: newX, y: newY }
+              })
+            }
+          }
+        }
+      })
+      
+      if (nodesToFix.length === 0) {
+        this.showAutoFixSuggestion = false
+        return
+      }
+      
+      // Cập nhật vị trí cho tất cả nodes
+      nodesToFix.forEach(({ node, newPosition }) => {
+        node.x = newPosition.x
+        node.y = newPosition.y
+        
+        // Cập nhật position trong original data
+        if (node._originalData) {
+          if (!node._originalData.position) {
+            node._originalData.position = { x: 0, y: 0 }
+          }
+          node._originalData.position.x = newPosition.x
+          node._originalData.position.y = newPosition.y
+        }
+        
+        // Emit event để parent component lưu
+        this.$emit('position-updated', {
+          element: node,
+          type: 'node',
+          position: newPosition,
+        })
+      })
+      
+      // Ẩn gợi ý sau khi fix
+      this.showAutoFixSuggestion = false
+      this.autoFixDismissed = true
+      
+      // Force update để render lại
+      this.$forceUpdate()
+    },
+    
+    dismissAutoFixSuggestion() {
+      this.showAutoFixSuggestion = false
+      this.autoFixDismissed = true
+    },
+
+    // ============ UTILITY METHODS ============
     setupEventListeners() {
       document.addEventListener('mousemove', this.handleMouseMove)
       document.addEventListener('mouseup', this.handleMouseUp)
@@ -1661,6 +2518,10 @@ export default {
               event.preventDefault()
               this.fitToViewport()
               break
+            case 'g':
+              event.preventDefault()
+              this.snapToGrid = !this.snapToGrid
+              break
           }
         }
         if (event.key === 'F11') {
@@ -1670,10 +2531,258 @@ export default {
         switch (event.key) {
           case 'Escape':
             this.clearSelection()
-            if (this.isFullscreen) this.exitFullscreen()
+            if (this.managementModal.visible) {
+              this.closeManagementModal()
+            } else if (this.formModal.visible) {
+              this.closeFormModal()
+            } else if (this.isFullscreen) {
+              this.exitFullscreen()
+            }
             break
         }
       })
+    },
+
+    // Management Modal Methods
+    showManagementModal() {
+      this.managementModal.visible = true
+      this.managementModal.activeTab = 'nodes'
+      this.managementModal.hasChanges = false
+    },
+    closeManagementModal() {
+      if (this.managementModal.hasChanges) {
+        this.$emit('diagram-updated')
+      }
+      this.managementModal.visible = false
+      this.managementModal.hasChanges = false
+    },
+    getTabCount(tabId) {
+      switch (tabId) {
+        case 'nodes':
+          return this.positionedNodes.length
+        case 'edges':
+          return this.computedEdges.length
+        case 'lanes':
+          return this.computedLanes.length
+        default:
+          return 0
+      }
+    },
+    getLaneName(laneId) {
+      if (!laneId) return 'No Lane'
+      const lane = this.computedLanes.find((l) => l.id === laneId)
+      return lane ? lane.name : 'Unknown Lane'
+    },
+    getNodesInLane(laneId) {
+      if (!laneId) return []
+      return this.positionedNodes.filter((node) => {
+        const nodeLaneId = this.normalizeId(node.lane_id)
+        const normalizedLaneId = this.normalizeId(laneId)
+        return nodeLaneId === normalizedLaneId
+      })
+    },
+    openCreateForm(type) {
+      this.formModal.visible = true
+      this.formModal.type = type
+      this.formModal.isEdit = false
+      this.formModal.element = null
+      this.formModal.hasChanges = false
+      this.formModal.data = {
+        label: '',
+        type: 'action',
+        lane_id: null,
+        from: '',
+        to: '',
+        condition: '',
+        guard: '',
+        trigger: '',
+        name: '',
+      }
+    },
+    openEditForm(type, element) {
+      this.formModal.visible = true
+      this.formModal.type = type
+      this.formModal.isEdit = true
+      this.formModal.element = element
+      this.formModal.hasChanges = false
+
+      if (type === 'node') {
+        this.formModal.data = {
+          label: element.label || '',
+          type: element.type || 'action',
+          lane_id: element.lane_id || null,
+        }
+      } else if (type === 'edge') {
+        const fromId = element.source?._id || element.source?.id || element.from
+        const toId = element.target?._id || element.target?.id || element.to
+        this.formModal.data = {
+          from: this.normalizeId(fromId) || '',
+          to: this.normalizeId(toId) || '',
+          condition: element.condition || '',
+          guard: element.guard || '',
+          trigger: element.trigger || '',
+        }
+      } else if (type === 'lane') {
+        this.formModal.data = {
+          name: element.name || '',
+        }
+      }
+    },
+    closeFormModal() {
+      if (this.formModal.hasChanges) {
+        this.$emit('diagram-updated')
+        this.managementModal.hasChanges = true
+      }
+      this.formModal.visible = false
+      this.formModal.element = null
+      this.formModal.hasChanges = false
+    },
+    async saveForm() {
+      const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
+      if (!diagramId) {
+        alert('Diagram ID not found')
+        return
+      }
+
+      if (this.isCrudLoading) return
+
+      try {
+        this.isCrudLoading = true
+        this.showSavingIndicator()
+
+        if (this.formModal.type === 'node') {
+          if (!this.formModal.data.label || !this.formModal.data.type) {
+            alert('Label and Type are required')
+            this.isCrudLoading = false
+            this.hideSavingIndicator()
+            return
+          }
+          if (this.formModal.isEdit) {
+            await updateNode(String(diagramId), String(this.formModal.element.id), {
+              label: this.formModal.data.label,
+              type: this.formModal.data.type,
+              lane_id: this.formModal.data.lane_id || null,
+            })
+          } else {
+            alert('Creating new nodes is not yet supported via API')
+            this.isCrudLoading = false
+            this.hideSavingIndicator()
+            return
+          }
+        } else if (this.formModal.type === 'edge') {
+          if (!this.formModal.data.from || !this.formModal.data.to) {
+            alert('From and To nodes are required')
+            this.isCrudLoading = false
+            this.hideSavingIndicator()
+            return
+          }
+          if (this.formModal.isEdit) {
+            await updateEdge(String(diagramId), String(this.formModal.element.id), {
+              from: this.formModal.data.from,
+              to: this.formModal.data.to,
+              condition: this.formModal.data.condition || '',
+              guard: this.formModal.data.guard || '',
+              trigger: this.formModal.data.trigger || '',
+            })
+          } else {
+            await createEdge(String(diagramId), {
+              from: this.formModal.data.from,
+              to: this.formModal.data.to,
+              condition: this.formModal.data.condition || '',
+              guard: this.formModal.data.guard || '',
+              trigger: this.formModal.data.trigger || '',
+            })
+          }
+        } else if (this.formModal.type === 'lane') {
+          if (!this.formModal.data.name) {
+            alert('Lane name is required')
+            this.isCrudLoading = false
+            this.hideSavingIndicator()
+            return
+          }
+          if (this.formModal.isEdit) {
+            await updateLane(String(diagramId), String(this.formModal.element.id), {
+              name: this.formModal.data.name,
+            })
+          } else {
+            alert('Creating new lanes is not yet supported via API')
+            this.isCrudLoading = false
+            this.hideSavingIndicator()
+            return
+          }
+        }
+
+        // Fetch updated diagram data
+        const response = await getActivityDiagramById(String(diagramId))
+        const updatedDiagram = response?.data?.data || response?.data
+
+        this.formModal.hasChanges = true
+        this.managementModal.hasChanges = true
+
+        if (updatedDiagram) {
+          this.$emit('diagram-updated', updatedDiagram)
+        } else {
+          this.$emit('diagram-updated')
+        }
+
+        this.closeFormModal()
+        this.hideSavingIndicator()
+        this.isCrudLoading = false
+      } catch (error) {
+        console.error('Error saving:', error)
+        alert('Failed to save: ' + (error.response?.data?.message || error.message))
+        this.hideSavingIndicator()
+        this.isCrudLoading = false
+      }
+    },
+    async confirmDelete(type, element) {
+      if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+        return
+      }
+
+      const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
+      if (!diagramId) {
+        alert('Diagram ID not found')
+        return
+      }
+
+      if (this.isCrudLoading || this.deletingElementId) return
+
+      try {
+        this.deletingElementId = element.id
+        this.isCrudLoading = true
+        this.showSavingIndicator()
+
+        if (type === 'node') {
+          await deleteNode(String(diagramId), String(element.id))
+        } else if (type === 'edge') {
+          await deleteEdge(String(diagramId), String(element.id))
+        } else if (type === 'lane') {
+          await deleteLane(String(diagramId), String(element.id))
+        }
+
+        // Fetch updated diagram data
+        const response = await getActivityDiagramById(String(diagramId))
+        const updatedDiagram = response?.data?.data || response?.data
+
+        this.managementModal.hasChanges = true
+
+        if (updatedDiagram) {
+          this.$emit('diagram-updated', updatedDiagram)
+        } else {
+          this.$emit('diagram-updated')
+        }
+
+        this.hideSavingIndicator()
+        this.isCrudLoading = false
+        this.deletingElementId = null
+      } catch (error) {
+        console.error('Error deleting:', error)
+        alert('Failed to delete: ' + (error.response?.data?.message || error.message))
+        this.hideSavingIndicator()
+        this.isCrudLoading = false
+        this.deletingElementId = null
+      }
     },
   },
 }
@@ -1684,12 +2793,14 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: white;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
   user-select: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .activity-diagram-renderer.preview-mode {
@@ -1727,67 +2838,107 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid rgba(226, 232, 240, 0.8);
   z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .toolbar-group {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  gap: 6px;
+  padding: 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  color: #6b7280;
+  color: #64748b;
   font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.toolbar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.toolbar-btn:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+}
+
+.toolbar-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.toolbar-btn.active {
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+}
+
+.toolbar-btn.active:hover {
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-1px);
 }
 
 .toolbar-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .zoom-display {
-  min-width: 48px;
+  min-width: 56px;
   text-align: center;
   font-size: 12px;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 700;
+  color: #1a365d;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(26, 54, 93, 0.1);
 }
 
 /* Main Container */
 .activity-container {
   flex: 1;
   overflow: hidden;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
   position: relative;
   cursor: grab;
 }
@@ -1810,22 +2961,38 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid #e5e7eb;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border-top: 2px solid rgba(226, 232, 240, 0.8);
   font-size: 12px;
-  color: #6b7280;
+  color: #64748b;
+  font-weight: 500;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .status-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.status-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
 }
 
 .status-item.spacer {
   flex: 1;
+  background: transparent;
+}
+
+.status-item.spacer:hover {
+  transform: none;
 }
 
 /* Node Styles */
@@ -1841,6 +3008,8 @@ export default {
 .node-group.draggable:active {
   cursor: grabbing;
 }
+
+/* .activity-node - Removed pointer-events: none to allow drag events */
 
 .node-start {
   fill: #10b981;
@@ -1880,6 +3049,10 @@ export default {
   stroke-width: 2;
 }
 
+.node-content {
+  pointer-events: none;
+}
+
 .node-label {
   font-size: 12px;
   font-weight: 500;
@@ -1903,15 +3076,21 @@ export default {
 }
 
 /* Edge Styles */
+.edge-group {
+  pointer-events: none;
+}
+
 .activity-edge {
   stroke: #374151;
   stroke-width: 2;
   fill: none;
+  pointer-events: none;
 }
 
 .edge-label {
   font-size: 10px;
   fill: #6b7280;
+  pointer-events: none;
 }
 
 /* Swimlane Styles */
@@ -1924,11 +3103,11 @@ export default {
 }
 
 .swimlane-even {
-  fill: rgba(243, 244, 246, 0.5);
+  fill: rgba(229, 231, 235, 0.8);
 }
 
 .swimlane-odd {
-  fill: rgba(249, 250, 251, 0.5);
+  fill: rgba(243, 244, 246, 0.8);
 }
 
 .swimlane-label {
@@ -1942,6 +3121,10 @@ export default {
 .swimlane-separator {
   stroke: #d1d5db;
   stroke-width: 2;
+}
+
+.swimlane-boundary {
+  pointer-events: none;
 }
 
 /* Canvas Boundary */
@@ -2051,6 +3234,99 @@ export default {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* Auto-fix Banner Styles */
+.auto-fix-banner {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  padding: 12px 20px;
+  min-width: 500px;
+  max-width: 90%;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.auto-fix-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auto-fix-content .material-symbols-outlined {
+  font-size: 24px;
+  color: #f59e0b;
+}
+
+.auto-fix-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #92400e;
+}
+
+.auto-fix-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auto-fix-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.auto-fix-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.auto-fix-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #92400e;
+  transition: all 0.2s ease;
+}
+
+.auto-fix-close:hover {
+  background: rgba(146, 64, 14, 0.1);
+}
+
+.auto-fix-close .material-symbols-outlined {
+  font-size: 20px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .toolbar {
@@ -2077,6 +3353,30 @@ export default {
   .auto-save-status {
     display: none;
   }
+  
+  .auto-fix-banner {
+    min-width: auto;
+    width: calc(100% - 32px);
+    left: 16px;
+    transform: none;
+    padding: 10px 16px;
+  }
+  
+  .auto-fix-content {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .auto-fix-text {
+    width: 100%;
+    font-size: 12px;
+  }
+  
+  .auto-fix-btn {
+    flex: 1;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }
 
 /* Fullscreen specific styles */
@@ -2085,5 +3385,443 @@ export default {
 :-moz-full-screen .activity-diagram-renderer,
 :-ms-fullscreen .activity-diagram-renderer {
   border-radius: 0;
+}
+
+/* Management Modal Styles */
+.management-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.management-modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.management-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.management-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.management-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #1a365d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-count {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.management-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.tab-panel {
+  animation: fadeIn 0.2s ease;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.btn-add-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-item:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.item-card:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.item-description {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.item-meta {
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.node-type-badge {
+  padding: 2px 8px;
+  background: #e0e7ff;
+  color: #6366f1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lane-badge {
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.btn-edit:hover {
+  background: #dbeafe;
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.empty-state .material-symbols-outlined {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Form Modal Styles */
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+}
+
+.form-modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.form-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.form-modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #1a365d;
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-add-item:disabled,
+.btn-edit:disabled,
+.btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-manage {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+}
+
+.btn-manage:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

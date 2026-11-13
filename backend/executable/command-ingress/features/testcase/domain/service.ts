@@ -1,12 +1,16 @@
 // TestcaseService.ts
+import { Types } from "mongoose";
 import Testcase from "../../../../../internal/model/testcase";
 import Database from "../../../../../internal/model/database";
 import Version from "../../../../../internal/model/version";
+import Usecase from "../../../../../internal/model/usecase";
 import User from "../../../../../internal/model/user";
 import { TestcaseGeminiService } from "./GeminiService";
 import { VersionService } from "../../version/domain/service";
 import { LogService } from "../../log/domain/service";
 import { PreviewChangeDto } from "../../version/adapter/preview.dto";
+import { testcaseSocketService } from "./testcase.socket.service";
+import { TestcaseGenerationAgent, TestcaseAgentContext } from "./TestcaseGenerationAgent";
 
 export class TestcaseService {
     private testcaseGeminiService = new TestcaseGeminiService();
@@ -36,13 +40,88 @@ export class TestcaseService {
             throw new Error("Version not found");
         }
 
-        const requirementsToProcess = version.requirement_model.filter(
-            req => selectedRequirementIds.includes(req.id)
-        );
+        // Lấy usecases từ collection
+        const allUsecases = await Usecase.find({ version_id: version._id }).lean();
+
+        // Helper: Normalize requirement ID (support both _id and id for backward compatibility)
+        const normalizeRequirementId = (req: any): string[] => {
+            const ids: string[] = [];
+            if (req._id) {
+                const idStr = String(req._id).trim();
+                ids.push(idStr);
+                // Also add without ObjectId wrapper if it's an ObjectId string
+                if (Types.ObjectId.isValid(idStr)) {
+                    ids.push(new Types.ObjectId(idStr).toString());
+                }
+            }
+            if (req.id && String(req.id).trim() !== String(req._id || '').trim()) {
+                ids.push(String(req.id).trim());
+            }
+            return Array.from(new Set(ids)); // Remove duplicates
+        };
+
+        // Normalize selectedRequirementIds from frontend (handle ObjectId strings, plain strings, etc.)
+        // Filter out null, undefined, empty strings, and invalid values
+        const normalizedSelectedIds = selectedRequirementIds
+            .filter(id => id != null && id !== '' && String(id).trim() !== '' && String(id).toLowerCase() !== 'null' && String(id).toLowerCase() !== 'undefined')
+            .map(id => {
+                const idStr = String(id).trim();
+                // Try to convert to ObjectId if valid, otherwise use as-is
+                if (Types.ObjectId.isValid(idStr)) {
+                    return new Types.ObjectId(idStr).toString();
+                }
+                return idStr;
+            })
+            .filter(id => id && id !== ''); // Final filter to ensure no empty strings
+
+        console.log('🔍 Testcase Generation Debug:', {
+            selectedRequirementIds,
+            normalizedSelectedIds,
+            totalUsecases: allUsecases.length,
+            usecaseIds: allUsecases.map(req => ({
+                _id: req._id ? String(req._id) : null,
+                id: req._id || null,
+                name: req.name
+            }))
+        });
+
+        // Filter requirements - handle both _id and id with normalized comparison
+        const requirementsToProcess = allUsecases.filter(req => {
+            const reqIds = normalizeRequirementId(req);
+            return normalizedSelectedIds.some(selectedId => {
+                const normalizedSelected = String(selectedId).trim();
+                return reqIds.some(reqId => {
+                    const normalizedReq = String(reqId).trim();
+                    // Case-insensitive comparison and handle ObjectId string variations
+                    return normalizedReq === normalizedSelected ||
+                        normalizedReq.toLowerCase() === normalizedSelected.toLowerCase() ||
+                        (Types.ObjectId.isValid(normalizedReq) && Types.ObjectId.isValid(normalizedSelected) &&
+                            new Types.ObjectId(normalizedReq).toString() === new Types.ObjectId(normalizedSelected).toString());
+                });
+            });
+        });
+
+        if (normalizedSelectedIds.length === 0) {
+            console.error('❌ No valid requirement IDs provided:', {
+                originalSelectedRequirementIds: selectedRequirementIds,
+                filteredCount: normalizedSelectedIds.length
+            });
+            throw new Error('No valid requirement IDs provided. Please select at least one requirement.');
+        }
 
         if (requirementsToProcess.length === 0) {
-            throw new Error("No matching requirements found");
+            console.error('❌ No matching requirements found:', {
+                selectedRequirementIds,
+                normalizedSelectedIds,
+                availableUsecaseIds: allUsecases.map(req => ({
+                    _id: req._id ? String(req._id) : null,
+                    name: req.name
+                }))
+            });
+            throw new Error(`No matching requirements found. Selected IDs: ${normalizedSelectedIds.join(', ')}. Available usecases: ${allUsecases.length}`);
         }
+
+        console.log(`✅ Found ${requirementsToProcess.length} matching requirements out of ${selectedRequirementIds.length} selected`);
 
         // Get database schema (optional)
         const database = await Database.findOne({
@@ -57,21 +136,407 @@ export class TestcaseService {
 
         console.log(`📊 Processing ${requirementsToProcess.length} requirements with ${databaseSchema.tables?.length || 0} tables`);
 
-        // XỬ LÝ LOGIC KHI testType = "all"
-        if (testType === 'all') {
-            return await this.generateAllTestTypes(
-                requirementsToProcess,
-                databaseSchema,
-                language
-            );
-        } else {
-            // Generate với testType cụ thể
-            return await this.testcaseGeminiService.generateTestCases(
-                requirementsToProcess,
-                databaseSchema,
-                language,
-                testType
-            );
+        // ✅ SỬ DỤNG TESTCASE GENERATION AGENT
+        console.log(`🤖 [TESTCASE_SERVICE] Using TestcaseGenerationAgent for generation...`);
+
+        // ✅ Lấy modelName từ user selection (sử dụng phương thức chung getRecommendedModel)
+        // getRecommendedModel đã tự động ưu tiên user selected model nếu có userId
+        const { LLMService } = await import("../../../shared/LLMService");
+        const llmService = new LLMService();
+        let modelName: string | undefined = undefined;
+
+        try {
+            // ✅ Chuẩn hóa: Dùng getRecommendedModel giống như orchestrator
+            // getRecommendedModel đã có logic ưu tiên user selected model bên trong
+            modelName = await llmService.getRecommendedModel(undefined, userId);
+            console.log(`✅ [TESTCASE_SERVICE] Using model: ${modelName}${userId ? ` (for user: ${userId})` : ''}`);
+        } catch (error: any) {
+            console.warn(`⚠️ [TESTCASE_SERVICE] Failed to get model preference: ${error.message}. Will use default.`);
+            // Fallback: thử lại không có userId
+            try {
+                modelName = await llmService.getRecommendedModel();
+                console.log(`✅ [TESTCASE_SERVICE] Using fallback model: ${modelName}`);
+            } catch (fallbackError: any) {
+                console.error(`❌ [TESTCASE_SERVICE] Failed to get recommended model: ${fallbackError.message}`);
+                // modelName sẽ là undefined, agent sẽ tự xử lý
+            }
+        }
+
+        // ✅ Kiểm tra resumeState từ Version (nếu có)
+        const resumeState = (version as any).resumeState?.testcase || null;
+
+        // Tạo context cho agent
+        const agentContext: TestcaseAgentContext = {
+            versionId: version._id.toString(),
+            projectId,
+            userId,
+            requirements: requirementsToProcess,
+            databaseSchema,
+            language,
+            testType,
+            modelName, // ✅ Sử dụng modelName từ user selection
+            resumeState: resumeState ? {
+                state: resumeState.state as any,
+                savedCount: resumeState.savedCount || 0,
+                currentBatchIndex: resumeState.currentBatchIndex || 0,
+                errorMessage: resumeState.errorMessage || '',
+                errorType: resumeState.errorType || ''
+            } : undefined
+        };
+
+        // Tạo và chạy agent
+        const agent = new TestcaseGenerationAgent(this.testcaseGeminiService, agentContext);
+
+        try {
+            const result = await agent.run();
+
+            // ✅ Kiểm tra nếu agent có resumeState (lỗi retryable)
+            const agentResumeState = agent.getResumeState();
+            if (agentResumeState) {
+                console.log(`⚠️ [TESTCASE_SERVICE] Agent paused due to retryable error. Saving resume state...`);
+
+                // Lưu resumeState vào Version
+                await Version.findByIdAndUpdate(version._id, {
+                    $set: {
+                        'resumeState.testcase': agentResumeState,
+                        status: 'paused'
+                    }
+                });
+
+                // Broadcast paused event
+                if (testcaseSocketService && projectId && versionId && userId) {
+                    testcaseSocketService.emitProgress(
+                        projectId,
+                        versionId,
+                        userId,
+                        95,
+                        'paused',
+                        true,
+                        {
+                            currentBatch: agentResumeState.currentBatchIndex + 1,
+                            totalBatches: agentContext.estimatedBatches || 1,
+                            testcasesInBatch: 0,
+                            savedCount: agentResumeState.savedCount,
+                            totalCount: agentContext.estimatedCount || 0
+                        },
+                        [agentResumeState.errorMessage],
+                        agentResumeState.state,
+                        `⚠️ ${agentResumeState.errorMessage}. Đã lưu ${agentResumeState.savedCount} testcases. Có thể tiếp tục sau...`
+                    );
+                }
+
+                // Trả về partial results
+                return result.testcases;
+            }
+
+            // ✅ Xóa resumeState nếu hoàn thành thành công
+            if ((version as any).resumeState?.testcase) {
+                await Version.findByIdAndUpdate(version._id, {
+                    $unset: { 'resumeState.testcase': '' },
+                    $set: { status: 'completed' }
+                });
+            }
+
+            // ✅ Ghi log cho generate testcase
+            try {
+                const user = await User.findById(userId).lean();
+                const username = user?.name || "Unknown User";
+                const agentContext = agent.getContext();
+                await this.logService.createLog({
+                    project_id: projectId,
+                    user_id: userId,
+                    action: "generate_output",
+                    target_id: versionId,
+                    target_type: "testcases",
+                    version_number: version.version_number,
+                    affects_requirement: true,
+                    level: "info",
+                    performed_by_ai: true,
+                    details: {
+                        after: {
+                            count: result.totalGenerated,
+                            test_type: testType,
+                            requirement_count: requirementsToProcess.length,
+                            estimated_count: agentContext.estimatedCount || 0,
+                            actual_count: result.totalGenerated
+                        },
+                        message: `${username} generated and saved ${result.totalGenerated} test cases from ${requirementsToProcess.length} requirement(s) (type: ${testType}, estimated: ${agentContext.estimatedCount || 0})`
+                    }
+                });
+            } catch (logError) {
+                console.error("❌ Error logging testcase generation:", logError);
+            }
+
+            // ✅ Broadcast completion
+            if (testcaseSocketService && projectId && versionId && userId) {
+                const agentContext = agent.getContext();
+                testcaseSocketService.emitProgress(
+                    projectId,
+                    versionId,
+                    userId,
+                    100,
+                    'completed',
+                    false,
+                    {
+                        currentBatch: agentContext.batchPlan?.length || 1,
+                        totalBatches: agentContext.batchPlan?.length || 1,
+                        testcasesInBatch: 0,
+                        savedCount: result.totalGenerated,
+                        totalCount: agentContext.estimatedCount || result.totalGenerated
+                    },
+                    undefined, // errors
+                    'DONE',
+                    `✅ Hoàn thành: ${result.totalGenerated} testcases đã được generate`
+                );
+            }
+
+            return result.testcases;
+        } catch (error: any) {
+            console.error(`❌ [TESTCASE_SERVICE] Error in agent:`, error.message);
+
+            // Broadcast failed event
+            if (testcaseSocketService && projectId && versionId && userId) {
+                testcaseSocketService.emitProgress(
+                    projectId,
+                    versionId,
+                    userId,
+                    100,
+                    'failed',
+                    false,
+                    undefined,
+                    [error.message || 'Failed to generate test cases']
+                );
+            }
+
+            throw error;
+        }
+    }
+
+    /**
+     * ✅ MỚI: Generate batch cho testType = "all" (tất cả các loại test)
+     */
+    private async generateBatchForAllTypes(
+        requirements: any[],
+        databaseSchema: any,
+        language: string,
+        batchNumber: number,
+        totalBatches: number,
+        offset: number,
+        batchSize: number,
+        estimatedTotal: number,
+        userId: string,
+        projectId: string
+    ): Promise<any[]> {
+        const testTypes = ['integration', 'api', 'ui', 'performance', 'security'];
+        const allTestCases: any[] = [];
+
+        // Tính toán số lượng test cases cần generate cho batch này
+        const testCasesPerType = Math.ceil(batchSize / testTypes.length);
+        let generatedCount = 0;
+
+        for (const testType of testTypes) {
+            if (generatedCount >= batchSize) break;
+
+            const remaining = batchSize - generatedCount;
+            const currentBatchSize = Math.min(testCasesPerType, remaining);
+
+            try {
+                const batchTestCases = await this.testcaseGeminiService.generateTestCasesBatch(
+                    requirements,
+                    databaseSchema,
+                    batchNumber,
+                    totalBatches,
+                    offset + generatedCount,
+                    currentBatchSize,
+                    language,
+                    testType,
+                    estimatedTotal,
+                    undefined,
+                    userId,
+                    projectId
+                );
+
+                allTestCases.push(...batchTestCases);
+                generatedCount += batchTestCases.length;
+
+                // Delay giữa các test types
+                await new Promise(resolve => setTimeout(resolve, 300));
+            } catch (error) {
+                console.error(`❌ Error generating ${testType} tests in batch ${batchNumber}:`, error);
+                // Tiếp tục với test type tiếp theo
+                continue;
+            }
+        }
+
+        return allTestCases;
+    }
+
+    /**
+     * ✅ MỚI: Validate test cases
+     */
+    private validateTestCases(testCases: any[], requirements: any[]): any[] {
+        const validTestCases: any[] = [];
+        const invalidTestCases: Array<{ index: number; errors: string[] }> = [];
+
+        testCases.forEach((tc, index) => {
+            const errors: string[] = [];
+
+            // Validate required fields
+            if (!tc.title || typeof tc.title !== 'string' || tc.title.trim() === '') {
+                errors.push('missing or invalid title');
+            }
+            if (!tc.description || typeof tc.description !== 'string' || tc.description.trim() === '') {
+                errors.push('missing or invalid description');
+            }
+            if (!tc.test_type || !['integration', 'api', 'ui', 'performance', 'security'].includes(tc.test_type)) {
+                errors.push('missing or invalid test_type');
+            }
+            if (!tc.priority || !['low', 'medium', 'high', 'critical'].includes(tc.priority)) {
+                errors.push('missing or invalid priority');
+            }
+            if (!tc.steps || !Array.isArray(tc.steps) || tc.steps.length === 0) {
+                errors.push('missing or invalid steps');
+            }
+            if (!tc.source_requirement_ids || !Array.isArray(tc.source_requirement_ids) || tc.source_requirement_ids.length === 0) {
+                errors.push('missing or invalid source_requirement_ids');
+            }
+
+            // Validate steps
+            if (tc.steps && Array.isArray(tc.steps)) {
+                tc.steps.forEach((step: any, stepIndex: number) => {
+                    if (!step.step_number || typeof step.step_number !== 'number') {
+                        errors.push(`step ${stepIndex + 1}: missing step_number`);
+                    }
+                    if (!step.action || typeof step.action !== 'string' || step.action.trim() === '') {
+                        errors.push(`step ${stepIndex + 1}: missing action`);
+                    }
+                    if (!step.expected_immediate_result || typeof step.expected_immediate_result !== 'string') {
+                        errors.push(`step ${stepIndex + 1}: missing expected_immediate_result`);
+                    }
+                });
+            }
+
+            if (errors.length > 0) {
+                invalidTestCases.push({ index, errors });
+                console.warn(`⚠️ Skipping invalid test case ${index + 1} ("${tc.title || 'unnamed'}"): ${errors.join(', ')}`);
+            } else {
+                validTestCases.push(tc);
+            }
+        });
+
+        if (invalidTestCases.length > 0) {
+            console.warn(`⚠️ Skipped ${invalidTestCases.length} invalid test case(s), proceeding with ${validTestCases.length} valid test case(s)`);
+        }
+
+        return validTestCases;
+    }
+
+    /**
+     * ✅ MỚI: Save một batch test cases vào DB
+     */
+    private async saveTestCasesBatch(
+        projectId: string,
+        versionId: string,
+        testCases: any[],
+        createdBy: string
+    ): Promise<any[]> {
+        if (testCases.length === 0) {
+            return [];
+        }
+
+        try {
+            const testCasesToSave = testCases.map(testCase => {
+                // XÓA id nếu có để MongoDB tự generate _id
+                const { id, ...cleanTestCase } = testCase;
+
+                return {
+                    project_id: projectId,
+                    version_id: versionId,
+                    created_by: createdBy,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    ...cleanTestCase
+                };
+            });
+
+            let result: any[] = [];
+            let insertedCount = 0;
+
+            try {
+                result = await Testcase.insertMany(testCasesToSave, { ordered: false });
+                insertedCount = result.length;
+            } catch (bulkError: any) {
+                // Nếu có BulkWriteError, có thể một số documents đã được insert
+                if (bulkError.name === 'BulkWriteError' && bulkError.result) {
+                    insertedCount = bulkError.result.insertedCount || 0;
+                    const writeErrors = bulkError.result.writeErrors || [];
+                    console.error(`❌ BulkWriteError: ${insertedCount}/${testCasesToSave.length} inserted`);
+                    console.error(`❌ Write errors:`, writeErrors.map((e: any) => ({
+                        index: e.index,
+                        code: e.code,
+                        errmsg: e.errmsg
+                    })));
+
+                    // Nếu không có document nào được insert, throw error
+                    if (insertedCount === 0) {
+                        throw new Error(`All ${testCasesToSave.length} test cases failed to insert. First error: ${writeErrors[0]?.errmsg || bulkError.message}`);
+                    }
+
+                    // Lấy các documents đã insert thành công
+                    result = [];
+                    for (let i = 0; i < insertedCount; i++) {
+                        if (bulkError.result.insertedIds && bulkError.result.insertedIds[i]) {
+                            const insertedDoc = await Testcase.findById(bulkError.result.insertedIds[i]);
+                            if (insertedDoc) result.push(insertedDoc);
+                        }
+                    }
+                } else {
+                    throw bulkError;
+                }
+            }
+
+            // Verify số lượng đã insert
+            if (insertedCount === 0) {
+                console.error(`❌ CRITICAL: insertMany returned 0 documents!`);
+                // Thử insert từng document để xem document nào fail
+                const individualResults: any[] = [];
+                const individualErrors: any[] = [];
+
+                for (let i = 0; i < testCasesToSave.length; i++) {
+                    try {
+                        const doc = new Testcase(testCasesToSave[i]);
+                        await doc.validate();
+                        const saved = await doc.save();
+                        individualResults.push(saved);
+                    } catch (individualError: any) {
+                        individualErrors.push({ index: i, title: testCasesToSave[i].title, error: individualError.message });
+                        console.error(`❌ Document ${i + 1} ("${testCasesToSave[i].title}") failed:`, individualError.message);
+                    }
+                }
+
+                if (individualResults.length > 0) {
+                    insertedCount = individualResults.length;
+                    result = individualResults;
+                    console.log(`✅ Successfully inserted ${insertedCount} test cases individually (${individualErrors.length} failed)`);
+                } else {
+                    throw new Error(`All ${testCasesToSave.length} test cases failed validation. Errors: ${individualErrors.map(e => `${e.title}: ${e.error}`).join('; ')}`);
+                }
+            }
+
+            console.log(`✅ Successfully inserted ${insertedCount} test cases into database`);
+
+            // Verify bằng cách query lại
+            const verifyCount = await Testcase.countDocuments({ version_id: versionId });
+            console.log(`✅ Total test cases in database for version ${versionId}: ${verifyCount}`);
+
+            if (insertedCount < testCasesToSave.length) {
+                console.warn(`⚠️ Only inserted ${insertedCount}/${testCasesToSave.length} test cases. Some may have been skipped.`);
+            }
+
+            return result;
+        } catch (error: any) {
+            console.error(`❌ Error saving test cases batch:`, error.message);
+            throw error;
         }
     }
 
@@ -221,6 +686,37 @@ export class TestcaseService {
             });
 
             console.log(`✅ Successfully processed ${savedTestCases.length} test cases`);
+
+            // ✅ Ghi log cho save testcase
+            try {
+                const version = await Version.findById(versionId).lean();
+                if (version && createdBy) {
+                    const user = await User.findById(createdBy).lean();
+                    const username = user?.name || "Unknown User";
+                    await this.logService.createLog({
+                        project_id: projectId,
+                        user_id: createdBy,
+                        action: "generate_output",
+                        target_id: versionId,
+                        target_type: "testcases",
+                        version_number: version.version_number,
+                        affects_requirement: true,
+                        level: "info",
+                        performed_by_ai: false,
+                        details: {
+                            after: {
+                                count: savedTestCases.length,
+                                saved_ids: savedTestCases.map((tc: any) => tc._id?.toString() || tc.id)
+                            },
+                            message: `${username} saved ${savedTestCases.length} test cases to database`
+                        }
+                    });
+                }
+            } catch (logError) {
+                console.error("❌ Error logging testcase save:", logError);
+                // Không throw error để không ảnh hưởng đến flow chính
+            }
+
             return savedTestCases;
 
         } catch (error: any) {
@@ -394,7 +890,12 @@ export class TestcaseService {
                 message: `${username} updated testcase ${updatedTestcase?.title || id}`
             }
         });
-        return updatedTestcase;
+        // Return cả testcase và version info để frontend có thể cập nhật selectedVersionId
+        return {
+            testcase: updatedTestcase,
+            version: version,
+            newVersionId: versionId
+        };
     }
 
     /**
@@ -727,7 +1228,11 @@ export class TestcaseService {
         if (versionId) versionQuery._id = versionId;
 
         const version = await Version.findOne(versionQuery).lean();
-        const totalRequirements = version?.requirement_model?.length || 0;
+
+        // Lấy tổng số usecases từ collection
+        const usecaseQuery: any = { project_id: projectId };
+        if (versionId) usecaseQuery.version_id = versionId;
+        const totalRequirements = await Usecase.countDocuments(usecaseQuery);
 
         // Get covered requirements from test cases
         const coverageStats = await Testcase.aggregate([
@@ -743,13 +1248,12 @@ export class TestcaseService {
             },
             {
                 $lookup: {
-                    from: "versions",
-                    let: { requirementId: "$_id", projectId: projectId },
+                    from: "usecases",
+                    let: { requirementId: "$_id", projectId: projectId, versionId: versionId },
                     pipeline: [
                         { $match: { $expr: { $eq: ["$project_id", { $toObjectId: projectId }] } } },
-                        { $unwind: "$requirement_model" },
-                        { $match: { $expr: { $eq: ["$requirement_model.id", "$$requirementId"] } } },
-                        { $replaceRoot: { newRoot: "$requirement_model" } }
+                        ...(versionId ? [{ $match: { $expr: { $eq: ["$version_id", { $toObjectId: versionId }] } } }] : []),
+                        { $match: { $expr: { $eq: [{ $toString: "$_id" }, { $toString: "$$requirementId" }] } } }
                     ],
                     as: "requirement_info"
                 }

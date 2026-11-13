@@ -1,85 +1,12 @@
 <template>
-  <div class="output-management-view">
-    <ProjectHeader
-      :project="project"
-      :versions="versions"
-      :selected-version-id="selectedVersionId"
-      :is-retrying="isRetrying"
-      :processing-progress="processingProgress"
-      :current-stage="currentStage"
-      :active-users="activeUsers"
-      @version-selected="handleVersionSelect"
-      @retry-analysis="handleRetry"
-      @go-back="goBack"
-    />
+  <div class="log-management-view">
 
-    <!-- Navigation Tabs -->
-    <div class="navigation-tabs">
-      <button class="tab-button" @click="navigateToUsecase">
-        <span class="material-symbols-outlined">list_alt</span>
-        Use Cases Management
-      </button>
-      <button class="tab-button active" @click="navigateToOutput">
-        <span class="material-symbols-outlined">output</span>
-        Output Management
-      </button>
-    </div>
-
-    <!-- Output Management Content -->
-    <div class="output-content">
-      <div class="output-header">
-        <h2>Output Management</h2>
-        <p class="subtitle">
-          Manage test cases, database schemas, and UML diagrams for your project
-        </p>
-      </div>
-
+    <!-- Log Management Content -->
+    <div class="log-content">
       <!-- Main Content -->
       <div class="main-content">
-        <!-- Output Cards Grid -->
-        <div class="output-cards-grid">
-          <!-- Test Case Management Card -->
-          <div class="output-card" @click="navigateToTestcase">
-            <div class="card-icon testcase">
-              <span class="material-symbols-outlined">play_arrow</span>
-            </div>
-            <div class="card-content">
-              <h3>Test Case Management</h3>
-              <p>Create, manage and execute test cases for your use cases</p>
-            </div>
-            <div class="card-arrow">
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- Database Management Card -->
-          <div class="output-card" @click="navigateToDatabase">
-            <div class="card-icon database">
-              <span class="material-symbols-outlined">storage</span>
-            </div>
-            <div class="card-content">
-              <h3>Database Management</h3>
-              <p>Design and manage database schemas and relationships</p>
-            </div>
-            <div class="card-arrow">
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-
-          <!-- UML Management Card -->
-          <div class="output-card" @click="navigateToUml">
-            <div class="card-icon uml">
-              <span class="material-symbols-outlined">schema</span>
-            </div>
-            <div class="card-content">
-              <h3>UML Diagram Management</h3>
-              <p>Create and manage UML diagrams for system design</p>
-            </div>
-            <div class="card-arrow">
-              <span class="material-symbols-outlined">arrow_forward</span>
-            </div>
-          </div>
-        </div>
+        <!-- Log Cards Grid -->
+        
 
         <!-- Enhanced Activity Logs Section -->
         <div class="activity-logs-section">
@@ -89,30 +16,165 @@
               <!-- Compact Filter Controls -->
               <div class="compact-filter-controls">
                 <div class="filter-select-group">
-                  <select v-model="filters.type" @change="applyFilters" class="filter-select">
-                    <option value="all">All Types</option>
-                    <option value="testcase">Test Cases</option>
-                    <option value="database">Database</option>
-                    <option value="uml">UML Diagrams</option>
-                    <option value="version">Versions</option>
-                    <option value="project">Projects</option>
-                  </select>
-
-                  <select v-model="filters.action" @change="applyFilters" class="filter-select">
-                    <option value="all">All Actions</option>
-                    <option value="create">Create</option>
-                    <option value="update">Update</option>
-                    <option value="delete">Delete</option>
-                    <option value="execute">Execute</option>
-                    <option value="export">Export</option>
-                  </select>
-
-                  <select v-model="filters.user" @change="applyFilters" class="filter-select">
-                    <option value="all">All Users</option>
-                    <option v-for="user in uniqueUsers" :key="user" :value="user">
-                      {{ user }}
-                    </option>
-                  </select>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-compact" 
+                      @click.stop="toggleTypeFilter"
+                      :title="getTypeFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">category</span>
+                    </button>
+                    <div 
+                      v-if="showTypeFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'all' }"
+                        @click="setTypeFilter('all')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Types
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'testcase' }"
+                        @click="setTypeFilter('testcase')"
+                      >
+                        <span class="material-symbols-outlined">play_arrow</span>
+                        Test Cases
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'database' }"
+                        @click="setTypeFilter('database')"
+                      >
+                        <span class="material-symbols-outlined">storage</span>
+                        Database
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'uml' }"
+                        @click="setTypeFilter('uml')"
+                      >
+                        <span class="material-symbols-outlined">schema</span>
+                        UML Diagrams
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'version' }"
+                        @click="setTypeFilter('version')"
+                      >
+                        <span class="material-symbols-outlined">history</span>
+                        Versions
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.type === 'project' }"
+                        @click="setTypeFilter('project')"
+                      >
+                        <span class="material-symbols-outlined">folder</span>
+                        Projects
+                      </button>
+                    </div>
+                  </div>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-compact" 
+                      @click.stop="toggleActionFilter"
+                      :title="getActionFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">tune</span>
+                    </button>
+                    <div 
+                      v-if="showActionFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'all' }"
+                        @click="setActionFilter('all')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Actions
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'create' }"
+                        @click="setActionFilter('create')"
+                      >
+                        <span class="material-symbols-outlined">add</span>
+                        Create
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'update' }"
+                        @click="setActionFilter('update')"
+                      >
+                        <span class="material-symbols-outlined">edit</span>
+                        Update
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'delete' }"
+                        @click="setActionFilter('delete')"
+                      >
+                        <span class="material-symbols-outlined">delete</span>
+                        Delete
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'execute' }"
+                        @click="setActionFilter('execute')"
+                      >
+                        <span class="material-symbols-outlined">play_arrow</span>
+                        Execute
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.action === 'export' }"
+                        @click="setActionFilter('export')"
+                      >
+                        <span class="material-symbols-outlined">download</span>
+                        Export
+                      </button>
+                    </div>
+                  </div>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-compact" 
+                      @click.stop="toggleUserFilter"
+                      :title="getUserFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">person</span>
+                    </button>
+                    <div 
+                      v-if="showUserFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: filters.user === 'all' }"
+                        @click="setUserFilter('all')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Users
+                      </button>
+                      <button 
+                        v-for="user in uniqueUsers" 
+                        :key="user"
+                        class="filter-option" 
+                        :class="{ active: filters.user === user }"
+                        @click="setUserFilter(user)"
+                      >
+                        <span class="material-symbols-outlined">account_circle</span>
+                        {{ user }}
+                      </button>
+                    </div>
+                  </div>
                   <button
                     @click="clearFilters"
                     class="clear-filters-button"
@@ -167,12 +229,26 @@
             <div v-else class="logs-container">
               <!-- Empty State -->
               <div v-if="filteredActivities.length === 0" class="empty-logs">
-                <span class="material-symbols-outlined">info</span>
-                <p>No activity logs found</p>
-                <button @click="clearFilters" class="retry-button" v-if="hasActiveFilters">
-                  Clear Filters
-                </button>
-                <button @click="refreshActivities" class="retry-button" v-else>Refresh</button>
+                <div class="empty-icon">
+                  <span class="material-symbols-outlined">inbox</span>
+                </div>
+                <h3>Không có log nào</h3>
+                <p v-if="hasActiveFilters">
+                  Không tìm thấy log phù hợp với bộ lọc hiện tại
+                </p>
+                <p v-else>
+                  Chưa có hoạt động nào được ghi lại
+                </p>
+                <div class="empty-actions">
+                  <button @click="clearFilters" class="retry-button" v-if="hasActiveFilters">
+                    <span class="material-symbols-outlined">clear_all</span>
+                    Xóa bộ lọc
+                  </button>
+                  <button @click="refreshActivities" class="retry-button" v-else>
+                    <span class="material-symbols-outlined">refresh</span>
+                    Làm mới
+                  </button>
+                </div>
               </div>
 
               <!-- Logs List -->
@@ -183,7 +259,7 @@
                   class="log-item"
                   :class="[
                     getActivityType(activity),
-                    getActivityLevel(activity),
+                    getActionType(activity),
                     { highlighted: isHighlighted(activity) },
                   ]"
                 >
@@ -193,9 +269,33 @@
 
                   <div class="log-content">
                     <div class="log-header">
-                      <!-- <span class="log-user">{{ activity.user_id?.name || 'Unknown User' }}</span> -->
-                      <span class="log-action">{{ formatAction(activity.action) }}</span>
-                      <span class="log-target">{{ formatTarget(activity.target_type) }}</span>
+                      <div class="log-user-info">
+                        <div 
+                          class="user-avatar-small"
+                          :title="activity.user_id?.name || 'System'"
+                        >
+                          <img
+                            v-if="activity.user_id?.avatar_url"
+                            :src="activity.user_id.avatar_url"
+                            :alt="activity.user_id.name"
+                            @error="(e) => (e.target.style.display = 'none')"
+                          />
+                          <span v-else class="material-symbols-outlined">person</span>
+                        </div>
+                        <span class="log-user-name">{{ activity.user_id?.name || 'System' }}</span>
+                        <span v-if="activity.performed_by_ai" class="ai-badge" title="Performed by AI">
+                          <span class="material-symbols-outlined">smart_toy</span>
+                          AI
+                        </span>
+                      </div>
+                      <div class="log-action-badges">
+                        <span class="log-action-badge">{{ formatAction(activity.action) }}</span>
+                        <span class="log-target-badge">{{ formatTarget(activity.target_type) }}</span>
+                        <span v-if="activity.version_number" class="log-version-badge" :title="`Version ${activity.version_number}`">
+                          <span class="material-symbols-outlined">history</span>
+                          v{{ activity.version_number }}
+                        </span>
+                      </div>
                     </div>
 
                     <div class="log-message">
@@ -203,10 +303,16 @@
                     </div>
 
                     <div class="log-meta">
-                      <span class="log-time">{{ formatTime(activity.created_at) }}</span>
-                      <span class="log-level" :class="getActivityLevel(activity)">
-                        {{ getActivityLevel(activity) }}
-                      </span>
+                      <div class="log-meta-left">
+                        <span class="log-time" :title="formatFullTime(activity.created_at)">
+                          <span class="material-symbols-outlined">schedule</span>
+                          {{ formatTime(activity.created_at) }}
+                        </span>
+                        <span v-if="activity.affects_requirement" class="log-requirement-badge" title="Affects requirements">
+                          <span class="material-symbols-outlined">description</span>
+                          Requirement
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -273,13 +379,19 @@ import { getTestStatistics } from '@/api/testcase'
 import { getDatabasesByVersion } from '@/api/project'
 import { getProjectLogs } from '@/api/output'
 import { useToast } from 'vue-toastification'
-import ProjectHeader from '@/components/ProjectHeader.vue'
 import { useActiveMembers } from '@/utils/useActiveMembers'
+import {
+  saveSelectedVersion,
+  getSelectedOrDefaultVersion,
+  filterApprovedVersions,
+  isOwner as checkIsOwner,
+} from '@/utils/versionSync'
+import eventBus from '@/utils/eventBus'
+import { socket } from '@/utils/socket'
 
 export default {
   name: 'OutputManagement',
   components: {
-    ProjectHeader,
   },
   setup() {
     const { activeUsers, initSocketConnection, cleanupSocketConnection } = useActiveMembers()
@@ -325,6 +437,9 @@ export default {
         action: 'all',
         user: 'all',
       },
+      showTypeFilter: false,
+      showActionFilter: false,
+      showUserFilter: false,
       searchQuery: '',
       searchTimeout: null,
 
@@ -338,8 +453,6 @@ export default {
 
       toast: useToast(),
       isRetrying: false,
-      processingProgress: 0,
-      currentStage: '',
     }
   },
   computed: {
@@ -451,11 +564,29 @@ export default {
   },
   async created() {
     await this.initializeData()
+    
+    // Listen for version-approved event from PreviewModal
+    eventBus.on('version-approved', this.handleVersionApproved)
+    
+    // Init version socket listeners
+    if (this.project._id) {
+      this.initVersionSocketListeners(this.project._id)
+    }
+    
+    // Add click outside listener for filter dropdowns
+    document.addEventListener('click', this.handleClickOutsideFilters)
   },
   beforeUnmount() {
     if (this.project._id) {
       this.cleanupSocketConnection(this.project._id)
+      this.cleanupVersionSocketListeners()
     }
+    
+    // Remove event listener
+    eventBus.off('version-approved', this.handleVersionApproved)
+    
+    // Remove click outside listener
+    document.removeEventListener('click', this.handleClickOutsideFilters)
   },
   methods: {
     // Navigation methods
@@ -506,7 +637,7 @@ export default {
         }
 
         await this.fetchProjectData(projectId)
-        await this.loadOutputStats()
+        await this.loadLogStats()
         await this.loadRecentActivities()
 
         this.initSocketConnection(projectId)
@@ -535,10 +666,20 @@ export default {
         const { data } = await getProjectDetail(projectId)
         const result = data.data || data
         this.project = result.project
-        this.versions = result.versions
+        // Lọc bỏ version tạm thời, chỉ giữ version đã được approve
+        const allVersions = result.versions || []
+        this.versions = filterApprovedVersions(allVersions)
 
-        if (this.versions.length > 0) {
-          this.selectedVersionId = this.versions[0]._id
+        // Sử dụng version sync utility
+        const currentVersionId = result.current_version?._id
+        this.selectedVersionId = getSelectedOrDefaultVersion(
+          projectId,
+          this.versions,
+          currentVersionId
+        )
+        
+        if (this.selectedVersionId) {
+          saveSelectedVersion(projectId, this.selectedVersionId)
         }
       } catch (err) {
         console.error('Error fetching project details:', err)
@@ -546,7 +687,7 @@ export default {
       }
     },
 
-    async loadOutputStats() {
+    async loadLogStats() {
       try {
         const projectId = this.$route.params.id
         const versionId = this.selectedVersionId
@@ -589,7 +730,7 @@ export default {
           }
         }
       } catch (err) {
-        console.error('Error loading output stats:', err)
+        console.error('Error loading log stats:', err)
       }
     },
 
@@ -662,6 +803,18 @@ export default {
       return 'default'
     },
 
+    getActionType(activity) {
+      const action = activity.action?.toLowerCase() || ''
+      if (action.includes('create') || action.includes('generate') || action.includes('add')) {
+        return 'action-create'
+      } else if (action.includes('delete') || action.includes('remove')) {
+        return 'action-delete'
+      } else if (action.includes('update') || action.includes('edit') || action.includes('modify')) {
+        return 'action-update'
+      }
+      return 'action-default'
+    },
+
     getActivityIcon(activity) {
       const type = this.getActivityType(activity)
 
@@ -706,46 +859,84 @@ export default {
     },
 
     formatActivityText(activity) {
-      // Use details.message if available
+      // Use details.message if available (preferred)
       if (activity.details?.message) {
         return activity.details.message
       }
 
-      // Fallback to default formatting
-      const userName = activity.user_id?.name || 'Someone'
+      // Fallback to default formatting with better messages
+      const userName = activity.user_id?.name || 'System'
       const action = activity.action
+      const targetType = activity.target_type
 
+      // Enhanced action mapping with more context
       const actionMap = {
+        // Input operations
+        create_input: `${userName} added new input`,
+        update_input: `${userName} updated input`,
+        delete_input: `${userName} removed input`,
+
         // Test cases
-        create_testcase: `${userName} created a test case`,
-        update_testcase: `${userName} updated a test case`,
-        delete_testcase: `${userName} deleted a test case`,
-        execute_testcase: `${userName} executed a test case`,
+        generate_output: activity.target_type === 'testcases' 
+          ? `${userName} generated ${activity.details?.after?.count || 'test cases'}`
+          : activity.target_type === 'activity_diagrams'
+          ? `${userName} generated activity diagram "${activity.details?.after?.name || ''}"`
+          : activity.target_type === 'sequence_diagrams'
+          ? `${userName} generated sequence diagram "${activity.details?.after?.name || ''}"`
+          : activity.target_type === 'usecase_diagrams'
+          ? `${userName} generated usecase diagram "${activity.details?.after?.name || ''}"`
+          : `${userName} generated ${targetType}`,
+        update_output: `${userName} updated ${targetType}`,
+        delete_output: `${userName} deleted ${targetType}`,
+        export_data: `${userName} exported ${targetType}`,
 
-        // Database
-        create_table: `${userName} created a table`,
-        update_table: `${userName} updated a table`,
-        delete_table: `${userName} deleted a table`,
-        create_column: `${userName} added a column`,
-        update_column: `${userName} updated a column`,
-        delete_column: `${userName} deleted a column`,
-        create_relation: `${userName} created a relationship`,
-        update_relation: `${userName} updated a relationship`,
-        delete_relation: `${userName} deleted a relationship`,
+        // Database operations
+        create_table: `${userName} created table "${activity.details?.after?.name || ''}"`,
+        update_table: `${userName} updated table`,
+        delete_table: `${userName} deleted table`,
+        create_column: `${userName} added column`,
+        update_column: `${userName} updated column`,
+        delete_column: `${userName} removed column`,
+        create_relation: `${userName} created relationship`,
+        update_relation: `${userName} updated relationship`,
+        delete_relation: `${userName} deleted relationship`,
 
-        // Version actions
-        create_version: `${userName} created a new version`,
-        update_version: `${userName} updated a version`,
-        delete_version: `${userName} deleted a version`,
+        // Version operations
+        create_version: `${userName} created version ${activity.version_number || ''}`,
+        update_version: `${userName} updated version ${activity.version_number || ''}`,
+        delete_version: `${userName} deleted version ${activity.version_number || ''}`,
+        rollback: `${userName} rolled back to version ${activity.details?.after?.version_number || ''}`,
 
-        // Project actions
-        create_project: `${userName} created project`,
+        // Project operations
+        create_project: `${userName} created project "${activity.details?.after?.name || ''}"`,
         update_project: `${userName} updated project`,
-        generate_output: `${userName} generated output`,
-        export_data: `${userName} exported data`,
+        delete_project: `${userName} deleted project`,
+        restore_project: `${userName} restored project`,
+
+        // Usecase/Requirement operations
+        generate_data: `${userName} generated usecase${activity.details?.after?.length ? ` (${activity.details.after.length} items)` : ''}`,
+        update_data: `${userName} updated usecase`,
+        delete_data: `${userName} deleted usecase`,
+        resolve_conflict: `${userName} resolved conflict`,
+
+        // Member operations
+        invite_member: `${userName} invited member`,
+        accept_invite: `${userName} accepted invitation`,
+        reject_invite: `${userName} rejected invitation`,
+        cancel_invite: `${userName} cancelled invitation`,
+        remove_member: `${userName} removed member`,
+        leave_project: `${userName} left project`,
+        change_member_role: `${userName} changed member role`,
+
+        // User operations
+        create_user: `${userName} created user account`,
+        update_user: `${userName} updated user account`,
+        login: `${userName} logged in`,
+        logout: `${userName} logged out`,
+        failed_login: `Failed login attempt`,
       }
 
-      return actionMap[action] || `${userName} performed ${action.replace(/_/g, ' ')}`
+      return actionMap[action] || `${userName} performed ${action.replace(/_/g, ' ')} on ${targetType}`
     },
 
     formatAction(action) {
@@ -782,14 +973,48 @@ export default {
       const activityTime = new Date(timestamp)
       const diffInMinutes = Math.floor((now - activityTime) / (1000 * 60))
 
-      if (diffInMinutes < 1) return 'Just now'
-      if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+      if (diffInMinutes < 1) return 'Vừa xong'
+      if (diffInMinutes < 60) return `${diffInMinutes} phút trước`
       if (diffInMinutes < 1440) {
         const hours = Math.floor(diffInMinutes / 60)
-        return `${hours}h ago`
+        return `${hours} giờ trước`
       }
       const days = Math.floor(diffInMinutes / 1440)
-      return `${days}d ago`
+      return `${days} ngày trước`
+    },
+
+    formatFullTime(timestamp) {
+      const date = new Date(timestamp)
+      return date.toLocaleString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })
+    },
+
+    formatLevel(level) {
+      const levelMap = {
+        info: 'Thông tin',
+        warning: 'Cảnh báo',
+        error: 'Lỗi',
+        success: 'Thành công',
+        default: 'Mặc định'
+      }
+      return levelMap[level] || level
+    },
+
+    getLevelIcon(level) {
+      const iconMap = {
+        info: 'info',
+        warning: 'warning',
+        error: 'error',
+        success: 'check_circle',
+        default: 'circle'
+      }
+      return iconMap[level] || 'circle'
     },
 
     // Filter methods
@@ -805,6 +1030,67 @@ export default {
       }
       this.searchQuery = ''
       this.pagination.currentPage = 1
+      this.showTypeFilter = false
+      this.showActionFilter = false
+      this.showUserFilter = false
+    },
+    
+    // Filter dropdown methods
+    toggleTypeFilter() {
+      this.showTypeFilter = !this.showTypeFilter
+      this.showActionFilter = false
+      this.showUserFilter = false
+    },
+    toggleActionFilter() {
+      this.showActionFilter = !this.showActionFilter
+      this.showTypeFilter = false
+      this.showUserFilter = false
+    },
+    toggleUserFilter() {
+      this.showUserFilter = !this.showUserFilter
+      this.showTypeFilter = false
+      this.showActionFilter = false
+    },
+    setTypeFilter(value) {
+      this.filters.type = value
+      this.showTypeFilter = false
+      this.applyFilters()
+    },
+    setActionFilter(value) {
+      this.filters.action = value
+      this.showActionFilter = false
+      this.applyFilters()
+    },
+    setUserFilter(value) {
+      this.filters.user = value
+      this.showUserFilter = false
+      this.applyFilters()
+    },
+    getTypeFilterLabel() {
+      if (this.filters.type === 'all') return 'All Types'
+      const labels = {
+        testcase: 'Test Cases',
+        database: 'Database',
+        uml: 'UML Diagrams',
+        version: 'Versions',
+        project: 'Projects',
+      }
+      return labels[this.filters.type] || this.filters.type
+    },
+    getActionFilterLabel() {
+      if (this.filters.action === 'all') return 'All Actions'
+      return this.filters.action.charAt(0).toUpperCase() + this.filters.action.slice(1)
+    },
+    getUserFilterLabel() {
+      if (this.filters.user === 'all') return 'All Users'
+      return this.filters.user
+    },
+    handleClickOutsideFilters(event) {
+      if (!event.target.closest('.filter-icon-wrapper')) {
+        this.showTypeFilter = false
+        this.showActionFilter = false
+        this.showUserFilter = false
+      }
     },
 
     debouncedSearch() {
@@ -850,8 +1136,98 @@ export default {
     },
 
     handleVersionSelect(versionId) {
+      // Chỉ Owner mới được phép select version
+      if (!checkIsOwner(this.project)) {
+        this.toast.warning('Only project owner can switch versions')
+        return
+      }
+      
+      const oldVersionId = this.selectedVersionId
       this.selectedVersionId = versionId
-      this.loadOutputStats()
+      // Lưu vào localStorage để đồng bộ
+      saveSelectedVersion(this.project._id, versionId)
+      
+      // Emit socket event để các thành viên khác biết version đã được switch
+      if (socket && socket.connected) {
+        const userId = localStorage.getItem('userId')
+        socket.emit('version_event', {
+          type: 'VERSION_SWITCHED',
+          projectId: this.project._id,
+          userId: userId,
+          toVersionId: versionId,
+          fromVersionId: oldVersionId,
+          timestamp: new Date(),
+        })
+        console.log('📡 Emitted VERSION_SWITCHED socket event')
+      }
+      
+      this.loadLogStats()
+    },
+
+    /**
+     * Xử lý khi version được approve thành công từ PreviewModal
+     */
+    async handleVersionApproved(event) {
+      // Chỉ xử lý nếu là project hiện tại
+      if (!event || event.projectId !== this.project._id) {
+        return
+      }
+
+      console.log('✅ Version approved event received:', event)
+
+      const { versionId, version, newVersion } = event
+
+      if (!versionId) {
+        console.warn('⚠️ Invalid version-approved event: missing versionId', event)
+        return
+      }
+
+      try {
+        // Đợi một chút để backend cập nhật xong
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        // Refresh project data để lấy version mới
+        await this.fetchProjectData(this.project._id)
+
+        // Đảm bảo version mới có trong danh sách (thêm vào nếu chưa có)
+        let newVersionObj = this.versions.find((v) => v._id === versionId)
+        
+        if (!newVersionObj) {
+          // Nếu chưa có trong danh sách, thử fetch lại một lần nữa
+          console.log('🔄 Version not found, fetching project data again...')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await this.fetchProjectData(this.project._id)
+          newVersionObj = this.versions.find((v) => v._id === versionId)
+        }
+
+        // Nếu vẫn chưa có và có version object từ event, thêm vào
+        if (!newVersionObj && version) {
+          // Chỉ thêm nếu version đã được approve (version_temporary = false)
+          if (version.version_temporary === false || version.version_temporary === undefined) {
+            this.versions.push(version)
+            newVersionObj = version
+            console.log('✅ Added new approved version to list:', versionId)
+          }
+        }
+
+        // Force set selectedVersionId ngay cả khi chưa có trong danh sách
+        // Vì version đã được approve rồi, nên chắc chắn sẽ có
+        this.selectedVersionId = versionId
+
+        // Lưu vào localStorage để đồng bộ với các trang khác
+        saveSelectedVersion(this.project._id, versionId)
+
+        // Refresh log stats với version mới
+        this.loadLogStats()
+
+        // Thông báo cho user
+        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+
+        this.$forceUpdate()
+      } catch (error) {
+        console.error('❌ Error handling version-approved event:', error)
+        this.toast.error('Failed to switch to approved version')
+      }
     },
 
     handleRetry() {
@@ -862,6 +1238,62 @@ export default {
     goBack() {
       this.$router.push('/dashboard')
     },
+
+    // Socket methods for version events
+    initVersionSocketListeners(projectId) {
+      if (!socket) return
+      if (socket.connected) {
+        socket.emit('join_project', projectId)
+      }
+      socket.on('version_event', this.handleVersionEvent)
+      console.log('✅ Version socket listeners initialized for OutputManagement')
+    },
+
+    cleanupVersionSocketListeners() {
+      if (socket) {
+        socket.off('version_event', this.handleVersionEvent)
+      }
+    },
+
+    handleVersionEvent(event) {
+      const currentUserId = localStorage.getItem('userId')
+      if (event.userId === currentUserId) return
+
+      switch (event.type) {
+        case 'VERSION_SWITCHED':
+          this.handleRemoteVersionSwitched(event)
+          break
+        case 'VERSION_CREATED':
+          this.handleRemoteVersionCreated(event)
+          break
+      }
+    },
+
+    async handleRemoteVersionSwitched(event) {
+      if (event.projectId !== this.project._id) return
+      this.selectedVersionId = event.toVersionId
+      saveSelectedVersion(this.project._id, event.toVersionId)
+      this.loadLogStats()
+      const version = this.versions.find((v) => v._id === event.toVersionId)
+      if (version) {
+        this.toast.info(`Version switched to: ${version.version_number || event.toVersionId}`)
+      }
+    },
+
+    async handleRemoteVersionCreated(event) {
+      if (event.projectId !== this.project._id) return
+      await this.fetchProjectData(this.project._id)
+      if (event.version && (event.version.version_temporary === false || event.version.version_temporary === undefined)) {
+        const exists = this.versions.find((v) => v._id === event.version._id)
+        if (!exists) {
+          this.versions.push(event.version)
+        }
+        this.selectedVersionId = event.version._id
+        saveSelectedVersion(this.project._id, event.version._id)
+        this.loadLogStats()
+        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+      }
+    },
   },
 }
 </script>
@@ -869,28 +1301,56 @@ export default {
 <style scoped>
 .output-management-view {
   padding: 30px;
-  background: #f9fafb;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  animation: fadeIn 0.5s ease;
 }
 
-.output-content {
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.log-content {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
 
-.output-header {
+.log-header {
   text-align: center;
   margin-bottom: 40px;
 }
 
+.main-content {
+  margin-top: 40px;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .output-header h2 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1a365d;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 8px;
 }
 
@@ -907,7 +1367,7 @@ export default {
   margin-bottom: 40px;
 }
 
-.output-card {
+.log-card {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -920,7 +1380,7 @@ export default {
   transition: all 0.3s ease;
 }
 
-.output-card:hover {
+.log-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
   border-color: #1a365d;
@@ -976,17 +1436,27 @@ export default {
   transition: color 0.3s ease;
 }
 
-.output-card:hover .card-arrow .material-symbols-outlined {
+.log-card:hover .card-arrow .material-symbols-outlined {
   color: #1a365d;
 }
 
 /* Enhanced Activity Logs Section */
 .activity-logs-section {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
   margin-bottom: 40px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
+}
+
+.activity-logs-section:hover {
+  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
 }
 
 .section-header {
@@ -994,21 +1464,45 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   gap: 16px;
+  overflow: visible;
+  position: relative;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
 }
 
 .section-header h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1a365d;
+  font-size: 1.75rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
   white-space: nowrap;
+  position: relative;
+  padding-left: 12px;
+}
+
+.section-header h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  border-radius: 2px;
 }
 
 .controls-header {
   flex: 1;
   width: 100%;
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
 }
 
 /* Compact Filter Controls */
@@ -1018,12 +1512,14 @@ export default {
   align-items: center;
   flex-direction: row;
   gap: 12px;
+  overflow: visible;
 }
 
 .filter-select-group {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  overflow: visible;
 }
 
 .filter-select {
@@ -1044,6 +1540,177 @@ export default {
   box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.1);
 }
 
+/* Filter Icon Buttons */
+.filter-icon-wrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 10;
+}
+
+/* Đảm bảo dropdown cuối cùng (user filter) mở về bên trái để không bị tràn */
+.filter-icon-wrapper:nth-child(3) .filter-dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+/* Đảm bảo container không cắt dropdown */
+.controls-header {
+  overflow: visible !important;
+}
+
+.compact-filter-controls {
+  overflow: visible !important;
+}
+
+.filter-icon-btn-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-icon-btn-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.filter-icon-btn-compact:hover::before {
+  left: 100%;
+}
+
+.filter-icon-btn-compact:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #1a365d;
+  color: #1a365d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+}
+
+.filter-icon-btn-compact .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.filter-dropdown-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.filter-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 18px;
+  border: none;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.filter-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  transition: width 0.3s ease;
+}
+
+.filter-option:hover {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-left: 20px;
+}
+
+.filter-option:hover::before {
+  width: 3px;
+}
+
+.filter-option.active {
+  background: linear-gradient(90deg, #e6f2ff 0%, #dbeafe 100%);
+  color: #1a365d;
+  font-weight: 600;
+  border-left-color: #1a365d;
+  padding-left: 20px;
+}
+
+.filter-option.active::before {
+  width: 3px;
+}
+
+.filter-option .material-symbols-outlined {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.filter-option.active .material-symbols-outlined {
+  color: #1a365d;
+}
+
 .search-refresh-group {
   display: flex;
   gap: 8px;
@@ -1055,50 +1722,79 @@ export default {
   display: flex;
   align-items: center;
   flex: 1;
-  max-width: 250px;
+  max-width: 300px;
 }
 
 .search-input.compact .material-symbols-outlined {
   position: absolute;
-  left: 16px;
-  color: #9ca3af;
-  font-size: 16px;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 18px;
+  z-index: 1;
+  transition: color 0.3s ease;
 }
 
 .search-input.compact input {
   width: 100%;
-  padding: 8px 8px 6px 32px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  transition: all 0.2s ease;
+  padding: 10px 12px 10px 40px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-input.compact:focus-within .material-symbols-outlined {
+  color: #1a365d;
 }
 
 .search-input.compact input:focus {
   outline: none;
   border-color: #1a365d;
-  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  transform: translateY(-1px);
 }
 
 .refresh-button.compact {
-  padding: 6px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  padding: 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   background: white;
-  color: #6b7280;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.refresh-button.compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.refresh-button.compact:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .refresh-button.compact:hover:not(:disabled) {
   border-color: #1a365d;
   color: #1a365d;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-2px) rotate(180deg);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
 
 .refresh-button.compact:disabled {
@@ -1107,24 +1803,44 @@ export default {
 }
 
 .clear-filters-button {
-  padding: 6px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  padding: 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   background: white;
-  color: #6b7280;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.clear-filters-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.clear-filters-button:hover::before {
+  left: 100%;
 }
 
 .clear-filters-button:hover {
   border-color: #ef4444;
   color: #ef4444;
-  background: #fef2f2;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 /* Logs Container Wrapper */
@@ -1139,42 +1855,76 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
-  color: #6b7280;
+  animation: fadeInUp 0.5s ease;
 }
 
 .logs-loading-container {
-  color: #6b7280;
+  color: #64748b;
 }
 
 .logs-error-container {
   color: #ef4444;
+  animation: fadeInUp 0.5s ease;
 }
 
 .logs-error-container .material-symbols-outlined {
-  font-size: 36px;
-  margin-bottom: 12px;
-  opacity: 0.7;
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.8;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .loading-spinner.small {
-  width: 30px;
-  height: 30px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #1a365d;
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #1a365d;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
 }
 
 /* Logs Container */
 .logs-container {
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #f9fafb;
+  overflow-x: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.logs-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.logs-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  border-radius: 4px;
+}
+
+.logs-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
 }
 
 .empty-logs {
@@ -1182,20 +1932,78 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 100px 20px;
   text-align: center;
-  color: #9ca3af;
+  color: #64748b;
+  animation: fadeInUp 0.6s ease;
 }
 
-.empty-logs .material-symbols-outlined {
-  font-size: 36px;
-  margin-bottom: 12px;
-  opacity: 0.5;
+.empty-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: float 3s ease-in-out infinite;
+  position: relative;
+}
+
+.empty-icon::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a365d, #2d4a8a);
+  opacity: 0.1;
+  z-index: -1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.2;
+  }
+}
+
+.empty-icon .material-symbols-outlined {
+  font-size: 56px;
+  color: #64748b;
+  animation: spin 20s linear infinite;
+}
+
+.empty-logs h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 8px 0;
 }
 
 .empty-logs p {
-  margin-bottom: 12px;
+  margin: 0 0 20px 0;
   font-size: 0.9rem;
+  color: #64748b;
+  max-width: 400px;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.empty-actions .retry-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Log Items */
@@ -1208,81 +2016,145 @@ export default {
 .log-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  background: white;
+  border-left: 5px solid transparent;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin: 4px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.log-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  transition: width 0.3s ease;
+}
+
+.log-item:hover::before {
+  width: 100%;
 }
 
 .log-item:last-child {
   border-bottom: none;
 }
 
-.log-item:hover {
-  background: #f8fafc;
+/* Màu nền theo action type */
+.log-item.action-create {
+  background: linear-gradient(90deg, #f0fdf4 0%, #dcfce7 100%);
+  border-left-color: #10b981;
+}
+
+.log-item.action-create:hover {
+  background: linear-gradient(90deg, #dcfce7 0%, #bbf7d0 100%);
+  transform: translateX(4px) translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+  border-left-width: 6px;
+}
+
+.log-item.action-delete {
+  background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 100%);
+  border-left-color: #ef4444;
+}
+
+.log-item.action-delete:hover {
+  background: linear-gradient(90deg, #fee2e2 0%, #fecaca 100%);
+  transform: translateX(4px) translateY(-2px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+  border-left-width: 6px;
+}
+
+.log-item.action-update {
+  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%);
+  border-left-color: #3b82f6;
+}
+
+.log-item.action-update:hover {
+  background: linear-gradient(90deg, #dbeafe 0%, #bfdbfe 100%);
+  transform: translateX(4px) translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+  border-left-width: 6px;
+}
+
+.log-item.action-default {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left-color: #94a3b8;
+}
+
+.log-item.action-default:hover {
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateX(4px) translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-left-width: 6px;
 }
 
 .log-item.highlighted {
-  background: #fffbf0;
-  border-left: 4px solid #f59e0b;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
 
-/* Log Type Colors */
-.log-item.testcase {
-  border-left: 4px solid #10b981;
+/* Log Type Colors - chỉ dùng cho icon */
+.log-item.testcase .log-icon {
+  background: transparent;
 }
 
-.log-item.database {
-  border-left: 4px solid #3b82f6;
+.log-item.database .log-icon {
+  background: transparent;
 }
 
-.log-item.uml {
-  border-left: 4px solid #8b5cf6;
+.log-item.uml .log-icon {
+  background: transparent;
 }
 
-.log-item.version {
-  border-left: 4px solid #f59e0b;
+.log-item.version .log-icon {
+  background: transparent;
 }
 
-.log-item.project {
-  border-left: 4px solid #ef4444;
-}
-
-/* Log Level Colors */
-.log-item.error {
-  background: #fef2f2;
-}
-
-.log-item.success {
-  /* background: #f0fdf4; */
-  border: 2px solid #bbf7d0;
-}
-
-.log-item.warning {
-  /* background: #fffbeb; */
-  border: 2px solid #fed7aa;
-}
-
-.log-item.info {
-  /* background: #f0f9ff; */
-  border: 2px solid #bae6fd;
-}
-
-.log-item.default {
-  /* background: #f9fafb; */
-  border: 2px solid #d1d5db;
+.log-item.project .log-icon {
+  background: transparent;
 }
 
 .log-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-top: 2px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.log-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.log-item:hover .log-icon {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.log-item:hover .log-icon::before {
+  opacity: 1;
 }
 
 .log-icon.testcase {
@@ -1317,42 +2189,180 @@ export default {
 .log-content {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .log-header {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.log-user-info {
+  display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 4px;
-  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
 }
 
-.log-user {
+.user-avatar-small {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar-small .material-symbols-outlined {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.log-user-name {
   font-weight: 600;
   color: #1a365d;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.log-action {
-  color: #6b7280;
-  font-size: 0.8rem;
-  font-weight: 500;
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-left: 4px;
 }
 
-.log-target {
-  background: #e5e7eb;
-  color: #4b5563;
-  padding: 2px 6px;
-  border-radius: 4px;
+.ai-badge .material-symbols-outlined {
+  font-size: 12px;
+}
+
+.log-action-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.log-action-badge {
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);
+  transition: all 0.3s ease;
+}
+
+.log-action-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+}
+
+.log-target-badge {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.log-target-badge:hover {
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.log-version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+  padding: 6px 10px;
+  border-radius: 8px;
   font-size: 0.7rem;
-  font-weight: 500;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.2);
+  transition: all 0.3s ease;
+}
+
+.log-version-badge:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+.log-version-badge .material-symbols-outlined {
+  font-size: 14px;
 }
 
 .log-message {
-  margin-bottom: 6px;
-  line-height: 1.4;
-  color: #374151;
-  font-size: 0.85rem;
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #1e293b;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.log-item.action-create .log-message {
+  border-left-color: #10b981;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.log-item.action-delete .log-message {
+  border-left-color: #ef4444;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.log-item.action-update .log-message {
+  border-left-color: #3b82f6;
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .log-message :deep(.highlight) {
@@ -1364,23 +2374,48 @@ export default {
 
 .log-meta {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.log-meta-left {
+  display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .log-time {
-  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748b;
+  font-weight: 500;
 }
 
-.log-level {
-  padding: 2px 6px;
-  border-radius: 10px;
+.log-time .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.log-requirement-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 2px 8px;
+  border-radius: 12px;
   font-size: 0.65rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
+
+.log-requirement-badge .material-symbols-outlined {
+  font-size: 12px;
+}
+
 
 .log-level.error {
   background: #fecaca;
@@ -1434,53 +2469,100 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   background: white;
-  color: #6b7280;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.8rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.pagination-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.pagination-btn:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .pagination-btn:hover:not(:disabled) {
   border-color: #1a365d;
   color: #1a365d;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
 
 .pagination-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: #f1f5f9;
 }
 
 .page-numbers {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .page-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
   background: white;
-  color: #6b7280;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.8rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.page-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.page-btn:hover::before {
+  opacity: 0.1;
 }
 
 .page-btn:hover {
   border-color: #1a365d;
   color: #1a365d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
 
 .page-btn.active {
-  background: #1a365d;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   border-color: #1a365d;
   color: white;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  transform: translateY(-2px);
+}
+
+.page-btn.active::before {
+  opacity: 0;
 }
 
 .page-size-selector {
@@ -1504,60 +2586,49 @@ export default {
   cursor: pointer;
 }
 
-/* Navigation Tabs */
-.navigation-tabs {
-  display: flex;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-  padding: 0 2rem;
-}
-
-.tab-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-  color: #1a365d;
-  background: var(--background-color);
-}
-
-.tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
-}
-
-.tab-button .material-symbols-outlined {
-  font-size: 20px;
-}
-
-.tab-button .material-symbols-outlined {
-  font-size: 20px;
-}
 
 .retry-button {
-  padding: 6px 12px;
-  border: 1px solid #1a365d;
-  border-radius: 6px;
-  background: #1a365d;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.8rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.retry-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.retry-button:hover::before {
+  left: 100%;
 }
 
 .retry-button:hover {
-  background: #2d4a7c;
-  border-color: #2d4a7c;
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+}
+
+.retry-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 /* Animations */
@@ -1634,11 +2705,8 @@ export default {
     justify-content: center;
   }
 
-  .navigation-tabs {
-    flex-direction: column;
-  }
 
-  .output-header h2 {
+  .log-header h2 {
     font-size: 2rem;
   }
 }
@@ -1651,13 +2719,26 @@ export default {
   .log-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 8px;
+  }
+
+  .log-user-info {
+    width: 100%;
+  }
+
+  .log-action-badges {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .log-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 6px;
+  }
+
+  .log-meta-left {
+    width: 100%;
   }
 
   .filter-select-group {
@@ -1667,6 +2748,16 @@ export default {
   .filter-select {
     min-width: auto;
     width: 100%;
+  }
+
+  .log-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .log-message {
+    font-size: 0.85rem;
+    padding: 6px 10px;
   }
 }
 </style>

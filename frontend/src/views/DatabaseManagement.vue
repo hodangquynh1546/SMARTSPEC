@@ -1,29 +1,5 @@
 <template>
   <div class="database-management-view">
-    <ProjectHeader
-      :project="project"
-      :versions="versions"
-      :selected-version-id="selectedVersionId"
-      :active-users="activeUsers"
-      @version-selected="handleVersionSelect"
-      @go-back="goBack"
-    />
-
-    <!-- Navigation Tabs -->
-    <div class="navigation-tabs">
-      <button class="tab-button" @click="navigateToUsecase">
-        <span class="material-symbols-outlined">list_alt</span>
-        Use Cases
-      </button>
-      <button class="tab-button" @click="navigateToOutput">
-        <span class="material-symbols-outlined">output</span>
-        Output
-      </button>
-      <button class="tab-button active">
-        <span class="material-symbols-outlined">storage</span>
-        Database
-      </button>
-    </div>
 
     <div class="database-content">
       <!-- Loading State -->
@@ -58,8 +34,8 @@
       <div v-else-if="database" class="database-main-content">
         <div class="content-header">
           <div class="header-left">
-            <h2>Database Management</h2>
-            <p class="description">{{ database.description }}</p>
+            <!-- <h2>Database Management</h2>
+            <p class="description">{{ database.description }}</p> -->
             <div class="database-meta">
               <span class="meta-item">
                 <span class="material-symbols-outlined">table</span>
@@ -167,14 +143,61 @@
             <div class="sql-actions">
               <!-- SQL Dialect Selector -->
               <div class="sql-dialect-selector">
-                <label>SQL Dialect:</label>
-                <select v-model="selectedSQLDialect" class="dialect-select">
-                  <option value="mysql">MySQL</option>
-                  <option value="sqlserver">SQL Server</option>
-                  <option value="postgresql">PostgreSQL</option>
-                  <option value="oracle">Oracle</option>
-                  <option value="sqlite">SQLite</option>
-                </select>
+                <div class="filter-icon-wrapper">
+                  <button 
+                    class="filter-icon-btn" 
+                    @click.stop="toggleDialectFilter"
+                    :title="`SQL Dialect: ${getDialectName(selectedSQLDialect)}`"
+                  >
+                    <span class="material-symbols-outlined">database</span>
+                  </button>
+                  <div 
+                    v-if="showDialectFilter" 
+                    class="filter-dropdown-menu"
+                    @click.stop
+                  >
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: selectedSQLDialect === 'mysql' }"
+                      @click="setDialect('mysql')"
+                    >
+                      <span class="material-symbols-outlined">storage</span>
+                      MySQL
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: selectedSQLDialect === 'sqlserver' }"
+                      @click="setDialect('sqlserver')"
+                    >
+                      <span class="material-symbols-outlined">dns</span>
+                      SQL Server
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: selectedSQLDialect === 'postgresql' }"
+                      @click="setDialect('postgresql')"
+                    >
+                      <span class="material-symbols-outlined">cloud</span>
+                      PostgreSQL
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: selectedSQLDialect === 'oracle' }"
+                      @click="setDialect('oracle')"
+                    >
+                      <span class="material-symbols-outlined">account_tree</span>
+                      Oracle
+                    </button>
+                    <button 
+                      class="filter-option" 
+                      :class="{ active: selectedSQLDialect === 'sqlite' }"
+                      @click="setDialect('sqlite')"
+                    >
+                      <span class="material-symbols-outlined">folder_data</span>
+                      SQLite
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <button class="btn-secondary" @click="copySQL">
@@ -263,7 +286,6 @@ import {
   validateTableStructure,
 } from '@/api/project'
 import { useToast } from 'vue-toastification'
-import ProjectHeader from '@/components/ProjectHeader.vue'
 import DatabaseStats from '@/components/database/DatabaseStats.vue'
 import DatabaseDiagram from '@/components/database/DatabaseDiagram/DatabaseDiagram.vue'
 import DatabaseList from '@/components/database/DatabaseList.vue'
@@ -273,11 +295,18 @@ import TableDetailsModal from '@/components/database/TableDetailsModal.vue'
 import CompositeKeyModal from '@/components/database/CompositeKeyModal.vue'
 import CompositeKeyDetailsModal from '@/components/database/CompositeKeyDetailsModal.vue'
 import { useActiveMembers } from '@/utils/useActiveMembers'
+import {
+  saveSelectedVersion,
+  getSelectedOrDefaultVersion,
+  filterApprovedVersions,
+  isOwner as checkIsOwner,
+} from '@/utils/versionSync'
+import eventBus from '@/utils/eventBus'
+import { socket } from '@/utils/socket'
 
 export default {
   name: 'DatabaseManagement',
   components: {
-    ProjectHeader,
     DatabaseStats,
     DatabaseDiagram,
     DatabaseList,
@@ -318,6 +347,7 @@ export default {
 
       viewMode: 'diagram',
       selectedSQLDialect: 'mysql', // Mặc định là MySQL
+      showDialectFilter: false,
 
       showCreateTableModal: false,
       showRelationshipModal: false,
@@ -379,13 +409,35 @@ export default {
 
       // ✅ THÊM: Init socket connection cho active members
       this.initSocketConnection(projectId)
+      
+      // ✅ THÊM: Init version socket listeners
+      this.initVersionSocketListeners(projectId)
     }
+    
+    // Listen for version-approved event from PreviewModal
+    eventBus.on('version-approved', this.handleVersionApproved)
+    
+    // ✅ THÊM: Listen for database-generation-completed event để tự động refresh data
+    eventBus.on('database-generation-completed', this.handleDatabaseGenerationCompleted)
+    
+    // Add click outside listener for dialect filter
+    document.addEventListener('click', this.handleClickOutsideDialectFilter)
   },
   beforeUnmount() {
     // ✅ THÊM: Cleanup socket connection
     if (this.project?._id) {
       this.cleanupSocketConnection(this.project._id)
+      this.cleanupVersionSocketListeners()
     }
+    
+    // Remove event listener
+    eventBus.off('version-approved', this.handleVersionApproved)
+    
+    // ✅ THÊM: Remove database-generation-completed event listener
+    eventBus.off('database-generation-completed', this.handleDatabaseGenerationCompleted)
+    
+    // Remove click outside listener
+    document.removeEventListener('click', this.handleClickOutsideDialectFilter)
   },
   methods: {
     // Navigation methods
@@ -396,7 +448,7 @@ export default {
       })
     },
 
-    navigateToOutput() {
+    navigateToLog() {
       this.$router.push({
         name: 'OutputManagement',
         params: { id: this.project._id },
@@ -408,8 +460,123 @@ export default {
     },
 
     handleVersionSelect(versionId) {
+      // Chỉ Owner mới được phép select version
+      if (!checkIsOwner(this.project)) {
+        this.toast.warning('Only project owner can switch versions')
+        return
+      }
+      
+      const oldVersionId = this.selectedVersionId
       this.selectedVersionId = versionId
+      // Lưu vào localStorage để đồng bộ
+      saveSelectedVersion(this.project._id, versionId)
+      
+      // Emit socket event để các thành viên khác biết version đã được switch
+      if (socket && socket.connected) {
+        const userId = localStorage.getItem('userId')
+        socket.emit('version_event', {
+          type: 'VERSION_SWITCHED',
+          projectId: this.project._id,
+          userId: userId,
+          toVersionId: versionId,
+          fromVersionId: oldVersionId,
+          timestamp: new Date(),
+        })
+        console.log('📡 Emitted VERSION_SWITCHED socket event')
+      }
+      
       this.loadDatabaseData()
+    },
+
+    /**
+     * Xử lý khi database generation hoàn thành từ ProjectLayout
+     */
+    async handleDatabaseGenerationCompleted(event) {
+      // Chỉ xử lý nếu là project hiện tại và version hiện tại
+      if (!event || event.projectId !== this.project._id) {
+        return
+      }
+
+      // Nếu có versionId trong event, chỉ refresh nếu đúng version đang được chọn
+      if (event.versionId && event.versionId !== this.selectedVersionId) {
+        console.log('⚠️ Database generation completed for different version, skipping refresh')
+        return
+      }
+
+      console.log('✅ Database generation completed event received:', event)
+      
+      // Đợi một chút để backend cập nhật xong
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      
+      // Tự động refresh database data
+      await this.loadDatabaseData()
+      this.toast.success('Database schema đã được cập nhật!')
+    },
+
+    /**
+     * Xử lý khi version được approve thành công từ PreviewModal
+     */
+    async handleVersionApproved(event) {
+      // Chỉ xử lý nếu là project hiện tại
+      if (!event || event.projectId !== this.project._id) {
+        return
+      }
+
+      console.log('✅ Version approved event received:', event)
+
+      const { versionId, version, newVersion } = event
+
+      if (!versionId) {
+        console.warn('⚠️ Invalid version-approved event: missing versionId', event)
+        return
+      }
+
+      try {
+        // Đợi một chút để backend cập nhật xong
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        // Refresh project data để lấy version mới
+        await this.fetchProjectData(this.project._id)
+
+        // Đảm bảo version mới có trong danh sách (thêm vào nếu chưa có)
+        let newVersionObj = this.versions.find((v) => v._id === versionId)
+        
+        if (!newVersionObj) {
+          // Nếu chưa có trong danh sách, thử fetch lại một lần nữa
+          console.log('🔄 Version not found, fetching project data again...')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await this.fetchProjectData(this.project._id)
+          newVersionObj = this.versions.find((v) => v._id === versionId)
+        }
+
+        // Nếu vẫn chưa có và có version object từ event, thêm vào
+        if (!newVersionObj && version) {
+          // Chỉ thêm nếu version đã được approve (version_temporary = false)
+          if (version.version_temporary === false || version.version_temporary === undefined) {
+            this.versions.push(version)
+            newVersionObj = version
+            console.log('✅ Added new approved version to list:', versionId)
+          }
+        }
+
+        // Force set selectedVersionId ngay cả khi chưa có trong danh sách
+        // Vì version đã được approve rồi, nên chắc chắn sẽ có
+        this.selectedVersionId = versionId
+
+        // Lưu vào localStorage để đồng bộ với các trang khác
+        saveSelectedVersion(this.project._id, versionId)
+
+        // Refresh database data với version mới
+        await this.loadDatabaseData()
+
+        // Thông báo cho user
+        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+
+        this.$forceUpdate()
+      } catch (error) {
+        console.error('❌ Error handling version-approved event:', error)
+        this.toast.error('Failed to switch to approved version')
+      }
     },
 
     // Data methods
@@ -418,10 +585,20 @@ export default {
         const { data } = await getProjectDetail(projectId)
         const result = data.data || data
         this.project = result.project || result
-        this.versions = result.versions || []
+        // Lọc bỏ version tạm thời, chỉ giữ version đã được approve
+        const allVersions = result.versions || []
+        this.versions = filterApprovedVersions(allVersions)
 
-        if (this.versions.length > 0) {
-          this.selectedVersionId = this.versions[0]._id
+        // Sử dụng version sync utility
+        const currentVersionId = result.current_version?._id
+        this.selectedVersionId = getSelectedOrDefaultVersion(
+          projectId,
+          this.versions,
+          currentVersionId
+        )
+        
+        if (this.selectedVersionId) {
+          saveSelectedVersion(projectId, this.selectedVersionId)
         }
       } catch (err) {
         console.error('Error fetching project details:', err)
@@ -497,18 +674,33 @@ export default {
 
     async generateDatabaseSchema() {
       if (!this.selectedVersionId) {
-        this.toast.error('Please select a version first')
+        this.toast.error('Vui lòng chọn version trước')
         return
+      }
+
+      // Nếu đã có database, cần xác nhận trước khi regenerate
+      if (this.database) {
+        const confirmMessage = 
+          'Are you sure you want to regenerate the database schema?\n\n' +
+          'This action will replace the current database schema with a new one generated from your use cases. ' +
+          'All existing tables, relationships, and data will be replaced.\n\n' +
+          'This action cannot be undone.'
+        
+        if (!confirm(confirmMessage)) {
+          return
+        }
       }
 
       this.generatingSchema = true
       try {
         const { data } = await generateDatabaseSchema(this.selectedVersionId)
-        this.toast.success('Database schema generated successfully!')
+        this.toast.success('Tạo database schema thành công!')
         await this.loadDatabaseData()
       } catch (err) {
         console.error('Error generating database schema:', err)
-        this.toast.error(err.response?.data?.message || 'Failed to generate database schema')
+        const { formatErrorForDisplay } = await import('@/utils/errorMessages')
+        const errorMessage = formatErrorForDisplay(err, 'Không thể tạo database schema. Vui lòng thử lại.')
+        this.toast.error(errorMessage)
       } finally {
         this.generatingSchema = false
       }
@@ -947,18 +1139,18 @@ export default {
 
     async exportSQL() {
       try {
-        const { data: sqlData } = await exportDatabaseSQL(this.database._id)
+        const { data: sqlData } = await exportDatabaseSQL(this.database._id, this.selectedSQLDialect)
         const sql = sqlData.data?.sql || sqlData.sql || sqlData
 
         const blob = new Blob([sql], { type: 'text/sql' })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.download = `${this.database?.name || 'database'}-schema-export.sql`
+        link.download = `${this.database?.name || 'database'}-schema-${this.selectedSQLDialect}.sql`
         link.click()
         URL.revokeObjectURL(url)
 
-        this.toast.success('SQL exported successfully')
+        this.toast.success(`SQL exported successfully (${this.getDialectName(this.selectedSQLDialect)})`)
       } catch (error) {
         console.error('Failed to export SQL:', error)
         this.toast.error('Failed to export SQL')
@@ -1043,9 +1235,19 @@ export default {
         this.relationships.push(relationship)
 
         if (this.database?._id) {
-          await updateDatabase(this.database._id, {
+          const response = await updateDatabase(this.database._id, {
             relationships: this.relationships,
           })
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          // Response format: { message, data, version, newVersionId }
+          const newVersionId = response.data?.newVersionId
+          if (newVersionId) {
+            this.selectedVersionId = newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+            // Reload database data để đồng bộ với version mới
+            await this.loadDatabaseData()
+          }
         }
 
         this.updateStats()
@@ -1062,9 +1264,19 @@ export default {
         this.relationships.splice(index, 1)
 
         if (this.database?._id) {
-          await updateDatabase(this.database._id, {
+          const response = await updateDatabase(this.database._id, {
             relationships: this.relationships,
           })
+          // ✅ Cập nhật selectedVersionId nếu có version mới được bump
+          // Response format: { message, data, version, newVersionId }
+          const newVersionId = response.data?.newVersionId
+          if (newVersionId) {
+            this.selectedVersionId = newVersionId
+            saveSelectedVersion(this.project._id, this.selectedVersionId)
+            console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
+            // Reload database data để đồng bộ với version mới
+            await this.loadDatabaseData()
+          }
         }
 
         this.updateStats()
@@ -1276,6 +1488,29 @@ export default {
       return typesWithoutLength.includes(type?.toUpperCase())
     },
 
+    // Dialect filter methods
+    toggleDialectFilter() {
+      this.showDialectFilter = !this.showDialectFilter
+    },
+    setDialect(value) {
+      this.selectedSQLDialect = value
+      this.showDialectFilter = false
+    },
+    getDialectName(dialect) {
+      const names = {
+        mysql: 'MySQL',
+        sqlserver: 'SQL Server',
+        postgresql: 'PostgreSQL',
+        oracle: 'Oracle',
+        sqlite: 'SQLite',
+      }
+      return names[dialect] || dialect
+    },
+    handleClickOutsideDialectFilter(event) {
+      if (!event.target.closest('.filter-icon-wrapper')) {
+        this.showDialectFilter = false
+      }
+    },
     closeModal() {
       this.showCreateTableModal = false
       this.editingTable = null
@@ -1326,14 +1561,100 @@ export default {
       this.updateStats()
       this.generateSQL()
     },
+
+    // Socket methods for version events
+    initVersionSocketListeners(projectId) {
+      if (!socket) return
+
+      // Join project room if not already joined
+      if (socket.connected) {
+        socket.emit('join_project', projectId)
+      }
+
+      // Listen for version events
+      socket.on('version_event', this.handleVersionEvent)
+      console.log('✅ Version socket listeners initialized for DatabaseManagement')
+    },
+
+    cleanupVersionSocketListeners() {
+      if (socket) {
+        socket.off('version_event', this.handleVersionEvent)
+        console.log('🧹 Version socket listeners cleaned up')
+      }
+    },
+
+    handleVersionEvent(event) {
+      console.log('📩 Realtime version event received in DatabaseManagement:', event)
+
+      // Bỏ qua events từ chính mình
+      const currentUserId = localStorage.getItem('userId')
+      if (event.userId === currentUserId) return
+
+      switch (event.type) {
+        case 'VERSION_SWITCHED':
+          this.handleRemoteVersionSwitched(event)
+          break
+        case 'VERSION_CREATED':
+          this.handleRemoteVersionCreated(event)
+          break
+        default:
+          console.log('ℹ️ Unhandled version event type:', event.type)
+      }
+    },
+
+    async handleRemoteVersionSwitched(event) {
+      console.log('🔄 Remote version switched event:', event)
+      
+      if (event.projectId !== this.project._id) return
+
+      const { toVersionId } = event
+
+      // Cập nhật selectedVersionId
+      this.selectedVersionId = toVersionId
+      saveSelectedVersion(this.project._id, toVersionId)
+
+      // Refresh data với version mới
+      await this.loadDatabaseData()
+
+      // Thông báo cho user
+      const version = this.versions.find((v) => v._id === toVersionId)
+      if (version) {
+        this.toast.info(`Version switched to: ${version.version_number || toVersionId}`)
+      }
+    },
+
+    async handleRemoteVersionCreated(event) {
+      console.log('🆕 Remote version created event:', event)
+      
+      if (event.projectId !== this.project._id) return
+
+      // Refresh project data để lấy version mới
+      await this.fetchProjectData(this.project._id)
+
+      // Nếu có version trong event, thêm vào danh sách
+      if (event.version) {
+        const exists = this.versions.find((v) => v._id === event.version._id)
+        if (!exists && (event.version.version_temporary === false || event.version.version_temporary === undefined)) {
+          this.versions.push(event.version)
+        }
+      }
+
+      // Tự động switch sang version mới nếu được approve
+      if (event.version && (event.version.version_temporary === false || event.version.version_temporary === undefined)) {
+        this.selectedVersionId = event.version._id
+        saveSelectedVersion(this.project._id, event.version._id)
+        await this.loadDatabaseData()
+        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+      }
+    },
   },
 }
 </script>
 
 <style scoped>
 .database-management-view {
-  padding: 30px;
-  background: #f9fafb;
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1350,7 +1671,17 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.content-header:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .header-left h2 {
@@ -1368,19 +1699,33 @@ export default {
 
 .database-meta {
   display: flex;
-  gap: 20px;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.9rem;
-  color: #6b7280;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #475569;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.meta-item:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .meta-item .material-symbols-outlined {
-  font-size: 16px;
+  font-size: 18px;
+  color: #1a365d;
 }
 
 .header-actions {
@@ -1393,40 +1738,77 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
-  background: #1a365d;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d4a8a;
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 .btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  padding: 10px 20px;
+  background: white;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }
 
 /* SQL Dialect Selector */
@@ -1443,7 +1825,17 @@ export default {
   font-weight: 500;
 }
 .database-main-content {
-  margin-top: 20px;
+  margin-top: 0;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .dialect-select {
   padding: 8px 12px;
@@ -1461,25 +1853,153 @@ export default {
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
+/* Filter Icon Buttons */
+.filter-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 44px;
+  height: 44px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filter-icon-btn:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #1a365d;
+  color: #1a365d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+}
+
+.filter-icon-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+  z-index: 100;
+  overflow: hidden;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  background: white;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.filter-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #1a365d;
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.filter-option:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-left: 24px;
+}
+
+.filter-option:hover::before {
+  transform: scaleY(1);
+}
+
+.filter-option.active {
+  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  color: #1a365d;
+  font-weight: 600;
+  padding-left: 24px;
+}
+
+.filter-option.active::before {
+  transform: scaleY(1);
+}
+
+.filter-option .material-symbols-outlined {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.filter-option.active .material-symbols-outlined {
+  color: #1a365d;
+}
+
 /* SQL Preview Header */
 .sql-header {
-  padding: 12px 20px;
-  background: #374151;
-  border-bottom: 1px solid #4b5563;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .dialect-badge {
-  background: #1a365d;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
-  padding: 4px 12px;
+  padding: 6px 16px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
 /* Quick Actions Panel */
@@ -1644,21 +2164,35 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 100px 40px;
   text-align: center;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .loading-state .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e5e7eb;
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e2e8f0;
   border-top: 4px solid #1a365d;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
 }
 
 @keyframes spin {
@@ -1672,128 +2206,192 @@ export default {
 
 .error-state .material-symbols-outlined,
 .empty-state .material-symbols-outlined {
-  font-size: 48px;
-  margin-bottom: 16px;
+  font-size: 64px;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .error-state .material-symbols-outlined {
   color: #ef4444;
+  filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.3));
 }
 
 .empty-state .material-symbols-outlined {
-  color: #9ca3af;
+  color: #64748b;
+  filter: drop-shadow(0 4px 8px rgba(100, 116, 139, 0.2));
 }
 
 .error-state h3,
 .empty-state h3 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-  color: #1f2937;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1a365d;
+  letter-spacing: -0.02em;
 }
 
 .error-state p,
 .empty-state p {
-  color: #6b7280;
-  margin-bottom: 20px;
+  color: #64748b;
+  margin-bottom: 32px;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 500px;
 }
 
 /* Schema Section */
 .schema-section {
   background: white;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 2px solid #0000005a;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.schema-section:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .section-header {
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
 }
 
 .section-header h3 {
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
+  font-weight: 700;
+  color: #1a365d;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .view-options {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .btn-secondary.active {
-  background: #1a365d;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
   border-color: #1a365d;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 /* SQL Preview */
 .sql-preview-section {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sql-preview-section:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .sql-preview {
   padding: 0;
-  background: #1f2937;
-  border-radius: 0 0 12px 12px;
-  max-height: 400px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 0 0 16px 16px;
+  max-height: 500px;
   overflow-y: auto;
+  position: relative;
+}
+
+.sql-preview::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sql-preview::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.sql-preview::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.sql-preview::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .sql-preview pre {
   margin: 0;
-  color: #e5e7eb;
-  font-family: 'Courier New', monospace;
+  color: #e2e8f0;
+  font-family: 'Fira Code', 'Courier New', monospace;
   font-size: 0.875rem;
-  line-height: 1.5;
-  padding: 20px;
+  line-height: 1.8;
+  padding: 24px;
+  tab-size: 2;
+}
+
+.sql-preview code {
+  color: #e2e8f0;
+  font-family: inherit;
 }
 
 .sql-actions {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-/* Navigation Tabs */
-.navigation-tabs {
-  display: flex;
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-  padding: 0 2rem;
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .database-management-view {
+    padding: 16px;
+  }
+
+  .content-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .database-meta {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .view-options,
+  .sql-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .sql-preview {
+    max-height: 300px;
+  }
 }
 
-.tab-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-  color: #1a365d;
-  background: var(--background-color);
-}
-
-.tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
-}
-
-.tab-button .material-symbols-outlined {
-  font-size: 20px;
-}
 </style>

@@ -120,87 +120,425 @@
       <!-- Charts and Analytics -->
       <section class="analytics-section">
         <div class="analytics-grid">
-          <!-- User Distribution Chart -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3>Phân bố người dùng</h3>
+          <!-- User Distribution & User Analytics (full-width) -->
+          <div class="analytics-card modern-card user-analytics-card">
+            <div class="card-header-modern">
+              <div class="header-content">
+                <span class="material-symbols-outlined header-icon">pie_chart</span>
+                <div>
+                  <h3>Phân bố người dùng</h3>
+                  <p class="header-subtitle">Tổng quan vai trò, đăng ký mới và người dùng đang hoạt động</p>
+                </div>
+              </div>
               <div class="chart-actions">
-                <button class="btn-icon" @click="refreshUserStats">
+                <div class="user-filters-modern">
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleRangeDaysFilter"
+                      :title="`Range: ${userAnalyticsFilters.rangeDays} days`"
+                    >
+                      <span class="material-symbols-outlined">calendar_month</span>
+                    </button>
+                    <div 
+                      v-if="showRangeDaysFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.rangeDays === 7 }"
+                        @click="setRangeDays(7)"
+                      >
+                        <span class="material-symbols-outlined">today</span>
+                        7 days
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.rangeDays === 30 }"
+                        @click="setRangeDays(30)"
+                      >
+                        <span class="material-symbols-outlined">date_range</span>
+                        30 days
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.rangeDays === 90 }"
+                        @click="setRangeDays(90)"
+                      >
+                        <span class="material-symbols-outlined">event</span>
+                        90 days
+                      </button>
+                    </div>
+                  </div>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleViewModeFilter"
+                      :title="`View: ${getViewModeLabel()}`"
+                    >
+                      <span class="material-symbols-outlined">timeline</span>
+                    </button>
+                    <div 
+                      v-if="showViewModeFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.viewMode === 'day' }"
+                        @click="setViewMode('day')"
+                      >
+                        <span class="material-symbols-outlined">today</span>
+                        By Day
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.viewMode === 'month' }"
+                        @click="setViewMode('month')"
+                      >
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        By Month
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: userAnalyticsFilters.viewMode === 'year' }"
+                        @click="setViewMode('year')"
+                      >
+                        <span class="material-symbols-outlined">event</span>
+                        By Year
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button class="btn-icon-modern" @click="() => { loadUserAnalytics(); loadUserTimelineChart(); }" title="Làm mới">
                   <span class="material-symbols-outlined">refresh</span>
                 </button>
-                <button class="btn-icon" @click="exportUserStats">
+                <button class="btn-icon-modern" @click="exportUserStats" title="Xuất dữ liệu">
                   <span class="material-symbols-outlined">download</span>
                 </button>
               </div>
             </div>
-            <div class="chart-container">
-              <div class="pie-chart" :style="{ background: pieBackground }">
-                <div class="pie-center">
-                  <div class="center-content">
-                    <span class="center-value">
-                      {{
-                        hoveredSegment !== null
-                          ? userDistribution[hoveredSegment].percentage + '%'
-                          : '100%'
-                      }}
-                    </span>
-                    <span class="center-label">
-                      {{
-                        hoveredSegment !== null
-                          ? userDistribution[hoveredSegment].label
-                          : 'Tổng'
-                      }}
-                    </span>
+            <div class="user-analytics-content">
+              <!-- Top counters -->
+              <div class="user-counters-grid">
+                <div class="user-counter-card">
+                  <div class="counter-icon total">
+                    <span class="material-symbols-outlined">group</span>
+                  </div>
+                  <div class="counter-info">
+                    <span class="counter-label">Tổng người dùng</span>
+                    <span class="counter-value">{{ formatNumber(userAnalytics.counters.totalUsers || 0) }}</span>
+                  </div>
+                </div>
+                <div class="user-counter-card">
+                  <div class="counter-icon active">
+                    <span class="material-symbols-outlined">verified_user</span>
+                  </div>
+                  <div class="counter-info">
+                    <span class="counter-label">Đang hoạt động</span>
+                    <span class="counter-value">{{ formatNumber(userAnalytics.counters.activeUsers || 0) }}</span>
+                  </div>
+                </div>
+                <div class="user-counter-card">
+                  <div class="counter-icon new">
+                    <span class="material-symbols-outlined">person_add</span>
+                  </div>
+                  <div class="counter-info">
+                    <span class="counter-label">Đăng ký hôm nay</span>
+                    <span class="counter-value">{{ formatNumber(userAnalytics.counters.newUsersToday || 0) }}</span>
+                  </div>
+                </div>
+                <div class="user-counter-card">
+                  <div class="counter-icon online">
+                    <span class="material-symbols-outlined">online_prediction</span>
+                  </div>
+                  <div class="counter-info">
+                    <span class="counter-label">Online hôm nay</span>
+                    <span class="counter-value">{{ formatNumber(userAnalytics.counters.onlineToday || 0) }}</span>
                   </div>
                 </div>
               </div>
 
-              <div class="chart-legend">
-                <div
-                  v-for="(item, index) in userDistribution"
-                  :key="item.label"
-                  class="legend-item"
-                  :class="{ active: hoveredSegment === index }"
-                  @mouseenter="hoveredSegment = index"
-                  @mouseleave="hoveredSegment = null"
-                >
-                  <div class="legend-color" :style="{ backgroundColor: item.color }"></div>
-                  <span class="legend-label">{{ item.label }}</span>
-                  <span class="legend-value">{{ item.value }} ({{ item.percentage }}%)</span>
+              <!-- Charts row: distribution & registrations timeline -->
+              <div class="user-charts-grid">
+                <!-- User distribution doughnut + legend -->
+                <div class="chart-container-modern">
+                  <div class="chart-header-inline">
+                    <div>
+                      <h4 class="chart-title-modern">
+                        <span class="material-symbols-outlined">donut_small</span>
+                        Phân bố theo vai trò
+                      </h4>
+                      <p class="chart-subtitle">Tỷ lệ người dùng theo nhóm quyền</p>
+                    </div>
+                  </div>
+                  <div class="chart-content-modern">
+                    <div class="chart-visual">
+                      <canvas ref="userDistributionChart" id="userDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-legend-modern">
+                      <div
+                        v-for="(item, index) in userDistribution"
+                        :key="item.label"
+                        class="legend-item-modern"
+                        :class="{ active: hoveredSegment === index }"
+                        @mouseenter="hoveredSegment = index"
+                        @mouseleave="hoveredSegment = null"
+                      >
+                        <div class="legend-indicator">
+                          <div class="legend-color-modern" :style="{ backgroundColor: item.color }"></div>
+                          <div class="legend-pulse" :style="{ backgroundColor: item.color }"></div>
+                        </div>
+                        <div class="legend-info">
+                          <span class="legend-label-modern">{{ item.label }}</span>
+                          <span class="legend-value-modern">{{ item.value }} người ({{ item.percentage }}%)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Registrations timeline -->
+                <div class="chart-container-modern user-timeline-container">
+                  <div class="chart-header-inline">
+                  <div>
+                    <h4 class="chart-title-modern">
+                      <span class="material-symbols-outlined">timeline</span>
+                      Đăng ký mới {{ userAnalyticsFilters.rangeDays || userAnalytics.rangeDays || 7 }}
+                      {{
+                        userAnalyticsFilters.viewMode === 'day'
+                          ? 'ngày gần đây'
+                          : userAnalyticsFilters.viewMode === 'month'
+                          ? 'tháng gần đây'
+                          : 'năm gần đây'
+                      }}
+                    </h4>
+                    <p class="chart-subtitle">
+                      Xu hướng người dùng đăng ký mới theo
+                      {{
+                        userAnalyticsFilters.viewMode === 'day'
+                          ? 'ngày'
+                          : userAnalyticsFilters.viewMode === 'month'
+                          ? 'tháng'
+                          : 'năm'
+                      }}
+                    </p>
+                  </div>
+                  </div>
+                  <div class="chart-canvas-wrapper small">
+                    <canvas ref="userTimelineChart" id="userTimelineChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- API Usage Chart -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3>Sử dụng API theo nhà cung cấp</h3>
+          <!-- API Usage Analytics -->
+          <div class="analytics-card modern-card api-analytics-card">
+            <div class="card-header-modern">
+              <div class="header-content">
+                <span class="material-symbols-outlined header-icon">analytics</span>
+                <div>
+                  <h3>Phân tích sử dụng API</h3>
+                  <p class="header-subtitle">Thống kê chi tiết theo nhà cung cấp</p>
+                </div>
+              </div>
               <div class="chart-actions">
-                <button class="btn-icon" @click="refreshApiStats">
+                <button class="btn-icon-modern" @click="refreshApiStats" title="Làm mới">
                   <span class="material-symbols-outlined">refresh</span>
                 </button>
-                <button class="btn-icon" @click="exportApiStats">
+                <button class="btn-icon-modern" @click="exportApiStats" title="Xuất dữ liệu">
                   <span class="material-symbols-outlined">download</span>
                 </button>
               </div>
             </div>
-            <div class="chart-container">
-              <div class="usage-stats">
-                <div v-for="provider in apiUsage" :key="provider.name" class="usage-item">
-                  <div class="usage-header">
-                    <span class="provider-name">{{ provider.name }}</span>
-                    <span class="usage-percentage">{{ provider.percentage }}%</span>
+
+            <!-- Enhanced Filters -->
+            <div class="filters-modern">
+              <div class="filters-header">
+                <span class="material-symbols-outlined">filter_list</span>
+                <span>Bộ lọc</span>
+              </div>
+              <div class="filters-grid">
+                <div class="filter-item-modern">
+                  <label class="filter-label">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    Từ ngày
+                  </label>
+                  <input type="date" v-model="apiFilters.dateFrom" @change="applyApiFilters" class="filter-input-modern" />
+                </div>
+                <div class="filter-item-modern">
+                  <label class="filter-label">
+                    <span class="material-symbols-outlined">event</span>
+                    Đến ngày
+                  </label>
+                  <input type="date" v-model="apiFilters.dateTo" @change="applyApiFilters" class="filter-input-modern" />
+                </div>
+                <div class="filter-item-modern">
+                  <label class="filter-label">
+                    <span class="material-symbols-outlined">cloud</span>
+                    Provider
+                  </label>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleProviderFilter"
+                      :title="getProviderFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">cloud</span>
+                    </button>
+                    <div 
+                      v-if="showProviderFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.provider === '' }"
+                        @click="setProviderFilter('')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Providers
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.provider === 'gemini' }"
+                        @click="setProviderFilter('gemini')"
+                      >
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                        Gemini
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.provider === 'openai' }"
+                        @click="setProviderFilter('openai')"
+                      >
+                        <span class="material-symbols-outlined">smart_toy</span>
+                        OpenAI
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.provider === 'claude' }"
+                        @click="setProviderFilter('claude')"
+                      >
+                        <span class="material-symbols-outlined">psychology</span>
+                        Claude
+                      </button>
+                    </div>
                   </div>
-                  <div class="usage-bar">
-                    <div
-                      class="usage-fill"
-                      :style="{ width: provider.percentage + '%', backgroundColor: provider.color }"
-                    ></div>
+                </div>
+                <div class="filter-item-modern">
+                  <label class="filter-label">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    Status
+                  </label>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleStatusFilter"
+                      :title="getStatusFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                    <div 
+                      v-if="showStatusFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.status === '' }"
+                        @click="setStatusFilter('')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Status
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.status === 'success' }"
+                        @click="setStatusFilter('success')"
+                      >
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Success
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.status === 'failed' }"
+                        @click="setStatusFilter('failed')"
+                      >
+                        <span class="material-symbols-outlined">cancel</span>
+                        Failed
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: apiFilters.status === 'timeout' }"
+                        @click="setStatusFilter('timeout')"
+                      >
+                        <span class="material-symbols-outlined">schedule</span>
+                        Timeout
+                      </button>
+                    </div>
                   </div>
-                  <div class="usage-details">
-                    <span class="usage-count">{{ provider.usage }} requests</span>
-                    <span class="usage-trend" :class="provider.trend">
+                </div>
+                <button class="btn-reset-modern" @click="resetApiFilters">
+                  <span class="material-symbols-outlined">clear_all</span>
+                  <span>Đặt lại</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- API Summary Cards -->
+            <div class="api-summary-modern">
+              <div class="summary-card-modern">
+                <div class="summary-icon requests">
+                  <span class="material-symbols-outlined">api</span>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-label-modern">Tổng requests</span>
+                  <span class="summary-value-modern">{{ formatNumber(totalApiRequests) }}</span>
+                </div>
+              </div>
+              <div class="summary-card-modern">
+                <div class="summary-icon tokens">
+                  <span class="material-symbols-outlined">token</span>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-label-modern">Tổng tokens</span>
+                  <span class="summary-value-modern">{{ formatNumber(totalApiTokens) }}</span>
+                </div>
+              </div>
+              <div class="summary-card-modern">
+                <div class="summary-icon success">
+                  <span class="material-symbols-outlined">check_circle</span>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-label-modern">Thành công</span>
+                  <span class="summary-value-modern success-text">{{ apiSuccessRate }}%</span>
+                </div>
+              </div>
+              <div class="summary-card-modern">
+                <div class="summary-icon error">
+                  <span class="material-symbols-outlined">error</span>
+                </div>
+                <div class="summary-content">
+                  <span class="summary-label-modern">Lỗi</span>
+                  <span class="summary-value-modern error-text">{{ apiErrorRate }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Provider Usage List -->
+            <div class="provider-list-modern">
+              <div v-for="provider in apiUsage" :key="provider.name" class="provider-item-modern">
+                <div class="provider-header-modern">
+                  <div class="provider-info">
+                    <div class="provider-badge" :style="{ backgroundColor: provider.color }"></div>
+                    <span class="provider-name-modern">{{ provider.name }}</span>
+                  </div>
+                  <div class="provider-stats">
+                    <span class="provider-percentage">{{ provider.percentage }}%</span>
+                    <span class="provider-trend" :class="provider.trend">
                       <span class="material-symbols-outlined">
                         {{ provider.trend === 'up' ? 'trending_up' : 'trending_down' }}
                       </span>
@@ -208,19 +546,62 @@
                     </span>
                   </div>
                 </div>
+                <div class="progress-bar-modern">
+                  <div
+                    class="progress-fill-modern"
+                    :style="{ width: provider.percentage + '%', backgroundColor: provider.color }"
+                  ></div>
+                </div>
+                <div class="provider-details-modern">
+                  <span class="provider-count">{{ provider.usage }} requests</span>
+                </div>
               </div>
-              <div class="api-summary">
-                <div class="summary-item">
-                  <span class="summary-label">Tổng requests</span>
-                  <span class="summary-value">{{ formatNumber(totalApiRequests) }}</span>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section-modern">
+              <div class="chart-container-modern timeline-chart">
+                <div class="chart-header-inline">
+                  <div>
+                    <h4 class="chart-title-modern">
+                      <span class="material-symbols-outlined">show_chart</span>
+                      Biểu đồ theo thời gian
+                    </h4>
+                    <p class="chart-subtitle">Xu hướng requests theo ngày</p>
+                  </div>
                 </div>
-                <div class="summary-item">
-                  <span class="summary-label">Thành công</span>
-                  <span class="summary-value success">{{ apiSuccessRate }}%</span>
+                <div class="chart-canvas-wrapper">
+                  <canvas ref="timelineChart" id="timelineChart"></canvas>
                 </div>
-                <div class="summary-item">
-                  <span class="summary-label">Lỗi</span>
-                  <span class="summary-value error">{{ apiErrorRate }}%</span>
+              </div>
+              <div class="charts-grid-modern">
+                <div class="chart-container-modern">
+                  <div class="chart-header-inline">
+                    <div>
+                      <h4 class="chart-title-modern">
+                        <span class="material-symbols-outlined">donut_large</span>
+                        Phân bố Provider
+                      </h4>
+                      <p class="chart-subtitle">Tỷ lệ sử dụng</p>
+                    </div>
+                  </div>
+                  <div class="chart-canvas-wrapper">
+                    <canvas ref="providerChart" id="providerChart"></canvas>
+                  </div>
+                </div>
+                <div class="chart-container-modern">
+                  <div class="chart-header-inline">
+                    <div>
+                      <h4 class="chart-title-modern">
+                        <span class="material-symbols-outlined">bar_chart</span>
+                        Thành công / Thất bại
+                      </h4>
+                      <p class="chart-subtitle">Tỷ lệ trạng thái</p>
+                    </div>
+                  </div>
+                  <div class="chart-canvas-wrapper">
+                    <canvas ref="statusChart" id="statusChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -272,8 +653,8 @@
               <span class="card-badge">{{ stats.activeApiKeys }}</span>
             </div>
             <div class="card-content">
-              <div class="quick-stats">
-                <div class="quick-stat">
+              <div class="quick-stats" style="min-height:150px">
+                <!-- <div class="quick-stat">
                   <span class="stat-label">Gemini</span>
                   <span class="stat-value">{{ apiStats.gemini }}</span>
                 </div>
@@ -284,7 +665,7 @@
                 <div class="quick-stat">
                   <span class="stat-label">Claude</span>
                   <span class="stat-value">{{ apiStats.claude }}</span>
-                </div>
+                </div> -->
               </div>
               <div class="action-buttons">
                 <button class="btn-action primary" @click="showApiKeyManagementModal = true">
@@ -342,7 +723,7 @@
           </div>
 
           <!-- System Management -->
-          <div class="management-card">
+          <!-- <div class="management-card">
             <div class="card-header">
               <h3><span class="material-symbols-outlined">settings</span> Quản lý hệ thống</h3>
               <span class="card-badge">{{ systemStats.totalConfigs }}</span>
@@ -373,7 +754,7 @@
                 </button>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </section>
 
@@ -388,19 +769,108 @@
               </h3>
               <div class="card-actions">
                 <div class="log-filters">
-                  <select v-model="logFilter.level" class="filter-select">
-                    <option value="all">Tất cả level</option>
-                    <option value="info">Info</option>
-                    <option value="warning">Warning</option>
-                    <option value="error">Error</option>
-                  </select>
-                  <select v-model="logFilter.type" class="form-input">
-                    <option value="all">Tất cả</option>
-                    <option value="system">Hệ thống</option>
-                    <option value="user">Người dùng</option>
-                    <option value="project">Dự án</option>
-                    <option value="member">Thành viên</option>
-                  </select>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleLogLevelFilter"
+                      :title="getLogLevelFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">signal_cellular_alt</span>
+                    </button>
+                    <div 
+                      v-if="showLogLevelFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.level === 'all' }"
+                        @click="setLogLevelFilter('all')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Levels
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.level === 'info' }"
+                        @click="setLogLevelFilter('info')"
+                      >
+                        <span class="material-symbols-outlined">info</span>
+                        Info
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.level === 'warning' }"
+                        @click="setLogLevelFilter('warning')"
+                      >
+                        <span class="material-symbols-outlined">warning</span>
+                        Warning
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.level === 'error' }"
+                        @click="setLogLevelFilter('error')"
+                      >
+                        <span class="material-symbols-outlined">error</span>
+                        Error
+                      </button>
+                    </div>
+                  </div>
+                  <div class="filter-icon-wrapper">
+                    <button 
+                      class="filter-icon-btn-modern" 
+                      @click.stop="toggleLogTypeFilter"
+                      :title="getLogTypeFilterLabel()"
+                    >
+                      <span class="material-symbols-outlined">category</span>
+                    </button>
+                    <div 
+                      v-if="showLogTypeFilter" 
+                      class="filter-dropdown-menu"
+                      @click.stop
+                    >
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.type === 'all' }"
+                        @click="setLogTypeFilter('all')"
+                      >
+                        <span class="material-symbols-outlined">filter_alt_off</span>
+                        All Types
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.type === 'system' }"
+                        @click="setLogTypeFilter('system')"
+                      >
+                        <span class="material-symbols-outlined">settings</span>
+                        System
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.type === 'user' }"
+                        @click="setLogTypeFilter('user')"
+                      >
+                        <span class="material-symbols-outlined">person</span>
+                        User
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.type === 'project' }"
+                        @click="setLogTypeFilter('project')"
+                      >
+                        <span class="material-symbols-outlined">folder</span>
+                        Project
+                      </button>
+                      <button 
+                        class="filter-option" 
+                        :class="{ active: logFilter.type === 'member' }"
+                        @click="setLogTypeFilter('member')"
+                      >
+                        <span class="material-symbols-outlined">group</span>
+                        Member
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <button class="btn-icon" @click="refreshLogs">
                   <span class="material-symbols-outlined">refresh</span>
@@ -428,17 +898,43 @@
             </div>
             <div class="log-list">
               <div v-for="log in filteredLogs" :key="log.id" class="log-item" :class="log.level">
-                <div class="log-level" :class="log.level">{{ log.level }}</div>
+                <div class="log-icon-wrapper" :class="log.level">
+                  <span class="material-symbols-outlined">{{ getLogIcon(log) }}</span>
+                </div>
                 <div class="log-content">
-                  <div class="log-message">{{ log.message }}</div>
-                  <div class="log-meta">
-                    <span class="log-type">{{ log.type }}</span>
-                    <span class="log-time">{{ formatTime(log.timestamp) }}</span>
-                    <span class="log-user" v-if="log.user">{{ log.user }}</span>
+                  <div class="log-header-enhanced">
+                    <div class="log-user-info">
+                      <span class="log-user-name">{{ log.user || 'System' }}</span>
+                      <span class="log-action-type">{{ formatLogAction(log.action) }}</span>
+                    </div>
+                    <div class="log-badges">
+                      <span class="log-type-badge">{{ formatLogType(log.type) }}</span>
+                      <span class="log-status-badge" :class="getLogStatus(log)">
+                        <span class="material-symbols-outlined">{{ getStatusIcon(log) }}</span>
+                        {{ getLogStatusText(log) }}
+                      </span>
+                      <!-- <span class="log-level-badge" :class="log.level">
+                        <span class="material-symbols-outlined">{{ getLevelIcon(log.level) }}</span>
+                        {{ formatLogLevel(log.level) }}
+                      </span> -->
+                    </div>
+                  </div>
+                  <div class="log-message-enhanced">
+                    {{ formatLogMessage(log) }}
+                  </div>
+                  <div class="log-meta-enhanced">
+                    <span class="log-time-enhanced" :title="formatFullTime(log.timestamp)">
+                      <span class="material-symbols-outlined">schedule</span>
+                      {{ formatTime(log.timestamp) }}
+                    </span>
+                    <span v-if="log.ip && log.ip !== '-'" class="log-ip" :title="`IP: ${log.ip}`">
+                      <span class="material-symbols-outlined">language</span>
+                      {{ log.ip }}
+                    </span>
                   </div>
                 </div>
                 <div class="log-actions">
-                  <button class="btn-icon small" @click="viewLogDetails(log)">
+                  <button class="btn-icon small" @click="viewLogDetails(log)" title="Xem chi tiết">
                     <span class="material-symbols-outlined">visibility</span>
                   </button>
                 </div>
@@ -456,7 +952,7 @@
           </div>
 
           <!-- System Status (right column, unchanged) -->
-          <div class="column-card">
+          <!-- <div class="column-card">
             <div class="card-header">
               <h3>
                 <span class="material-symbols-outlined">monitor_heart</span> Trạng thái hệ thống
@@ -503,7 +999,7 @@
                 <span class="metric-value">{{ systemMetrics.disk }}%</span>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </section>
     </main>
@@ -631,90 +1127,25 @@ const currentUser = ref({
   avatar_url: '',
 })
 
-const stats = ref({
-  totalUsers: 1247,
-  activeUsers: 893,
-  newUsersToday: 12,
-  pendingUsers: 5,
-  totalProjects: 567,
-  activeProjects: 432,
-  newProjectsToday: 8,
-  activeApiKeys: 23,
-  dailyActive: 234,
-  totalLogs: 12456,
-  errorLogsToday: 3,
-  warningLogsToday: 12,
-})
-
-const systemStats = ref({
-  totalConfigs: 45,
-  activeServices: 8,
-  lastBackup: '2h',
-  systemUptime: '99.8%',
-})
+const stats = ref({})
+const systemStats = ref({})
+const apiUsage = ref([])
+const apiStats = ref({})
+const totalApiRequests = ref(0)
+const totalApiTokens = ref(0)
+const apiSuccessRate = ref(0)
+const apiErrorRate = ref(0)
 
 const userDistribution = ref([
 ])
 const userList = ref([])
-const apiUsage = ref([
-  { name: 'Gemini', usage: '1,234', percentage: 45, color: '#1a365d', trend: 'up', change: '+12%' },
-  { name: 'OpenAI', usage: '987', percentage: 35, color: '#2d3748', trend: 'up', change: '+8%' },
-  { name: 'Claude', usage: '543', percentage: 20, color: '#4a5568', trend: 'down', change: '-3%' },
-])
 
-const apiStats = ref({
-  gemini: 12,
-  openai: 8,
-  claude: 3,
-  totalRequests: 2764,
-  successRate: 98.2,
-  errorRate: 1.8,
-})
-
-
-const systemServices = ref([
-  {
-    name: 'API Gateway',
-    description: 'Cổng kết nối API chính',
-    status: 'online',
-    statusText: 'Online',
-    uptime: '99.9%',
-  },
-  {
-    name: 'Database',
-    description: 'Hệ thống cơ sở dữ liệu',
-    status: 'online',
-    statusText: 'Online',
-    uptime: '99.8%',
-  },
-  {
-    name: 'Authentication',
-    description: 'Dịch vụ xác thực',
-    status: 'online',
-    statusText: 'Online',
-    uptime: '100%',
-  },
-  {
-    name: 'File Storage',
-    description: 'Lưu trữ file',
-    status: 'maintenance',
-    statusText: 'Bảo trì',
-    uptime: '95.2%',
-  },
-  {
-    name: 'Cache Service',
-    description: 'Dịch vụ cache',
-    status: 'online',
-    statusText: 'Online',
-    uptime: '99.7%',
-  },
-])
-
+const systemServices = ref([])
 const systemMetrics = ref({
-  cpu: 45,
-  memory: 68,
-  disk: 32,
-  network: 12,
+  cpu: 0,
+  memory: 0,
+  disk: 0,
+  network: 0,
 })
 
 const systemLogs = ref([])
@@ -724,50 +1155,59 @@ const logFilter = ref({
   type: 'all',
 })
 
-const systemSettings = ref({
-  systemName: 'SmartSpec',
-  adminEmail: 'admin@smartspec.com',
-  maxProjectsPerUser: 10,
-  dailyApiLimit: 1000,
-  sessionTimeout: 30,
-  backupInterval: 24,
-  logRetention: 30,
-  maintenanceMode: false,
+// Filter dropdown states
+const showRangeDaysFilter = ref(false)
+const showViewModeFilter = ref(false)
+const showProviderFilter = ref(false)
+const showStatusFilter = ref(false)
+const showLogLevelFilter = ref(false)
+const showLogTypeFilter = ref(false)
+
+const systemSettings = ref({})
+
+// API Filters
+const apiFilters = ref({
+  dateFrom: '',
+  dateTo: '',
+  provider: '',
+  status: '',
+})
+
+// User analytics filters
+const userAnalyticsFilters = ref({
+  rangeDays: 7,
+  viewMode: 'day', // 'day' | 'month' | 'year'
+})
+
+// Chart refs
+const timelineChart = ref(null)
+const providerChart = ref(null)
+const statusChart = ref(null)
+const userDistributionChart = ref(null)
+const userTimelineChart = ref(null)
+let timelineChartInstance = null
+let providerChartInstance = null
+let statusChartInstance = null
+let userDistributionChartInstance = null
+let userTimelineChartInstance = null
+
+const userAnalytics = ref({
+  counters: {
+    totalUsers: 0,
+    activeUsers: 0,
+    pendingUsers: 0,
+    newUsersToday: 0,
+    onlineToday: 0,
+  },
+  registrationTimeline: [],
+  rangeDays: 7,
 })
 
 // Computed
-const totalApiRequests = computed(() => {
-  return apiUsage.value.reduce((total, provider) => {
-    return total + parseInt(provider.usage.replace(',', ''))
-  }, 0)
-})
-
-const apiSuccessRate = computed(() => apiStats.value.successRate)
-const apiErrorRate = computed(() => apiStats.value.errorRate)
-
-const userTrend = computed(() => ({
-  type: 'positive',
-  icon: 'trending_up',
-  value: '+12%',
-}))
-
-const apiTrend = computed(() => ({
-  type: 'positive',
-  icon: 'trending_up',
-  value: '+8%',
-}))
-
-const projectTrend = computed(() => ({
-  type: 'positive',
-  icon: 'trending_up',
-  value: '+15%',
-}))
-
-const activityTrend = computed(() => ({
-  type: 'negative',
-  icon: 'trending_down',
-  value: '-3%',
-}))
+const userTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
+const apiTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
+const projectTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
+const activityTrend = ref({ type: 'negative', icon: 'trending_down', value: '-0%' })
 
 const filteredLogs = computed(() => {
   return systemLogs.value.filter((log) => {
@@ -822,6 +1262,157 @@ const formatTime = (date) => {
   if (minutes < 60) return `${minutes} phút trước`
   if (hours < 24) return `${hours} giờ trước`
   return `${days} ngày trước`
+}
+
+const formatFullTime = (date) => {
+  const d = new Date(date)
+  return d.toLocaleString('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+}
+
+const formatLogLevel = (level) => {
+  const levelMap = {
+    info: 'Thông tin',
+    warning: 'Cảnh báo',
+    error: 'Lỗi'
+  }
+  return levelMap[level] || level
+}
+
+const formatLogType = (type) => {
+  const typeMap = {
+    system: 'Hệ thống',
+    user: 'Người dùng',
+    project: 'Dự án',
+    member: 'Thành viên'
+  }
+  return typeMap[type] || type
+}
+
+const formatLogAction = (action) => {
+  if (!action) return ''
+  return action
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+const getLogIcon = (log) => {
+  const action = log.action?.toLowerCase() || ''
+  if (action.includes('login')) return 'login'
+  if (action.includes('logout')) return 'logout'
+  if (action.includes('create')) return 'add_circle'
+  if (action.includes('update')) return 'edit'
+  if (action.includes('delete')) return 'delete'
+  if (action.includes('generate')) return 'auto_awesome'
+  if (action.includes('export')) return 'download'
+  if (action.includes('error') || action.includes('failed')) return 'error'
+  return 'info'
+}
+
+const getLevelIcon = (level) => {
+  const iconMap = {
+    info: 'info',
+    warning: 'warning',
+    error: 'error'
+  }
+  return iconMap[level] || 'circle'
+}
+
+const getLogStatus = (log) => {
+  // Xác định status dựa trên level và action
+  if (log.level === 'error' || log.action?.toLowerCase().includes('failed') || log.action?.toLowerCase().includes('error')) {
+    return 'status-failed'
+  }
+  // Nếu không phải error thì coi là success
+  return 'status-success'
+}
+
+const getLogStatusText = (log) => {
+  const status = getLogStatus(log)
+  return status === 'status-failed' ? 'Thất bại' : 'Thành công'
+}
+
+const getStatusIcon = (log) => {
+  const status = getLogStatus(log)
+  return status === 'status-failed' ? 'cancel' : 'check_circle'
+}
+
+const formatLogMessage = (log) => {
+  if (!log.message) return 'Không có mô tả hành động'
+  
+  let message = String(log.message)
+  const userName = log.user || 'Hệ thống'
+  const userId = log.userId || ''
+  
+  // Pattern 1: Thay thế user ID (ObjectId format) bằng tên người dùng
+  // "6927fdb0baa4bc0eafe6e990" → tên người dùng
+  if (userId && typeof userId === 'string' && userId.length === 24) {
+    // ObjectId pattern: 24 ký tự hex
+    const objectIdPattern = new RegExp(`\\b${userId}\\b`, 'gi')
+    message = message.replace(objectIdPattern, userName)
+  }
+  
+  // Pattern 2: "User "ID" logged out successfully (Session ID: ...)" 
+  // → "Người dùng [Tên] đã đăng xuất thành công"
+  message = message.replace(/User\s+["']?([^"'\s]+)["']?\s+logged\s+out\s+successfully[^.]*/gi, 
+    () => `Người dùng ${userName} đã đăng xuất thành công`)
+  
+  // Pattern 3: "User "ID" logged in successfully"
+  message = message.replace(/User\s+["']?([^"'\s]+)["']?\s+logged\s+in\s+successfully[^.]*/gi, 
+    () => `Người dùng ${userName} đã đăng nhập thành công`)
+  
+  // Pattern 4: "ID updated usecase X in version Y"
+  // → "Người dùng [Tên] đã cập nhật usecase 'X' trong version Y"
+  message = message.replace(/([a-f0-9]{24})\s+updated\s+usecase\s+([^i]+?)\s+in\s+version\s+([\d.]+)/gi, 
+    (match, id, usecase, version) => {
+      const name = (id === userId || id.length === 24) ? userName : id
+      return `${name} đã cập nhật usecase "${usecase.trim()}" trong version ${version}`
+    })
+  
+  // Pattern 5: "ID created usecase X in version Y"
+  message = message.replace(/([a-f0-9]{24})\s+created\s+usecase\s+([^i]+?)\s+in\s+version\s+([\d.]+)/gi, 
+    (match, id, usecase, version) => {
+      const name = (id === userId || id.length === 24) ? userName : id
+      return `${name} đã tạo usecase "${usecase.trim()}" trong version ${version}`
+    })
+  
+  // Pattern 6: "ID deleted usecase X in version Y"
+  message = message.replace(/([a-f0-9]{24})\s+deleted\s+usecase\s+([^i]+?)\s+in\s+version\s+([\d.]+)/gi, 
+    (match, id, usecase, version) => {
+      const name = (id === userId || id.length === 24) ? userName : id
+      return `${name} đã xóa usecase "${usecase.trim()}" trong version ${version}`
+    })
+  
+  // Pattern 7: Bất kỳ ObjectId nào còn lại trong message → thay bằng userName nếu match userId
+  if (userId && userId.length === 24) {
+    const remainingObjectIdPattern = new RegExp(`\\b${userId}\\b`, 'gi')
+    message = message.replace(remainingObjectIdPattern, userName)
+  }
+  
+  // Loại bỏ Session ID không cần thiết
+  message = message.replace(/\s*\(Session ID:\s*[^)]+\)/gi, '')
+  message = message.replace(/\s*\(session id:\s*[^)]+\)/gi, '')
+  
+  // Loại bỏ các dấu ngoặc kép thừa và chuẩn hóa
+  message = message.replace(/["']{2,}/g, '"')
+  message = message.replace(/^["']|["']$/g, '')
+  
+  // Loại bỏ khoảng trắng thừa
+  message = message.replace(/\s+/g, ' ').trim()
+  
+  // Đảm bảo câu đầu tiên viết hoa
+  if (message.length > 0) {
+    message = message.charAt(0).toUpperCase() + message.slice(1)
+  }
+  
+  return message
 }
 
 
@@ -946,6 +1537,14 @@ const refreshUserStats = async () => {
 
       userDistribution.value = distribution
 
+      // Đồng bộ counters cơ bản với userAnalytics (fallback nếu API analytics chưa trả về)
+      userAnalytics.value.counters.totalUsers = users.length
+      userAnalytics.value.counters.activeUsers = stats.value.activeUsers || 0
+      // Load chart after data is ready
+      setTimeout(() => {
+        loadUserDistributionChart()
+      }, 100)
+
       console.log('✅ User stats loaded:', {
         total: users.length,
         active: stats.value.activeUsers,
@@ -960,14 +1559,63 @@ const refreshUserStats = async () => {
   }
 }
 
+// Load user analytics (new registrations, online users, timeline)
+const loadUserAnalytics = async () => {
+  try {
+    const params = {
+      rangeDays: userAnalyticsFilters.value.rangeDays,
+    }
+    const res = await axiosClient.get('/api/stats/users/analytics', { params })
+    
+    // Xử lý response format: có thể là res.data hoặc res.data.data
+    const data = res.data?.data || res.data
+    
+    if (data) {
+      userAnalytics.value = {
+        counters: data.counters || userAnalytics.value.counters,
+        registrationTimeline: data.registrationTimeline || [],
+        rangeDays: data.rangeDays || userAnalyticsFilters.value.rangeDays,
+      }
+
+      console.log('✅ User analytics loaded:', {
+        counters: userAnalytics.value.counters,
+        timelineCount: userAnalytics.value.registrationTimeline.length,
+        rangeDays: userAnalytics.value.rangeDays
+      })
+
+      // Đợi một chút để đảm bảo canvas đã sẵn sàng, sau đó load chart
+      await new Promise(resolve => setTimeout(resolve, 100))
+      await loadUserTimelineChart()
+    } else {
+      console.warn('⚠️ Không nhận được dữ liệu từ user analytics API:', res.data)
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi tải user analytics:', error)
+    toast.error('Không thể tải dữ liệu đăng ký người dùng')
+  }
+}
+
+const applyApiFilters = async () => {
+  await refreshApiStats()
+  await loadChartData()
+}
+
+const resetApiFilters = () => {
+  apiFilters.value = {
+    dateFrom: '',
+    dateTo: '',
+    provider: '',
+    status: '',
+  }
+  applyApiFilters()
+}
+
 const refreshApiStats = async () => {
   try {
-    const res = await axiosClient.get('http://localhost:8000/api/keys')
-
-    if (res.data?.status === 'Success' && Array.isArray(res.data.data)) {
-      const keys = res.data.data
-
-      // Đếm số lượng key đang hoạt động
+    // Lấy số lượng keys
+    const keysRes = await axiosClient.get('/api/keys')
+    if (keysRes.data?.status === 'Success' && Array.isArray(keysRes.data.data)) {
+      const keys = keysRes.data.data
       const activeKeys = keys.filter((k) => k.is_active).length
       stats.value.activeApiKeys = activeKeys
 
@@ -978,54 +1626,521 @@ const refreshApiStats = async () => {
         return acc
       }, {})
 
-      // Gán vào biến thống kê chính
       apiStats.value.gemini = providerStats['gemini'] || 0
       apiStats.value.openai = providerStats['openai'] || 0
       apiStats.value.claude = providerStats['claude'] || 0
-      apiStats.value.totalRequests = keys.length
-      apiStats.value.successRate = 100 // nếu API chưa trả dữ liệu này, để tạm
-      apiStats.value.errorRate = 0
-
-      // Cập nhật biểu đồ hiển thị
-      const total = keys.length
-      apiUsage.value = Object.entries(providerStats).map(([provider, count]) => ({
-        name:
-          provider === 'gemini'
-            ? 'Gemini'
-            : provider === 'openai'
-            ? 'OpenAI'
-            : provider === 'claude'
-            ? 'Claude'
-            : 'Khác',
-        usage: count.toString(),
-        percentage: total ? Math.round((count / total) * 100) : 0,
-        color:
-          provider === 'gemini'
-            ? '#1a365d'
-            : provider === 'openai'
-            ? '#2d3748'
-            : provider === 'claude'
-            ? '#4a5568'
-            : '#718096',
-        trend: 'up',
-        change: '+0%',
-      }))
-
-      console.log('✅ API key stats loaded:', apiUsage.value)
-    } else {
-      console.warn('⚠️ Không nhận được dữ liệu hợp lệ từ API /api/keys')
     }
+
+    // Lấy usage từ API stats với filters
+    const params = {}
+    if (apiFilters.value.dateFrom) params.dateFrom = apiFilters.value.dateFrom
+    if (apiFilters.value.dateTo) params.dateTo = apiFilters.value.dateTo
+    if (apiFilters.value.provider) params.provider = apiFilters.value.provider
+    if (apiFilters.value.status) params.status = apiFilters.value.status
+
+    const [usageRes, providerRes] = await Promise.all([
+      axiosClient.get('/api/stats/usage-summary', { params }),
+      axiosClient.get('/api/stats/provider-usage', { params }),
+    ])
+
+    if (usageRes.data) {
+      totalApiRequests.value = usageRes.data.total_requests || 0
+      totalApiTokens.value = usageRes.data.total_tokens || 0
+      apiSuccessRate.value = usageRes.data.total_requests 
+        ? Math.round((usageRes.data.total_success / usageRes.data.total_requests) * 100) 
+        : 0
+      apiErrorRate.value = usageRes.data.total_requests 
+        ? Math.round((usageRes.data.total_failed / usageRes.data.total_requests) * 100) 
+        : 0
+    }
+
+    if (providerRes.data && Array.isArray(providerRes.data)) {
+      const totalRequests = providerRes.data.reduce((sum, p) => sum + (p.requests || 0), 0)
+      apiUsage.value = providerRes.data.map(p => ({
+        name: p.provider,
+        usage: formatNumber(p.requests || 0),
+        percentage: totalRequests > 0 ? Math.round((p.requests / totalRequests) * 100) : 0,
+        color: p.provider === 'Gemini' ? '#1a365d' : p.provider === 'OpenAI' ? '#2d3748' : '#4a5568',
+        trend: (p.success || 0) > (p.failed || 0) ? 'up' : 'down',
+        change: p.failed > 0 ? `-${Math.round((p.failed / p.requests) * 100)}%` : '+0%',
+      }))
+    }
+
+    console.log('✅ API stats loaded:', { apiUsage: apiUsage.value, totalRequests: totalApiRequests.value })
   } catch (error) {
     console.error('❌ Lỗi khi tải API key stats:', error)
   }
 }
 
+const loadChartData = async () => {
+  try {
+    const params = {}
+    if (apiFilters.value.dateFrom) params.dateFrom = apiFilters.value.dateFrom
+    if (apiFilters.value.dateTo) params.dateTo = apiFilters.value.dateTo
+    if (apiFilters.value.provider) params.provider = apiFilters.value.provider
+
+    const [timelineRes, providerRes, statusRes] = await Promise.all([
+      axiosClient.get('/api/stats/usage/charts', { params: { ...params, chartType: 'timeline' } }),
+      axiosClient.get('/api/stats/usage/charts', { params: { ...params, chartType: 'provider' } }),
+      axiosClient.get('/api/stats/usage/charts', { params: { ...params, chartType: 'status' } }),
+    ])
+
+    // Load Chart.js dynamically
+    const Chart = (await import('chart.js/auto')).default
+
+    // Timeline Chart (Line)
+    if (timelineRes.data?.data) {
+      const ctx = timelineChart.value?.getContext('2d')
+      if (ctx) {
+        if (timelineChartInstance) timelineChartInstance.destroy()
+        timelineChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: timelineRes.data.data.map(d => d.date),
+            datasets: [
+              {
+                label: 'Requests',
+                data: timelineRes.data.data.map(d => d.requests),
+                borderColor: '#1a365d',
+                backgroundColor: 'rgba(26, 54, 93, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#1a365d',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+              },
+              {
+                label: 'Success',
+                data: timelineRes.data.data.map(d => d.success),
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+              },
+              {
+                label: 'Failed',
+                data: timelineRes.data.data.map(d => d.failed),
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            plugins: {
+              legend: { 
+                position: 'top',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                  font: { size: 13, weight: '600' }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 16,
+                titleFont: { size: 14, weight: '600' },
+                bodyFont: { size: 13 },
+                cornerRadius: 8,
+                position: 'nearest',
+                intersect: false,
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { font: { size: 12 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 12 } }
+              }
+            }
+          },
+          plugins: [
+            {
+              id: 'timelineCrosshair',
+              afterDraw(chart) {
+                const activePoints = chart.getActiveElements()
+                if (!activePoints || activePoints.length === 0) return
+
+                const ctx = chart.ctx
+                const chartArea = chart.chartArea
+                const x = activePoints[0].element.x
+
+                ctx.save()
+                ctx.beginPath()
+                ctx.moveTo(x, chartArea.top)
+                ctx.lineTo(x, chartArea.bottom)
+                ctx.lineWidth = 1
+                ctx.strokeStyle = 'rgba(26, 54, 93, 0.6)'
+                ctx.setLineDash([4, 4])
+                ctx.stroke()
+                ctx.restore()
+              },
+            },
+          ],
+        })
+      }
+    }
+
+    // Provider Chart (Pie)
+    if (providerRes.data?.data) {
+      const ctx = providerChart.value?.getContext('2d')
+      if (ctx) {
+        if (providerChartInstance) providerChartInstance.destroy()
+        providerChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: providerRes.data.data.map(d => d.provider),
+            datasets: [{
+              data: providerRes.data.data.map(d => d.requests),
+              backgroundColor: ['#1a365d', '#2d3748', '#4a5568', '#718096'],
+              borderWidth: 0,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { 
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                  font: { size: 13, weight: '600' }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 16,
+                titleFont: { size: 14, weight: '600' },
+                bodyFont: { size: 13 },
+                cornerRadius: 8,
+                callbacks: {
+                  label: (context) => {
+                    const label = context.label || ''
+                    const value = context.parsed || 0
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0)
+                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0
+                    return `${label}: ${value} requests (${percentage}%)`
+                  }
+                }
+              }
+            },
+            cutout: '60%',
+          },
+        })
+      }
+    }
+
+    // Status Chart (Bar)
+    if (statusRes.data?.data) {
+      const ctx = statusChart.value?.getContext('2d')
+      if (ctx) {
+        if (statusChartInstance) statusChartInstance.destroy()
+        statusChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: statusRes.data.data.map(d => d.status === 'success' ? 'Thành công' : d.status === 'failed' ? 'Thất bại' : 'Timeout'),
+            datasets: [{
+              label: 'Số lượng',
+              data: statusRes.data.data.map(d => d.count),
+              backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+              borderRadius: 8,
+              borderSkipped: false,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 16,
+                titleFont: { size: 14, weight: '600' },
+                bodyFont: { size: 13 },
+                cornerRadius: 8,
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { font: { size: 12 } }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 12, weight: '600' } }
+              }
+            }
+          },
+        })
+      }
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi tải chart data:', error)
+  }
+}
+
+const loadUserTimelineChart = async () => {
+  try {
+    // Kiểm tra canvas ref có sẵn sàng không
+    if (!userTimelineChart.value) {
+      console.warn('⚠️ Canvas ref chưa sẵn sàng, đợi thêm...')
+      setTimeout(() => loadUserTimelineChart(), 200)
+      return
+    }
+
+    const Chart = (await import('chart.js/auto')).default
+    const ctx = userTimelineChart.value?.getContext('2d')
+
+    if (!ctx) {
+      console.warn('⚠️ Không thể lấy context từ canvas')
+      return
+    }
+
+    // Chuẩn hóa dữ liệu: luôn hiển thị đủ rangeDays ngày, nếu không có dữ liệu thì = 0
+    const range = userAnalytics.value.rangeDays || userAnalyticsFilters.value.rangeDays || 7
+    const raw = userAnalytics.value.registrationTimeline || []
+    
+    console.log('📊 Loading timeline chart with:', {
+      range,
+      rawDataCount: raw.length,
+      rawData: raw
+    })
+    
+    const countsByDate = raw.reduce((acc, item) => {
+      if (item && item.date) {
+        acc[item.date] = item.count || 0
+      }
+      return acc
+    }, {})
+
+    const labels = []
+    const data = []
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) // Đảm bảo bắt đầu từ 00:00:00
+
+    for (let i = range - 1; i >= 0; i--) {
+      const d = new Date(today)
+      d.setDate(d.getDate() - i)
+      const label = d.toISOString().slice(0, 10) // YYYY-MM-DD
+      labels.push(label)
+      data.push(countsByDate[label] || 0)
+    }
+    
+    console.log('📈 Chart data prepared:', { labels, data })
+
+    // Gộp dữ liệu theo tháng/năm nếu cần
+    const mode = userAnalyticsFilters.value.viewMode || 'day'
+    if (mode === 'month' || mode === 'year') {
+      const grouped = {}
+
+      labels.forEach((label, idx) => {
+        const count = data[idx] || 0
+        if (!label) return
+
+        let key = label
+        let display = label
+
+        if (mode === 'month') {
+          // YYYY-MM -> MM/YYYY
+          const parts = label.split('-')
+          if (parts.length === 3) {
+            const year = parts[0]
+            const month = parts[1]
+            key = `${year}-${month}`
+            display = `${month}/${year}`
+          }
+        } else if (mode === 'year') {
+          const year = label.split('-')[0]
+          key = year
+          display = year
+        }
+
+        if (!grouped[key]) {
+          grouped[key] = { label: display, count: 0 }
+        }
+        grouped[key].count += count
+      })
+
+      const sortedKeys = Object.keys(grouped).sort()
+      const aggLabels = []
+      const aggData = []
+      sortedKeys.forEach((k) => {
+        aggLabels.push(grouped[k].label)
+        aggData.push(grouped[k].count)
+      })
+
+      // Gán lại labels/data sau khi gộp
+      labels.length = 0
+      data.length = 0
+      aggLabels.forEach((l) => labels.push(l))
+      aggData.forEach((v) => data.push(v))
+    }
+
+    // Destroy existing chart instance if exists
+    if (userTimelineChartInstance) {
+      userTimelineChartInstance.destroy()
+      userTimelineChartInstance = null
+    }
+
+    // Tạo chart mới
+    userTimelineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Đăng ký mới',
+              data,
+              borderColor: '#4299e1',
+              backgroundColor: 'rgba(66, 153, 225, 0.15)',
+              tension: 0.4,
+              fill: true,
+              borderWidth: 3,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#3182ce',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 16,
+              titleFont: { size: 14, weight: '600' },
+              bodyFont: { size: 13 },
+              cornerRadius: 8,
+              position: 'nearest',
+              intersect: false,
+              callbacks: {
+                label: (context) => {
+                  const value = context.parsed.y || 0
+                  return `Đăng ký mới: ${value} người`
+                },
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(0, 0, 0, 0.05)' },
+              ticks: { font: { size: 12 } },
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                font: { size: 12 },
+                callback: (value, index, ticks) => {
+                  // ticks[index].label trong runtime là string ngày 'YYYY-MM-DD'
+                  const tick = ticks[index]
+                  const label = tick && typeof tick.label === 'string' ? tick.label : ''
+                  if (!label) return ''
+                  const parts = label.split('-')
+                  if (parts.length !== 3) return label
+                  const day = parts[2]
+                  const month = parts[1]
+                  // Hiển thị dạng dd/MM
+                  return `${day}/${month}`
+                },
+              },
+            },
+          },
+        },
+        plugins: [
+          {
+            id: 'userTimelineCrosshair',
+            afterDraw(chart) {
+              const activePoints = chart.getActiveElements()
+              if (!activePoints || activePoints.length === 0) return
+
+              const ctx = chart.ctx
+              const chartArea = chart.chartArea
+              const x = activePoints[0].element.x
+
+              ctx.save()
+              ctx.beginPath()
+              ctx.moveTo(x, chartArea.top)
+              ctx.lineTo(x, chartArea.bottom)
+              ctx.lineWidth = 1
+              ctx.strokeStyle = 'rgba(66, 153, 225, 0.6)'
+              ctx.setLineDash([4, 4])
+              ctx.stroke()
+              ctx.restore()
+            },
+          },
+        ],
+      })
+      
+      console.log('✅ User timeline chart rendered successfully')
+  } catch (error) {
+    console.error('❌ Lỗi khi vẽ user timeline chart:', error)
+    toast.error('Không thể vẽ biểu đồ đăng ký người dùng')
+  }
+}
+
 const refreshActivities = async () => {
-  console.log('Refreshing activities...')
+  try {
+    const res = await axiosClient.get('/api/stats/activities')
+    if (res.data?.dailyActive !== undefined) {
+      stats.value.dailyActive = res.data.dailyActive
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi tải activities:', error)
+  }
 }
 
 const refreshSystemStatus = async () => {
-  console.log('Refreshing system status...')
+  try {
+    const res = await axiosClient.get('/api/stats/system')
+    if (res.data) {
+      systemServices.value = res.data.services || []
+      systemMetrics.value = {
+        cpu: res.data.cpu || 0,
+        memory: res.data.memory || 0,
+        disk: res.data.disk || 0,
+        network: res.data.network || 0,
+      }
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi tải system status:', error)
+  }
 }
 
 const refreshLogs = async () => {
@@ -1042,21 +2157,52 @@ const refreshLogs = async () => {
     const logItems = res.data?.data?.items || res.data?.data || []
 
     if (res.data?.status === 'Success' && Array.isArray(logItems)) {
-      systemLogs.value = logItems.map((log) => ({
-        id: log._id || log.id,
-        userId: log.user_id,
-        user: log.user_name || log.user_email || 'Hệ thống',
-        action: log.action || '-',
-        type: log.target_type?.toLowerCase() || 'system',  // ✅ chuẩn hóa type
-        level: log.level?.toLowerCase() || 'info',
-        message:
-          log.details?.message ||
-          log.action ||
-          'Không có mô tả hành động',
-        timestamp: new Date(log.created_at || log.timestamp),
-        ip: log.ip || '-',
-        userAgent: log.user_agent || '-',
-      }))
+      systemLogs.value = logItems.map((log) => {
+        // Xử lý user_id - có thể là ObjectId hoặc populated object
+        const userId = log.user_id?._id || log.user_id?.id || log.user_id || null
+        const userIdString = userId ? String(userId) : null
+        
+        // Xử lý user name - ưu tiên từ populated user_id (backend đã populate)
+        let userName = null
+        if (log.user_id && typeof log.user_id === 'object' && !log.user_id._id) {
+          // Populated user object
+          userName = log.user_id.name || log.user_id.email
+        } else if (log.user_id?.name) {
+          // Nested populated
+          userName = log.user_id.name
+        } else if (log.user_id?.email) {
+          userName = log.user_id.email
+        } else if (log.user_name) {
+          userName = log.user_name
+        } else if (log.user_email) {
+          userName = log.user_email
+        }
+        
+        // Chỉ dùng "Hệ thống" nếu thực sự không có user_id
+        // Nếu có user_id nhưng không có tên, có thể user đã bị xóa - dùng "Người dùng [ID ngắn]"
+        if (!userName && !userIdString) {
+          userName = 'Hệ thống'
+        } else if (!userName && userIdString) {
+          // Có user_id nhưng không lấy được tên (user có thể đã bị xóa)
+          userName = `Người dùng ${userIdString.substring(0, 8)}...`
+        }
+        
+        return {
+          id: log._id || log.id,
+          userId: userIdString,
+          user: userName,
+          action: log.action || '-',
+          type: log.target_type?.toLowerCase() || 'system',  // ✅ chuẩn hóa type
+          level: log.level?.toLowerCase() || 'info',
+          message:
+            log.details?.message ||
+            log.action ||
+            'Không có mô tả hành động',
+          timestamp: new Date(log.created_at || log.timestamp),
+          ip: log.ip || '-',
+          userAgent: log.user_agent || '-',
+        }
+      })
 
       console.log(`✅ Loaded ${systemLogs.value.length} logs`)
     } else {
@@ -1153,6 +2299,104 @@ const exportLogs = async (format) => {
   }
 };
 
+// Filter dropdown methods
+const toggleRangeDaysFilter = () => {
+  showRangeDaysFilter.value = !showRangeDaysFilter.value
+  showViewModeFilter.value = false
+}
+const toggleViewModeFilter = () => {
+  showViewModeFilter.value = !showViewModeFilter.value
+  showRangeDaysFilter.value = false
+}
+const setRangeDays = (value) => {
+  userAnalyticsFilters.value.rangeDays = value
+  showRangeDaysFilter.value = false
+  loadUserAnalytics()
+}
+const setViewMode = (value) => {
+  userAnalyticsFilters.value.viewMode = value
+  showViewModeFilter.value = false
+  loadUserTimelineChart()
+}
+const getViewModeLabel = () => {
+  const labels = {
+    day: 'By Day',
+    month: 'By Month',
+    year: 'By Year',
+  }
+  return labels[userAnalyticsFilters.value.viewMode] || 'View'
+}
+
+const toggleProviderFilter = () => {
+  showProviderFilter.value = !showProviderFilter.value
+  showStatusFilter.value = false
+}
+const toggleStatusFilter = () => {
+  showStatusFilter.value = !showStatusFilter.value
+  showProviderFilter.value = false
+}
+const setProviderFilter = (value) => {
+  apiFilters.value.provider = value
+  showProviderFilter.value = false
+  applyApiFilters()
+}
+const setStatusFilter = (value) => {
+  apiFilters.value.status = value
+  showStatusFilter.value = false
+  applyApiFilters()
+}
+const getProviderFilterLabel = () => {
+  if (apiFilters.value.provider === '') return 'All Providers'
+  return apiFilters.value.provider.charAt(0).toUpperCase() + apiFilters.value.provider.slice(1)
+}
+const getStatusFilterLabel = () => {
+  if (apiFilters.value.status === '') return 'All Status'
+  const labels = {
+    success: 'Success',
+    failed: 'Failed',
+    timeout: 'Timeout',
+  }
+  return labels[apiFilters.value.status] || apiFilters.value.status
+}
+
+const toggleLogLevelFilter = () => {
+  showLogLevelFilter.value = !showLogLevelFilter.value
+  showLogTypeFilter.value = false
+}
+const toggleLogTypeFilter = () => {
+  showLogTypeFilter.value = !showLogTypeFilter.value
+  showLogLevelFilter.value = false
+}
+const setLogLevelFilter = (value) => {
+  logFilter.value.level = value
+  showLogLevelFilter.value = false
+  refreshLogs()
+}
+const setLogTypeFilter = (value) => {
+  logFilter.value.type = value
+  showLogTypeFilter.value = false
+  refreshLogs()
+}
+const getLogLevelFilterLabel = () => {
+  if (logFilter.value.level === 'all') return 'All Levels'
+  return logFilter.value.level.charAt(0).toUpperCase() + logFilter.value.level.slice(1)
+}
+const getLogTypeFilterLabel = () => {
+  if (logFilter.value.type === 'all') return 'All Types'
+  return logFilter.value.type.charAt(0).toUpperCase() + logFilter.value.type.slice(1)
+}
+
+const handleClickOutsideFilters = (event) => {
+  if (!event.target.closest('.filter-icon-wrapper')) {
+    showRangeDaysFilter.value = false
+    showViewModeFilter.value = false
+    showProviderFilter.value = false
+    showStatusFilter.value = false
+    showLogLevelFilter.value = false
+    showLogTypeFilter.value = false
+  }
+}
+
 
 const viewLogDetails = (log) => {
   console.log('Viewing log details:', log)
@@ -1179,10 +2423,19 @@ const addApiKey = (apiKeyData) => {
   showAddApiKeyModal.value = false
 }
 
-const saveSystemSettings = (settings) => {
-  console.log('Saving system settings:', settings)
-  systemSettings.value = { ...systemSettings.value, ...settings }
-  showSystemSettingsModal.value = false
+const saveSystemSettings = async (settings) => {
+  try {
+    const res = await axiosClient.put('/api/stats/settings', settings)
+    if (res.data) {
+      systemSettings.value = { ...systemSettings.value, ...settings }
+      toast.success('Cập nhật cài đặt hệ thống thành công')
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi lưu system settings:', error)
+    toast.error('Lỗi khi lưu cài đặt hệ thống')
+  } finally {
+    showSystemSettingsModal.value = false
+  }
 }
 
 const logout = () => {
@@ -1212,43 +2465,182 @@ watch(logFilter, () => {
   refreshLogs()
 }, { deep: true })
 
+// Watch user analytics filters để tự động reload
+watch(() => userAnalyticsFilters.value.rangeDays, () => {
+  loadUserAnalytics()
+})
+
+watch(() => userAnalyticsFilters.value.viewMode, () => {
+  loadUserTimelineChart()
+}, { immediate: false })
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  document.addEventListener('click', handleClickOutsideFilters)
   initSocketConnection()
   // 🔥 Lắng nghe log realtime từ server (cả project + system)
   socket.on("log_event", (event) => {
-  console.log("🧩 Realtime log event:", event);
+    console.log("🧩 Realtime log event:", event);
 
-  // Nếu log hệ thống (không có projectId)
-  if (!event.projectId) {
-    const log = event.log || event;
-    systemLogs.value.unshift({
-      id: log._id || log.id,
-      user: log.user_name || log.user_email || 'Hệ thống',
-      action: log.action || '-',
-      type: log.target_type?.toLowerCase() || 'system',
-      level: log.level?.toLowerCase() || 'info',
-      message: log.details?.message || log.action || 'Không có mô tả hành động',
-      timestamp: new Date(log.created_at || log.timestamp || event.timestamp),
-      ip: log.ip || '-',
-      userAgent: log.user_agent || '-',
-    });
+    // Nếu log hệ thống (không có projectId)
+    if (!event.projectId) {
+      const log = event.log || event;
+      const userId = log.user_id?._id || log.user_id?.id || log.user_id || null
+      const userIdString = userId ? String(userId) : null
+      const userName = log.user_id?.name || 
+                      log.user_id?.email || 
+                      log.user_name || 
+                      log.user_email || 
+                      'Hệ thống'
+      
+      systemLogs.value.unshift({
+        id: log._id || log.id,
+        userId: userIdString,
+        user: userName,
+        action: log.action || '-',
+        type: log.target_type?.toLowerCase() || 'system',
+        level: log.level?.toLowerCase() || 'info',
+        message: log.details?.message || log.action || 'Không có mô tả hành động',
+        timestamp: new Date(log.created_at || log.timestamp || event.timestamp),
+        ip: log.ip || '-',
+        userAgent: log.user_agent || '-',
+      });
 
-    // Giới hạn tối đa 100 log
-    if (systemLogs.value.length > 100) systemLogs.value.pop();
-  }
-})
+      // Giới hạn tối đa 100 log
+      if (systemLogs.value.length > 100) systemLogs.value.pop();
+    }
+  })
 
-  // Fetch initial data
+  // Load tất cả dữ liệu từ API
+  loadDashboardStatsFromAPI()
+  
+  // Fetch initial data từ các API riêng lẻ (nếu cần)
   refreshUserStats()
+  loadUserAnalytics()
   refreshProjectStats()
   refreshApiStats()
-  refreshActivities()
-  refreshSystemStatus()
   refreshLogs()
   fetchCurrentUser()
+  
+  // Load charts after a short delay to ensure canvas is ready
+  setTimeout(() => {
+    loadChartData()
+    loadUserDistributionChart()
+    // Đảm bảo user timeline chart được render sau khi dữ liệu đã load
+    if (userAnalytics.value.registrationTimeline && userAnalytics.value.registrationTimeline.length > 0) {
+      loadUserTimelineChart()
+    }
+  }, 500)
+  
   console.log('Admin dashboard mounted')
 })
+
+const loadUserDistributionChart = async () => {
+  try {
+    if (!userDistribution.value || userDistribution.value.length === 0) return
+    
+    const Chart = (await import('chart.js/auto')).default
+    const ctx = userDistributionChart.value?.getContext('2d')
+    
+    if (ctx) {
+      if (userDistributionChartInstance) userDistributionChartInstance.destroy()
+      
+      userDistributionChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: userDistribution.value.map(d => d.label),
+          datasets: [{
+            data: userDistribution.value.map(d => d.value),
+            backgroundColor: userDistribution.value.map(d => d.color),
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              titleFont: { size: 14, weight: '600' },
+              bodyFont: { size: 13 },
+              callbacks: {
+                label: (context) => {
+                  const label = context.label || ''
+                  const value = context.parsed || 0
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0)
+                  const percentage = total > 0 ? Math.round((value / total) * 100) : 0
+                  return `${label}: ${value} người (${percentage}%)`
+                }
+              }
+            }
+          },
+          cutout: '60%',
+        },
+      })
+    }
+  } catch (error) {
+    console.error('❌ Lỗi khi tải user distribution chart:', error)
+  }
+}
+
+async function loadDashboardStatsFromAPI() {
+  try {
+    // Song song các request
+    const [usage, provider, quick, sys, trends, activities, settings] = await Promise.all([
+      axiosClient.get('/api/stats/usage-summary'),
+      axiosClient.get('/api/stats/provider-usage'),
+      axiosClient.get('/api/stats/quick'),
+      axiosClient.get('/api/stats/system'),
+      axiosClient.get('/api/stats/trends'),
+      axiosClient.get('/api/stats/activities'),
+      axiosClient.get('/api/stats/settings'),
+    ])
+    // Tổng hợp vào biến
+    stats.value = { ...stats.value, ...(quick.data || {}) }
+    if (activities.data?.dailyActive !== undefined) {
+      stats.value.dailyActive = activities.data.dailyActive
+    }
+    
+    systemStats.value = sys.data || {}
+    systemServices.value = sys.data?.services || []
+    systemMetrics.value = {
+      cpu: sys.data?.cpu || 0,
+      memory: sys.data?.memory || 0,
+      disk: sys.data?.disk || 0,
+      network: sys.data?.network || 0,
+    }
+    
+    const totalProviderRequests = (provider.data || []).reduce((sum, p) => sum + (p.requests || 0), 0)
+    apiUsage.value = (provider.data || []).map(p => ({
+      name: p.provider,
+      usage: formatNumber(p.requests || 0),
+      percentage: totalProviderRequests > 0 ? Math.round((p.requests / totalProviderRequests) * 100) : 0,
+      color: p.provider === 'Gemini' ? '#1a365d' : p.provider === 'OpenAI' ? '#2d3748' : '#4a5568',
+      trend: (p.success || 0) > (p.failed || 0) ? 'up' : 'down',
+      change: p.failed > 0 ? `-${Math.round((p.failed / p.requests) * 100)}%` : '+0%',
+    }))
+    
+    totalApiRequests.value = usage.data?.total_requests || 0
+    totalApiTokens.value = usage.data?.total_tokens || 0
+    apiSuccessRate.value = usage.data && usage.data.total_requests ? Math.round((usage.data.total_success / usage.data.total_requests) * 100) : 0
+    apiErrorRate.value = usage.data && usage.data.total_requests ? Math.round((usage.data.total_failed / usage.data.total_requests) * 100) : 0
+    
+    // Trends
+    if (trends.data) {
+      userTrend.value = trends.data.userTrend || userTrend.value
+      apiTrend.value = trends.data.apiTrend || apiTrend.value
+      projectTrend.value = trends.data.projectTrend || projectTrend.value
+      activityTrend.value = trends.data.activityTrend || activityTrend.value
+    }
+    
+    // Settings
+    systemSettings.value = settings.data || {}
+  } catch (err) {
+    console.error('Lỗi load dashboard stats:', err)
+  }
+}
 
 </script>
 
@@ -1575,7 +2967,7 @@ onMounted(() => {
   font-size: 14px;
 }
 
-/* Analytics Section */
+/* Analytics Section - Modern Design */
 .analytics-section {
   margin-bottom: 32px;
 }
@@ -1586,12 +2978,708 @@ onMounted(() => {
   gap: 24px;
 }
 
-.chart-card {
+.modern-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.modern-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.api-analytics-card {
+  grid-column: span 2;
+}
+
+.user-analytics-card {
+  grid-column: span 2;
+}
+
+.card-header-modern {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  padding: 24px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  font-size: 32px;
+  color: #63b3ed;
+  background: rgba(255, 255, 255, 0.1);
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-header-modern h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.header-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+}
+
+.btn-icon-modern {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+
+.btn-icon-modern:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.chart-content-modern {
+  padding: 24px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.user-analytics-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.user-counters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.user-counter-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.counter-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.counter-icon.total {
+  background: linear-gradient(135deg, #3182ce 0%, #2b6cb0 100%);
+}
+
+.counter-icon.active {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.counter-icon.new {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.counter-icon.online {
+  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+}
+
+.counter-icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.counter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.counter-label {
+  font-size: 12px;
+  color: #718096;
+}
+
+.counter-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.user-timeline-container {
+  margin-top: 0;
+}
+
+.chart-canvas-wrapper.small {
+  height: 260px;
+}
+
+.user-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.chart-visual {
+  flex-shrink: 0;
+  width: 280px;
+  height: 280px;
+  position: relative;
+}
+
+.chart-visual canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-legend-modern {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.legend-item-modern {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.legend-item-modern:hover {
+  background: #f7fafc;
+  border-color: #e2e8f0;
+  transform: translateX(4px);
+}
+
+.legend-item-modern.active {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-color: #1a365d;
+  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+}
+
+.legend-indicator {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.legend-color-modern {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 2;
+}
+
+.legend-pulse {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  opacity: 0.3;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.3); opacity: 0; }
+}
+
+.legend-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.legend-label-modern {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.legend-value-modern {
+  font-size: 13px;
+  color: #718096;
+}
+
+/* Filters Modern */
+.filters-modern {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #1a365d;
+  font-size: 14px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+
+.filter-select-modern.small {
+  padding: 6px 10px;
+  font-size: 12px;position: absolute;
+  right: 100px;
+  top: 24px;
+}
+
+.filter-item-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.filter-label .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.filter-input-modern,
+.filter-select-modern {
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  color: #2d3748;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.filter-input-modern:focus,
+.filter-select-modern:focus {
+  outline: none;
+  border-color: #1a365d;
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Filter Icon Buttons */
+.filter-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-icon-btn-modern {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+}
+
+.filter-icon-btn-modern:hover {
+  background: #f9fafb;
+  border-color: #1a365d;
+  color: #1a365d;
+}
+
+.filter-icon-btn-modern .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background: #f9fafb;
+}
+
+.filter-option.active {
+  background: #e6f2ff;
+  color: #1a365d;
+  font-weight: 500;
+}
+
+.filter-option .material-symbols-outlined {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.filter-option.active .material-symbols-outlined {
+  color: #1a365d;
+}
+
+.btn-reset-modern {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+  color: #2d3748;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  height: fit-content;
+}
+
+.btn-reset-modern:hover {
+  background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* API Summary Modern */
+.api-summary-modern {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.summary-card-modern {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.summary-card-modern:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #1a365d;
+}
+
+.summary-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summary-icon.requests {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  color: white;
+}
+
+.summary-icon.tokens {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+}
+
+.summary-icon.success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+}
+
+.summary-icon.error {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  color: white;
+}
+
+.summary-icon .material-symbols-outlined {
+  font-size: 28px;
+}
+
+.summary-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label-modern {
+  font-size: 12px;
+  color: #718096;
+  font-weight: 500;
+}
+
+.summary-value-modern {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.summary-value-modern.success-text {
+  color: #38a169;
+}
+
+.summary-value-modern.error-text {
+  color: #e53e3e;
+}
+
+/* Provider List Modern */
+.provider-list-modern {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.provider-item-modern {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 14px;
+  padding: 20px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.provider-item-modern:hover {
+  border-color: #1a365d;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.1);
+  transform: translateX(4px);
+}
+
+.provider-header-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.provider-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.provider-badge {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+}
+
+.provider-name-modern {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.provider-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.provider-percentage {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a365d;
+}
+
+.provider-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.provider-trend.up {
+  color: #38a169;
+}
+
+.provider-trend.down {
+  color: #e53e3e;
+}
+
+.progress-bar-modern {
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.progress-fill-modern {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill-modern::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.provider-details-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.provider-count {
+  color: #718096;
+  font-weight: 500;
+}
+
+/* Charts Section Modern */
+.charts-section-modern {
+  padding: 24px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.chart-container-modern {
   background: white;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
+  max-width: calc(100% - 20px);
+}
+
+.chart-container-modern.timeline-chart {
+  margin-bottom: 24px;
+}
+
+.chart-header-inline {
+  margin-bottom: 20px;
+}
+
+.chart-title-modern {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a365d;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-title-modern .material-symbols-outlined {
+  font-size: 24px;
+  color: #4299e1;
+}
+
+.chart-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #718096;
+  font-weight: 400;
+}
+
+.chart-canvas-wrapper {
+  height: 320px;
+  position: relative;
+}
+
+.charts-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.charts-grid-modern .chart-canvas-wrapper {
+  height: 280px;
 }
 
 .chart-header {
@@ -1830,6 +3918,111 @@ onMounted(() => {
   border-top: 1px solid #e2e8f0;
 }
 
+/* API Filters */
+.api-filters {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 150px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.filter-input,
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: #2d3748;
+  transition: all 0.2s;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #1a365d;
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.btn-filter-reset {
+  padding: 8px 16px;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  height: fit-content;
+}
+
+.btn-filter-reset:hover {
+  background: #cbd5e0;
+  color: #2d3748;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.chart-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.chart-wrapper h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.chart-wrapper canvas {
+  max-height: 300px;
+}
+
+#timelineChart {
+  height: 300px !important;
+}
+
+#providerChart,
+#statusChart {
+  height: 250px !important;
+}
+
 .summary-item {
   text-align: center;
   padding: 12px;
@@ -1991,7 +4184,6 @@ onMounted(() => {
 
 .column-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
@@ -2001,6 +4193,9 @@ onMounted(() => {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .column-card .card-header {
@@ -2294,70 +4489,279 @@ onMounted(() => {
   padding: 0;
   max-height: 506px;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.log-list:empty::after {
+  content: 'Không có log nào';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
 }
 
 .log-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
-  padding: 16px 24px;
-  border-bottom: 1px solid #f7fafc;
-  transition: background 0.2s;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  background: white;
+  border-left: 4px solid transparent;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .log-item:hover {
-  background: #f7fafc;
+  background: #f8fafc;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .log-item:last-child {
   border-bottom: none;
 }
 
-.log-level {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  width: 60px;
-  text-align: center;
+.log-item.info {
+  border-left-color: #3b82f6;
 }
 
-.log-level.info {
-  background: #bee3f8;
-  color: #2b6cb0;
+.log-item.warning {
+  border-left-color: #f59e0b;
 }
 
-.log-level.warning {
-  background: #faf089;
-  color: #d69e2e;
+.log-item.error {
+  border-left-color: #ef4444;
 }
 
-.log-level.error {
-  background: #fed7d7;
-  color: #c53030;
+.log-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.log-item:hover .log-icon-wrapper {
+  transform: scale(1.1);
+}
+
+.log-icon-wrapper.info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.log-icon-wrapper.warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.log-icon-wrapper.error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.log-icon-wrapper .material-symbols-outlined {
+  font-size: 20px;
 }
 
 .log-content {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-.log-message {
+.log-header-enhanced {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.log-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.log-user-name {
+  font-weight: 600;
+  color: #1a365d;
+  font-size: 0.9rem;
+}
+
+.log-action-type {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.log-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.log-type-badge {
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.log-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.log-level-badge.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.log-level-badge.warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.log-level-badge.error {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.log-level-badge .material-symbols-outlined {
   font-size: 14px;
-  color: #4a5568;
-  margin-bottom: 4px;
+}
+
+.log-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.log-status-badge.status-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.log-status-badge.status-failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.log-status-badge .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.log-message-enhanced {
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #e2e8f0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.log-item.info .log-message-enhanced {
+  border-left-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.log-item.warning .log-message-enhanced {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.log-item.error .log-message-enhanced {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.log-meta-enhanced {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.log-time-enhanced {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #64748b;
   font-weight: 500;
 }
 
-.log-meta {
-  display: flex;
-  gap: 12px;
-  font-size: 12px;
-  color: #718096;
+.log-time-enhanced .material-symbols-outlined {
+  font-size: 14px;
 }
 
-.log-type {
-  text-transform: capitalize;
+.log-ip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.log-ip .material-symbols-outlined {
+  font-size: 12px;
 }
 
 .log-actions {
@@ -2389,6 +4793,33 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
+  .api-analytics-card {
+    grid-column: span 1;
+  }
+
+  .chart-content-modern {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .chart-visual {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .api-summary-modern {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts-grid-modern {
+    grid-template-columns: 1fr;
+  }
+
   .chart-container {
     flex-direction: column;
   }
@@ -2411,6 +4842,20 @@ onMounted(() => {
 
   .api-summary {
     grid-template-columns: 1fr;
+  }
+
+  .api-summary-modern {
+    grid-template-columns: 1fr;
+  }
+
+  .card-header-modern {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .chart-actions {
+    align-self: flex-end;
   }
 
   .log-filters {
@@ -2455,8 +4900,33 @@ onMounted(() => {
     gap: 12px;
   }
 
+  .log-header-enhanced {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .log-badges {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .log-meta-enhanced {
+    width: 100%;
+  }
+
   .log-actions {
     align-self: flex-end;
+  }
+
+  .log-icon-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  .log-message-enhanced {
+    font-size: 0.85rem;
+    padding: 6px 10px;
   }
 }
 

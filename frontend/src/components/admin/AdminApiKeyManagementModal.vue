@@ -319,6 +319,11 @@ const toggleApiKeyStatus = async (apiKey) => {
   apiKey.is_active = !apiKey.is_active
 
   try {
+    console.log('🔄 Toggling API Key status:', { 
+      id: apiKey.id, 
+      idType: typeof apiKey.id,
+      newStatus: apiKey.is_active 
+    })
     const res = await axiosClient.patch(`/api/keys/${apiKey.id}`, {
       is_active: apiKey.is_active,
     })
@@ -638,6 +643,7 @@ onMounted(() => {
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.2s;
+  min-height: 250px;
 }
 
 .api-key-card:hover {

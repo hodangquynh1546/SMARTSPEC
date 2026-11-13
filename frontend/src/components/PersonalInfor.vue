@@ -259,12 +259,93 @@ export default {
       try {
         const res = await axiosClient.get('/api/auth/me')
         const user = res.data?.data
-        if (!user) return
+        
+        // Debug: Log toàn bộ response để kiểm tra
+        console.log('📥 Full API Response:', res.data)
+        console.log('👤 User data:', user)
+        console.log('📅 User.dob raw:', user?.dob, 'Type:', typeof user?.dob)
+        
+        if (!user) {
+          console.warn('⚠️ No user data in response')
+          return
+        }
 
         let formatted = ''
+        
+        // Xử lý dob từ nhiều format khác nhau
         if (user.dob) {
+          console.log('🔍 Processing dob:', user.dob)
+          
+          // Case 1: Đã là string YYYY-MM-DD
+          if (typeof user.dob === 'string') {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(user.dob)) {
+              // Format YYYY-MM-DD
+              formatted = user.dob
+              console.log('✅ Found YYYY-MM-DD format:', formatted)
+            } else if (/^\d{4}-\d{2}-\d{2}T/.test(user.dob)) {
+              // Format ISO string YYYY-MM-DDTHH:mm:ss.sssZ
+              formatted = user.dob.split('T')[0]
+              console.log('✅ Found ISO format, extracted:', formatted)
+            } else {
+              // Thử parse như ISO string
           const d = new Date(user.dob)
-          formatted = d.toISOString().split('T')[0]
+              if (!isNaN(d.getTime())) {
+                // Sử dụng UTC để tránh timezone issues
+                const year = d.getUTCFullYear()
+                const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+                const day = String(d.getUTCDate()).padStart(2, '0')
+                formatted = `${year}-${month}-${day}`
+                console.log('✅ Parsed from string (UTC) to:', formatted)
+              } else {
+                console.warn('⚠️ Cannot parse dob string:', user.dob)
+              }
+            }
+          } 
+          // Case 2: Là Date object (nếu backend trả về object)
+          else if (user.dob instanceof Date || (user.dob.constructor && user.dob.constructor.name === 'Date')) {
+            const d = new Date(user.dob)
+            if (!isNaN(d.getTime())) {
+              // Sử dụng UTC để tránh timezone issues
+              const year = d.getUTCFullYear()
+              const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+              const day = String(d.getUTCDate()).padStart(2, '0')
+              formatted = `${year}-${month}-${day}`
+              console.log('✅ Parsed from Date object (UTC) to:', formatted)
+            }
+          }
+          // Case 3: Có thể là object với các field day, month, year
+          else if (typeof user.dob === 'object' && user.dob.day && user.dob.month && user.dob.year) {
+            const { day, month, year } = user.dob
+            formatted = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+            console.log('✅ Constructed from object to:', formatted)
+          }
+          // Case 4: Fallback - thử parse bất kỳ giá trị nào
+          else {
+            const d = new Date(user.dob)
+            if (!isNaN(d.getTime())) {
+              // Sử dụng UTC để tránh timezone issues
+              const year = d.getUTCFullYear()
+              const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+              const day = String(d.getUTCDate()).padStart(2, '0')
+              formatted = `${year}-${month}-${day}`
+              console.log('✅ Fallback parse (UTC) to:', formatted)
+            } else {
+              console.error('❌ Cannot parse dob:', user.dob)
+            }
+          }
+        } else {
+          console.warn('⚠️ user.dob is null, undefined, or empty')
+        }
+
+        // Parse dob để lưu vào localUser.dob object
+        let dobObject = { day: '', month: '', year: '' }
+        if (formatted) {
+          const parts = formatted.split('-')
+          if (parts.length === 3) {
+            const [year, month, day] = parts.map(Number)
+            dobObject = { day, month, year }
+            console.log('✅ Final dobObject:', dobObject)
+          }
         }
 
         this.localUser = {
@@ -273,18 +354,15 @@ export default {
           gender: user.gender || 'female',
           status: user.status || 'ACTIVE',
           avatar_url: user.avatar_url || '',
-          dob: user.dob
-            ? {
-                day: new Date(user.dob).getUTCDate(),
-                month: new Date(user.dob).getUTCMonth() + 1,
-                year: new Date(user.dob).getUTCFullYear(),
-              }
-            : { day: '', month: '', year: '' },
+          dob: dobObject,
         }
         this.formattedDOB = formatted
         this.twoFAEnabled = user.isTwoFactorEnabled || false
+        
+        console.log('✅ Final formattedDOB:', this.formattedDOB)
+        console.log('✅ Final localUser.dob:', this.localUser.dob)
       } catch (err) {
-        console.error('Error fetching user:', err.response?.data || err.message)
+        console.error('❌ Error fetching user:', err.response?.data || err.message)
         this.showNotification({
           type: 'error',
           title: 'Error',
@@ -469,74 +547,6 @@ export default {
       const colors = ['#4A90E2', '#50E3C2', '#B8E986', '#F5A623', '#D0021B', '#BD10E0']
       return colors[(name?.charCodeAt(0) || 0) % colors.length]
     },
-    async handleAvatarUpload(e) {
-      const file = e.target.files[0]
-      if (!file) return
-
-      // Validate file
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-      if (!allowedTypes.includes(file.type)) {
-        this.showNotification({
-          type: 'error',
-          title: 'Invalid File',
-          message: 'Only JPEG, PNG, GIF, and WebP images are allowed.',
-        })
-        return
-      }
-
-      // Validate file size (5MB)
-      const maxSize = 5 * 1024 * 1024
-      if (file.size > maxSize) {
-        this.showNotification({
-          type: 'error',
-          title: 'File Too Large',
-          message: 'File size must be less than 5MB.',
-        })
-        return
-      }
-
-      this.isUploadingAvatar = true
-
-      try {
-        // Tạo FormData
-        const formData = new FormData()
-        formData.append('avatar', file)
-
-        // Gọi API upload
-        const response = await axiosClient.post('/api/users/upload-avatar', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-
-        // Cập nhật avatar_url từ response
-        const newAvatarUrl = response.data.data.avatar_url
-        this.localUser.avatar_url = newAvatarUrl
-
-        // 🔥 QUAN TRỌNG: Emit event để thông báo avatar đã thay đổi
-        this.$emit('avatar-updated', {
-          avatar_url: newAvatarUrl,
-          user: this.localUser,
-        })
-
-        this.showNotification({
-          type: 'success',
-          title: 'Success',
-          message: 'Avatar uploaded successfully!',
-        })
-      } catch (err) {
-        console.error('Error uploading avatar:', err.response?.data || err.message)
-        this.showNotification({
-          type: 'error',
-          title: 'Upload Failed',
-          message: err.response?.data?.message || 'Failed to upload avatar.',
-        })
-      } finally {
-        this.isUploadingAvatar = false
-        // Reset file input
-        this.$refs.fileInput.value = ''
-      }
-    },
   },
 }
 </script>
@@ -560,23 +570,66 @@ export default {
 
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
-  background: var(--background-color);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   width: 90%;
   max-width: 800px;
-  border-radius: var(--border-radius-lg);
-  padding: 20px 28px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Important for positioning the toast */
-  position: relative; /* Important for positioning the toast */
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 20px 60px rgba(26, 54, 93, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  position: relative;
   max-height: 95vh;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1a365d 0%, #2d4a8a 50%, #1a365d 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ===== NEW: Notification Styles ===== */
@@ -741,18 +794,27 @@ export default {
   margin-bottom: 2px;
 }
 .form-control {
-  padding: 8px 12px;
+  padding: 12px 16px;
   font-size: 14px;
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-  background-color: var(--form-control-bg);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
+
+.form-control:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+}
+
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
+  background: #ffffff;
+  transform: translateY(-1px);
 }
 .security-section {
   margin-top: 20px;
@@ -832,11 +894,35 @@ export default {
   font-size: 18px;
 }
 .btn-primary {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #2d4a8a 100%);
   color: #fff;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.25);
+  position: relative;
+  overflow: hidden;
 }
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
 .btn-primary:hover {
-  background-color: var(--primary-hover-color);
+  background: linear-gradient(135deg, #2d4a8a 0%, var(--primary-color) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
 }
 .btn-secondary {
   background-color: var(--secondary-color);

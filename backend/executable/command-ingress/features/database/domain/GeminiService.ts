@@ -1,5 +1,6 @@
 // DatabaseGeminiService.ts
 import { ApiKeyService } from "../../orchestrator/domain/ApiKeyService";
+import { LLMService } from "../../../shared/LLMService";
 
 // PROMPTS cho database design
 const databasePrompts = {
@@ -223,6 +224,8 @@ Phản hồi của bạn BẮT BUỘC CHỈ LÀ một đối tượng JSON hợp
    - Khóa ngoại đặt tên theo mẫu: 'referenced_table_id'
    - Khóa chính đơn là 'id', khóa chính tổng hợp chỉ dùng trong bảng trung gian.
    - Luôn sử dụng tên tiếng Anh cho tất cả các bảng, cột và mối quan hệ (tránh sử dụng các định danh bằng ngôn ngữ địa phương).
+   - **QUAN TRỌNG: TRÁNH SQL RESERVED WORDS** - KHÔNG được dùng các từ khóa SQL như: order, select, insert, update, delete, table, index, view, user, group, key, value, type, status, level, date, time, year, month, day, hour, minute, second, count, sum, avg, max, min, join, inner, outer, left, right, where, from, as, on, and, or, not, null, is, in, like, between, exists, case, when, then, else, end, if, else, while, for, loop, begin, commit, rollback, transaction, constraint, primary, foreign, unique, check, default, auto_increment, database, schema, grant, revoke, privileges, values, set, into, return, declare, variable, cursor, fetch, open, close, procedure, function, trigger, index, view.
+   - Nếu cần đặt tên liên quan đến reserved word, thêm hậu tố: ví dụ 'order' → 'order_item' hoặc 'order_data', 'user' → 'user_account' hoặc 'user_profile', 'group' → 'user_group' hoặc 'group_info', 'type' → 'item_type' hoặc 'type_name', 'status' → 'order_status' hoặc 'status_code', 'level' → 'user_level' hoặc 'level_name'.
 
 7. **XÁC ĐỊNH USE CASE:**
    - Đối với mỗi cột riêng lẻ, bạn BẮT BUỘC phải xác định những use case nào yêu cầu sự tồn tại của nó
@@ -456,6 +459,8 @@ The JSON object MUST strictly follow this detailed structure. Include ALL fields
    - Foreign keys: referenced_table_id
    - Primary keys: 'id' for single, composite for junction tables
    - Always use English names for all tables, columns, and relationships (avoid local-language identifiers).
+   - **CRITICAL: AVOID SQL RESERVED WORDS** - DO NOT use SQL keywords such as: order, select, insert, update, delete, table, index, view, user, group, key, value, type, status, level, date, time, year, month, day, hour, minute, second, count, sum, avg, max, min, join, inner, outer, left, right, where, from, as, on, and, or, not, null, is, in, like, between, exists, case, when, then, else, end, if, else, while, for, loop, begin, commit, rollback, transaction, constraint, primary, foreign, unique, check, default, auto_increment, database, schema, grant, revoke, privileges, values, set, into, return, declare, variable, cursor, fetch, open, close, procedure, function, trigger, index, view.
+   - If you need a name related to a reserved word, add a suffix: e.g., 'order' → 'order_item' or 'order_data', 'user' → 'user_account' or 'user_profile', 'group' → 'user_group' or 'group_info', 'type' → 'item_type' or 'type_name', 'status' → 'order_status' or 'status_code', 'level' → 'user_level' or 'level_name'.
 
 7. **USE CASE TRACEABILITY:**
    - For each individual column, you MUST determine which use cases require its existence
@@ -476,6 +481,7 @@ Infer necessary tables from the provided use cases and strictly apply all design
 
 export class DatabaseGeminiService {
   private apiKeyService = new ApiKeyService();
+  private llmService = new LLMService();
 
   // config
   private readonly DB_GEN_BATCH_SIZE = 10;
@@ -486,29 +492,22 @@ export class DatabaseGeminiService {
    */
   async generateDatabaseSchema(
     requirements: any[],
-    language: string
+    language: string,
+    userId?: string,
+    projectId?: string
   ): Promise<any> {
-    try {
-      if (requirements.length <= this.DB_GEN_BATCH_SIZE) {
-        // Nếu ít requirements, xử lý một l ần
-        return await this.generateDatabaseSchemaBatch(requirements, language);
-      } else {
-        // Nhiều requirements, chia thành các batch và merge
-        return await this.generateDatabaseSchemaWithChunking(
-          requirements,
-          language
-        );
-      }
-    } catch (error) {
-      console.error("❌ Error in generateDatabaseSchema:", error);
-
-      // Fallback: trả về schema cơ bản nếu không generate được
-      return {
-        name: "fallback_database",
-        description: "Fallback database schema due to generation failure",
-        tables: [],
-        relationships: [],
-      };
+    // ✅ Không catch error ở đây - để DatabaseCoreService xử lý và emit failed event
+    if (requirements.length <= this.DB_GEN_BATCH_SIZE) {
+      // Nếu ít requirements, xử lý một lần
+      return await this.generateDatabaseSchemaBatch(requirements, language, userId, projectId);
+    } else {
+      // Nhiều requirements, chia thành các batch và merge
+      return await this.generateDatabaseSchemaWithChunking(
+        requirements,
+        language,
+        userId,
+        projectId
+      );
     }
   }
 
@@ -517,14 +516,16 @@ export class DatabaseGeminiService {
    */
   private async generateDatabaseSchemaBatch(
     requirements: any[],
-    language: string
+    language: string,
+    userId?: string,
+    projectId?: string
   ): Promise<any> {
     const simplifiedRequirements = requirements.map((r) => ({
-      id: r.id,
+      id: r.id || r._id,
       name: r.name,
-      role: r.role,
+      actor: (r as any).actor || r.role, // Hỗ trợ cả actor (mới) và role (cũ)
       goal: r.goal,
-      tasks: r.tasks,
+      main_flow: (r as any).main_flow || r.tasks, // Hỗ trợ cả main_flow (mới) và tasks (cũ)
       inputs: r.inputs,
       outputs: r.outputs,
     }));
@@ -538,7 +539,15 @@ export class DatabaseGeminiService {
       `📊 Generating database schema batch for ${requirements.length} use cases`
     );
 
-    const generatedJsonString = await this.generateJsonContent(prompt);
+    // ✅ MỚI: Token analysis trước khi gọi LLM (sử dụng model user đã chọn)
+    const { getModelConfig, logTokenInfo } = await import("../../../shared/tokenManager");
+    const modelName = await this.llmService.getRecommendedModel(undefined, userId);
+    // ✅ CẢI THIỆN: getModelConfig đã tự động xử lý OpenRouter models và model có phí
+    // Set isProductionFreeMode = false để cho phép model có phí (user đã chọn)
+    const modelConfig = getModelConfig(modelName, undefined, false);
+    logTokenInfo(prompt, modelConfig, '[Database Schema]');
+
+    const generatedJsonString = await this.generateJsonContent(prompt, userId, projectId);
 
     if (!generatedJsonString) {
       throw new Error("Empty response from Gemini");
@@ -944,9 +953,23 @@ export class DatabaseGeminiService {
   }
 
   /**
-   * FIX 6: Validate naming conventions
+   * FIX 6: Validate naming conventions and SQL reserved words
    */
   private validateNamingConventions(databaseSchema: any): any {
+    // SQL reserved words (comprehensive list)
+    const sqlReservedWords = new Set([
+      'select', 'insert', 'update', 'delete', 'create', 'drop', 'alter', 'table',
+      'where', 'from', 'join', 'inner', 'left', 'right', 'outer', 'on',
+      'group', 'order', 'by', 'having', 'distinct', 'union', 'all',
+      'and', 'or', 'not', 'in', 'exists', 'like', 'between', 'is', 'null',
+      'as', 'case', 'when', 'then', 'else', 'end', 'if', 'while', 'for',
+      'begin', 'commit', 'rollback', 'transaction', 'index', 'view', 'procedure',
+      'function', 'trigger', 'constraint', 'primary', 'foreign', 'key', 'unique',
+      'check', 'default', 'auto_increment', 'identity', 'sequence', 'database',
+      'schema', 'user', 'grant', 'revoke', 'privileges', 'values', 'set',
+      'into', 'return', 'declare', 'variable', 'cursor', 'fetch', 'open', 'close'
+    ]);
+
     databaseSchema.tables.forEach((table: any) => {
       // Table naming convention
       if (!/^[a-z][a-z0-9_]*$/.test(table.name)) {
@@ -955,11 +978,66 @@ export class DatabaseGeminiService {
         );
       }
 
+      // Check SQL reserved words for table name - AUTO FIX
+      if (sqlReservedWords.has(table.name.toLowerCase())) {
+        const oldName = table.name;
+        const reservedWord = table.name.toLowerCase();
+        // Auto-fix: thay thế reserved word bằng tên mô tả hơn
+        const suffixMap: { [key: string]: string } = {
+          'order': 'orders',
+          'user': 'users',
+          'group': 'user_groups',
+          'type': 'item_types',
+          'status': 'status_codes',
+          'level': 'levels',
+          'key': 'keys',
+          'value': 'values',
+          'table': 'tables',
+          'index': 'indexes',
+          'view': 'views',
+        };
+        table.name = suffixMap[reservedWord] || `${table.name}_table`;
+        console.warn(
+          `⚠️ Table name '${oldName}' is a SQL reserved word. Auto-renamed to '${table.name}'.`
+        );
+      }
+
       table.columns.forEach((column: any) => {
         // Column naming convention
         if (!/^[a-z][a-z0-9_]*$/.test(column.name)) {
           console.warn(
             `💡 Column name should be lowercase snake_case: ${table.name}.${column.name}`
+          );
+        }
+
+        // Check SQL reserved words for column name - AUTO FIX
+        if (sqlReservedWords.has(column.name.toLowerCase())) {
+          const oldName = column.name;
+          // Auto-fix: thêm suffix để tránh reserved word
+          if (column.is_foreign_key) {
+            // Foreign key: thay thế reserved word bằng tên mô tả hơn
+            // Ví dụ: 'order' → 'order_item_id', 'user' → 'user_account_id'
+            const reservedWord = column.name.toLowerCase();
+            const suffixMap: { [key: string]: string } = {
+              'order': 'order_item',
+              'user': 'user_account',
+              'group': 'user_group',
+              'type': 'item_type',
+              'status': 'status_code',
+              'level': 'level_name',
+              'key': 'key_value',
+              'value': 'value_data',
+              'date': 'date_value',
+              'time': 'time_value',
+            };
+            const replacement = suffixMap[reservedWord] || `${reservedWord}_item`;
+            column.name = `${replacement}_id`;
+          } else {
+            // Regular column: thêm suffix _value
+            column.name = `${column.name}_value`;
+          }
+          console.warn(
+            `⚠️ Column name '${table.name}.${oldName}' is a SQL reserved word. Auto-renamed to '${column.name}'.`
           );
         }
 
@@ -1039,9 +1117,14 @@ export class DatabaseGeminiService {
     for (const table of databaseSchema.tables) {
       if (!table?.columns) continue;
 
-      const primaryKeys = table.columns.filter(
-        (col) => col.is_primary_key === true
-      );
+      // ✅ Cải thiện: Detect primary keys với nhiều cách (true, "true", 1, etc.)
+      const primaryKeys = table.columns.filter((col: any) => {
+        const isPK = col.is_primary_key === true ||
+          col.is_primary_key === "true" ||
+          col.is_primary_key === 1 ||
+          (typeof col.is_primary_key === 'string' && col.is_primary_key.toLowerCase() === 'true');
+        return isPK;
+      });
 
       if (primaryKeys.length > 1) {
         console.log(
@@ -1051,7 +1134,8 @@ export class DatabaseGeminiService {
         // 🔴 FIX TRIỆT ĐỂ: Đảm bảo mọi composite key đều có primary_key_order
         let order = 1;
         for (const pk of primaryKeys) {
-          if (pk.primary_key_order == null) {
+          // ✅ FIX: Luôn set primary_key_order cho composite keys, bất kể giá trị hiện tại
+          if (pk.primary_key_order == null || pk.primary_key_order === undefined) {
             console.log(
               `   🛠️ FIXING: ${pk.name} - setting primary_key_order = ${order}`
             );
@@ -1066,13 +1150,14 @@ export class DatabaseGeminiService {
 
           // Đảm bảo primary key không thể null
           pk.nullable = false;
+          pk.is_primary_key = true; // ✅ Đảm bảo flag đúng
         }
 
-        console.log(`✅ Table ${table.name}: Composite key FIXED`);
+        console.log(`✅ Table ${table.name}: Composite key FIXED - [${primaryKeys.map((pk: any) => `${pk.name}(${pk.primary_key_order})`).join(', ')}]`);
       } else if (primaryKeys.length === 1) {
         // Single primary key - đảm bảo primary_key_order là null
         const singlePK = primaryKeys[0];
-        if (singlePK.primary_key_order != null) {
+        if (singlePK.primary_key_order != null && singlePK.primary_key_order !== undefined) {
           console.log(
             `🛠️ Table ${table.name}: Converting to single primary key, setting primary_key_order = null`
           );
@@ -1191,7 +1276,9 @@ export class DatabaseGeminiService {
    */
   private async generateDatabaseSchemaWithChunking(
     requirements: any[],
-    language: string
+    language: string,
+    userId?: string,
+    projectId?: string
   ): Promise<any> {
     console.log(
       `🔀 Splitting ${requirements.length} requirements into chunks for database generation`
@@ -1206,13 +1293,17 @@ export class DatabaseGeminiService {
 
     const allSchemas: any[] = [];
 
+    const chunkErrors: string[] = [];
+
     // Xử lý từng batch tuần tự để tránh rate limit
     for (let i = 0; i < chunks.length; i++) {
       try {
         console.log(`🔄 Processing chunk ${i + 1}/${chunks.length}`);
         const schema = await this.generateDatabaseSchemaBatch(
           chunks[i],
-          language
+          language,
+          userId,
+          projectId
         );
         allSchemas.push(schema);
         console.log(`✅ Completed chunk ${i + 1}/${chunks.length}`);
@@ -1221,14 +1312,25 @@ export class DatabaseGeminiService {
         if (i < chunks.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
-      } catch (error) {
-        console.error(`❌ Failed chunk ${i + 1}:`, error);
+      } catch (error: any) {
+        const errorMsg = error.message || `Failed to generate chunk ${i + 1}`;
+        console.error(`❌ Failed chunk ${i + 1}:`, errorMsg);
+        chunkErrors.push(`Chunk ${i + 1}/${chunks.length}: ${errorMsg}`);
         // Tiếp tục với các chunk khác thay vì dừng hoàn toàn
       }
     }
 
+    // ✅ Nếu tất cả chunks đều fail, throw error với chi tiết
     if (allSchemas.length === 0) {
-      throw new Error("All database schema generation chunks failed");
+      const errorMsg = chunkErrors.length > 0
+        ? `All database schema generation chunks failed. Errors: ${chunkErrors.join('; ')}`
+        : "All database schema generation chunks failed";
+      throw new Error(errorMsg);
+    }
+
+    // ✅ Nếu có một số chunks fail, log warning nhưng vẫn tiếp tục merge
+    if (chunkErrors.length > 0) {
+      console.warn(`⚠️ Some chunks failed (${chunkErrors.length}/${chunks.length}), but continuing with successful chunks. Errors:`, chunkErrors);
     }
 
     console.log(`🔄 Merging ${allSchemas.length} schemas...`);
@@ -1463,8 +1565,7 @@ export class DatabaseGeminiService {
         primaryKeys.forEach((pk, index) => {
           if (pk.primary_key_order == null) {
             console.warn(
-              `   ↳ Missing primary_key_order for: ${pk.name}, assigning: ${
-                index + 1
+              `   ↳ Missing primary_key_order for: ${pk.name}, assigning: ${index + 1
               }`
             );
             pk.primary_key_order = index + 1;
@@ -1661,64 +1762,30 @@ export class DatabaseGeminiService {
   /**
    * Một hàm chung để gửi prompt tới Gemini và trả về kết quả dạng chuỗi JSON đã được làm sạch.
    */
-  private async generateJsonContent(prompt: string): Promise<string> {
-    const keys = await this.apiKeyService.getAllActiveKeys("gemini");
-    if (!keys || keys.length === 0) {
-      throw new Error("No active Gemini API key found.");
+  private async generateJsonContent(prompt: string, userId?: string, projectId?: string): Promise<string> {
+    // ✅ Sử dụng LLMService để lấy recommended model (ưu tiên model user đã chọn)
+    const modelName = await this.llmService.getRecommendedModel(undefined, userId);
+
+    try {
+      console.log(`🔑 Calling LLM for database content with model: ${modelName}`);
+
+      const response = await this.llmService.callLLM({
+        prompt: prompt,
+        modelName: modelName,
+        userId: userId,
+        projectId: projectId,
+        endpoint: 'generateDatabase',
+        isProductionFreeMode: true
+      });
+
+      const text: string = response.text || "";
+
+      // Trả về ngay sau khi thành công
+      return this.cleanJsonStringDatabase(text);
+    } catch (err: any) {
+      console.error(`❌ LLM call failed during database content generation:`, err?.message || err);
+      throw err;
     }
-
-    let lastError: any;
-    for (const k of keys) {
-      try {
-        console.log(
-          `🔑 Trying Gemini key for database content: ${k.key_value.slice(
-            0,
-            12
-          )}...`
-        );
-        const { GoogleGenerativeAI } = await import("@google/generative-ai");
-        const client = new GoogleGenerativeAI(k.key_value);
-        const model = client.getGenerativeModel({
-          model: "gemini-2.0-flash-001",
-        });
-
-        const resp: any = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        });
-
-        const text: string = resp?.response?.text?.() || "";
-
-        // Trả về ngay sau khi thành công
-        return this.cleanJsonStringDatabase(text);
-      } catch (err: any) {
-        lastError = err;
-        const msg = (err?.message || "").toLowerCase();
-        console.error(
-          `❌ Gemini key ${k._id} failed during database content generation:`,
-          err?.message || err
-        );
-
-        // Vô hiệu hóa key nếu nó không hợp lệ
-        if (msg.includes("invalid") || msg.includes("unauthorized")) {
-          try {
-            await this.apiKeyService.disableKey(k._id);
-            console.warn(`⚠️ Disabled invalid Gemini key: ${k._id}`);
-          } catch {
-            /* Bỏ qua lỗi khi disable key */
-          }
-        }
-        // Thử key tiếp theo
-        continue;
-      }
-    }
-
-    // Nếu tất cả các key đều thất bại
-    throw (
-      lastError ||
-      new Error(
-        "All Gemini API keys failed during database content generation."
-      )
-    );
   }
 
   /**

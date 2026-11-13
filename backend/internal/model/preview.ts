@@ -10,7 +10,7 @@ const previewChangeSchema = new Schema({
   },
   entity_type: {
     type: String,
-    enum: ["requirement", "input","output", "database","table","column","relationship", "testcase","uml", "activity_diagram","sequence_diagram","usecase_diagram"],
+    enum: ["requirement", "input", "database","table","column","relationship", "testcase", "activity_diagram","sequence_diagram","usecase_diagram"],
     required: true
   },
   entity_id: { type: String, required: false },
@@ -25,9 +25,12 @@ const previewChangeSchema = new Schema({
 }, { _id: false });
 
 // === Cấu trúc người phê duyệt ===
+// Note: role trong approver có thể là "owner" hoặc "member" (đại diện cho editor)
+// Project members có roles: "owner", "editor", "viewer"
+// Mapping: owner -> owner, editor -> member
 const approverSchema = new Schema({
   user_id: { type: Schema.Types.ObjectId, ref: "users", required: true },
-  role: { type: String, enum: ["owner", "member"], required: true },
+  role: { type: String, enum: ["owner", "member"], required: true }, // "member" = editor trong project
   approved_at: { type: Date, default: null },
   status: { type: String, enum: ["pending", "approved", "rejected","rollback"], default: "pending" },
   comment: { type: String, default: "" }
@@ -36,8 +39,7 @@ const approverSchema = new Schema({
 // === Schema chính của Preview ===
 const previewSchema = new Schema({
   project_id: { type: Schema.Types.ObjectId, ref: "projects", required: true },
-  base_version_id: { type: Schema.Types.ObjectId, ref: "versions", required: true }, // version gốc
-  target_version_id: { type: Schema.Types.ObjectId, ref: "versions" }, // version mới sẽ tạo sau khi approved
+  base_version_id: { type: Schema.Types.ObjectId, ref: "versions", required: false }, // version gốc
   created_by: { type: Schema.Types.ObjectId, ref: "users", required: true },
   created_at: { type: Date, default: Date.now },
 

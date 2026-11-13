@@ -45,14 +45,13 @@ export interface ActivityLane {
 // MAIN DTO
 // ======================
 export interface ActivityDiagramDTO {
-  uml_id?: string;
-
+  project_id?: string;
+  version_id?: string;
   name: string;
   description?: string;
   lanes?: ActivityLane[]; 
   nodes: ActivityNode[];
   edges: ActivityEdge[];
 
-  diagram_svg?: string;
   created_by?: string;
 }

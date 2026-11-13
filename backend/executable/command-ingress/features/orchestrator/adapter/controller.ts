@@ -43,18 +43,37 @@ export class OrchestratorController {
         if (!['full', 'incremental'].includes(mode)) {
             return res.status(400).json({ success: false, error: 'Mode phải là full hoặc incremental' });
         }
+        
+        // ✅ QUAN TRỌNG: Kiểm tra xem version đang processing không để tránh chạy đồng thời
+        const currentVersion = await Version.findById(version_id).lean();
+        if (currentVersion && (currentVersion as any).is_processing === true) {
+            console.warn(`⚠️ Version ${version_id} is already processing. Rejecting concurrent request.`);
+            return res.status(409).json({ 
+                success: false, 
+                error: 'Version is already being processed. Please wait for the current process to complete.' 
+            });
+        }
+        
         // const userId = req.getSubject();
         try {
             // Không `await` ở đây để nó chạy nền và trả về response ngay lập tức
+            // Nhưng cần catch lỗi để log và đảm bảo version status được cập nhật
             this.service.run(project_id, version_id, {
                 files,
                 rawText,
                 mode
-            }, language, userId);
+            }, language, userId).catch((error: any) => {
+                // Log lỗi để debug
+                console.error("❌ Error in background processing:", error);
+                // Version status đã được cập nhật thành "failed" trong service.run()
+                // Frontend sẽ nhận được thông báo lỗi qua polling status
+            });
 
             // Trả về response ngay lập tức để không bắt người dùng chờ
             return res.status(202).json({ success: true, message: 'Processing started. Check status for results.' });
         } catch (e: any) {
+            // Lỗi xảy ra trước khi service.run() được gọi (validation, etc.)
+            console.error("❌ Error before processing:", e);
             return res.status(500).json({ success: false, error: e?.message || 'Internal error' });
         }
     }
@@ -75,28 +94,33 @@ export class OrchestratorController {
                 return res.status(404).json({ success: false, error: 'Project not found' });
             }
 
+            // ✅ QUAN TRỌNG: Kiểm tra xem version đang processing không
+            const currentVersion = await Version.findById(version_id).lean();
+            if (currentVersion && (currentVersion as any).is_processing === true) {
+                console.warn(`⚠️ Version ${version_id} is already processing. Rejecting retry request.`);
+                return res.status(409).json({ 
+                    success: false, 
+                    error: 'Version is already being processed. Please wait for the current process to complete.' 
+                });
+            }
+
             const language = project.language;
             // const userId = req.getSubject();
-            await Version.findByIdAndUpdate(version_id, {
-                $set: {
-                    status: "processing",
-                    stage: "initializing",
-                    progress: 15,
-                    processing_errors: [],
-                    pending_conflicts: [],
-                    updated_at: new Date()
-                }
-            });
-
+            
             // Chạy nền với mode 'full' và không có dữ liệu mới
-            // Service sẽ tự động dọn dẹp kết quả cũ
+            // Service sẽ tự động dọn dẹp kết quả cũ và set is_processing
             this.service.run(
                 project_id,
                 version_id,
                 { files: [], rawText: '', mode: 'full' },
                 language,
                 userId 
-            );
+            ).catch((error: any) => {
+                // Log lỗi để debug
+                console.error("❌ Error in retry background processing:", error);
+                // Version status đã được cập nhật thành "failed" trong service.run()
+                // Frontend sẽ nhận được thông báo lỗi qua polling status
+            });
 
             return res.status(202).json({ success: true, message: 'Retry process started.' });
 

@@ -1,6 +1,5 @@
 <template>
   <div
-    @click="openProject"
     class="project-card"
     :class="{
       trashed: isTrashed,
@@ -9,61 +8,11 @@
       failed: project.creationStatus === 'failed',
       retrying: project.isRetry,
       mobile: isMobile,
+      selected: isSelected,
     }"
+    @click="handleCardClick"
   >
-    <!-- TRẠNG THÁI ĐANG TẠO HOẶC RETRY -->
-    <div v-if="isCreating" class="creating-state">
-      <div class="creating-header">
-        <h3 class="creating-title">{{ project.name }}</h3>
-        <span
-          class="creating-badge"
-          :class="{
-            failed: project.creationStatus === 'failed',
-            retrying: project.isRetry,
-          }"
-        >
-          {{ creatingLabel }}
-        </span>
-      </div>
-
-      <p class="creating-description">{{ project.description }}</p>
-
-      <!-- HIỂN THỊ PROGRESS BAR KHI ĐANG TẠO HOẶC RETRY -->
-      <div v-if="project.creationStatus !== 'failed'" class="creating-progress">
-        <div class="progress-info">
-          <span class="stage-text">{{ project.currentStage }}</span>
-          <span class="progress-percent">{{ project.processingProgress }}%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" :style="{ width: project.processingProgress + '%' }"></div>
-        </div>
-      </div>
-
-      <!-- HIỂN THỊ LỖI KHI FAILED -->
-      <div v-else class="creating-failed">
-        <span class="material-symbols-outlined failed-icon">error</span>
-        <p class="failed-message">
-          {{ project.isRetry ? 'Retry failed' : 'Project creation failed' }}
-        </p>
-        <button class="retry-btn" @click.stop="retryCreation">Retry</button>
-      </div>
-
-      <div class="creating-footer">
-        <span class="creating-note">
-          <span class="material-symbols-outlined">schedule</span>
-          {{
-            project.creationStatus === 'failed'
-              ? project.isRetry
-                ? 'Retry failed - Will be removed soon'
-                : 'Creation failed - Will be removed soon'
-              : project.isRetry
-              ? 'Project is being retried in background'
-              : 'Project is being created in background'
-          }}
-        </span>
-      </div>
-    </div>
-
+    <!-- Project Content -->
     <div v-if="!isEditing" class="project-content">
       <div class="project-header">
         <h3>{{ project.name }}</h3>
@@ -76,10 +25,21 @@
       <p class="project-description">{{ project.description }}</p>
 
       <div class="project-meta">
-        <span class="update-time">
-          {{ isTrashed ? 'Trashed' : 'Updated' }}
-          {{ formatDate(isTrashed ? project.status.trashed_at : project.updatedAt) }}
-        </span>
+        <div class="meta-left">
+          <span class="update-time">
+            {{ isTrashed ? 'Trashed' : 'Updated' }}
+            {{ formatDate(isTrashed ? project.status.trashed_at : project.updatedAt) }}
+          </span>
+
+          <!-- Hiển thị version hiện tại -->
+          <div v-if="!isTrashed && currentVersion" class="version-info">
+            <span class="version-label">Version:</span>
+            <span class="version-number">{{
+              currentVersion.version_number ||
+              `${currentVersion.version_major}.${currentVersion.version_minor}`
+            }}</span>
+          </div>
+        </div>
 
         <div class="meta-right">
           <span class="project-members">
@@ -87,18 +47,31 @@
             {{ project.members?.filter((member) => member.status === 'accepted').length || 0 }}
           </span>
 
-          <div class="fab-container" @click.stop v-click-outside="closeFab">
+          <!-- Hiển thị số lượng changes và nút mở preview -->
+          <div
+            v-if="!isTrashed && pendingChangesCount > 0"
+            class="changes-indicator"
+            @click.stop="openPreview"
+          >
+            <span class="material-symbols-outlined">sync_alt</span>
+            <span class="changes-count"
+              >{{ pendingChangesCount }} change{{ pendingChangesCount > 1 ? 's' : '' }}</span
+            >
+          </div>
+
+          <!-- FAB Menu -->
+          <div v-if="!isTrashed" class="fab-container" @click.stop v-click-outside="closeFab">
             <button class="fab-main" @click="toggleFab">
               <span class="material-symbols-outlined">more_vert</span>
             </button>
 
             <div class="fab-options" :class="{ open }">
               <button
-                v-for="(btn, i) in isTrashed ? trashedActions : normalActions"
+                v-for="(btn, i) in normalActions"
                 :key="i"
                 class="fab-btn"
                 :class="`fab-${btn.type}`"
-                :style="getStyle(i, isTrashed ? trashedActions.length : normalActions.length)"
+                :style="getStyle(i, normalActions.length)"
                 @click.stop="btn.action"
                 :title="btn.title"
                 :disabled="btn.disabled"
@@ -161,6 +134,10 @@ const clickOutside = {
   },
 }
 
+import { getPreview } from '@/api/version'
+import { getVersionInProject } from '@/api/project'
+import eventBus from '@/utils/eventBus'
+
 export default {
   name: 'ProjectCard',
   directives: {
@@ -170,6 +147,7 @@ export default {
     project: { type: Object, required: true },
     showDelete: { type: Boolean, default: true },
     isTrashed: { type: Boolean, default: false },
+    isSelected: { type: Boolean, default: false },
   },
   data() {
     return {
@@ -180,6 +158,9 @@ export default {
         description: '',
       },
       isMobile: false,
+      currentVersion: null,
+      temporaryVersion: null, // Version tạm thời có pending changes
+      pendingChangesCount: 0,
     }
   },
   computed: {
@@ -203,12 +184,6 @@ export default {
         this.project.status === 'retrying' ||
         this.project.isRetry
       )
-    },
-    creatingLabel() {
-      if (this.project.isRetry) {
-        return 'Retrying...'
-      }
-      return this.project.creationStatus === 'failed' ? 'Failed' : 'Creating...'
     },
     projectType() {
       return this.isOwner ? 'my' : 'shared'
@@ -244,13 +219,6 @@ export default {
           disabled: false,
         },
         {
-          icon: 'palette',
-          title: 'Change Color',
-          type: 'palette',
-          action: () => this.changeColor(),
-          disabled: false,
-        },
-        {
           icon: 'delete',
           title: 'Move to Trash',
           type: 'delete',
@@ -259,47 +227,163 @@ export default {
         },
       ]
     },
-    trashedActions() {
-      return [
-        {
-          icon: 'restore_from_trash',
-          title: 'Restore',
-          type: 'restore',
-          action: this.restoreProject,
-          disabled: false,
-        },
-        {
-          icon: 'delete_forever',
-          title: 'Delete Permanently',
-          type: 'delete',
-          action: this.deletePermanently,
-          disabled: false,
-        },
-      ]
-    },
   },
-  mounted() {
+  async mounted() {
     this.checkMobile()
     window.addEventListener('resize', this.checkMobile)
+
+    // Listen for changes-updated event from PreviewModal
+    eventBus.on('project-changes-updated', this.handleProjectChangesUpdated)
+    
+    // Listen for project data updates from other pages (e.g., UsecaseManagement)
+    eventBus.on('project-data-updated', this.handleProjectDataUpdated)
+
+    // Load version và changes data
+    if (!this.isTrashed) {
+      await this.loadVersionData()
+      await this.loadPendingChanges()
+    }
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.checkMobile)
+    eventBus.off('project-changes-updated', this.handleProjectChangesUpdated)
+    eventBus.off('project-data-updated', this.handleProjectDataUpdated)
   },
+  watch: {
+    'project._id': {
+      immediate: true,
+      async handler() {
+        if (!this.isTrashed) {
+          await this.loadVersionData()
+          await this.loadPendingChanges()
+        }
+      },
+    },
+    currentVersion: {
+      handler(newVersion) {
+        // Khi currentVersion thay đổi, load lại pending changes
+        if (newVersion && !this.isTrashed) {
+          this.loadPendingChanges()
+        }
+      },
+    },
+  },
+
   methods: {
+    async loadVersionData() {
+      try {
+        const response = await getVersionInProject(this.project._id)
+        if (response.data && response.data.data) {
+          const allVersions = response.data.data
+          
+          // Chỉ lấy version đã được approve (version_temporary = false) để hiển thị
+          const approvedVersions = allVersions.filter(
+            (v) => v.version_temporary === false || v.version_temporary === undefined
+          )
+          
+          // Tìm version từ project.current_version (đã được approve) để hiển thị
+          this.currentVersion =
+            approvedVersions.find((v) => v._id === this.project.current_version) ||
+            approvedVersions[0] ||
+            null
+          
+          // Tìm version tạm thời (có thể có pending changes)
+          this.temporaryVersion = allVersions.find(
+            (v) => v.version_temporary === true
+          ) || null
+        }
+      } catch (error) {
+        console.error('Error loading version data:', error)
+      }
+    },
+
+    async loadPendingChanges() {
+      try {
+        // Tìm version tạm thời có preview (pending changes)
+        // Nếu không có version tạm thời, thử load từ currentVersion
+        const versionToCheck = this.temporaryVersion || this.currentVersion
+        
+        if (!versionToCheck) {
+          console.log('⚠️ No version to check for pending changes')
+          this.pendingChangesCount = 0
+          return
+        }
+
+        console.log('🔄 Loading pending changes for version:', versionToCheck._id, {
+          isTemporary: versionToCheck.version_temporary === true
+        })
+        const response = await getPreview(versionToCheck._id)
+        console.log('📦 Preview response:', response.data)
+        
+        if (response.data && response.data.data) {
+          const changes = response.data.data.changes || []
+          this.pendingChangesCount = changes.length
+          console.log(`✅ Loaded ${this.pendingChangesCount} pending changes for project ${this.project._id}`)
+        } else {
+          this.pendingChangesCount = 0
+          console.log('⚠️ No changes data in response')
+        }
+      } catch (error) {
+        // Nếu lỗi 404 hoặc preview không tồn tại, không có pending changes
+        if (error.response?.status === 404) {
+          console.log('ℹ️ No preview found (no pending changes)')
+          this.pendingChangesCount = 0
+        } else {
+          console.error('❌ Error loading pending changes:', error)
+          this.pendingChangesCount = 0
+        }
+      }
+    },
+
+    async openPreview() {
+      // Refresh data trước khi mở modal
+      await this.loadVersionData()
+      await this.loadPendingChanges()
+
+      // Sử dụng version tạm thời nếu có (để xem pending changes)
+      // Nếu không có, sử dụng currentVersion
+      const versionToOpen = this.temporaryVersion || this.currentVersion
+      
+      if (!versionToOpen) {
+        console.warn('⚠️ No version available to open preview')
+        return
+      }
+
+      this.$emit('open-preview', {
+        projectId: this.project._id,
+        versionId: versionToOpen._id,
+        versionData: versionToOpen,
+        pendingChangesCount: this.pendingChangesCount,
+      })
+    },
+
+    handleCardClick() {
+      if (this.isEditing || this.isCreating) return
+
+      if (this.isTrashed) {
+        this.toggleSelection()
+        return
+      }
+
+      this.openProject()
+    },
+
+    toggleSelection() {
+      this.$emit('selection-toggle', this.project._id || this.project.id)
+    },
+
     checkMobile() {
       this.isMobile = window.innerWidth <= 768
     },
+
     toggleFab() {
-      if (this.isMobile) {
-        // Trên mobile, hiển thị menu đơn giản
-        this.open = !this.open
-      } else {
-        this.open = !this.open
-      }
+      this.open = !this.open
     },
+
     closeFab() {
       this.open = false
     },
+
     startEditing() {
       this.editForm = {
         name: this.project.name,
@@ -312,20 +396,17 @@ export default {
         this.$refs.nameInput?.focus()
       })
     },
-    retryCreation() {
-      this.$emit('retry-creation', this.project._id)
-    },
-    changeColor() {
-      alert('Change color clicked')
-    },
+
     shareProject() {
       this.$emit('share', this.project)
       this.closeFab()
     },
+
     leaveProject() {
       this.$emit('leave', this.project._id || this.project.id)
       this.closeFab()
     },
+
     cancelEdit(event) {
       if (event) {
         event.stopPropagation()
@@ -336,6 +417,7 @@ export default {
         description: '',
       }
     },
+
     async saveProject(event) {
       if (event) {
         event.stopPropagation()
@@ -361,9 +443,9 @@ export default {
         alert('Failed to update project')
       }
     },
+
     getStyle(index, total) {
       if (this.isMobile) {
-        // Trên mobile, hiển thị menu dạng list thẳng đứng
         return {
           transform: 'none',
           position: 'static',
@@ -382,22 +464,17 @@ export default {
         transform: `translate(${x}px, ${-y}px)`,
       }
     },
+
     openProject() {
       if (this.isTrashed || this.isEditing || this.isCreating) return
       this.$emit('open', this.project)
     },
+
     confirmDelete() {
       this.$emit('delete', this.project._id || this.project.id)
       this.closeFab()
     },
-    restoreProject() {
-      this.$emit('restore', this.project._id || this.project.id)
-      this.closeFab()
-    },
-    deletePermanently() {
-      this.$emit('delete-permanently', this.project._id || this.project.id)
-      this.closeFab()
-    },
+
     formatDate(dateStr) {
       if (!dateStr) return ''
       const date = new Date(dateStr)
@@ -406,29 +483,117 @@ export default {
       const y = date.getFullYear()
       return `${d}/${m}/${y}`
     },
+    async refreshProjectData() {
+      await this.loadVersionData()
+      await this.loadPendingChanges()
+    },
+    handleProjectChangesUpdated(event) {
+      // Only refresh if this is the affected project
+      if (event && event.projectId === this.project._id) {
+        console.log('🔄 Refreshing ProjectCard after changes update:', event)
+        this.refreshProjectData()
+      }
+    },
+    handleProjectDataUpdated(event) {
+      // Refresh when project data is updated from other pages (e.g., UsecaseManagement)
+      if (event && event.projectId === this.project._id) {
+        console.log('🔄 Refreshing ProjectCard after project data update:', event)
+        this.refreshProjectData()
+      }
+    },
   },
 }
 </script>
 
 <style scoped>
+/* Giữ nguyên tất cả CSS hiện có và thêm style mới */
+
 .project-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 16px 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
   margin-bottom: 64px;
   margin-right: 36px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
   min-height: 140px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  transition: width 0.3s ease;
+}
+
+.project-card:hover:not(.trashed)::before {
+  width: 4px;
 }
 
 .project-card:hover:not(.trashed) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 8px 32px rgba(26, 54, 93, 0.2), 0 0 0 1px rgba(26, 54, 93, 0.1);
+  transform: translateY(-4px) scale(1.02);
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+.project-card.selected {
+  border: 3px solid #1a365d;
+  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
+  animation: selectedPulse 2s ease-in-out infinite;
+}
+
+@keyframes selectedPulse {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
+  }
+  50% {
+    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35), 0 0 0 3px rgba(26, 54, 93, 0.2);
+  }
+}
+
+.project-card.trashed.selected {
+  background-color: #e8f4ff;
+  border-color: #0056b3;
+}
+
+.project-card.trashed:not(.selected):hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.selection-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+}
+
+.selection-checkbox input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 .project-content {
@@ -447,15 +612,24 @@ export default {
 
 .project-header h3 {
   font-size: 18px;
-  font-weight: 600;
-  color: #222;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 .project-header h3:hover {
-  color: #007bff;
+  transform: translateX(2px);
+  filter: brightness(1.1);
 }
 
 .project-type {
@@ -481,19 +655,9 @@ export default {
   margin: 6px 0 12px;
   line-height: 1.5;
   text-align: left;
-}
-
-.project-description {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.project-header h3 {
-  max-width: 200px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -504,6 +668,31 @@ export default {
   justify-content: space-between;
   font-size: 12px;
   color: #777;
+}
+
+.meta-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.version-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-label {
+  color: #666;
+}
+
+.version-number {
+  font-weight: 600;
+  color: #1a365d;
+  background: #e8f3ff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
 }
 
 .meta-right {
@@ -523,14 +712,68 @@ export default {
   color: #555;
 }
 
+/* Changes Indicator */
+.changes-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.changes-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.changes-indicator:hover::before {
+  left: 100%;
+}
+
+.changes-indicator:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.changes-indicator .material-symbols-outlined {
+  font-size: 14px;
+}
+
+.changes-count {
+  font-weight: 600;
+}
+
 .project-card.trashed {
   background-color: #fdfdfd;
   border: 1px dashed #ccc;
   opacity: 0.85;
+  cursor: pointer;
 }
 
 .project-card.trashed h3 {
   color: #888;
+}
+
+.project-card.trashed .fab-container {
+  display: none !important;
 }
 
 .fab-container {
@@ -670,262 +913,6 @@ export default {
   box-shadow: 0 0 12px rgba(121, 118, 118, 0.6);
 }
 
-/* Edit Form Styles */
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.form-group {
-  margin-bottom: 0;
-}
-
-.inline-input,
-.inline-textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border 0.3s ease;
-  box-sizing: border-box;
-}
-
-.inline-input:focus,
-.inline-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-}
-
-.inline-input {
-  font-size: 18px;
-  font-weight: 600;
-  height: 36px;
-}
-
-.inline-textarea {
-  resize: vertical;
-  min-height: 60px;
-  font-family: inherit;
-}
-
-.edit-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.2s ease;
-}
-
-.btn-cancel {
-  background: #f8f9fa;
-  color: #333;
-}
-
-.btn-cancel:hover {
-  background: #e9ecef;
-}
-
-.btn-save {
-  background: #1a365d;
-  opacity: 0.8;
-  color: white;
-}
-
-.btn-save:hover {
-  opacity: 1;
-}
-
-/* Ensure consistent height when editing */
-.project-card.editing {
-  min-height: 140px;
-  justify-content: flex-start;
-}
-
-.fab-btn:disabled {
-  position: absolute;
-  top: 36%;
-  left: 38%;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: rgb(73, 73, 73);
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.3s ease;
-  cursor: not-allowed;
-}
-
-.fab-btn:disabled:hover {
-  background: rgb(73, 73, 73);
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  transform: scale(1);
-}
-
-/* Creating State Styles */
-.project-card.creating {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 2px dashed #1a365d;
-  cursor: not-allowed;
-  opacity: 0.9;
-}
-
-.creating-state {
-  padding: 4px;
-}
-
-.creating-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
-}
-
-.creating-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a365d;
-  margin: 0;
-  flex: 1;
-}
-
-.creating-badge {
-  background: #1a365d;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.creating-badge.failed {
-  background: #ef4444;
-}
-
-.creating-description {
-  color: #666;
-  font-size: 14px;
-  margin: 8px 0 16px;
-  line-height: 1.4;
-}
-
-.creating-progress {
-  margin: 16px 0;
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 12px;
-  color: #666;
-}
-
-.stage-text {
-  font-weight: 500;
-}
-
-.progress-percent {
-  font-weight: 600;
-  color: #1a365d;
-}
-
-.progress-bar {
-  height: 6px;
-  background-color: #e5e7eb;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #1a365d, #2c5282);
-  border-radius: 3px;
-  transition: width 0.5s ease-in-out;
-}
-
-.creating-footer {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e9ecef;
-}
-
-.creating-note {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #6c757d;
-  font-style: italic;
-}
-
-.creating-note .material-symbols-outlined {
-  font-size: 14px;
-}
-
-/* Failed State */
-.project-card.failed {
-  border-color: #ef4444;
-  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-}
-
-.creating-failed {
-  text-align: center;
-  padding: 16px 0;
-}
-
-.failed-icon {
-  font-size: 32px;
-  color: #ef4444;
-  margin-bottom: 8px;
-}
-
-.failed-message {
-  color: #ef4444;
-  font-size: 14px;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-.retry-btn {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.retry-btn:hover {
-  background: #dc2626;
-}
-
-/* Ẩn FAB menu và normal content khi đang creating */
-.project-card.creating .project-content,
-.project-card.creating .fab-container {
-  display: none !important;
-}
-
 /* ===== RESPONSIVE STYLES ===== */
 @media (max-width: 768px) {
   .project-card {
@@ -965,6 +952,11 @@ export default {
   .meta-right {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .changes-indicator {
+    font-size: 10px;
+    padding: 3px 6px;
   }
 
   /* Mobile FAB menu */
@@ -1023,6 +1015,16 @@ export default {
     width: 100%;
     padding: 10px;
   }
+
+  .selection-checkbox {
+    top: 6px;
+    left: 6px;
+  }
+
+  .selection-checkbox input {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1061,6 +1063,11 @@ export default {
   }
   .fab-main span {
     font-size: 24px;
+  }
+
+  .changes-indicator {
+    font-size: 9px;
+    padding: 2px 4px;
   }
 }
 </style>

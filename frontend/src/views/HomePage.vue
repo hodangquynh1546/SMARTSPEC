@@ -8,11 +8,58 @@
         @logout="logout"
         @open-personal="openPersonalInfo"
       />
+      
+      <!-- Preview Modal -->
+      <PreviewModal
+        v-if="isPreviewModalVisible"
+        :is-visible="isPreviewModalVisible"
+        :project-id="previewData.projectId"
+        :version-id="previewData.versionId"
+        :version-data="previewData.versionData"
+        @close="closePreviewModal"
+        @approved="handlePreviewApproved"
+        @changes-updated="handleChangesUpdated"
+        @modal-closing="handlePreviewModalClosing"
+      />
 
       <div class="main-content">
         <header class="page-header">
           <h1>HOME PAGE</h1>
-          <div class="header-actions">
+
+          <!-- Bulk Actions khi có project được chọn -->
+          <div v-if="selectedProjects.length > 0" class="bulk-actions">
+            <span class="selected-count">{{ selectedProjects.length }} selected</span>
+            <button
+              v-if="currentView !== 'trash'"
+              @click="bulkMoveToTrash"
+              class="btn-bulk btn-bulk-delete"
+            >
+              <span class="material-symbols-outlined">delete</span>
+              Move to Trash
+            </button>
+            <button
+              v-if="currentView === 'trash'"
+              @click="bulkRestore"
+              class="btn-bulk btn-bulk-restore"
+            >
+              <span class="material-symbols-outlined">restore</span>
+              Restore
+            </button>
+            <button
+              v-if="currentView === 'trash'"
+              @click="bulkDeletePermanently"
+              class="btn-bulk btn-bulk-delete"
+            >
+              <span class="material-symbols-outlined">delete_forever</span>
+              Delete Permanently
+            </button>
+            <button @click="clearSelection" class="btn-bulk btn-bulk-cancel">
+              <span class="material-symbols-outlined">close</span>
+              Cancel
+            </button>
+          </div>
+
+          <div v-else class="header-actions">
             <button @click="openInvitationsModal" class="btn-icon invitations-btn">
               <span class="material-symbols-outlined">group</span>
               <span v-if="sentInvitations.length > 0" class="invitation-badge">
@@ -75,16 +122,84 @@
                   class="search-input"
                 />
               </div>
-              <select v-model="languageFilter" class="filter-select">
-                <option value="">All Languages</option>
-                <option value="vi-VN">Vietnamese</option>
-                <option value="en-US">English</option>
-              </select>
-              <select v-model="sortBy" class="filter-select">
-                <option value="updatedAt">Last Updated</option>
-                <option value="createdAt">Date Created</option>
-                <option value="name">Name</option>
-              </select>
+              <div class="filter-icon-wrapper">
+                <button 
+                  class="filter-icon-btn" 
+                  @click.stop="toggleLanguageFilter"
+                  :title="getLanguageFilterLabel()"
+                >
+                  <span class="material-symbols-outlined">language</span>
+                </button>
+                <div 
+                  v-if="showLanguageFilter" 
+                  class="filter-dropdown-menu"
+                  @click.stop
+                >
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: languageFilter === '' }"
+                    @click="setLanguageFilter('')"
+                  >
+                    <span class="material-symbols-outlined">public</span>
+                    All Languages
+                  </button>
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: languageFilter === 'vi-VN' }"
+                    @click="setLanguageFilter('vi-VN')"
+                  >
+                    <span class="material-symbols-outlined">flag</span>
+                    Vietnamese
+                  </button>
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: languageFilter === 'en-US' }"
+                    @click="setLanguageFilter('en-US')"
+                  >
+                    <span class="material-symbols-outlined">flag</span>
+                    English
+                  </button>
+                </div>
+              </div>
+              <div class="filter-icon-wrapper">
+                <button 
+                  class="filter-icon-btn" 
+                  @click.stop="toggleSortFilter"
+                  :title="getSortFilterLabel()"
+                >
+                  <span class="material-symbols-outlined">sort</span>
+                </button>
+                <div 
+                  v-if="showSortFilter" 
+                  class="filter-dropdown-menu"
+                  @click.stop
+                >
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: sortBy === 'updatedAt' }"
+                    @click="setSortBy('updatedAt')"
+                  >
+                    <span class="material-symbols-outlined">schedule</span>
+                    Last Updated
+                  </button>
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: sortBy === 'createdAt' }"
+                    @click="setSortBy('createdAt')"
+                  >
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    Date Created
+                  </button>
+                  <button 
+                    class="filter-option" 
+                    :class="{ active: sortBy === 'name' }"
+                    @click="setSortBy('name')"
+                  >
+                    <span class="material-symbols-outlined">text_fields</span>
+                    Name
+                  </button>
+                </div>
+              </div>
             </div>
             <div class="filter-stats">
               <span class="stat-text">{{ filteredProjects.length }} projects found</span>
@@ -94,46 +209,27 @@
             </div>
           </div>
 
-          <!-- Hiển thị projects đang được tạo -->
-          <div
-            v-if="filteredCreatingProjects.length > 0 && currentView !== 'trash'"
-            class="projects-view creating-projects-section"
-          >
-            <div class="section-header">
-              <h2>Creating Projects</h2>
-              <p>{{ filteredCreatingProjects.length }} project(s) in progress</p>
-            </div>
-            <div class="projects-grid">
-              <ProjectCard
-                v-for="p in filteredCreatingProjects"
-                :key="p._id"
-                :project="p"
-                :user="user"
-                :is-creating="true"
-                @open="openProject"
-                @retry-creation="retryCreatingProject"
-                @leave="handleLeaveProject"
-              />
-            </div>
-          </div>
-
           <!-- Recent Projects -->
           <div v-if="currentView === 'recent-projects'" class="projects-view">
             <div class="section-header">
               <h2>Recent Projects</h2>
-              <p>Your recently accessed projects</p>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
                 v-for="p in filteredProjects"
                 :key="p._id"
                 :project="p"
-                :user="user"
+                :show-multi-select="isMultiSelectMode"
+                :is-selected="selectedProjects.includes(p._id)"
                 @open="openProject"
                 @edit="handleEditProject"
                 @delete="confirmMoveToTrash"
                 @share="openShareModal"
                 @leave="handleLeaveProject"
+                @restore="restoreProject"
+                @delete-permanently="confirmDeletePermanently"
+                @selection-toggle="handleSelectionToggle"
+                @open-preview="openPreviewModal"
               />
             </div>
             <div v-else class="empty-state">
@@ -153,19 +249,23 @@
           <div v-if="currentView === 'my-projects'" class="projects-view">
             <div class="section-header">
               <h2>My Projects</h2>
-              <p>Projects you own</p>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
                 v-for="p in filteredProjects"
                 :key="p._id"
                 :project="p"
-                :user="user"
+                :show-multi-select="isMultiSelectMode"
+                :is-selected="selectedProjects.includes(p._id)"
                 @open="openProject"
                 @edit="handleEditProject"
                 @delete="confirmMoveToTrash"
                 @share="openShareModal"
                 @leave="handleLeaveProject"
+                @restore="restoreProject"
+                @delete-permanently="confirmDeletePermanently"
+                @selection-toggle="handleSelectionToggle"
+                @open-preview="openPreviewModal"
               />
             </div>
             <div v-else class="empty-state">
@@ -185,19 +285,23 @@
           <div v-if="currentView === 'shared-projects'" class="projects-view">
             <div class="section-header">
               <h2>Shared Projects</h2>
-              <p>Projects shared with you</p>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
                 v-for="p in filteredProjects"
                 :key="p._id"
                 :project="p"
-                :user="user"
+                :show-multi-select="isMultiSelectMode"
+                :is-selected="selectedProjects.includes(p._id)"
                 @open="openProject"
                 @edit="handleEditProject"
                 @delete="confirmMoveToTrash"
                 @share="openShareModal"
                 @leave="handleLeaveProject"
+                @restore="restoreProject"
+                @delete-permanently="confirmDeletePermanently"
+                @selection-toggle="handleSelectionToggle"
+                @open-preview="openPreviewModal"
               />
             </div>
             <div v-else class="empty-state">
@@ -220,12 +324,17 @@
                 v-for="p in trashedProjects"
                 :key="p._id"
                 :project="p"
-                :user="user"
                 :is-trashed="true"
-                @restore="restoreProject"
-                @delete-permanently="confirmDeletePermanently"
+                :show-multi-select="isMultiSelectMode"
+                :is-selected="selectedProjects.includes(p._id)"
+                @open="openProject"
+                @edit="handleEditProject"
+                @delete="confirmMoveToTrash"
                 @share="openShareModal"
                 @leave="handleLeaveProject"
+                @restore="restoreProject"
+                @delete-permanently="confirmDeletePermanently"
+                @selection-toggle="handleSelectionToggle"
               />
             </div>
             <div v-else class="empty-state">
@@ -242,9 +351,7 @@
 
     <NewProjectModal
       :show="isNewProjectModalVisible"
-      :creating-projects="creatingProjects"
       @close="closeNewProjectModal"
-      @close-during-creation="handleCloseDuringCreation"
       @project-created="handleProjectCreated"
     />
     <PersonalInfor
@@ -266,6 +373,7 @@
       :is-confirmation="modalContent.isConfirmation"
       @confirm="modalContent.onConfirm"
     />
+
     <!-- Modal xem invitations -->
     <InvitationsModal
       v-if="isInvitationsModalVisible"
@@ -288,6 +396,7 @@ import NewProjectModal from '@/components/NewProjectForm.vue'
 import ProjectCard from '@/components/ProjectCard.vue'
 import AppModal from '@/components/AppModal.vue'
 import InvitationsModal from '@/components/InvitationsModal.vue'
+import PreviewModal from '@/components/PreviewModal.vue'
 import {
   getMyProjects,
   getSharedProjects,
@@ -297,8 +406,6 @@ import {
   getTrashedProjects,
   restoreProject as apiRestoreProject,
   updateProject,
-  getVersionStatus,
-  retryProjectAnalysis,
 } from '@/api/project'
 import {
   getMyInvitations,
@@ -310,6 +417,7 @@ import {
 } from '@/api/share'
 import { getUserInfo, logout as authLogout } from '@/utils/authGuard'
 import { socket } from '@/utils/socket'
+import eventBus from '@/utils/eventBus'
 
 export default {
   name: 'Homepage',
@@ -321,6 +429,7 @@ export default {
     PersonalInfor,
     ProjectSharingModal,
     InvitationsModal,
+    PreviewModal,
   },
   data() {
     return {
@@ -336,30 +445,46 @@ export default {
       myProjects: [],
       sharedProjects: [],
       trashedProjects: [],
-      creatingProjects: [],
       isAppModalVisible: false,
+      refreshTrigger: 0,
       modalContent: {
         title: '',
         message: '',
         isConfirmation: false,
         onConfirm: () => {},
       },
-      pollingIntervals: {},
+      isPreviewModalVisible: false,
+      previewData: {
+        projectId: '',
+        versionId: '',
+        versionData: null,
+      },
       toast: useToast(),
 
       // Filter states
       searchQuery: '',
       languageFilter: '',
       sortBy: 'updatedAt',
+      showLanguageFilter: false,
+      showSortFilter: false,
       isNotificationsVisible: false,
       myInvitations: [],
       sentInvitations: [],
       isMobile: false,
+
+      // Multi-select states
+      isMultiSelectMode: false,
+      selectedProjects: [],
+
+      // Refresh tracking
+      lastPreviewProjectId: null,
+      lastPreviewVersionId: null,
     }
   },
   mounted() {
     this.checkMobile()
     window.addEventListener('resize', this.checkMobile)
+    document.addEventListener('click', this.handleClickOutside)
 
     socket.on('notification', (data) => {
       console.log('📩 Realtime notification received:', data)
@@ -401,11 +526,6 @@ export default {
       }
       return labels[this.languageFilter] || this.languageFilter
     },
-    filteredCreatingProjects() {
-      return this.creatingProjects.filter((project) =>
-        project.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      )
-    },
     filteredProjects() {
       let filtered = this.currentProjects.filter(
         (project) =>
@@ -437,23 +557,289 @@ export default {
     this.fetchInitialData()
   },
   beforeUnmount() {
-    this.cleanupAllPolling()
     window.removeEventListener('resize', this.checkMobile)
+    document.removeEventListener('click', this.handleClickOutside)
     if (socket) {
       socket.off('notification')
       console.log('🧹 Socket listener removed on unmount')
     }
   },
+  watch: {
+    filteredProjects: {
+      handler(newVal) {
+        console.log('🔄 filteredProjects updated:', newVal.length, 'projects')
+      },
+      deep: true,
+    },
+    currentProjects: {
+      handler(newVal) {
+        console.log('🔄 currentProjects updated:', newVal.length, 'projects')
+      },
+      deep: true,
+    },
+  },
+
   methods: {
+    // Filter dropdown methods
+    toggleLanguageFilter() {
+      this.showLanguageFilter = !this.showLanguageFilter
+      this.showSortFilter = false
+    },
+    toggleSortFilter() {
+      this.showSortFilter = !this.showSortFilter
+      this.showLanguageFilter = false
+    },
+    setLanguageFilter(value) {
+      this.languageFilter = value
+      this.showLanguageFilter = false
+    },
+    setSortBy(value) {
+      this.sortBy = value
+      this.showSortFilter = false
+    },
+    getLanguageFilterLabel() {
+      if (this.languageFilter === '') return 'All Languages'
+      return this.languageLabel
+    },
+    getSortFilterLabel() {
+      const labels = {
+        updatedAt: 'Last Updated',
+        createdAt: 'Date Created',
+        name: 'Name',
+      }
+      return labels[this.sortBy] || 'Sort'
+    },
+    handleClickOutside(event) {
+      if (!event.target.closest('.filter-icon-wrapper')) {
+        this.showLanguageFilter = false
+        this.showSortFilter = false
+      }
+    },
+    // Multi-select methods
+    toggleMultiSelectMode() {
+      this.isMultiSelectMode = !this.isMultiSelectMode
+      if (!this.isMultiSelectMode) {
+        this.selectedProjects = []
+      }
+    },
+
+    handleSelectionToggle(projectId) {
+      const index = this.selectedProjects.indexOf(projectId)
+      if (index > -1) {
+        this.selectedProjects.splice(index, 1)
+      } else {
+        this.selectedProjects.push(projectId)
+      }
+    },
+
+    clearSelection() {
+      this.selectedProjects = []
+      this.isMultiSelectMode = false
+    },
+
+    async bulkMoveToTrash() {
+      if (this.selectedProjects.length === 0) return
+
+      this.showConfirmation(
+        'Confirm Bulk Move to Trash',
+        `Are you sure you want to move ${this.selectedProjects.length} project(s) to trash?`,
+        async () => {
+          try {
+            const promises = this.selectedProjects.map((projectId) => deleteProject(projectId))
+            await Promise.all(promises)
+            this.toast.success(
+              `Moved ${this.selectedProjects.length} project(s) to trash successfully!`
+            )
+            this.clearSelection()
+            this.fetchInitialData()
+          } catch (err) {
+            console.error('Bulk move to trash error', err)
+            this.toast.error('Failed to move some projects to trash!')
+          }
+        }
+      )
+    },
+
+    async bulkRestore() {
+      if (this.selectedProjects.length === 0) return
+
+      this.showConfirmation(
+        'Confirm Bulk Restore',
+        `Are you sure you want to restore ${this.selectedProjects.length} project(s)?`,
+        async () => {
+          try {
+            const promises = this.selectedProjects.map((projectId) => apiRestoreProject(projectId))
+            await Promise.all(promises)
+            this.toast.success(`Restored ${this.selectedProjects.length} project(s) successfully!`)
+            this.clearSelection()
+            this.fetchInitialData()
+          } catch (err) {
+            console.error('Bulk restore error', err)
+            this.toast.error('Failed to restore some projects!')
+          }
+        }
+      )
+    },
+
+    async bulkDeletePermanently() {
+      if (this.selectedProjects.length === 0) return
+
+      this.showConfirmation(
+        'Confirm Bulk Permanent Deletion',
+        `This action is irreversible. Are you sure you want to permanently delete ${this.selectedProjects.length} project(s)?`,
+        async () => {
+          try {
+            const promises = this.selectedProjects.map((projectId) => deleteProject(projectId))
+            await Promise.all(promises)
+            this.toast.success(
+              `Permanently deleted ${this.selectedProjects.length} project(s) successfully!`
+            )
+            this.clearSelection()
+            this.fetchInitialData()
+          } catch (err) {
+            console.error('Bulk permanent delete error', err)
+            this.toast.error('Failed to permanently delete some projects!')
+          }
+        }
+      )
+    },
+
+    /**
+     * Mở Preview Modal khi click vào changes indicator
+     */
+    openPreviewModal(data) {
+      this.previewData = {
+        projectId: data.projectId,
+        versionId: data.versionId,
+        versionData: data.versionData,
+      }
+      
+      // Lưu thông tin preview để refresh sau này
+      this.lastPreviewProjectId = data.projectId
+      this.lastPreviewVersionId = data.versionId
+      
+      this.isPreviewModalVisible = true
+    },
+
+    /**
+     * Xử lý khi modal sắp đóng - refresh data trước khi đóng
+     */
+    async handlePreviewModalClosing(previewInfo) {
+      console.log('🔄 Preview modal closing, refreshing data...', previewInfo)
+      
+      // Refresh data ngay lập tức trước khi modal đóng hoàn toàn
+      await this.refreshProjectDataImmediately(previewInfo)
+    },
+
+    /**
+     * Đóng Preview Modal
+     */
+    async closePreviewModal() {
+      console.log('🔒 Closing preview modal')
+      
+      // Đóng modal trước
+      this.isPreviewModalVisible = false
+      
+      // Reset preview data
+      this.previewData = {
+        projectId: '',
+        versionId: '',
+        versionData: null,
+      }
+      
+      console.log('✅ Modal closed')
+    },
+
+    /**
+     * Refresh data ngay lập tức với retry mechanism
+     */
+    async refreshProjectDataImmediately(previewInfo = null) {
+      const maxRetries = 2
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          console.log(`🔄 Refreshing project data (attempt ${attempt}/${maxRetries})...`)
+          
+          // Refresh tất cả data
+          await this.fetchInitialData()
+          
+          // Thêm delay nhỏ để đảm bảo Vue đã update DOM
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          console.log('✅ Project data refreshed successfully')
+          break // Thành công, thoát khỏi vòng lặp
+          
+        } catch (error) {
+          console.error(`❌ Attempt ${attempt} failed:`, error)
+          
+          if (attempt === maxRetries) {
+            this.toast.error('Failed to refresh project data')
+          } else {
+            // Chờ trước khi retry
+            await new Promise(resolve => setTimeout(resolve, 300 * attempt))
+          }
+        }
+      }
+    },
+
+    /**
+     * Xử lý khi có changes được updated trong modal
+     */
+    async handleChangesUpdated(event) {
+      console.log('🔄 Changes updated in modal, refreshing data...', event)
+      
+      // Emit event để ProjectCard có thể refresh
+      if (event && event.projectId) {
+        eventBus.emit('project-changes-updated', event)
+      }
+      
+      await this.refreshProjectDataImmediately()
+    },
+
+    /**
+     * Xử lý khi changes được approved
+     */
+    async handlePreviewApproved(result) {
+      console.log('✅ Changes approved:', result)
+      this.toast.success(`Version ${result.newVersion} created successfully!`)
+      
+      // Refresh project data để cập nhật version mới và changes count
+      await this.refreshProjectDataImmediately()
+      
+      // Emit event global để các trang khác biết version mới được approve
+      if (result.version && result.version._id) {
+        eventBus.emit('version-approved', {
+          projectId: this.previewData.projectId,
+          versionId: result.version._id,
+          version: result.version,
+          newVersion: result.newVersion,
+        })
+        console.log('📢 Emitted version-approved event:', {
+          projectId: this.previewData.projectId,
+          versionId: result.version._id,
+          newVersion: result.newVersion,
+        })
+
+        // Emit socket event để các thành viên khác biết version mới được tạo
+        if (socket && socket.connected) {
+          const userId = localStorage.getItem('userId')
+          socket.emit('version_event', {
+            type: 'VERSION_CREATED',
+            projectId: this.previewData.projectId,
+            versionId: result.version._id,
+            userId: userId,
+            version: result.version,
+            timestamp: new Date(),
+          })
+          console.log('📡 Emitted VERSION_CREATED socket event')
+        }
+      }
+    },
+
     checkMobile() {
       this.isMobile = window.innerWidth <= 768
     },
-    cleanupAllPolling() {
-      Object.values(this.pollingIntervals).forEach((interval) => {
-        clearInterval(interval)
-      })
-      this.pollingIntervals = {}
-    },
+
     async fetchMyInvitationsRealtime() {
       try {
         const invRes = await getMyInvitations()
@@ -472,6 +858,7 @@ export default {
         console.error('❌ Failed to fetch invitations via socket:', error)
       }
     },
+
     async fetchInitialData() {
       try {
         const [userRes, myRes, sharedRes, recentRes, trashedRes, invRes] = await Promise.all([
@@ -490,25 +877,21 @@ export default {
         this.trashedProjects = trashedRes.data?.data || []
 
         this.myInvitations = (invRes.data?.data || []).map((inv) => ({
-          ...inv, // ✅ Giữ nguyên tất cả data từ BE
-          // Chỉ thêm id nếu cần
+          ...inv,
           id: inv.invite_id || inv._id,
         }))
 
-        console.log(
-          '📥 Loaded invitations:',
-          this.myInvitations.map((inv) => ({
-            id: inv.id,
-            project: inv.projectName,
-            hasToken: !!inv.invite_token,
-          }))
-        )
+        console.log('📥 Loaded data:', {
+          myProjects: this.myProjects.length,
+          sharedProjects: this.sharedProjects.length,
+          recentProjects: this.recentProjects.length,
+          trashedProjects: this.trashedProjects.length,
+        })
 
         this.loadSentInvitations()
 
-        this.$nextTick(() => {
-          this.restoreRetryProcesses()
-        })
+        // Force update để đảm bảo UI được render lại
+        this.$forceUpdate()
       } catch (err) {
         console.error('Failed to fetch initial data:', err)
         if (err.response?.status === 401 || err.response?.status === 400) {
@@ -516,6 +899,7 @@ export default {
         }
       }
     },
+
     async handleLeaveProject(projectId) {
       try {
         console.log('Leaving project:', projectId)
@@ -534,9 +918,11 @@ export default {
         }
       }
     },
+
     toggleNotifications() {
       this.isNotificationsVisible = !this.isNotificationsVisible
     },
+
     async handleAcceptInvitation(inv) {
       try {
         console.log('🎯 Accepting invitation:', {
@@ -579,6 +965,7 @@ export default {
         }
       }
     },
+
     async handleRejectInvitation(inv) {
       try {
         console.log('🎯 Rejecting invitation:', {
@@ -619,17 +1006,21 @@ export default {
         }
       }
     },
+
     openPersonalInfo() {
       this.showPersonalInfo = true
     },
+
     openShareModal(project) {
       this.selectedProject = project
       this.isShareModalVisible = true
     },
+
     closeShareModal() {
       this.isShareModalVisible = false
       this.fetchInitialData()
     },
+
     showNotification(title, message) {
       this.modalContent = {
         title,
@@ -638,6 +1029,7 @@ export default {
       }
       this.isAppModalVisible = true
     },
+
     showConfirmation(title, message, onConfirm) {
       this.modalContent = {
         title,
@@ -647,9 +1039,11 @@ export default {
       }
       this.isAppModalVisible = true
     },
+
     openNewProjectModal() {
       this.isNewProjectModalVisible = true
     },
+
     closeNewProjectModal() {
       this.isNewProjectModalVisible = false
       if (this.creationSuccess) {
@@ -657,219 +1051,20 @@ export default {
         this.creationSuccess = false
       }
     },
-    handleCloseDuringCreation(creationData) {
-      console.log('📝 Received creation data:', creationData)
 
-      if (!creationData.pollingData?.versionId) {
-        console.error('❌ No versionId provided for polling')
-        this.toast.error('Cannot track project creation progress. Please check the project later!')
-        this.isNewProjectModalVisible = false
-        return
-      }
-
-      const tempProject = {
-        _id: 'creating-' + Date.now(),
-        name: creationData.projectData.name,
-        description: creationData.projectData.description,
-        status: 'creating',
-        processingProgress: creationData.processingProgress || 0,
-        currentStage: creationData.currentStage || 'Initializing...',
-        creationStatus: creationData.creationStatus || 'polling',
-        isTemp: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        members: [],
-        pollingData: creationData.pollingData,
-      }
-
-      this.creatingProjects.unshift(tempProject)
-      this.isNewProjectModalVisible = false
-
-      this.startPollingForProject(tempProject._id, creationData.pollingData)
-
-      if (this.currentView !== 'my-projects') {
-        this.navigateTo('my-projects')
-      }
-    },
-    restoreRetryProcesses() {
-      const retryKeys = Object.keys(localStorage).filter((key) => key.startsWith('retry_'))
-
-      retryKeys.forEach((key) => {
-        try {
-          const retryState = JSON.parse(localStorage.getItem(key))
-          if (retryState && retryState.type === 'retry') {
-            console.log('🔄 Restoring retry process:', retryState)
-
-            const existingIndex = this.creatingProjects.findIndex(
-              (p) => p.pollingData?.projectId === retryState.projectId && p.isRetry
-            )
-
-            if (existingIndex === -1) {
-              const tempProject = {
-                _id: `retry-${Date.now()}`,
-                name: retryState.projectName,
-                description: retryState.projectDescription,
-                status: 'retrying',
-                processingProgress: retryState.processingProgress || 0,
-                currentStage: retryState.currentStage || 'Initializing...',
-                creationStatus: 'polling',
-                isTemp: true,
-                isRetry: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                members: [],
-                pollingData: {
-                  projectId: retryState.projectId,
-                  versionId: retryState.versionId,
-                  projectName: retryState.projectName,
-                  projectDescription: retryState.projectDescription,
-                  type: 'retry',
-                },
-              }
-
-              this.creatingProjects.unshift(tempProject)
-              this.startPollingForProject(tempProject._id, tempProject.pollingData)
-            }
-          }
-        } catch (error) {
-          console.error('Error restoring retry process:', error)
-          localStorage.removeItem(key)
-        }
-      })
-    },
-    startPollingForProject(tempProjectId, pollingData) {
-      console.log('🚀 Starting polling for project:', tempProjectId, pollingData)
-
-      const interval = setInterval(async () => {
-        try {
-          const response = await getVersionStatus(pollingData.versionId)
-          const { status, version, project } = response.data.data
-
-          console.log('📊 Polling update:', {
-            tempProjectId,
-            status,
-            progress: version?.progress,
-            stage: version?.stage,
-          })
-
-          this.updateCreatingProjectProgress(tempProjectId, {
-            processingProgress: version?.progress || 0,
-            currentStage: version?.stage || 'Processing',
-            creationStatus: status,
-          })
-
-          if (pollingData.type === 'retry') {
-            const retryState = {
-              projectId: pollingData.projectId,
-              versionId: pollingData.versionId,
-              projectName: pollingData.projectName,
-              projectDescription: pollingData.projectDescription,
-              processingProgress: version?.progress || 0,
-              currentStage: version?.stage || 'Processing',
-              timestamp: new Date().getTime(),
-              type: 'retry',
-            }
-            localStorage.setItem(`retry_${pollingData.projectId}`, JSON.stringify(retryState))
-          }
-
-          if (status !== 'processing') {
-            const isReallyCompleted =
-              status === 'completed' ||
-              status === 'has_conflicts' ||
-              version?.progress === 100 ||
-              version?.stage === 'completed'
-
-            if (isReallyCompleted) {
-              clearInterval(interval)
-              delete this.pollingIntervals[tempProjectId]
-
-              if (pollingData.type === 'retry') {
-                localStorage.removeItem(`retry_${pollingData.projectId}`)
-              }
-
-              this.updateCreatingProjectProgress(tempProjectId, {
-                processingProgress: 100,
-                currentStage: 'Completed',
-                creationStatus: 'completed',
-              })
-
-              setTimeout(() => {
-                this.moveCreatingToRealProject(tempProjectId, project)
-              }, 2000)
-            }
-          }
-        } catch (error) {
-          console.error('Polling error:', error)
-          if (this.pollingIntervals[tempProjectId]?.retryCount > 3) {
-            clearInterval(interval)
-            delete this.pollingIntervals[tempProjectId]
-            this.markCreatingProjectFailed(tempProjectId)
-          } else {
-            this.pollingIntervals[tempProjectId].retryCount =
-              (this.pollingIntervals[tempProjectId]?.retryCount || 0) + 1
-          }
-        }
-      }, 3000)
-
-      this.pollingIntervals[tempProjectId] = {
-        interval,
-        retryCount: 0,
-      }
-    },
-    updateCreatingProjectProgress(tempProjectId, progressData) {
-      const projectIndex = this.creatingProjects.findIndex((p) => p._id === tempProjectId)
-      if (projectIndex !== -1) {
-        this.creatingProjects[projectIndex] = {
-          ...this.creatingProjects[projectIndex],
-          processingProgress: progressData.processingProgress,
-          currentStage: progressData.currentStage,
-          creationStatus: progressData.creationStatus,
-          updatedAt: new Date().toISOString(),
-        }
-      }
-    },
-    moveCreatingToRealProject(tempProjectId, realProject) {
-      const projectIndex = this.creatingProjects.findIndex((p) => p._id === tempProjectId)
-      if (projectIndex !== -1) {
-        this.creatingProjects.splice(projectIndex, 1)
-        this.myProjects.unshift(realProject)
-        this.recentProjects.unshift(realProject)
-        this.toast.success(`Project created successfully!`)
-      }
-    },
-    markCreatingProjectFailed(tempProjectId) {
-      const projectIndex = this.creatingProjects.findIndex((p) => p._id === tempProjectId)
-      if (projectIndex !== -1) {
-        this.creatingProjects[projectIndex] = {
-          ...this.creatingProjects[projectIndex],
-          creationStatus: 'failed',
-          currentStage: 'Failed',
-          processingProgress: 0,
-        }
-
-        const project = this.creatingProjects[projectIndex]
-        if (project.pollingData?.type === 'retry') {
-          localStorage.removeItem(`retry_${project.pollingData.projectId}`)
-        }
-
-        setTimeout(() => {
-          this.creatingProjects = this.creatingProjects.filter((p) => p._id !== tempProjectId)
-        }, 30000)
-      }
-    },
     handleProjectCreated(newProject) {
       if (newProject) {
-        this.creatingProjects = this.creatingProjects.filter(
-          (p) => !p._id.includes('creating-') || p.name !== newProject.name
-        )
         this.myProjects.unshift(newProject)
         this.recentProjects.unshift(newProject)
       }
       this.creationSuccess = true
     },
+
     navigateTo(view) {
       this.currentView = view
+      this.clearSelection()
     },
+
     async handleEditProject({ projectId, data }) {
       try {
         await updateProject(projectId, data)
@@ -880,6 +1075,7 @@ export default {
         this.toast.error(`Failed to update project!`)
       }
     },
+
     updateProjectInLists(projectId, newData) {
       const updateProjectInArray = (array) => {
         const index = array.findIndex((p) => (p._id || p.id) === projectId)
@@ -891,23 +1087,15 @@ export default {
       updateProjectInArray(this.recentProjects)
       updateProjectInArray(this.myProjects)
       updateProjectInArray(this.sharedProjects)
-      updateProjectInArray(this.creatingProjects)
     },
-    cleanupOldCreatingProjects() {
-      const now = new Date().getTime()
-      this.creatingProjects = this.creatingProjects.filter((p) => {
-        if (p.isTemp) {
-          const createdTime = new Date(p.createdAt).getTime()
-          return now - createdTime < 7200000 // 2 giờ
-        }
-        return true
-      })
-    },
+
     openProject(project) {
-      if (project.isTemp) return
+      if (this.isMultiSelectMode) return
+
       const id = project._id || project.id
       if (id) this.$router.push({ name: 'Editor', params: { id } })
     },
+
     confirmMoveToTrash(projectId) {
       this.showConfirmation(
         'Confirm Move to Trash',
@@ -915,6 +1103,7 @@ export default {
         () => this.moveToTrash(projectId)
       )
     },
+
     async moveToTrash(projectId) {
       try {
         await deleteProject(projectId)
@@ -925,6 +1114,7 @@ export default {
         this.toast.error(`Failed to trash project!`)
       }
     },
+
     async restoreProject(projectId) {
       try {
         await apiRestoreProject(projectId)
@@ -935,6 +1125,7 @@ export default {
         this.toast.error(`Failed to restore project!`)
       }
     },
+
     confirmDeletePermanently(projectId) {
       this.showConfirmation(
         'Confirm Permanent Deletion',
@@ -942,6 +1133,7 @@ export default {
         () => this.deleteProjectPermanently(projectId)
       )
     },
+
     async deleteProjectPermanently(projectId) {
       try {
         await deleteProject(projectId)
@@ -952,6 +1144,7 @@ export default {
         this.toast.error(`Failed to permanently delete project!`)
       }
     },
+
     async logout() {
       console.log('🚪 Logged out')
       if (socket && socket.connected) {
@@ -961,6 +1154,7 @@ export default {
       await authLogout()
       this.$router.push('/login')
     },
+
     handleAvatarUpdated(avatarData) {
       console.log('🔄 Avatar updated in PersonalInfo:', avatarData)
 
@@ -970,6 +1164,7 @@ export default {
         this.fetchUserData()
       }
     },
+
     async fetchUserData() {
       try {
         const userRes = await getCurrentUser()
@@ -979,14 +1174,17 @@ export default {
         console.error('❌ Failed to refresh user data:', error)
       }
     },
+
     // INVITATION MODAL METHODS
     openInvitationsModal() {
       this.isInvitationsModalVisible = true
       this.loadSentInvitations()
     },
+
     closeInvitationsModal() {
       this.isInvitationsModalVisible = false
     },
+
     async loadSentInvitations() {
       try {
         const myProjects = await getMyProjects()
@@ -1034,6 +1232,7 @@ export default {
         this.toast.error('Failed to load sent invitations')
       }
     },
+
     async handleCancelInvite(invitation) {
       try {
         await cancelInvite(invitation.project_id, invitation.invitee._id)
@@ -1049,37 +1248,6 @@ export default {
         this.toast.error('Failed to cancel invitation')
       }
     },
-    async retryCreatingProject(projectData) {
-      try {
-        const userId = localStorage.getItem('userId')
-        if (!userId) {
-          console.error('❌ User ID not found for retry')
-          this.toast.error('User identification required for retry')
-          return
-        }
-
-        console.log('🔄 Retrying project creation:', projectData)
-
-        await retryProjectAnalysis(
-          projectData.pollingData.projectId,
-          projectData.pollingData.versionId,
-          userId
-        )
-
-        this.updateCreatingProjectProgress(projectData._id, {
-          processingProgress: 0,
-          currentStage: 'Initializing...',
-          creationStatus: 'polling',
-        })
-
-        this.startPollingForProject(projectData._id, projectData.pollingData)
-
-        this.toast.success('Retry started successfully!')
-      } catch (error) {
-        console.error('❌ Retry error:', error)
-        this.toast.error('Failed to start retry process')
-      }
-    },
   },
 }
 </script>
@@ -1087,9 +1255,20 @@ export default {
 <style scoped>
 .homepage {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f9fafb;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
   min-height: 100vh;
   overflow: hidden;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .app-container {
@@ -1106,29 +1285,115 @@ export default {
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE và Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .main-content::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
 }
 
 .page-header {
-  padding: 20px 30px;
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #ffffff;
+  padding: 24px 32px;
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  min-height: 80px;
+  box-shadow: 0 2px 12px rgba(26, 54, 93, 0.08);
+  position: relative;
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, #1a365d 0%, #2d4a8a 100%);
+  border-radius: 2px;
 }
 
 .page-header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a365d;
+  font-size: 1.75rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Bulk Actions */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.selected-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.btn-bulk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-bulk-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-bulk-delete:hover {
+  background: #fecaca;
+}
+
+.btn-bulk-restore {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.btn-bulk-restore:hover {
+  background: #bbf7d0;
+}
+
+.btn-bulk-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-bulk-cancel:hover {
+  background: #e5e7eb;
 }
 
 .header-actions {
@@ -1275,22 +1540,40 @@ export default {
 
 /* Filter Section */
 .filter-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 100%;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.filter-section:hover {
+  box-shadow: 0 6px 28px rgba(26, 54, 93, 0.15), 0 0 0 1px rgba(26, 54, 93, 0.1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filter-controls {
   display: flex;
   gap: 12px;
   align-items: center;
+  /* flex-wrap: wrap; */
 }
 
 .search-input-container {
@@ -1307,18 +1590,28 @@ export default {
 }
 
 .search-input {
-  padding: 10px 12px 10px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  padding: 12px 16px 12px 44px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
   font-size: 0.875rem;
   width: 300px;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
 }
 
 .search-input:focus {
   outline: none;
   border-color: #1a365d;
+  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
+  background: #ffffff;
+  transform: translateY(-1px);
 }
 
 .filter-select {
@@ -1334,6 +1627,111 @@ export default {
 
 .filter-select:focus {
   outline: none;
+  border-color: #1a365d;
+}
+
+/* Filter Icon Buttons */
+.filter-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+}
+
+.filter-icon-btn:hover {
+  background: #f9fafb;
+  border-color: #1a365d;
+  color: #1a365d;
+}
+
+.filter-icon-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-option:hover {
+  background: #f9fafb;
+}
+
+.filter-option.active {
+  background: #e6f2ff;
+  color: #1a365d;
+  font-weight: 500;
+}
+
+.filter-option .material-symbols-outlined {
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.filter-option.active .material-symbols-outlined {
+  color: #1a365d;
+}
+
+/* Multi-select Button */
+.btn-multi-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 150px;
+}
+
+.btn-multi-select:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-multi-select.active {
+  background: #1a365d;
+  color: white;
   border-color: #1a365d;
 }
 
@@ -1376,6 +1774,9 @@ export default {
   margin-bottom: 30px;
   text-align: left;
   max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .section-header h2 {
@@ -1391,30 +1792,28 @@ export default {
   margin: 0;
 }
 
+.trash-actions {
+  display: flex;
+  gap: 12px;
+}
+
 /* Projects Grid */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  gap: 28px;
   max-width: 100%;
   box-sizing: border-box;
+  animation: fadeIn 0.6s ease-out;
 }
 
-/* Creating Projects Section */
-.creating-projects-section {
-  border-bottom: 2px solid #e3f2fd;
-  padding-bottom: 30px;
-  margin-bottom: 30px;
-  max-width: 100%;
-}
-
-.creating-projects-section .section-header h2 {
-  color: #1a365d;
-}
-
-.creating-projects-section .section-header p {
-  color: #2c5282;
-  font-weight: 500;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Empty State */
@@ -1492,10 +1891,23 @@ export default {
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
+    min-height: auto;
   }
 
   .page-header h1 {
     font-size: 1.25rem;
+  }
+
+  .bulk-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-bulk {
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .header-actions {
@@ -1539,8 +1951,23 @@ export default {
     width: 100%;
   }
 
+  .btn-multi-select {
+    width: 100%;
+    justify-content: center;
+  }
+
   .filter-stats {
     justify-content: space-between;
+    width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .trash-actions {
     width: 100%;
   }
 

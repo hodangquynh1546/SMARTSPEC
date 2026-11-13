@@ -54,22 +54,37 @@
             <div v-if="isOpen" class="dropdown-menu">
               <div class="dropdown-header">
                 <span>Select Version</span>
+                <span v-if="!isOwner" class="owner-only-hint">(Owner only)</span>
               </div>
               <div class="version-list">
                 <div
-                  v-for="version in versions"
+                  v-for="version in approvedVersions"
                   :key="version._id"
                   class="version-option"
-                  :class="{ active: version._id === selectedVersionId }"
-                  @click="selectVersion(version)"
+                  :class="{
+                    active: version._id === selectedVersionId,
+                    disabled: !isOwner,
+                  }"
                 >
-                  <div class="version-icon">
-                    <span class="material-symbols-outlined">history</span>
+                  <div class="version-main-content" @click="selectVersion(version)">
+                    <div class="version-icon">
+                      <span class="material-symbols-outlined">history</span>
+                    </div>
+                    <div class="version-details">
+                      <span class="version-number">Version {{ version.version_number }}</span>
+                      <span class="version-date">{{ formatDate(version.created_at) }}</span>
+                    </div>
                   </div>
-                  <div class="version-details">
-                    <span class="version-number">Version {{ version.version_number }}</span>
-                    <span class="version-date">{{ formatDate(version.created_at) }}</span>
-                  </div>
+
+                  <!-- Rollback Button - Only show for current version that can be rolled back -->
+                  <button
+                    v-if="isOwner && version.parent_version_id && version._id === selectedVersionId"
+                    class="rollback-btn"
+                    @click.stop="handleRollback(version)"
+                    title="Rollback to parent version"
+                  >
+                    <span class="material-symbols-outlined">undo</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -85,18 +100,6 @@
             <span class="btn-text">Retry Failed</span>
           </button> -->
         </div>
-
-        <!-- Progress Indicator -->
-        <!-- <div v-if="isRetrying" class="progress-indicator">
-          <div class="progress-header">
-            <span class="stage-name">{{ currentStage }}</span>
-            <span class="progress-percentage">{{ processingProgress }}%</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: processingProgress + '%' }"></div>
-          </div>
-          <div class="stage-description">{{ getStageDescription(currentStage) }}</div>
-        </div> -->
 
         <!-- Active Users Indicator -->
         <div class="active-users-indicator" ref="activeUsersIndicator">
@@ -170,6 +173,13 @@
 </template>
 
 <script>
+import {
+  saveSelectedVersion,
+  getSelectedOrDefaultVersion,
+  filterApprovedVersions,
+  isOwner as checkIsOwner,
+} from '@/utils/versionSync'
+import { rollbackVersion, setCurrentVersion } from '@/api/version'
 export default {
   name: 'ProjectHeaderModern',
   props: {
@@ -181,21 +191,13 @@ export default {
       type: Array,
       default: () => [],
     },
-    selectedVersionId: {
-      type: String,
-      default: null,
-    },
+    // selectedVersionId: {
+    //   type: String,
+    //   default: null,
+    // },
     isRetrying: {
       type: Boolean,
       default: false,
-    },
-    processingProgress: {
-      type: Number,
-      default: 0,
-    },
-    currentStage: {
-      type: String,
-      default: 'Initializing...',
     },
     activeUsers: {
       type: Array,
@@ -208,15 +210,40 @@ export default {
       showDescription: false,
       isOpen: false,
       showActiveUsers: false,
+      isComponentMounted: false,
     }
   },
   computed: {
+    // Lọc bỏ version tạm thời, chỉ hiển thị version đã được approve
+    // Deduplicate theo version_number (ưu tiên version mới nhất hoặc current version)
+    approvedVersions() {
+      // Đảm bảo versions là array
+      const versions = Array.isArray(this.versions) ? this.versions : []
+      const currentVersionId = this.project?.current_version?._id || this.project?.current_version
+      return filterApprovedVersions(versions, currentVersionId)
+    },
     hasFailedVersion() {
-      return this.versions.some((version) => version.status === 'failed')
+      return this.approvedVersions.some((version) => version.status === 'failed')
     },
     selectedLabel() {
-      const version = this.versions.find((v) => v._id === this.selectedVersionId)
-      return version ? `v${version.version_number}` : 'Select version'
+      // Ưu tiên hiển thị version đang được chọn
+      const selectedVersion = this.approvedVersions.find((v) => v._id === this.selectedVersionId)
+      if (selectedVersion) {
+        return `Version ${selectedVersion.version_number}`
+      }
+
+      // Fallback: hiển thị current version từ project
+      const currentVersion = this.approvedVersions.find(
+        (v) => v._id === this.project.current_version
+      )
+      if (currentVersion) {
+        return `Version ${currentVersion.version_number}`
+      }
+
+      // Fallback cuối cùng: hiển thị version đầu tiên hoặc "No version"
+      return this.approvedVersions.length > 0
+        ? `Version ${this.approvedVersions[0].version_number}`
+        : 'No version'
     },
     totalMembersCount() {
       const ownerCount = 1
@@ -225,13 +252,39 @@ export default {
       return ownerCount + acceptedMembers - 1
     },
     currentUserId() {
-      // CÁCH 1: Nếu dùng Vuex store
-      // return this.$store.state.user?.id || this.$store.getters.userId
-
-      // CÁCH 2: Nếu dùng localStorage (hiện tại)
       const userId = localStorage.getItem('userId')
       console.log('🔍 Current User ID from localStorage:', userId)
       return userId
+    },
+    isOwner() {
+      return checkIsOwner(this.project)
+    },
+    // Computed để lấy version hiện tại đang selected
+    currentVersion() {
+      return this.approvedVersions.find((v) => v._id === this.selectedVersionId) || null
+    },
+    selectedVersionId() {
+      // Lấy từ props, attrs, hoặc project
+      return this.$attrs.selectedVersionId || 
+             this.$props.selectedVersionId || 
+             this.project?.current_version?._id ||
+             this.project?.current_version
+    },
+  },
+  watch: {
+    selectedVersionId: {
+      handler(newVal, oldVal) {
+        if (!this.isComponentMounted) return
+
+        if (newVal !== oldVal) {
+          this.$nextTick(() => {
+            if (this.isComponentMounted) {
+              this.$forceUpdate()
+            }
+          })
+        }
+      },
+      immediate: true,
     },
   },
   methods: {
@@ -239,25 +292,102 @@ export default {
       this.showDescription = !this.showDescription
     },
     toggleDropdown() {
+      if (!this.isComponentMounted) return
       this.isOpen = !this.isOpen
       if (this.isOpen) {
         this.showActiveUsers = false
       }
     },
-    selectVersion(version) {
-      this.$emit('version-selected', version._id)
-      this.isOpen = false
+    async selectVersion(version) {
+      if (!this.isComponentMounted) return
+
+      // Chỉ Owner mới được phép select version
+      if (!this.isOwner) {
+        return
+      }
+
+      try {
+        // Gọi API setCurrentVersion thay vì lưu vào localStorage
+        await setCurrentVersion(this.project._id, version._id)
+
+        // Lưu vào localStorage để đồng bộ (nếu cần)
+        saveSelectedVersion(this.project._id, version._id)
+
+        // Emit event để component cha biết
+        this.$emit('version-selected', version._id)
+        this.isOpen = false
+
+        console.log('✅ Version selected successfully:', version.version_number)
+      } catch (error) {
+        console.error('❌ Failed to set current version:', error)
+        // Có thể thêm thông báo lỗi cho user ở đây
+      }
     },
     handleRetry() {
-      const userId = this.currentUserId // LẤY userId từ computed
+      if (!this.isComponentMounted) return
+
+      const userId = this.currentUserId
       if (!userId) {
         console.error('❌ User ID not found for retry operation')
         return
       }
 
-      this.$emit('retry-analysis', userId) // TRUYỀN userId lên component cha
+      this.$emit('retry-analysis', userId)
+    },
+    async handleRollback(version) {
+      if (!this.isComponentMounted) return
+
+      // ✅ Chỉ cho phép rollback current version
+      if (version._id !== this.selectedVersionId) {
+        this.toast.error('Can only rollback the current version')
+        return
+      }
+
+      // ✅ Kiểm tra có parent version không
+      if (!version.parent_version_id) {
+        this.toast.error('This version does not have a parent version to rollback to')
+        return
+      }
+
+      try {
+        // Xác nhận rollback
+        const confirmMessage = `Are you sure you want to rollback from version ${version.version_number}? This will revert all changes and switch to the parent version.`
+        if (!confirm(confirmMessage)) {
+          return
+        }
+
+        // Gọi API rollback (rollback current version về parent)
+        const response = await rollbackVersion(version._id)
+
+        if (response.data && response.data.status === 'Success') {
+          // Tìm parent version để hiển thị
+          const parentVersion = this.versions.find(v => v._id === version.parent_version_id)
+          const parentVersionNumber = parentVersion?.version_number || version.parent_version_id
+
+          this.toast.success(`Successfully rolled back to parent version ${parentVersionNumber}`)
+
+          // Đóng dropdown
+          this.isOpen = false
+
+          // Backend đã tự động set current_version về parent, chỉ cần refresh
+          // Emit event để component cha cập nhật
+          if (parentVersion) {
+            this.$emit('version-selected', parentVersion._id)
+          }
+
+          // Refresh toàn bộ dữ liệu project
+          this.$emit('version-rollback-completed')
+        } else {
+          throw new Error(response.data?.message || 'Rollback failed')
+        }
+      } catch (error) {
+        console.error('Error rolling back version:', error)
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to rollback version'
+        this.toast.error(errorMessage)
+      }
     },
     goBack() {
+      if (!this.isComponentMounted) return
       this.$emit('go-back')
     },
     getStageDescription(stage) {
@@ -272,15 +402,19 @@ export default {
       return descriptions[stage] || 'Processing your request...'
     },
     showSharingModal() {
+      if (!this.isComponentMounted) return
       this.$emit('show-sharing')
     },
     toggleActiveUsers() {
+      if (!this.isComponentMounted) return
       this.showActiveUsers = !this.showActiveUsers
       if (this.showActiveUsers) {
         this.isOpen = false
       }
     },
     handleClickOutside(event) {
+      if (!this.isComponentMounted) return
+
       if (
         this.$refs.activeUsersIndicator &&
         !this.$refs.activeUsersIndicator.contains(event.target)
@@ -303,7 +437,15 @@ export default {
     formatDate(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false, // Sử dụng 24h format, nếu muốn 12h format thì đổi thành true
+      })
     },
     getFullAvatarUrl(avatarUrl) {
       if (!avatarUrl) {
@@ -325,24 +467,28 @@ export default {
       console.log('🔗 Header constructed avatar URL:', fullUrl)
       return fullUrl
     },
-
     handleResize() {
+      if (!this.isComponentMounted) return
+
       // Đóng dropdown khi resize để tránh vị trí không chính xác
       if (window.innerWidth < 768) {
         this.isOpen = false
         this.showActiveUsers = false
       }
     },
-
     // Tối ưu touch events cho mobile
     handleTouchStart(event) {
+      if (!this.isComponentMounted) return
+
       // Ngăn chặn double tap zoom trên các interactive elements
       if (event.target.closest('.selector-header, .active-users-trigger, .version-option')) {
         event.preventDefault()
       }
     },
-    // THÊM: Xử lý lỗi load avatar (từ Sidebar)
+    // Xử lý lỗi load avatar
     handleAvatarError(event) {
+      if (!this.isComponentMounted) return
+
       console.error('❌ Header avatar load failed:', event.target.src)
 
       // Fallback to placeholder
@@ -355,21 +501,42 @@ export default {
         placeholder.style.display = 'flex'
       }
     },
+    // Safe force update method
+    safeForceUpdate() {
+      if (this.isComponentMounted) {
+        this.$forceUpdate()
+      }
+    },
   },
   mounted() {
+    this.isComponentMounted = true
     document.addEventListener('click', this.handleClickOutside)
     window.addEventListener('resize', this.handleResize)
     document.addEventListener('touchstart', this.handleTouchStart, { passive: false })
-  },
 
+
+    console.log('✅ ProjectHeaderModern mounted successfully')
+  },
   beforeUnmount() {
+    this.isComponentMounted = false
+
+    // Remove event listeners
     document.removeEventListener('click', this.handleClickOutside)
     window.removeEventListener('resize', this.handleResize)
     document.removeEventListener('touchstart', this.handleTouchStart)
+    
+
+    console.log('✅ ProjectHeaderModern unmounted cleanly')
+  },
+  // Lifecycle hook để xử lý lỗi
+  errorCaptured(err, vm, info) {
+    console.error('🚨 Error captured in ProjectHeaderModern:', err)
+    console.log('Component:', vm)
+    console.log('Info:', info)
+    return false
   },
 }
 </script>
-
 <style scoped>
 .project-header-modern {
   background: white;
@@ -629,9 +796,25 @@ export default {
   border-bottom: none;
 }
 
-.version-option:hover,
+.version-option:hover:not(.disabled),
 .version-option.active {
   background: #f0f4f8;
+}
+
+.version-option.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.version-option.disabled:hover {
+  background: transparent;
+}
+
+.owner-only-hint {
+  font-size: 0.75rem;
+  color: #8a94a6;
+  font-weight: normal;
+  margin-left: 8px;
 }
 
 .version-icon {
@@ -709,56 +892,6 @@ export default {
   cursor: not-allowed;
 }
 
-/* Progress Indicator */
-.progress-indicator {
-  background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 12px;
-  padding: 16px;
-  min-width: 280px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.stage-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #1a365d;
-}
-
-.progress-percentage {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #1a365d;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #1a365d, #2c5282);
-  border-radius: 4px;
-  transition: width 0.5s ease-in-out;
-}
-
-.stage-description {
-  font-size: 0.75rem;
-  color: #8a94a6;
-  font-style: italic;
-}
 
 /* Active Users Indicator */
 .active-users-indicator {
@@ -1060,7 +1193,6 @@ export default {
   }
 
   .version-control,
-  .progress-indicator,
   .active-users-indicator {
     flex: 1;
     min-width: auto;
@@ -1089,7 +1221,6 @@ export default {
   }
 
   .version-control,
-  .progress-indicator,
   .active-users-indicator {
     width: 30%;
   }
@@ -1257,12 +1388,11 @@ export default {
     position: relative;
   }
   .version-control,
-  .progress-indicator,
   .active-users-indicator,
   .members-btn {
     max-width: calc(30% - 2px);
   }
-  .material-symbols-outlined{
+  .material-symbols-outlined {
     font-size: 14px;
   }
   .selector-header {
@@ -1383,5 +1513,51 @@ export default {
   .dropdown-menu {
     max-height: 40vh;
   }
+}
+.version-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.version-main-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.rollback-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #e53e3e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.rollback-btn:hover {
+  background: #fed7d7;
+  opacity: 1;
+}
+
+.rollback-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.rollback-btn:disabled:hover {
+  background: transparent;
 }
 </style>

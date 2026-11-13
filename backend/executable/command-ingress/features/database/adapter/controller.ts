@@ -18,13 +18,15 @@ export class DatabaseController {
      * Endpoint để sinh schema database từ một version_id.
      */
     public generateDatabaseSchema = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+        // ✅ Khai báo các biến ở đầu function để có thể sử dụng trong catch block
+        const userId = req.getSubject();
+        const { versionId } = req.params || {};
+        
         try {
-            const userId = req.getSubject();
             if (!userId) {
                 handleServiceResponse(new ServiceResponse(ResponseStatus.Failed, "Unauthorized", null, 401), res);
                 return;
             }
-            const { versionId } = req.params;
 
             if (!versionId) {
                 res.status(400).json({ message: "versionId là bắt buộc." });
@@ -37,20 +39,73 @@ export class DatabaseController {
                 return;
             }
 
+            // Lấy usecases từ collection
+            const Usecase = (await import("../../../../../internal/model/usecase")).default;
+            const requirements = await Usecase.find({ version_id: version._id }).lean();
+            
             const payload = {
                 versionId: version._id.toString(),
                 projectId: version.project_id.toString(),
-                requirements: version.requirement_model,
+                requirements: requirements,
             };
 
-            const newDatabase = await this.databaseService.generateSchemaFromRequirements(userId,payload);
+            const newDatabase = await this.databaseService.generateSchemaFromRequirements(userId, payload);
 
             res.status(201).json({
                 message: "Tạo database schema thành công!",
                 data: newDatabase
             });
 
-        } catch (error) {
+        } catch (error: any) {
+            console.error("❌ Error generating database schema:", error);
+
+            // ✅ Emit failed event với errors - các biến đã được khai báo ở đầu function
+            if (userId && versionId) {
+                try {
+                    const version = await VersionModel.findById(versionId);
+                    if (version) {
+                        const { databaseSocketService } = await import('../domain/database.socket.service');
+                        if (databaseSocketService) {
+                            const errorMessage = error.message || 'Failed to generate database schema';
+                            databaseSocketService.emitProgress(
+                                version.project_id.toString(),
+                                versionId,
+                                userId,
+                                100,
+                                'failed',
+                                false,
+                                undefined,
+                                [errorMessage]
+                            );
+                        }
+                    }
+                } catch (socketError) {
+                    console.error("❌ Error emitting failed event:", socketError);
+                }
+            }
+
+            if (error.message?.includes('not found')) {
+                res.status(404).json({
+                    message: error.message
+                });
+                return;
+            }
+
+            if (error.message?.includes('requirements') || error.message?.includes('No requirements')) {
+                res.status(400).json({
+                    message: error.message
+                });
+                return;
+            }
+
+            if (error.message?.includes('API key') || error.message?.includes('Gemini')) {
+                res.status(503).json({
+                    message: "Database generation service temporarily unavailable",
+                    error: error.message
+                });
+                return;
+            }
+
             next(error);
         }
     }
@@ -94,12 +149,23 @@ export class DatabaseController {
                 return;
             }
             const { databaseId } = req.params;
-            const updatedDatabase = await this.databaseService.updateDatabase(userId,databaseId, req.body);
-            if (!updatedDatabase) {
+            const result = await this.databaseService.updateDatabase(userId,databaseId, req.body);
+            // Type guard: kiểm tra result có phải object với property database không
+            if (!result || typeof result !== 'object') {
                 res.status(404).json({ message: "Không tìm thấy database schema để cập nhật." });
                 return;
             }
-            res.status(200).json({ message: "Cập nhật thành công!", data: updatedDatabase });
+            const resultWithDb = result as { database: any; version: any; newVersionId: string };
+            if (!resultWithDb.database) {
+                res.status(404).json({ message: "Không tìm thấy database schema để cập nhật." });
+                return;
+            }
+            res.status(200).json({ 
+                message: "Cập nhật thành công!", 
+                data: resultWithDb.database,
+                version: resultWithDb.version,
+                newVersionId: resultWithDb.newVersionId
+            });
         } catch (error: any) {
             // Xử lý lỗi validation từ service
             if (error.message.includes('foreign key') || error.message.includes('primary key') ||
@@ -121,12 +187,22 @@ export class DatabaseController {
                 return;
             }
             const { databaseId } = req.params;
-            const deletedDatabase = await this.databaseService.deleteDatabase(userId,databaseId);
-            if (!deletedDatabase) {
+            const result = await this.databaseService.deleteDatabase(userId,databaseId);
+            // Type guard: kiểm tra result có phải object với property database không
+            if (!result || typeof result !== 'object') {
                 res.status(404).json({ message: "Không tìm thấy database schema để xóa." });
                 return;
             }
-            res.status(200).json({ message: "Xóa thành công!" });
+            const resultWithDb = result as { database: any; version: any; newVersionId: string };
+            if (!resultWithDb.database) {
+                res.status(404).json({ message: "Không tìm thấy database schema để xóa." });
+                return;
+            }
+            res.status(200).json({ 
+                message: "Xóa thành công!",
+                version: resultWithDb.version,
+                newVersionId: resultWithDb.newVersionId
+            });
         } catch (error) {
             next(error);
         }
@@ -635,13 +711,27 @@ export class DatabaseController {
     public exportDatabaseSQL = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { databaseId } = req.params;
+            const { dialect = 'mysql' } = req.query;
 
-            const sqlStatements = await this.databaseService.exportDatabaseSQL(databaseId);
+            // Validate dialect
+            const validDialects = ['mysql', 'postgresql', 'sqlserver', 'oracle', 'sqlite'];
+            if (!validDialects.includes(dialect as string)) {
+                res.status(400).json({
+                    message: `Invalid dialect. Must be one of: ${validDialects.join(', ')}`
+                });
+                return;
+            }
+
+            const sqlStatements = await this.databaseService.exportDatabaseSQL(
+                databaseId,
+                dialect as 'mysql' | 'postgresql' | 'sqlserver' | 'oracle' | 'sqlite'
+            );
 
             res.status(200).json({
                 message: "Export SQL thành công!",
                 data: {
                     sql: sqlStatements,
+                    dialect: dialect,
                     tablesCount: sqlStatements.split('CREATE TABLE').length - 1
                 }
             });

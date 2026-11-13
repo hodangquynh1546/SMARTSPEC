@@ -54,6 +54,25 @@ export class ActivityDiagramController {
   }
 
 
+  public create = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.getSubject();
+      if (!userId) {
+        handleServiceResponse(new ServiceResponse(ResponseStatus.Failed, "Unauthorized", null, 401), res);
+        return;
+      }
+      const { project_id, version_id, name, description } = req.body;
+      if (!project_id || !version_id || !name) {
+        res.status(400).json({ message: 'project_id, version_id, và name là bắt buộc.' });
+        return;
+      }
+      const result = await this.service.create(project_id, version_id, name, description, userId);
+      res.status(201).json({ message: 'Tạo activity diagram thành công!', data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   public getListActivityDiagram = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { versionId } = req.params;
@@ -150,6 +169,277 @@ export class ActivityDiagramController {
         // Chuyển lỗi khác đến error handler chung
         next(err);
       }
+    }
+  }
+
+  public updateNodePosition = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, nodeId } = req.params;
+      const position = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "ActivityDiagramId is required." });
+        return;
+      }
+      if (!nodeId) {
+        res.status(400).json({ message: "NodeId is required." });
+        return;
+      }
+      if (!position || position.x === undefined || position.y === undefined) {
+        res.status(400).json({ message: "Valid position {x, y} is required." });
+        return;
+      }
+
+      const responseData = await this.service.updateNodePosition(
+        activityDiagramId,
+        nodeId,
+        position
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Update Node Position Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public updateMultipleNodePositions = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId } = req.params;
+      const { nodes } = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "ActivityDiagramId is required." });
+        return;
+      }
+      if (!nodes || !Array.isArray(nodes)) {
+        res.status(400).json({ message: "Valid nodes array is required." });
+        return;
+      }
+
+      const responseData = await this.service.updateMultipleNodePositions(
+        activityDiagramId,
+        nodes
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Update Multiple Node Positions Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // ==================== NODE CRUD ====================
+  public updateNode = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, nodeId } = req.params;
+      const data = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!nodeId) {
+        res.status(400).json({ message: "Node ID is required." });
+        return;
+      }
+      if (!data) {
+        res.status(400).json({ message: "Data is required." });
+        return;
+      }
+
+      const responseData = await this.service.updateNode(
+        activityDiagramId,
+        nodeId,
+        data
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Update Node Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public deleteNode = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, nodeId } = req.params;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!nodeId) {
+        res.status(400).json({ message: "Node ID is required." });
+        return;
+      }
+
+      await this.service.deleteNode(activityDiagramId, nodeId);
+
+      res.status(200).json({
+        status: "Success",
+        message: "Delete Node Successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // ==================== EDGE CRUD ====================
+  public createEdge = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId } = req.params;
+      const data = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!data || !data.from || !data.to) {
+        res.status(400).json({
+          message: "from and to are required."
+        });
+        return;
+      }
+
+      const responseData = await this.service.createEdge(
+        activityDiagramId,
+        data
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Create Edge Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public updateEdge = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, edgeId } = req.params;
+      const data = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!edgeId) {
+        res.status(400).json({ message: "Edge ID is required." });
+        return;
+      }
+      if (!data) {
+        res.status(400).json({ message: "Data is required." });
+        return;
+      }
+
+      const responseData = await this.service.updateEdge(
+        activityDiagramId,
+        edgeId,
+        data
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Update Edge Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public deleteEdge = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, edgeId } = req.params;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!edgeId) {
+        res.status(400).json({ message: "Edge ID is required." });
+        return;
+      }
+
+      await this.service.deleteEdge(activityDiagramId, edgeId);
+
+      res.status(200).json({
+        status: "Success",
+        message: "Delete Edge Successfully",
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // ==================== LANE CRUD ====================
+  public updateLane = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, laneId } = req.params;
+      const data = req.body;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!laneId) {
+        res.status(400).json({ message: "Lane ID is required." });
+        return;
+      }
+      if (!data) {
+        res.status(400).json({ message: "Data is required." });
+        return;
+      }
+
+      const responseData = await this.service.updateLane(
+        activityDiagramId,
+        laneId,
+        data
+      );
+
+      res.status(200).json({
+        status: "Success",
+        message: "Update Lane Successfully",
+        data: responseData,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public deleteLane = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { activityDiagramId, laneId } = req.params;
+
+      if (!activityDiagramId) {
+        res.status(400).json({ message: "Activity Diagram ID is required." });
+        return;
+      }
+      if (!laneId) {
+        res.status(400).json({ message: "Lane ID is required." });
+        return;
+      }
+
+      await this.service.deleteLane(activityDiagramId, laneId);
+
+      res.status(200).json({
+        status: "Success",
+        message: "Delete Lane Successfully",
+      });
+    } catch (err) {
+      next(err);
     }
   }
 }

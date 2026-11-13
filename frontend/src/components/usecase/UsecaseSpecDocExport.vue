@@ -178,7 +178,8 @@ export default {
     availableRoles() {
       const roles = new Set()
       this.useCases.forEach((uc) => {
-        if (uc.role.name) roles.add(uc.role.name)
+        const actorName = uc.actor?.name || uc.role?.name
+        if (actorName) roles.add(actorName)
       })
       return Array.from(roles).sort()
     },
@@ -186,8 +187,9 @@ export default {
     roleUseCaseCounts() {
       const counts = {}
       this.useCases.forEach((uc) => {
-        if (uc.role) {
-          counts[uc.role.name] = (counts[uc.role.name] || 0) + 1
+        const actorName = uc.actor?.name || uc.role?.name
+        if (actorName) {
+          counts[actorName] = (counts[actorName] || 0) + 1
         }
       })
       return counts
@@ -199,7 +201,10 @@ export default {
           return this.selectedUseCases
         case 'role':
           return this.selectedRole
-            ? this.useCases.filter((uc) => uc.role.name === this.selectedRole)
+            ? this.useCases.filter((uc) => {
+                const actorName = uc.actor?.name || uc.role?.name
+                return actorName === this.selectedRole
+              })
             : []
         case 'all':
         default:
@@ -214,6 +219,11 @@ export default {
     },
   },
   methods: {
+    // Helper: Get usecase ID (support both _id and id for backward compatibility)
+    getUsecaseId(uc) {
+      if (!uc) return ''
+      return String(uc._id || uc.id || '')
+    },
     closeExportModal() {
       if (!this.exporting) {
         this.$emit('close')
@@ -269,75 +279,156 @@ export default {
         <link rel="icon" href="../../public/slack-brands-solid-full.svg">
         <style>
           body { 
-            font-family: Arial, sans-serif; 
-            line-height: 1.6; 
+            font-family: 'Times New Roman', Times, serif; 
+            font-size: 11pt;
+            line-height: 1.5; 
             margin: 20px;
-            color: #333;
+            color: #000;
           }
+          
+          h1 {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 12pt 0 8pt 0;
+            color: #000;
+          }
+          
+          h2 {
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 10pt 0 6pt 0;
+            color: #000;
+          }
+          
+          h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin: 8pt 0 4pt 0;
+            color: #000;
+          }
+          
           .header { 
             border-bottom: 2px solid #1a365d; 
             padding-bottom: 10px; 
             margin-bottom: 20px;
           }
+          
           .project-info { 
             background: #f8fafc; 
-            padding: 15px; 
+            padding: 12px; 
             border-radius: 5px; 
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-left: 4px solid #1a365d;
+            font-size: 11pt;
           }
+          
+          .project-info h3 {
+            font-size: 12pt;
+            margin-top: 0;
+          }
+          
+          .project-info p {
+            margin: 4pt 0;
+            font-size: 11pt;
+          }
+          
           .toc { 
             margin-bottom: 20px; 
-            padding: 15px;
+            padding: 12px;
             background: #f9fafb;
             border-radius: 5px;
+            font-size: 11pt;
+          }
+          
+          .toc h2 {
+            font-size: 14pt;
+            margin-top: 0;
+          }
+          
+          .toc ul {
+            margin: 8pt 0;
+            padding-left: 20px;
+          }
+          
+          .toc li {
+            margin: 4pt 0;
+            font-size: 11pt;
           }
           
           /* QUAN TRỌNG: Ngăn page break trong các section quan trọng */
           .usecase-section { 
-            margin-bottom: 30px; 
+            margin-bottom: 24pt; 
             page-break-inside: avoid;
             break-inside: avoid;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 20px;
+            padding: 16px;
           }
+          
           .usecase-header { 
             background: #1a365d; 
             color: white; 
-            padding: 10px 15px; 
-            margin: -20px -20px 15px -20px;
+            padding: 8px 12px; 
+            margin: -16px -16px 12px -16px;
             border-radius: 8px 8px 0 0;
             page-break-after: avoid;
             break-after: avoid;
+          }
+          
+          .usecase-header h2 {
+            font-size: 14pt;
+            color: white;
+            margin: 0;
+          }
+          
+          .usecase-header p {
+            font-size: 10pt;
+            margin: 4pt 0 0 0;
+            color: rgba(255, 255, 255, 0.9);
           }
           
           /* Đảm bảo các detail-item không bị tách rời */
           .detail-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 15px; 
-            margin-bottom: 15px;
+            gap: 12px; 
+            margin-bottom: 12px;
             page-break-inside: avoid;
             break-inside: avoid;
           }
+          
           .detail-item { 
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             page-break-inside: avoid;
             break-inside: avoid;
           }
+          
           .detail-item h4 { 
-            margin: 0 0 5px 0; 
-            color: #374151;
-            font-size: 14px;
+            margin: 0 0 4px 0; 
+            color: #000;
+            font-size: 11pt;
+            font-weight: bold;
             page-break-after: avoid;
             break-after: avoid;
           }
-          .detail-item p, .detail-item ul { 
+          
+          .detail-item p { 
             margin: 0; 
-            font-size: 13px;
+            font-size: 11pt;
+            line-height: 1.5;
             page-break-before: avoid;
             break-before: avoid;
+          }
+          
+          .detail-item ul, .detail-item ol {
+            margin: 4pt 0;
+            padding-left: 20px;
+            font-size: 11pt;
+            line-height: 1.5;
+          }
+          
+          .detail-item li {
+            margin: 2pt 0;
           }
           
           /* Đặc biệt quan tâm đến các phần full-width */
@@ -366,36 +457,82 @@ export default {
           
           .task-list, .condition-list { 
             padding-left: 20px; 
-            margin: 5px 0;
+            margin: 6pt 0;
+            font-size: 11pt;
+            line-height: 1.5;
           }
+          
+          .task-list li, .condition-list li {
+            margin: 3pt 0;
+          }
+          
           .tag { 
             display: inline-block; 
             background: #e5e7eb; 
-            padding: 2px 8px; 
-            border-radius: 12px; 
-            font-size: 12px; 
+            padding: 2px 6px; 
+            border-radius: 3px; 
+            font-size: 10pt; 
             margin: 2px;
+            line-height: 1.4;
           }
+          
           .timestamp { 
             text-align: center; 
-            color: #6b7280; 
+            color: #666; 
             font-style: italic; 
-            margin-top: 30px;
+            font-size: 10pt;
+            margin-top: 20pt;
           }
           
           /* Media print quan trọng */
           @media print {
             body { 
-              margin: 15mm;
+              margin: 20mm 15mm;
+              font-size: 11pt;
+              line-height: 1.5;
+              color: #000;
+            }
+            
+            h1 {
+              font-size: 16pt;
+              margin: 12pt 0 8pt 0;
+            }
+            
+            h2 {
+              font-size: 14pt;
+              margin: 10pt 0 6pt 0;
+            }
+            
+            h3 {
               font-size: 12pt;
-              line-height: 1.4;
+              margin: 8pt 0 4pt 0;
+            }
+            
+            .detail-item h4 {
+              font-size: 11pt;
+            }
+            
+            .detail-item p, .detail-item ul, .detail-item ol {
+              font-size: 11pt;
+            }
+            
+            .task-list, .condition-list {
+              font-size: 11pt;
+            }
+            
+            .tag {
+              font-size: 10pt;
+            }
+            
+            .timestamp {
+              font-size: 10pt;
             }
             
             /* Quy tắc page break cho in ấn */
             .usecase-section { 
               page-break-inside: avoid;
               break-inside: avoid-page;
-              margin-bottom: 20px;
+              margin-bottom: 20pt;
             }
             
             .detail-item,
@@ -463,7 +600,7 @@ export default {
         content += 'TABLE OF CONTENTS\n'
         content += '================\n'
         this.useCasesToExport.forEach((uc, index) => {
-          content += `${index + 1}. ${uc.name} (UC-${uc.id})\n`
+          content += `${index + 1}. ${uc.name} (UC-${this.getUsecaseId(uc)})\n`
         })
         content += '\n'
       }
@@ -472,24 +609,74 @@ export default {
       this.useCasesToExport.forEach((uc, index) => {
         content += `\n${index + 1}. USE CASE: ${uc.name}\n`
         content += `${'='.repeat(50)}\n`
-        content += `ID: UC-${uc.id}\n`
-        content += `Role: ${uc.role.name || 'Not specified'}\n`
+        content += `ID: UC-${this.getUsecaseId(uc)}\n`
+        const actorName = uc.actor?.name || uc.role?.name || 'Not specified'
+        content += `Actor: ${actorName}\n`
         content += `Priority: ${uc.priority || 'Not specified'}\n\n`
 
         content += `Goal: ${uc.goal || 'Not specified'}\n\n`
-        content += `Description: ${uc.reason || 'Not specified'}\n\n`
-        content += `Context: ${uc.context || 'Not specified'}\n\n`
+        content += `Description: ${(uc.description || uc.business_reason || uc.reason) || 'Not specified'}\n\n`
+        
+        // Business Reason (separate from description)
+        if (uc.business_reason || uc.reason) {
+          content += `Business Reason: ${(uc.business_reason || uc.reason)}\n\n`
+        }
+        
+        // Context - xử lý đúng format như UseCaseMainContent
+        const contextStr = typeof uc.context === 'object' 
+          ? (uc.context.module || uc.context.scope || uc.context.system || '') 
+          : (uc.context || '')
+        content += `Context: ${contextStr || 'Not specified'}\n\n`
 
-        // Main Flow
+        // Actor Details - nếu actor là object
+        if (uc.actor && typeof uc.actor === 'object') {
+          content += `Actor: ${uc.actor.name || 'Not specified'}`
+          if (uc.actor.description) {
+            content += ` - ${uc.actor.description}`
+          }
+          content += '\n\n'
+        }
+
+        // Main Flow - xử lý đúng format như UseCaseMainContent
         content += 'Main Flow:\n'
-        if (uc.tasks && uc.tasks.length > 0) {
-          uc.tasks.forEach((task, i) => {
-            content += `  ${i + 1}. ${task}\n`
+        const mainFlow = uc.main_flow || uc.tasks || []
+        if (mainFlow.length > 0) {
+          mainFlow.forEach((step, i) => {
+            if (typeof step === 'object') {
+              const stepNum = step.step || (i + 1)
+              const actor = step.actor || 'User'
+              const action = step.action || step
+              content += `  ${stepNum}. [${actor}] ${action}`
+              if (step.expected_result) {
+                content += ` → ${step.expected_result}`
+              }
+              if (step.inputs && step.inputs.length > 0) {
+                content += ` (Inputs: ${step.inputs.join(', ')})`
+              }
+              if (step.rules_applied && step.rules_applied.length > 0) {
+                content += ` [Rules: ${step.rules_applied.join(', ')}]`
+              }
+              content += '\n'
+            } else {
+              content += `  ${i + 1}. ${step}\n`
+            }
           })
         } else {
           content += '  No tasks defined\n'
         }
         content += '\n'
+
+        // Alternative Flows - thêm mới
+        if (uc.alternative_flows && uc.alternative_flows.length > 0) {
+          content += 'Alternative Flows:\n'
+          uc.alternative_flows.forEach((af, i) => {
+            const afId = af.id || `AF${i + 1}`
+            content += `  ${afId} (at Step ${af.at_step}):\n`
+            content += `    Condition: ${af.condition || 'N/A'}\n`
+            content += `    System Response: ${af.system_response || 'N/A'}\n`
+            content += `    End State: ${af.end_state || 'N/A'}\n\n`
+          })
+        }
 
         // Preconditions & Postconditions
         content += 'Preconditions:\n'
@@ -512,13 +699,19 @@ export default {
         }
         content += '\n'
 
-        // Inputs & Outputs
+        // Inputs & Outputs - xử lý đúng format như UseCaseMainContent
         content += 'Inputs:\n'
         if (uc.inputs && uc.inputs.length > 0) {
           uc.inputs.forEach((input) => {
-            content += `  [${input}] `
+            if (typeof input === 'object') {
+              const name = input.name || 'N/A'
+              const type = input.type ? ` (${input.type})` : ''
+              const required = input.required !== undefined ? (input.required ? ' [Required]' : ' [Optional]') : ''
+              content += `  • ${name}${type}${required}\n`
+            } else {
+              content += `  • ${input}\n`
+            }
           })
-          content += '\n'
         } else {
           content += '  None\n'
         }
@@ -527,17 +720,28 @@ export default {
         content += 'Outputs:\n'
         if (uc.outputs && uc.outputs.length > 0) {
           uc.outputs.forEach((output) => {
-            content += `  [${output}] `
+            if (typeof output === 'object') {
+              const name = output.name || 'N/A'
+              const type = output.type ? ` (${output.type})` : ''
+              const optional = output.optional !== undefined ? (output.optional ? ' [Optional]' : ' [Required]') : ''
+              content += `  • ${name}${type}${optional}\n`
+            } else {
+              content += `  • ${output}\n`
+            }
           })
-          content += '\n'
         } else {
           content += '  None\n'
         }
         content += '\n'
 
-        // Triggers, Rules, Constraints
-        content += 'Triggers:\n'
-        if (uc.triggers && uc.triggers.length > 0) {
+        // Trigger, Rules, Non-functional Constraints
+        content += 'Trigger:\n'
+        if (uc.trigger && typeof uc.trigger === 'object') {
+          content += `  • Event: ${uc.trigger.event || 'N/A'}\n`
+          if (uc.trigger.source) {
+            content += `  • Source: ${uc.trigger.source}\n`
+          }
+        } else if (uc.triggers && uc.triggers.length > 0) {
           uc.triggers.forEach((trigger) => {
             content += `  • ${trigger}\n`
           })
@@ -556,9 +760,10 @@ export default {
         }
         content += '\n'
 
-        content += 'Constraints:\n'
-        if (uc.constraints && uc.constraints.length > 0) {
-          uc.constraints.forEach((constraint) => {
+        content += 'Non-functional Constraints:\n'
+        const constraints = uc.non_functional_constraints || uc.constraints || []
+        if (constraints.length > 0) {
+          constraints.forEach((constraint) => {
             content += `  • ${constraint}\n`
           })
         } else {
@@ -566,11 +771,23 @@ export default {
         }
         content += '\n'
 
-        // Exceptions
+        // Exceptions - xử lý đúng format như UseCaseMainContent
         content += 'Exceptions:\n'
         if (uc.exceptions && uc.exceptions.length > 0) {
           uc.exceptions.forEach((exception) => {
-            content += `  ⚠ ${exception}\n`
+            if (typeof exception === 'object') {
+              const id = exception.id || 'N/A'
+              const type = exception.type ? ` [${exception.type}]` : ''
+              const atStep = exception.at_step ? ` at Step ${exception.at_step}` : ''
+              const desc = exception.description || exception
+              content += `  ⚠ ${id}${type}${atStep}: ${desc}`
+              if (exception.system_response) {
+                content += ` → ${exception.system_response}`
+              }
+              content += '\n'
+            } else {
+              content += `  ⚠ ${exception}\n`
+            }
           })
         } else {
           content += '  No exceptions defined\n'
@@ -649,7 +866,7 @@ export default {
       if (this.includeTableOfContents && this.useCasesToExport.length > 0) {
         html += '<div class="toc"><h2>Table of Contents</h2><ul>'
         this.useCasesToExport.forEach((uc, index) => {
-          html += `<li>${index + 1}. ${uc.name} (UC-${uc.id})</li>`
+          html += `<li>${index + 1}. ${uc.name} (UC-${this.getUsecaseId(uc)})</li>`
         })
         html += '</ul></div>'
       }
@@ -660,7 +877,7 @@ export default {
       <div class="usecase-section page-break-avoid">
         <div class="usecase-header keep-with-next">
           <h2>${index + 1}. ${uc.name}</h2>
-          <p>UC-${uc.id} | Role: ${uc.role.name || 'Not specified'} | Priority: ${
+          <p>UC-${this.getUsecaseId(uc)} | Actor: ${(uc.actor?.name || uc.role?.name) || 'Not specified'}${uc.actor?.description ? ` - ${this.escapeHtml(uc.actor.description)}` : ''} | Priority: ${
           uc.priority || 'Not specified'
         }</p>
         </div>
@@ -673,25 +890,78 @@ export default {
           </div>
           <div class="detail-item">
             <h4 class="keep-with-next">Description</h4>
-            <p>${this.escapeHtml(uc.reason || 'Not specified')}</p>
+            <p>${this.escapeHtml((uc.description || uc.business_reason || uc.reason) || 'Not specified')}</p>
           </div>
           <div class="detail-item">
             <h4 class="keep-with-next">Context</h4>
-            <p>${this.escapeHtml(uc.context || 'Not specified')}</p>
+            <p>${this.escapeHtml((typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'Not specified')}</p>
           </div>
+          ${uc.business_reason || uc.reason ? `
+          <div class="detail-item">
+            <h4 class="keep-with-next">Business Reason</h4>
+            <p>${this.escapeHtml((uc.business_reason || uc.reason) || 'Not specified')}</p>
+          </div>
+          ` : ''}
         </div>
         
-        <!-- Main Flow -->
+        <!-- Main Flow - Enhanced -->
         <div class="detail-item full-width page-break-avoid">
           <h4 class="keep-with-next">Main Flow</h4>
           <ol class="task-list">
             ${
-              uc.tasks && uc.tasks.length > 0
-                ? uc.tasks.map((task) => `<li>${this.escapeHtml(task)}</li>`).join('')
-                : '<li>No tasks defined</li>'
+              (() => {
+                const mainFlow = uc.main_flow || uc.tasks || []
+                if (mainFlow.length > 0) {
+                  return mainFlow.map((step, i) => {
+                    if (typeof step === 'object') {
+                      const stepNum = step.step || (i + 1)
+                      const actor = step.actor || 'User'
+                      const action = step.action || step
+                      let html = `<li><strong>Step ${stepNum} [${actor}]:</strong> ${this.escapeHtml(action)}`
+                      if (step.expected_result) {
+                        html += ` <span style="color: #059669;">→ ${this.escapeHtml(step.expected_result)}</span>`
+                      }
+                      if (step.inputs && step.inputs.length > 0) {
+                        html += ` <span style="color: #7c3aed; font-size: 0.9em;">(Inputs: ${step.inputs.map(inp => this.escapeHtml(inp)).join(', ')})</span>`
+                      }
+                      if (step.rules_applied && step.rules_applied.length > 0) {
+                        html += ` <span style="color: #dc2626; font-size: 0.9em;">[Rules: ${step.rules_applied.map(rule => this.escapeHtml(rule)).join(', ')}]</span>`
+                      }
+                      html += '</li>'
+                      return html
+                    } else {
+                      return `<li>${this.escapeHtml(step)}</li>`
+                    }
+                  }).join('')
+                } else {
+                  return '<li>No tasks defined</li>'
+                }
+              })()
             }
           </ol>
         </div>
+        
+        <!-- Alternative Flows -->
+        ${uc.alternative_flows && uc.alternative_flows.length > 0 ? `
+        <div class="detail-item full-width page-break-avoid">
+          <h4 class="keep-with-next">Alternative Flows</h4>
+          <div style="margin-left: 20px;">
+            ${uc.alternative_flows.map((af, i) => {
+              const afId = af.id || `AF${i + 1}`
+              return `
+              <div style="margin-bottom: 12px; padding: 8px; background: #f9fafb; border-left: 3px solid #1a365d; border-radius: 4px;">
+                <div style="font-weight: bold; margin-bottom: 4px;">
+                  ${afId} <span style="color: #6b7280; font-weight: normal;">(at Step ${af.at_step})</span>
+                </div>
+                <div style="margin: 4px 0;"><strong>If:</strong> ${this.escapeHtml(af.condition || 'N/A')}</div>
+                <div style="margin: 4px 0;"><strong>Then:</strong> ${this.escapeHtml(af.system_response || 'N/A')}</div>
+                <div style="margin: 4px 0;"><strong>End State:</strong> ${this.escapeHtml(af.end_state || 'N/A')}</div>
+              </div>
+              `
+            }).join('')}
+          </div>
+        </div>
+        ` : ''}
         
         <!-- Preconditions & Postconditions -->
         <div class="detail-grid two-columns page-break-avoid">
@@ -721,16 +991,23 @@ export default {
           </div>
         </div>
         
-        <!-- Inputs & Outputs -->
+        <!-- Inputs & Outputs - Enhanced -->
         <div class="detail-grid two-columns page-break-avoid">
           <div class="detail-item">
             <h4 class="keep-with-next">Inputs</h4>
             <div>
               ${
                 uc.inputs && uc.inputs.length > 0
-                  ? uc.inputs
-                      .map((input) => `<span class="tag">${this.escapeHtml(input)}</span>`)
-                      .join('')
+                  ? uc.inputs.map((input) => {
+                      if (typeof input === 'object') {
+                        const name = this.escapeHtml(input.name || 'N/A')
+                        const type = input.type ? ` <span style="color: #6b7280; font-size: 0.9em;">(${this.escapeHtml(input.type)})</span>` : ''
+                        const required = input.required !== undefined ? (input.required ? ' <span style="color: #dc2626; font-size: 0.85em;">[Required]</span>' : ' <span style="color: #059669; font-size: 0.85em;">[Optional]</span>') : ''
+                        return `<div style="margin: 4px 0;"><span class="tag">${name}${type}${required}</span></div>`
+                      } else {
+                        return `<span class="tag">${this.escapeHtml(input)}</span>`
+                      }
+                    }).join('')
                   : '<span class="tag">None</span>'
               }
             </div>
@@ -740,9 +1017,16 @@ export default {
             <div>
               ${
                 uc.outputs && uc.outputs.length > 0
-                  ? uc.outputs
-                      .map((output) => `<span class="tag">${this.escapeHtml(output)}</span>`)
-                      .join('')
+                  ? uc.outputs.map((output) => {
+                      if (typeof output === 'object') {
+                        const name = this.escapeHtml(output.name || 'N/A')
+                        const type = output.type ? ` <span style="color: #6b7280; font-size: 0.9em;">(${this.escapeHtml(output.type)})</span>` : ''
+                        const optional = output.optional !== undefined ? (output.optional ? ' <span style="color: #059669; font-size: 0.85em;">[Optional]</span>' : ' <span style="color: #dc2626; font-size: 0.85em;">[Required]</span>') : ''
+                        return `<div style="margin: 4px 0;"><span class="tag">${name}${type}${optional}</span></div>`
+                      } else {
+                        return `<span class="tag">${this.escapeHtml(output)}</span>`
+                      }
+                    }).join('')
                   : '<span class="tag">None</span>'
               }
             </div>
@@ -755,9 +1039,15 @@ export default {
             <h4 class="keep-with-next">Triggers</h4>
             <ul class="condition-list">
               ${
-                uc.triggers && uc.triggers.length > 0
-                  ? uc.triggers.map((trigger) => `<li>${this.escapeHtml(trigger)}</li>`).join('')
-                  : '<li>None</li>'
+                (() => {
+                  if (uc.trigger && typeof uc.trigger === 'object') {
+                    return `<li><strong>Event:</strong> ${this.escapeHtml(uc.trigger.event || 'N/A')}</li>${uc.trigger.source ? `<li><strong>Source:</strong> ${this.escapeHtml(uc.trigger.source)}</li>` : ''}`
+                  } else if (uc.triggers && uc.triggers.length > 0) {
+                    return uc.triggers.map((trigger) => `<li>${this.escapeHtml(trigger)}</li>`).join('')
+                  } else {
+                    return '<li>None</li>'
+                  }
+                })()
               }
             </ul>
           </div>
@@ -766,7 +1056,15 @@ export default {
             <ul class="condition-list">
               ${
                 uc.rules && uc.rules.length > 0
-                  ? uc.rules.map((rule) => `<li>${this.escapeHtml(rule)}</li>`).join('')
+                  ? uc.rules.map((rule) => {
+                      if (typeof rule === 'object') {
+                        const id = rule.id ? `<strong>${this.escapeHtml(rule.id)}:</strong> ` : ''
+                        const desc = this.escapeHtml(rule.description || rule)
+                        return `<li>${id}${desc}</li>`
+                      } else {
+                        return `<li>${this.escapeHtml(rule)}</li>`
+                      }
+                    }).join('')
                   : '<li>None</li>'
               }
             </ul>
@@ -779,11 +1077,14 @@ export default {
             <h4 class="keep-with-next">Constraints</h4>
             <ul class="condition-list">
               ${
-                uc.constraints && uc.constraints.length > 0
-                  ? uc.constraints
-                      .map((constraint) => `<li>${this.escapeHtml(constraint)}</li>`)
-                      .join('')
-                  : '<li>None</li>'
+                (() => {
+                  const constraints = uc.non_functional_constraints || uc.constraints || []
+                  if (constraints.length > 0) {
+                    return constraints.map((constraint) => `<li>${this.escapeHtml(constraint)}</li>`).join('')
+                  } else {
+                    return '<li>None</li>'
+                  }
+                })()
               }
             </ul>
           </div>
@@ -792,9 +1093,18 @@ export default {
             <ul class="condition-list">
               ${
                 uc.exceptions && uc.exceptions.length > 0
-                  ? uc.exceptions
-                      .map((exception) => `<li>⚠ ${this.escapeHtml(exception)}</li>`)
-                      .join('')
+                  ? uc.exceptions.map((exception) => {
+                      if (typeof exception === 'object') {
+                        const id = exception.id ? `<strong>${this.escapeHtml(exception.id)}</strong>` : ''
+                        const type = exception.type ? ` <span style="color: #6b7280;">[${this.escapeHtml(exception.type)}]</span>` : ''
+                        const atStep = exception.at_step ? ` <span style="color: #6b7280;">at Step ${exception.at_step}</span>` : ''
+                        const desc = this.escapeHtml(exception.description || exception)
+                        const response = exception.system_response ? ` → ${this.escapeHtml(exception.system_response)}` : ''
+                        return `<li>⚠ ${id}${type}${atStep}: ${desc}${response}</li>`
+                      } else {
+                        return `<li>⚠ ${this.escapeHtml(exception)}</li>`
+                      }
+                    }).join('')
                   : '<li>No exceptions defined</li>'
               }
             </ul>
@@ -811,20 +1121,6 @@ export default {
                   ? uc.stakeholders
                       .map(
                         (stakeholder) => `<span class="tag">${this.escapeHtml(stakeholder)}</span>`
-                      )
-                      .join('')
-                  : '<span class="tag">None</span>'
-              }
-            </div>
-          </div>
-          <div class="detail-item">
-            <h4 class="keep-with-next">Related Use Cases</h4>
-            <div>
-              ${
-                uc.related_usecases && uc.related_usecases.length > 0
-                  ? uc.related_usecases
-                      .map(
-                        (relatedId) => `<span class="tag">UC-${this.escapeHtml(relatedId)}</span>`
                       )
                       .join('')
                   : '<span class="tag">None</span>'

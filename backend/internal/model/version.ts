@@ -1,52 +1,18 @@
 import { InferSchemaType, model, Schema } from "mongoose";
 import { randomUUID } from "crypto";
 
-// Schema cho Role
-const roleSchema = new Schema({
-    id: {
-        type: String,
-        required: true,
-        default: () => randomUUID()
-    },
-    name: { type: String, required: true },
-    description: { type: String, default: "" }
-}, { _id: false });
-
-const requirementModelSchema = new Schema({
-    id: { type: String, required: true },
-    name: { type: String, required: true },
-    role: {
-        type: roleSchema,
-        required: true
-    },
-    goal: { type: String, required: true },
-    reason: { type: String, required: true },
-    tasks: { type: [String], required: true },
-    inputs: { type: [String], default: [] },
-    outputs: { type: [String], default: [] },
-    context: { type: String, default: "" },
-    priority: { type: String, enum: ["low", "medium", "high"], required: true },
-    feedback: { type: Schema.Types.Mixed, default: null },
-    rules: { type: [String], default: [] },
-    triggers: { type: [String], default: [] },
-    preconditions: { type: [String], default: [] },
-    postconditions: { type: [String], default: [] },
-    exceptions: { type: [String], default: [] },
-    stakeholders: { type: [String], default: [] },
-    constraints: { type: [String], default: [] },
-    related_usecases: { type: [String], default: [] },
-}, { _id: true });
-
+// Conflict schema - items giờ reference usecase _id thay vì embed
 const conflictSchema = new Schema({
     conflict_id: {
         type: String,
         default: () => randomUUID(),
         required: true
     },
-    items: {
-        type: [requirementModelSchema],
+    items: [{
+        type: Schema.Types.ObjectId,
+        ref: "usecases",
         required: true
-    }
+    }]
 });
 
 const versionSchema = new Schema({
@@ -58,25 +24,28 @@ const versionSchema = new Schema({
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
     parent_version_id: { type: Schema.Types.ObjectId, ref: "versions", default: null },
-    version_temporary: { type: Boolean, default: false }, // là version tmp -> true
+    version_temporary: { type: Boolean, default: true }, // là version tmp -> true
     inputs: [{ type: Schema.Types.ObjectId, ref: "inputs" }],
-    outputs: [{ type: Schema.Types.ObjectId, ref: "outputs" }],
     progress: { type: Number, default: 0 },
-    stage: { type: String, enum: ["normalization", "input", "analyzing", "finalizing", "completed", "failed"], default: "input" },
+    stage: { type: String, enum: ["normalization", "input", "analyzing", "finalizing", "completed", "failed", "paused"], default: "input" },
     status: {
         type: String,
-        enum: ['processing', 'completed', 'failed', 'has_conflicts'],
+        enum: ['processing', 'completed', 'failed', 'has_conflicts', 'paused'],
         default: 'processing'
     },
     affects_requirement: { type: Boolean, default: false },
-    requirement_model: { type: [requirementModelSchema], default: [] },
     pending_conflicts: { type: [conflictSchema], default: [] },
     processing_errors: { type: [String], default: [] },
     // ===== TRƯỜNG MỚI: CỜ VERSION =====
-    edit_flag: { 
-        type: String, 
-        enum: ["editing", "locked", "none"], 
-        default: "none" 
+    edit_flag: {
+        type: String,
+        enum: ["editing", "locked", "none"],
+        default: "none"
+    },
+    // ===== TRƯỜNG MỚI: CHECKPOINT CHO RESUME =====
+    processing_checkpoint: {
+        type: Schema.Types.Mixed,
+        default: null
     }
 }, {
     timestamps: true

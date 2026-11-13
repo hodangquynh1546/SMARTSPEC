@@ -2,54 +2,66 @@ import { Schema, model, InferSchemaType } from "mongoose";
 
 /* ----------------- NODE SCHEMA ------------------ */
 const nodeSchema = new Schema({
-    id: { type: String, required: true },
-    type: { 
-        type: String, 
+    type: {
+        type: String,
         enum: [
-            "start", 
-            "end", 
-            "action", 
-            "decision", 
-            "merge", 
-            "fork", 
-            "join", 
-            "object", 
+            "start",
+            "end",
+            "action",
+            "decision",
+            "merge",
+            "fork",
+            "join",
+            "object",
             "swimlane"
         ],
         required: true
     },
     label: String,
-    lane_id: String  // để phân swimlane
-}, { _id: false });
+    // Tham chiếu đến _id của một 'lane' trong MẢNG 'lanes'
+    lane_id: { type: Schema.Types.ObjectId, default: null },
+    // Thêm trường position cho node
+    position: {
+        x: { type: Number, default: 0 },
+        y: { type: Number, default: 0 }
+    }
+}, { _id: true }); // Bật _id để edges có thể tham chiếu đến _id này
 
 /* ----------------- EDGE SCHEMA ------------------ */
 const edgeSchema = new Schema({
-    from: { type: String, required: true },
-    to:   { type: String, required: true },
+    // Tham chiếu đến _id của một 'node' trong MẢNG 'nodes'
+    from: { type: Schema.Types.ObjectId, required: true },
+    // Tham chiếu đến _id của một 'node' trong MẢNG 'nodes'
+    to: { type: Schema.Types.ObjectId, required: true },
     condition: String,     // dùng cho decision nodes
     guard: String,         // biểu thức điều kiện
     trigger: String        // sự kiện kích hoạt
-}, { _id: false });
+}, { _id: true }); // Bật _id để có thể tham chiếu nếu cần
 
 /* ----------------- ACTIVITY DIAGRAM ------------------ */
 const activityDiagramSchema = new Schema({
-    uml_id: { type: Schema.Types.ObjectId, ref: "umls", required: true },
-
+    project_id: {
+        type: Schema.Types.ObjectId,
+        ref: "projects",
+        required: true,
+    },
+    version_id: {
+        type: Schema.Types.ObjectId,
+        ref: "versions",
+        required: true,
+    },
     name: { type: String, required: true },
     description: String,
     lanes: [
-            {
-                id: String,
-                name: String
-            }
-        ],
+        {
+            name: String
+        }
+    ], // Lanes sẽ có _id tự động
     nodes: [nodeSchema],
     edges: [edgeSchema],
 
-    diagram_svg: String,
-
     created_by: { type: Schema.Types.ObjectId, ref: "users" }
-}, { timestamps: true });
+}, { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } });
 
 type ActivityDiagramInferType = InferSchemaType<typeof activityDiagramSchema>;
 export default model<ActivityDiagramInferType>("activity_diagrams", activityDiagramSchema);

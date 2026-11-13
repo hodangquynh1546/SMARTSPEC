@@ -1,4 +1,5 @@
 import { ApiKeyService } from "../../../orchestrator/domain/ApiKeyService";
+import { LLMService } from "../../../../shared/LLMService";
 import { ObjectId } from "mongodb"; // <-- THÊM MỚI: Cần thiết để tạo ID
 
 type PromptEntry = {
@@ -153,21 +154,29 @@ Analyze carefully and return ONLY this JSON object.`,
 
 export class UsecaseDiagramGeminiService {
   private apiKeyService = new ApiKeyService();
+  private llmService = new LLMService(); // ✅ Sử dụng LLMService
 
   /**
    * Tạo JSON cho use case diagram (theo format Mongoose Schema) từ requirements
    */
   async generateUsecaseDiagram(
     requirements: any[],
-    language: string
+    language: string,
+    userId?: string,
+    projectId?: string
   ): Promise<any> {
     try {
       const simplifiedRequirements = requirements.map((r) => ({
-        id: r.id,
+        id: r.id || r._id,
         name: r.name,
-        role: r.role,
+        actor: (r as any).actor || r.role, // Hỗ trợ cả actor (mới) và role (cũ)
         goal: r.goal,
-        tasks: r.tasks,
+        main_flow: (r as any).main_flow || (r.tasks ? r.tasks.map((task: string, index: number) => ({
+          step: index + 1,
+          actor: ((r as any).actor || r.role)?.name || 'User',
+          action: task,
+          expected_result: `Task ${index + 1} completed`
+        })) : []),
       }));
 
       const requirementsJson = JSON.stringify(simplifiedRequirements, null, 2);
@@ -180,8 +189,15 @@ export class UsecaseDiagramGeminiService {
         `📊 Generating use case diagram for ${requirements.length} use cases`
       );
 
+      // ✅ MỚI: Token analysis trước khi gọi LLM (sử dụng model user đã chọn)
+      const { getModelConfig, estimateTokens, determineStrategy, logTokenInfo } = await import("../../../../shared/tokenManager");
+      const modelName = await this.llmService.getRecommendedModel(undefined, userId);
+      // ✅ CẢI THIỆN: Set isProductionFreeMode = false để cho phép model có phí (user đã chọn)
+      const modelConfig = getModelConfig(modelName, undefined, false);
+      logTokenInfo(prompt, modelConfig, '[UML Usecase Diagram]');
+
       // 1. Gọi Gemini và lấy chuỗi JSON (dùng TÊN string)
-      const generatedJsonString = await this.generateJsonContent(prompt);
+      const generatedJsonString = await this.generateJsonContent(prompt, userId, projectId);
 
       if (!generatedJsonString) {
         throw new Error("Empty response from Gemini");
@@ -419,62 +435,27 @@ export class UsecaseDiagramGeminiService {
   }
 
   /**
-   * Một hàm chung để gửi prompt tới Gemini và trả về kết quả dạng chuỗi JSON đã được làm sạch.
-   * (Giữ nguyên toàn bộ nội dung hàm này)
+   * ✅ CẬP NHẬT: Sử dụng LLMService thay vì hardcode Gemini
    */
-  private async generateJsonContent(prompt: string): Promise<string> {
-    const keys = await this.apiKeyService.getAllActiveKeys("gemini");
-    if (!keys || keys.length === 0) {
-      throw new Error("No active Gemini API key found.");
+  private async generateJsonContent(prompt: string, userId?: string, projectId?: string): Promise<string> {
+    // ✅ Sử dụng LLMService để lấy recommended model (ưu tiên model user đã chọn)
+    const modelName = await this.llmService.getRecommendedModel(undefined, userId);
+
+    try {
+      const response = await this.llmService.callLLM({
+        prompt: prompt,
+        modelName: modelName,
+        userId: userId,
+        projectId: projectId,
+        endpoint: 'generateUsecaseDiagram',
+        isProductionFreeMode: true
+      });
+
+      return this.cleanJsonString(response.text);
+    } catch (err: any) {
+      console.error('❌ LLM call failed for usecase diagram:', err.message);
+      throw err;
     }
-
-    let lastError: any;
-    for (const k of keys) {
-      try {
-        console.log(
-          `🔑 Trying Gemini key for diagram content: ${k.key_value.slice(
-            0,
-            12
-          )}...`
-        );
-
-        const { GoogleGenerativeAI } = await import("@google/generative-ai");
-        const client = new GoogleGenerativeAI(k.key_value);
-        const model = client.getGenerativeModel({
-          model: k.model_name,
-        });
-
-        const resp: any = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        });
-
-        const text: string = resp?.response?.text?.() || "";
-
-        return this.cleanJsonString(text);
-      } catch (err: any) {
-        lastError = err;
-        const msg = (err?.message || "").toLowerCase();
-        console.error(
-          `❌ Gemini key ${k._id} failed during diagram content generation:`,
-          err?.message || err
-        );
-
-        if (msg.includes("invalid") || msg.includes("unauthorized")) {
-          try {
-            await this.apiKeyService.disableKey(k._id);
-            console.warn(`⚠️ Disabled invalid Gemini key: ${k._id}`);
-          } catch {
-            /* Bỏ qua lỗi khi disable key */
-          }
-        }
-        continue;
-      }
-    }
-
-    throw (
-      lastError ||
-      new Error("All Gemini API keys failed during diagram content generation.")
-    );
   }
 
   /**

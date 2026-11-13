@@ -25,18 +25,15 @@ export class TestcaseController {
  * Generate test cases from selected requirements
  */
     public generateTestCases = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
+        // ✅ Khai báo các biến ở đầu function để có thể sử dụng trong catch block
+        const userId = req.getSubject();
+        const { projectId, versionId } = req.params || {};
+        
         try {
-            const userId = req.getSubject();
             if (!userId) {
                 handleServiceResponse(new ServiceResponse(ResponseStatus.Failed, "Unauthorized", null, 401), res);
                 return;
             }
-            const { projectId, versionId } = req.params;
-            const {
-                selectedRequirementIds,
-                language = 'vi-VN',
-                testType = 'all' // MẶC ĐỊNH LÀ 'all'
-            } = req.body;
 
             if (!projectId || !versionId) {
                 res.status(400).json({
@@ -44,6 +41,12 @@ export class TestcaseController {
                 });
                 return;
             }
+
+            const {
+                selectedRequirementIds,
+                language = 'vi-VN',
+                testType = 'all' // MẶC ĐỊNH LÀ 'all'
+            } = req.body;
 
             if (!selectedRequirementIds || !Array.isArray(selectedRequirementIds) || selectedRequirementIds.length === 0) {
                 res.status(400).json({
@@ -90,6 +93,28 @@ export class TestcaseController {
 
         } catch (error: any) {
             console.error("❌ Error generating test cases:", error);
+
+            // ✅ Emit failed event với errors - các biến đã được khai báo ở đầu function
+            if (userId && projectId && versionId) {
+                try {
+                    const { testcaseSocketService } = await import('../domain/testcase.socket.service');
+                    if (testcaseSocketService) {
+                        const errorMessage = error.message || 'Failed to generate test cases';
+                        testcaseSocketService.emitProgress(
+                            projectId,
+                            versionId,
+                            userId,
+                            100,
+                            'failed',
+                            false,
+                            undefined,
+                            [errorMessage]
+                        );
+                    }
+                } catch (socketError) {
+                    console.error("❌ Error emitting failed event:", socketError);
+                }
+            }
 
             if (error.message.includes('not found')) {
                 res.status(404).json({
@@ -311,20 +336,22 @@ export class TestcaseController {
 
             console.log(`✏️ Updating test case ${testCaseId}`);
 
-            const updatedTestCase = await this.testcaseService.updateTestCase(
+            const result = await this.testcaseService.updateTestCase(
                 testCaseId,
                 updateData,
                 updatedBy
             );
 
-            if (!updatedTestCase) {
+            if (!result || !result.testcase) {
                 res.status(404).json({ message: `Test case not found: ${testCaseId}` });
                 return;
             }
 
             res.status(200).json({
                 message: "Successfully updated test case",
-                data: updatedTestCase
+                data: result.testcase,
+                version: result.version,
+                newVersionId: result.newVersionId
             });
 
         } catch (error: any) {
@@ -914,14 +941,27 @@ export class TestcaseController {
     public exportTestCasesToExcel = async (req: HttpRequest, res: Response, next: NextFunction): Promise<void> => {
         try {
             const { projectId } = req.params;
-            const { versionId, test_type, status, priority, startDate, endDate } = req.query;
+            const { 
+                versionId, 
+                test_type, 
+                status, 
+                priority, 
+                startDate, 
+                endDate,
+                testCaseIds,
+                requirementIds
+            } = req.query;
 
             if (!projectId) {
                 res.status(400).json({ message: "projectId is required" });
                 return;
             }
 
-            console.log(`📊 Exporting test cases to Excel for project ${projectId}`);
+            console.log(`📊 Exporting test cases to Excel for project ${projectId}`, {
+                versionId,
+                testCaseIds: testCaseIds ? (Array.isArray(testCaseIds) ? testCaseIds.length : 1) : 0,
+                requirementIds: requirementIds ? (Array.isArray(requirementIds) ? requirementIds.length : 1) : 0
+            });
 
             // Build filters
             const filters: ExportFilters = {};
@@ -938,11 +978,40 @@ export class TestcaseController {
                 };
             }
 
-            const excelBuffer = await this.exportService.exportTestCasesToExcel(
-                projectId,
-                versionId as string,
-                filters
-            );
+            // Test case IDs filter (specific test cases)
+            if (testCaseIds) {
+                const ids = Array.isArray(testCaseIds) ? testCaseIds : [testCaseIds];
+                filters.testCaseIds = ids.map(id => String(id));
+            }
+
+            // Requirement IDs filter (test cases for specific use cases)
+            if (requirementIds) {
+                const ids = Array.isArray(requirementIds) ? requirementIds : [requirementIds];
+                filters.source_requirement_ids = ids.map(id => String(id));
+            }
+
+            // Check if custom sheets and fields are provided (from POST body)
+            const sheets = req.body?.sheets;
+            const fields = req.body?.fields;
+
+            let excelBuffer: Buffer;
+            if (sheets && Array.isArray(sheets) && sheets.length > 0 && fields && Array.isArray(fields)) {
+                // Custom export with sheets and fields
+                excelBuffer = await this.exportService.exportTestCasesToExcelWithSheets(
+                    projectId,
+                    versionId as string,
+                    sheets,
+                    fields,
+                    filters
+                );
+            } else {
+                // Default export
+                excelBuffer = await this.exportService.exportTestCasesToExcel(
+                    projectId,
+                    versionId as string,
+                    filters
+                );
+            }
 
             // Set response headers for file download
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

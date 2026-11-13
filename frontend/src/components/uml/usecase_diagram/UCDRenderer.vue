@@ -49,6 +49,14 @@
           </button>
         </div>
 
+        <!-- CRUD Controls -->
+        <div class="toolbar-group">
+          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Manage Diagram">
+            <span class="material-symbols-outlined">settings</span>
+            Manage
+          </button>
+        </div>
+
         <!-- Export Controls -->
         <div class="toolbar-group">
           <button class="toolbar-btn" @click="exportAsSVG" title="Export as SVG">
@@ -267,6 +275,7 @@
               draggable: editable,
             }"
             @mousedown="startDrag(uc, 'usecase', $event)"
+            @contextmenu.prevent="showContextMenu($event, uc, 'usecase')"
           >
             <ellipse
               :cx="uc.x"
@@ -301,6 +310,7 @@
               draggable: editable,
             }"
             @mousedown="startDrag(actor, 'actor', $event)"
+            @contextmenu.prevent="showContextMenu($event, actor, 'actor')"
           >
             <!-- Actor stick figure -->
             <circle
@@ -444,10 +454,403 @@
       </div>
       <div class="status-item">Zoom: {{ Math.round(internalZoom * 100) }}%</div>
     </div>
+
+    <!-- Management Modal -->
+    <div v-if="managementModal.visible" class="management-modal-overlay" @click="closeManagementModal">
+      <div class="management-modal-content" @click.stop>
+        <div class="management-modal-header">
+          <h2>Manage Use Case Diagram</h2>
+          <button class="modal-close-btn" @click="closeManagementModal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="management-tabs">
+          <button
+            v-for="tab in managementTabs"
+            :key="tab.id"
+            class="tab-btn"
+            :class="{ active: managementModal.activeTab === tab.id }"
+            @click="managementModal.activeTab = tab.id"
+          >
+            <span class="material-symbols-outlined">{{ tab.icon }}</span>
+            {{ tab.label }}
+            <span class="tab-count">({{ getTabCount(tab.id) }})</span>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="management-tab-content">
+          <!-- Actors Tab -->
+          <div v-if="managementModal.activeTab === 'actors'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Actors</h3>
+              <button class="btn-add-item" @click="openCreateForm('actor')">
+                <span class="material-symbols-outlined">add</span>
+                Add Actor
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="actor in computedActors"
+                :key="actor.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">{{ actor.name }}</div>
+                  <div v-if="actor.description" class="item-description">{{ actor.description }}</div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn-edit" @click="openEditForm('actor', actor)" title="Edit">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('actor', actor)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === actor.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === actor.id }"
+                    >
+                      {{ deletingElementId === actor.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedActors.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">person_off</span>
+                <p>No actors yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usecases Tab -->
+          <div v-if="managementModal.activeTab === 'usecases'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Use Cases</h3>
+              <button 
+                class="btn-add-item" 
+                @click="openCreateForm('usecase')"
+                :disabled="isCrudLoading"
+              >
+                <span class="material-symbols-outlined">add</span>
+                Add Usecase
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="uc in computedUsecases"
+                :key="uc.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">{{ uc.title }}</div>
+                  <div v-if="uc.description" class="item-description">{{ uc.description }}</div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn-edit" @click="openEditForm('usecase', uc)" title="Edit">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('usecase', uc)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === uc.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === uc.id }"
+                    >
+                      {{ deletingElementId === uc.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedUsecases.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">cases</span>
+                <p>No use cases yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Associations Tab -->
+          <div v-if="managementModal.activeTab === 'associations'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Associations</h3>
+              <button 
+                class="btn-add-item" 
+                @click="openCreateForm('association')"
+                :disabled="isCrudLoading"
+              >
+                <span class="material-symbols-outlined">add</span>
+                Add Association
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="assoc in computedAssociations"
+                :key="assoc.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">
+                    {{ assoc.actor?.name || 'Unknown Actor' }} → {{ assoc.usecase?.title || 'Unknown Usecase' }}
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn-edit" @click="openEditForm('association', assoc)" title="Edit">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('association', assoc)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === assoc.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === assoc.id }"
+                    >
+                      {{ deletingElementId === assoc.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedAssociations.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">link_off</span>
+                <p>No associations yet</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Relationships Tab -->
+          <div v-if="managementModal.activeTab === 'relationships'" class="tab-panel">
+            <div class="panel-header">
+              <h3>Relationships</h3>
+              <button 
+                class="btn-add-item" 
+                @click="openCreateForm('relationship')"
+                :disabled="isCrudLoading"
+              >
+                <span class="material-symbols-outlined">add</span>
+                Add Relationship
+              </button>
+            </div>
+            <div class="items-list">
+              <div
+                v-for="rel in computedRelationships"
+                :key="rel.id"
+                class="item-card"
+              >
+                <div class="item-info">
+                  <div class="item-name">
+                    {{ rel.source?.name || rel.source?.title || 'Unknown' }} 
+                    <span class="relationship-type">{{ rel.type }}</span>
+                    {{ rel.target?.name || rel.target?.title || 'Unknown' }}
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <button class="btn-edit" @click="openEditForm('relationship', rel)" title="Edit">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button 
+                    class="btn-delete" 
+                    @click="confirmDelete('relationship', rel)" 
+                    title="Delete"
+                    :disabled="isCrudLoading || deletingElementId === rel.id"
+                  >
+                    <span 
+                      class="material-symbols-outlined"
+                      :class="{ 'spinning': deletingElementId === rel.id }"
+                    >
+                      {{ deletingElementId === rel.id ? 'sync' : 'delete' }}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div v-if="computedRelationships.length === 0" class="empty-state">
+                <span class="material-symbols-outlined">link_off</span>
+                <p>No relationships yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create/Edit Form Modal -->
+    <div v-if="formModal.visible" class="form-modal-overlay" @click="closeFormModal">
+      <div class="form-modal-content" @click.stop>
+        <div class="form-modal-header">
+          <h3>{{ formModal.isEdit ? 'Edit' : 'Create' }} {{ formModal.type }}</h3>
+          <button class="modal-close-btn" @click="closeFormModal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="form-modal-body">
+          <!-- Actor Form -->
+          <div v-if="formModal.type === 'actor'">
+            <div class="form-group">
+              <label>Actor Name *</label>
+              <input
+                v-model="formModal.data.name"
+                type="text"
+                placeholder="Enter actor name"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                v-model="formModal.data.description"
+                placeholder="Enter description (optional)"
+                class="form-textarea"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Usecase Form -->
+          <div v-if="formModal.type === 'usecase'">
+            <div class="form-group">
+              <label>Usecase Title *</label>
+              <input
+                v-model="formModal.data.title"
+                type="text"
+                placeholder="Enter usecase title"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea
+                v-model="formModal.data.description"
+                placeholder="Enter description (optional)"
+                class="form-textarea"
+                rows="3"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Association Form -->
+          <div v-if="formModal.type === 'association'">
+            <div class="form-group">
+              <label>Actor *</label>
+              <select v-model="formModal.data.actor_id" class="form-input">
+                <option value="">Select Actor</option>
+                <option
+                  v-for="actor in computedActors"
+                  :key="actor.id"
+                  :value="actor.id"
+                >
+                  {{ actor.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Usecase *</label>
+              <select v-model="formModal.data.usecase_id" class="form-input">
+                <option value="">Select Usecase</option>
+                <option
+                  v-for="uc in computedUsecases"
+                  :key="uc.id"
+                  :value="uc.id"
+                >
+                  {{ uc.title }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Relationship Form -->
+          <div v-if="formModal.type === 'relationship'">
+            <div class="form-group">
+              <label>Source *</label>
+              <select v-model="formModal.data.source" class="form-input">
+                <option value="">Select Source</option>
+                <optgroup label="Actors">
+                  <option
+                    v-for="actor in computedActors"
+                    :key="actor.id"
+                    :value="actor.id"
+                  >
+                    {{ actor.name }}
+                  </option>
+                </optgroup>
+                <optgroup label="Use Cases">
+                  <option
+                    v-for="uc in computedUsecases"
+                    :key="uc.id"
+                    :value="uc.id"
+                  >
+                    {{ uc.title }}
+                  </option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Target *</label>
+              <select v-model="formModal.data.target" class="form-input">
+                <option value="">Select Target</option>
+                <optgroup label="Actors">
+                  <option
+                    v-for="actor in computedActors"
+                    :key="actor.id"
+                    :value="actor.id"
+                  >
+                    {{ actor.name }}
+                  </option>
+                </optgroup>
+                <optgroup label="Use Cases">
+                  <option
+                    v-for="uc in computedUsecases"
+                    :key="uc.id"
+                    :value="uc.id"
+                  >
+                    {{ uc.title }}
+                  </option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Type *</label>
+              <select v-model="formModal.data.type" class="form-input">
+                <option value="include">Include</option>
+                <option value="extend">Extend</option>
+                <option value="generalization">Generalization</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-modal-footer">
+          <button class="btn-secondary" @click="closeFormModal">Cancel</button>
+          <button class="btn-primary" @click="saveForm">{{ formModal.isEdit ? 'Update' : 'Create' }}</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import {
+  createActor,
+  updateActor,
+  deleteActor,
+  createUsecase,
+  updateUsecase,
+  deleteUsecase,
+  createAssociation,
+  updateAssociation,
+  deleteAssociation,
+  createRelationship,
+  updateRelationship,
+  deleteRelationship,
+  getUsecaseDiagramById,
+} from '@/api/ucd';
+
 export default {
   name: 'UCDRendererFinal',
   props: {
@@ -540,6 +943,39 @@ export default {
 
       // Preview generation
       previewGenerated: false,
+
+      // Management Modal state
+      managementModal: {
+        visible: false,
+        activeTab: 'actors',
+        hasChanges: false, // Track if there were changes in the modal
+      },
+      managementTabs: [
+        { id: 'actors', label: 'Actors', icon: 'person' },
+        { id: 'usecases', label: 'Use Cases', icon: 'cases' },
+        { id: 'associations', label: 'Associations', icon: 'link' },
+        { id: 'relationships', label: 'Relationships', icon: 'account_tree' },
+      ],
+      formModal: {
+        visible: false,
+        type: null, // 'actor', 'usecase', 'association', 'relationship'
+        isEdit: false,
+        hasChanges: false, // Track if there were changes in the form
+        data: {
+          name: '',
+          title: '',
+          description: '',
+          actor_id: '',
+          usecase_id: '',
+          source: '',
+          target: '',
+          type: 'include',
+        },
+        element: null,
+      },
+      diagramId: null, // Will be set from props or diagramData
+      isCrudLoading: false,
+      deletingElementId: null,
     }
   },
   computed: {
@@ -1655,6 +2091,282 @@ export default {
       document.removeEventListener('mouseup', this.handleMouseUp)
     },
 
+    // Management Modal Methods
+    showManagementModal() {
+      this.managementModal.visible = true;
+      this.managementModal.activeTab = 'actors';
+      this.managementModal.hasChanges = false; // Reset changes tracking
+    },
+    closeManagementModal() {
+      // If there were changes, emit event to refresh diagram
+      if (this.managementModal.hasChanges) {
+        this.$emit('diagram-updated');
+      }
+      this.managementModal.visible = false;
+      this.managementModal.hasChanges = false;
+    },
+    getTabCount(tabId) {
+      switch (tabId) {
+        case 'actors':
+          return this.computedActors.length;
+        case 'usecases':
+          return this.computedUsecases.length;
+        case 'associations':
+          return this.computedAssociations.length;
+        case 'relationships':
+          return this.computedRelationships.length;
+        default:
+          return 0;
+      }
+    },
+    openCreateForm(type) {
+      this.formModal.visible = true;
+      this.formModal.type = type;
+      this.formModal.isEdit = false;
+      this.formModal.element = null;
+      this.formModal.hasChanges = false; // Reset changes tracking
+      this.formModal.data = {
+        name: '',
+        title: '',
+        description: '',
+        actor_id: '',
+        usecase_id: '',
+        source: '',
+        target: '',
+        type: 'include',
+      };
+    },
+    openEditForm(type, element) {
+      this.formModal.visible = true;
+      this.formModal.type = type;
+      this.formModal.isEdit = true;
+      this.formModal.element = element;
+      this.formModal.hasChanges = false; // Reset changes tracking
+      
+      if (type === 'actor') {
+        this.formModal.data = {
+          name: element.name || '',
+          description: element.description || '',
+        };
+      } else if (type === 'usecase') {
+        this.formModal.data = {
+          title: element.title || '',
+          description: element.description || '',
+        };
+      } else if (type === 'association') {
+        const actorId = element.actor?._id || element.actor?.id || element.actor_id;
+        const usecaseId = element.usecase?._id || element.usecase?.id || element.usecase_id;
+        this.formModal.data = {
+          actor_id: this.normalizeId(actorId) || '',
+          usecase_id: this.normalizeId(usecaseId) || '',
+        };
+      } else if (type === 'relationship') {
+        const sourceId = element.source?._id || element.source?.id || element.source;
+        const targetId = element.target?._id || element.target?.id || element.target;
+        this.formModal.data = {
+          source: this.normalizeId(sourceId) || '',
+          target: this.normalizeId(targetId) || '',
+          type: element.type || 'include',
+        };
+      }
+    },
+    closeFormModal() {
+      // If there were changes, emit event to refresh diagram
+      if (this.formModal.hasChanges) {
+        this.$emit('diagram-updated');
+        this.managementModal.hasChanges = true; // Also mark management modal as changed
+      }
+      this.formModal.visible = false;
+      this.formModal.element = null;
+      this.formModal.hasChanges = false;
+    },
+    async saveForm() {
+      const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id;
+      if (!diagramId) {
+        alert('Diagram ID not found');
+        return;
+      }
+
+      if (this.isCrudLoading) return
+
+      try {
+        this.isCrudLoading = true
+        this.showSavingIndicator();
+
+        if (this.formModal.type === 'actor') {
+          if (!this.formModal.data.name.trim()) {
+            alert('Actor name is required');
+            this.isCrudLoading = false
+            this.hideSavingIndicator();
+            return;
+          }
+          if (this.formModal.isEdit) {
+            await updateActor(String(diagramId), String(this.formModal.element.id), {
+              name: this.formModal.data.name,
+              description: this.formModal.data.description || '',
+            });
+          } else {
+            const position = {
+              x: this.virtualSpace.centerX - 200 + (this.computedActors.length % 3) * 200,
+              y: this.virtualSpace.centerY - 100 + Math.floor(this.computedActors.length / 3) * 150,
+            };
+            await createActor(String(diagramId), {
+              name: this.formModal.data.name,
+              description: this.formModal.data.description || '',
+              position,
+            });
+          }
+        } else if (this.formModal.type === 'usecase') {
+          if (!this.formModal.data.title.trim()) {
+            alert('Usecase title is required');
+            this.isCrudLoading = false
+            this.hideSavingIndicator();
+            return;
+          }
+          if (this.formModal.isEdit) {
+            await updateUsecase(String(diagramId), String(this.formModal.element.id), {
+              title: this.formModal.data.title,
+              description: this.formModal.data.description || '',
+            });
+          } else {
+            const position = {
+              x: this.virtualSpace.centerX + 200 + (this.computedUsecases.length % 4) * 150,
+              y: this.virtualSpace.centerY - 100 + Math.floor(this.computedUsecases.length / 4) * 100,
+            };
+            await createUsecase(String(diagramId), {
+              title: this.formModal.data.title,
+              description: this.formModal.data.description || '',
+              position,
+            });
+          }
+        } else if (this.formModal.type === 'association') {
+          if (!this.formModal.data.actor_id || !this.formModal.data.usecase_id) {
+            alert('Actor and Usecase are required');
+            this.isCrudLoading = false
+            this.hideSavingIndicator();
+            return;
+          }
+          if (this.formModal.isEdit) {
+            await updateAssociation(String(diagramId), String(this.formModal.element.id), {
+              actor_id: this.formModal.data.actor_id,
+              usecase_id: this.formModal.data.usecase_id,
+            });
+          } else {
+            await createAssociation(String(diagramId), {
+              actor_id: this.formModal.data.actor_id,
+              usecase_id: this.formModal.data.usecase_id,
+            });
+          }
+        } else if (this.formModal.type === 'relationship') {
+          if (!this.formModal.data.source || !this.formModal.data.target || !this.formModal.data.type) {
+            alert('Source, Target, and Type are required');
+            this.isCrudLoading = false
+            this.hideSavingIndicator();
+            return;
+          }
+          if (this.formModal.isEdit) {
+            await updateRelationship(String(diagramId), String(this.formModal.element.id), {
+              source: this.formModal.data.source,
+              target: this.formModal.data.target,
+              type: this.formModal.data.type,
+            });
+          } else {
+            await createRelationship(String(diagramId), {
+              source: this.formModal.data.source,
+              target: this.formModal.data.target,
+              type: this.formModal.data.type,
+            });
+          }
+        }
+
+        // Fetch updated diagram data
+        const response = await getUsecaseDiagramById(String(diagramId));
+        const updatedDiagram = response?.data?.data || response?.data;
+        
+        // Mark form as having changes
+        this.formModal.hasChanges = true;
+        this.managementModal.hasChanges = true;
+
+        if (updatedDiagram) {
+          // Emit updated data to parent
+          this.$emit('diagram-updated', updatedDiagram);
+        } else {
+          // Fallback: just emit event without data
+          this.$emit('diagram-updated');
+        }
+
+        this.closeFormModal();
+        this.hideSavingIndicator();
+        this.isCrudLoading = false
+      } catch (error) {
+        console.error('Error saving:', error);
+        alert('Failed to save: ' + (error.response?.data?.message || error.message));
+        this.hideSavingIndicator();
+        this.isCrudLoading = false
+      }
+    },
+    async confirmDelete(type, element) {
+      if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+        return;
+      }
+
+      const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id;
+      if (!diagramId) {
+        alert('Diagram ID not found');
+        return;
+      }
+
+      if (this.isCrudLoading || this.deletingElementId) return
+
+      try {
+        this.deletingElementId = element.id
+        this.isCrudLoading = true
+        this.showSavingIndicator();
+
+        if (type === 'actor') {
+          await deleteActor(String(diagramId), String(element.id));
+        } else if (type === 'usecase') {
+          await deleteUsecase(String(diagramId), String(element.id));
+        } else if (type === 'association') {
+          await deleteAssociation(String(diagramId), String(element.id));
+        } else if (type === 'relationship') {
+          await deleteRelationship(String(diagramId), String(element.id));
+        }
+
+        // Fetch updated diagram data
+        const response = await getUsecaseDiagramById(String(diagramId));
+        const updatedDiagram = response?.data?.data || response?.data;
+        
+        // Mark management modal as having changes
+        this.managementModal.hasChanges = true;
+
+        if (updatedDiagram) {
+          // Emit updated data to parent
+          this.$emit('diagram-updated', updatedDiagram);
+        } else {
+          // Fallback: just emit event without data
+          this.$emit('diagram-updated');
+        }
+
+        this.hideSavingIndicator();
+      } catch (error) {
+        console.error('Error deleting:', error);
+        alert('Failed to delete: ' + (error.response?.data?.message || error.message));
+        this.hideSavingIndicator();
+      }
+    },
+    // Context Menu Methods (kept for right-click)
+    showContextMenu(event, element, type) {
+      if (!this.editable || this.previewMode) return;
+      
+      // For now, just open management modal and select the item
+      this.showManagementModal();
+      if (type === 'actor') {
+        this.managementModal.activeTab = 'actors';
+      } else if (type === 'usecase') {
+        this.managementModal.activeTab = 'usecases';
+      }
+    },
     setupKeyboardShortcuts() {
       document.addEventListener('keydown', (event) => {
         if (event.ctrlKey || event.metaKey) {
@@ -1693,7 +2405,13 @@ export default {
         switch (event.key) {
           case 'Escape':
             this.clearSelection()
-            if (this.isFullscreen) this.exitFullscreen()
+            if (this.managementModal.visible) {
+              this.closeManagementModal()
+            } else if (this.formModal.visible) {
+              this.closeFormModal()
+            } else if (this.isFullscreen) {
+              this.exitFullscreen()
+            }
             break
         }
       })
@@ -1706,8 +2424,8 @@ export default {
 .ucd-renderer-final {
   display: flex;
   height: 100%;
-  background: white;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
@@ -1715,6 +2433,8 @@ export default {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .ucd-renderer-final.preview-mode {
@@ -1752,67 +2472,96 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid rgba(226, 232, 240, 0.8);
   z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .toolbar-group {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  gap: 6px;
+  padding: 6px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  color: #6b7280;
+  color: #64748b;
   font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.toolbar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.toolbar-btn:hover:not(:disabled)::before {
+  left: 100%;
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
   color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+}
+
+.toolbar-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .toolbar-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .zoom-display {
-  min-width: 48px;
+  min-width: 56px;
   text-align: center;
   font-size: 12px;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 700;
+  color: #1a365d;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(26, 54, 93, 0.1);
 }
 
 /* Main Container */
 .ucd-container-final {
   flex: 1;
   overflow: hidden;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
   position: relative;
   cursor: grab;
 }
@@ -1835,22 +2584,38 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid #e5e7eb;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  border-top: 2px solid rgba(226, 232, 240, 0.8);
   font-size: 12px;
-  color: #6b7280;
+  color: #64748b;
+  font-weight: 500;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
 }
 
 .status-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.status-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
 }
 
 .status-item.spacer {
   flex: 1;
+  background: transparent;
+}
+
+.status-item.spacer:hover {
+  transform: none;
 }
 
 /* SVG Element Styles */
@@ -2046,13 +2811,14 @@ export default {
 .save-indicator {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
   font-size: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  min-width: 120px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 140px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .save-indicator .icon {
@@ -2063,7 +2829,8 @@ export default {
 /* Saving State */
 .save-indicator.saving {
   color: #f59e0b;
-  background: rgba(245, 158, 11, 0.1);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .save-indicator.saving .icon {
@@ -2074,7 +2841,8 @@ export default {
 /* Saved State */
 .save-indicator.saved {
   color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .save-indicator.saved .icon {
@@ -2083,7 +2851,9 @@ export default {
 
 /* Default State */
 .save-indicator:not(.saving):not(.saved) {
-  color: #6b7280;
+  color: #64748b;
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.1) 0%, rgba(100, 116, 139, 0.05) 100%);
+  border: 1px solid rgba(100, 116, 139, 0.15);
 }
 
 .save-text {
@@ -2125,6 +2895,530 @@ export default {
 @media (max-width: 768px) {
   .auto-save-status {
     display: none; /* Ẩn trên mobile để tiết kiệm không gian */
+  }
+}
+
+/* CRUD Styles */
+.btn-add {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+}
+
+.btn-add:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  min-width: 160px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.context-menu-item:hover {
+  background: #f3f4f6;
+}
+
+.context-menu-item.danger {
+  color: #ef4444;
+}
+
+.context-menu-item.danger:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.context-menu-item .material-symbols-outlined {
+  font-size: 18px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #1a365d;
+  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+}
+
+/* Management Modal Styles */
+.management-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.management-modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.management-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.management-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.management-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #1a365d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-count {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.management-tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.tab-panel {
+  animation: fadeIn 0.2s ease;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.btn-add-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-item:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.item-card:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.item-description {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.relationship-type {
+  padding: 2px 8px;
+  background: #e0e7ff;
+  color: #6366f1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 8px;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.btn-edit:hover {
+  background: #dbeafe;
+}
+
+.btn-delete {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-delete:hover {
+  background: #fee2e2;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #9ca3af;
+}
+
+.empty-state .material-symbols-outlined {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Form Modal Styles */
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+}
+
+.form-modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.form-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.form-modal-body {
+  padding: 24px;
+}
+
+.form-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-manage {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  border: none;
+}
+
+.btn-manage:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>
