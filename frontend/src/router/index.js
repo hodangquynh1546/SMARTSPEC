@@ -6,6 +6,7 @@ import TestcaseManagement from '../views/TestcaseManagement.vue'
 import DatabaseManagement from '../views/DatabaseManagement.vue'
 // import ActivityDiagramManagement from '../views/ActivityDiagramManagement.vue'
 import UmlManagement from '../views/UmlManagement.vue'
+import AICopilotView from '../views/AICopilotView.vue'
 import Login from '../pages/login.vue'
 import OauthRedirect from '../pages/OauthRedirect.vue'
 import Register from '../pages/register.vue'
@@ -26,8 +27,6 @@ const routes = [
   { path: '/verify-email', component: VerifyEmail },
   { path: '/verify-otp', component: VerifyOtp },
   { path: '/forgot-password', component: ForgotPassword },
-  { path: '/reset-password', component: ResetPassword },
-
   { path: '/reset-password', component: ResetPassword },
   { 
     path: '/dashboard', 
@@ -75,6 +74,12 @@ const routes = [
     name: 'UmlManagement',
     component: UmlManagement,
     props: true,
+      },
+      {
+        path: 'ai-copilot',
+        name: 'AICopilot',
+        component: AICopilotView,
+        props: true,
       },
     ]
   },

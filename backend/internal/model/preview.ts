@@ -30,7 +30,7 @@ const previewChangeSchema = new Schema({
 // Mapping: owner -> owner, editor -> member
 const approverSchema = new Schema({
   user_id: { type: Schema.Types.ObjectId, ref: "users", required: true },
-  role: { type: String, enum: ["owner", "member"], required: true }, // "member" = editor trong project
+  role: { type: String, enum: ["owner", "editor", "member"], required: true }, // hỗ trợ cả editor và member
   approved_at: { type: Date, default: null },
   status: { type: String, enum: ["pending", "approved", "rejected","rollback"], default: "pending" },
   comment: { type: String, default: "" }

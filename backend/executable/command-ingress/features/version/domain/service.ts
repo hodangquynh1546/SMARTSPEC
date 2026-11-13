@@ -896,10 +896,10 @@ export class VersionService {
     session.startTransaction();
 
     try {
-      const baseVersion = await Version.findById(versionId).session(session);
+      let baseVersion = await Version.findById(versionId).session(session);
       if (!baseVersion) throw new Error("Base version not found");
 
-      const preview = await Preview.findOne({ base_version_id: versionId }).session(session);
+      let preview = await Preview.findOne({ base_version_id: versionId }).session(session);
       if (!preview) throw new Error("Preview not found");
 
       const change = preview.changes.find((c: any) => c.change_id === changeId);
@@ -1069,12 +1069,18 @@ export class VersionService {
       // ======================================================
       // 3️⃣ Commit changes
       // ======================================================
+      console.log("Số change trước khi xóa", preview.changes.length);
       preview.changes.pull({ change_id: changeId });
       await preview.save({ session });
       await baseVersion.save({ session });
 
       await session.commitTransaction();
-
+      preview = await Preview.findOne({ base_version_id: versionId });
+      baseVersion = await Version.findById(versionId);
+      console.log("Số change sau khi xóa: ",preview.changes.length);
+      if(baseVersion.version_temporary==true && preview.changes.length==0 && baseVersion.parent_version_id){
+        await this.deleteVersion(versionId,userId);
+      }
       return new ServiceResponse(
         ResponseStatus.Success,
         "Reverted successfully",

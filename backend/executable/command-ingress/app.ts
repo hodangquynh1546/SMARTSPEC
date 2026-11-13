@@ -110,6 +110,8 @@ import { PresenceRedisService } from "./features/presence/domain/presence.redis.
 import { presenceSocketService } from "./features/presence/domain/presence.socket.service";
 
 import initLLMRoute from "./features/llm/adapter/route";
+import { AICopilotController } from "./features/ai_copilot/adapter/controller";
+import initAICopilotRoute from "./features/ai_copilot/adapter/route";
 
 
 const app = express();
@@ -275,6 +277,7 @@ const createHttpServer = (redisClient: any) => {
   app.use("/api/logs", initLogRoute(new LogController(new LogService())));
   app.use("/api/versions", initVersionRoute(new VersionController(new VersionService())))
   app.use("/api/llm", initLLMRoute());
+  app.use("/api/ai-copilot", initAICopilotRoute(new AICopilotController()));
   app.use(recoverMiddleware);
 
   // ✅ Khởi tạo Redis services nếu có Redis client
