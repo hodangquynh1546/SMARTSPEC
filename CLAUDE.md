@@ -21,6 +21,7 @@ SmartSpec/
     │   │   │   ├── socket.ts        # Socket.IO Realtime Hub & Rooms
     │   │   │   └── features/        # Các Feature Slices (Clean Architecture)
     │   │   │       ├── auth/        # Xác thực, JWT, 2FA, Google OAuth
+    │   │   │       ├── ai_copilot/  # 🤖 AI Copilot Chatbot tương tác dữ liệu dự án
     │   │   │       ├── orchestrator/# Điều phối bóc tách đa nguồn & gọi Gemini AI
     │   │   │       ├── handle_audio/# STT với Whisper + Librosa (Python)
     │   │   │       ├── handle_image/# OCR với EasyOCR + Tesseract (Python)
@@ -28,24 +29,27 @@ SmartSpec/
     │   │   │       ├── handle_pdf/  # Bóc tách text & scan OCR file PDF
     │   │   │       ├── usecase/     # Quản lý CRUD & định dạng Use Case
     │   │   │       ├── uml/         # Sinh sơ đồ Use Case, Activity, Sequence
-    │   │   │       ├── database/    # Thiết kế CSDL (Tables, Columns, Relationships)
+    │   │   │       ├── database/    # Thiết kế CSDL (Tables, Columns, Relationships, SQL Gen)
     │   │   │       ├── testcase/    # Sinh kịch bản kiểm thử & Export báo cáo
     │   │   │       ├── project/     # Quản lý dự án, chia sẻ, thùng rác
     │   │   │       ├── version/     # Quản lý phiên bản đặc tả (Semantic Versioning)
     │   │   │       ├── api_key/     # Quản lý Pool API Key (Gemini, OpenAI, Claude)
-    │   │   │       ├── presence/    # Trạng thái online thời gian thực của thành viên
+    │   │   │       ├── presence/    # Trạng thái online thời gian thực của thành viên (Redis)
+    │   │   │       ├── stats/       # Thống kê lượng dùng token, API usage logs & cache
+    │   │   │       ├── llm/         # Cấu hình & lựa chọn model AI linh hoạt
     │   │   │       └── log/         # Ghi nhận và stream log hệ thống/dự án
     │   │   └── mongodb-redis-connector/ # CDC đồng bộ Mongo Change Streams -> Redis
-    │   ├── internal/model/          # Mongoose Schemas & TypeScript Types
+    │   ├── internal/model/          # Mongoose Schemas (usecase, ai_copilot_chat, api_usage,...)
     │   └── requirements.txt         # Thư viện Python phục vụ AI/OCR/STT
     └── frontend/                    # Vue 3 + Vite + Tailwind CSS Frontend (Port 5173)
         └── src/
             ├── main.js              # Entry point Vue app
             ├── router/              # Vue Router 4 (authGuard & adminGuard)
+            ├── layouts/             # ProjectLayout.vue (Khung điều hướng dự án thống nhất)
             ├── stores/              # Pinia state stores
             ├── utils/               # axiosClient (auto refresh JWT), socket.js, authGuard
-            ├── views/               # Các trang chính (Dashboard, Editor, UML, DB, Testcase, Admin)
-            └── components/          # UI components phân theo domain (usecase, database, uml, testcase, admin)
+            ├── views/               # Các trang chính (Dashboard, Editor, UML, DB, Testcase, Admin, AICopilotView)
+            └── components/          # UI components phân theo domain (ai-copilot, usecase, database, uml, testcase, admin)
 ```
 
 ---
