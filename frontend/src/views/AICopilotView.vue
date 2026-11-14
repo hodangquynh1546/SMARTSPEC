@@ -7,7 +7,7 @@
         <div class="lane-header">
           <h3>
             <span class="material-symbols-outlined">folder</span>
-            Project Data
+            Dữ liệu dự án
           </h3>
           <button @click="leftCollapsed = !leftCollapsed" class="collapse-btn">
             <span class="material-symbols-outlined">{{ leftCollapsed ? 'chevron_right' : 'chevron_left' }}</span>
@@ -31,7 +31,7 @@
         <div class="lane-header">
           <h3>
             <span class="material-symbols-outlined">dashboard</span>
-            Visualization
+            Trực quan hoá
           </h3>
           <div class="header-actions">
             <button @click="centerCollapsed = !centerCollapsed" class="collapse-btn">
@@ -171,7 +171,7 @@ const saveChanges = async () => {
     // TODO: Implement save logic
   } catch (error) {
     console.error('Error saving:', error)
-    alert('Invalid JSON format')
+    alert('Định dạng JSON không hợp lệ')
   }
 }
 
@@ -191,7 +191,7 @@ const handleItemUpdated = async (updatedItem, itemType) => {
     handleRefreshRequested()
   } catch (error) {
     console.error('Error updating item:', error)
-    alert('Failed to update item')
+    alert('Cập nhật mục thất bại')
   }
 }
 

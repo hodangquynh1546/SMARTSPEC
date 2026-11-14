@@ -10,7 +10,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ statistics.total || 0 }}</h3>
-            <p>Total Test Cases</p>
+            <p>Tổng số test case</p>
           </div>
         </div>
         <div class="stat-card passed">
@@ -19,7 +19,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ statistics.passed || 0 }}</h3>
-            <p>Passed</p>
+            <p>Đạt</p>
           </div>
         </div>
         <div class="stat-card failed">
@@ -28,7 +28,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ statistics.failed || 0 }}</h3>
-            <p>Failed</p>
+            <p>Thất bại</p>
           </div>
         </div>
         <!--<div class="stat-card pending">
@@ -37,7 +37,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ statistics.not_executed || 0 }}</h3>
-            <p>Not Executed</p>
+            <p>Chưa chạy</p>
           </div>
         </div>-->
         <!--<div class="stat-card coverage">
@@ -46,7 +46,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ coveragePercentage }}%</h3>
-            <p>Requirement Coverage</p>
+            <p>Độ phủ yêu cầu</p>
           </div>
         </div>-->
       </div>
@@ -69,11 +69,11 @@
         <div class="action-buttons-group">
           <button class="btn-secondary" @click="showGenerateModal = true" :disabled="loading">
             <span class="material-symbols-outlined">auto_awesome</span>
-            Generate Test Cases
+            Sinh test case
           </button>
           <button class="btn-primary" @click="showCreateModal = true" :disabled="loading">
             <span class="material-symbols-outlined">add</span>
-            Create Manual
+            Tạo thủ công
           </button>
           <button
             class="btn-secondary export-btn"
@@ -81,7 +81,7 @@
             :disabled="loading || !project._id"
           >
             <span class="material-symbols-outlined">download</span>
-            Export Test Cases
+            Xuất test case
           </button>
         </div>
       </div>
@@ -93,7 +93,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search test cases..."
+              placeholder="Tìm test case..."
               class="search-input"
               @input="handleSearch"
               :disabled="loading"
@@ -119,7 +119,7 @@
                 @click="setStatusFilter('')"
               >
                 <span class="material-symbols-outlined">filter_alt_off</span>
-                All Status
+                Tất cả trạng thái
               </button>
               <button 
                 class="filter-option" 
@@ -127,7 +127,7 @@
                 @click="setStatusFilter('passed')"
               >
                 <span class="material-symbols-outlined">check_circle</span>
-                Passed
+                Đạt
               </button>
               <button 
                 class="filter-option" 
@@ -135,7 +135,7 @@
                 @click="setStatusFilter('failed')"
               >
                 <span class="material-symbols-outlined">cancel</span>
-                Failed
+                Thất bại
               </button>
               <button 
                 class="filter-option" 
@@ -143,7 +143,7 @@
                 @click="setStatusFilter('blocked')"
               >
                 <span class="material-symbols-outlined">block</span>
-                Blocked
+                Bị chặn
               </button>
               <button 
                 class="filter-option" 
@@ -151,7 +151,7 @@
                 @click="setStatusFilter('not_executed')"
               >
                 <span class="material-symbols-outlined">schedule</span>
-                Not Executed
+                Chưa chạy
               </button>
               <button 
                 class="filter-option" 
@@ -159,7 +159,7 @@
                 @click="setStatusFilter('in_progress')"
               >
                 <span class="material-symbols-outlined">hourglass_empty</span>
-                In Progress
+                Đang thực hiện
               </button>
             </div>
           </div>
@@ -183,7 +183,7 @@
                 @click="setTypeFilter('')"
               >
                 <span class="material-symbols-outlined">filter_alt_off</span>
-                All Types
+                Tất cả loại
               </button>
               <button 
                 class="filter-option" 
@@ -191,7 +191,7 @@
                 @click="setTypeFilter('unit')"
               >
                 <span class="material-symbols-outlined">science</span>
-                Unit
+                Đơn vị
               </button>
               <button 
                 class="filter-option" 
@@ -199,7 +199,7 @@
                 @click="setTypeFilter('integration')"
               >
                 <span class="material-symbols-outlined">hub</span>
-                Integration
+                Tích hợp
               </button>
               <button 
                 class="filter-option" 
@@ -223,7 +223,7 @@
                 @click="setTypeFilter('performance')"
               >
                 <span class="material-symbols-outlined">speed</span>
-                Performance
+                Hiệu năng
               </button>
               <button 
                 class="filter-option" 
@@ -231,7 +231,7 @@
                 @click="setTypeFilter('security')"
               >
                 <span class="material-symbols-outlined">security</span>
-                Security
+                Bảo mật
               </button>
             </div>
           </div>
@@ -255,7 +255,7 @@
                 @click="setPriorityFilter('')"
               >
                 <span class="material-symbols-outlined">filter_alt_off</span>
-                All Priorities
+                Tất cả mức ưu tiên
               </button>
               <button 
                 class="filter-option" 
@@ -263,7 +263,7 @@
                 @click="setPriorityFilter('critical')"
               >
                 <span class="material-symbols-outlined">error</span>
-                Critical
+                Nghiêm trọng
               </button>
               <button 
                 class="filter-option" 
@@ -271,7 +271,7 @@
                 @click="setPriorityFilter('high')"
               >
                 <span class="material-symbols-outlined">priority_high</span>
-                High
+                Cao
               </button>
               <button 
                 class="filter-option" 
@@ -279,7 +279,7 @@
                 @click="setPriorityFilter('medium')"
               >
                 <span class="material-symbols-outlined">remove</span>
-                Medium
+                Trung bình
               </button>
               <button 
                 class="filter-option" 
@@ -287,24 +287,24 @@
                 @click="setPriorityFilter('low')"
               >
                 <span class="material-symbols-outlined">arrow_downward</span>
-                Low
+                Thấp
               </button>
             </div>
           </div>
           <button class="btn-secondary clear-filters" @click="clearFilters" :disabled="loading">
             <span class="material-symbols-outlined">clear_all</span>
-            Clear
+            Xoá
           </button>
         </div>
         <div class="view-actions">
           <!-- Column Visibility Toggle -->
           <div class="column-visibility-menu">
-            <button class="btn-icon" @click="showColumnMenu = !showColumnMenu" title="Column Options">
+            <button class="btn-icon" @click="showColumnMenu = !showColumnMenu" title="Tuỳ chọn cột">
               <span class="material-symbols-outlined">view_column</span>
             </button>
             <div v-if="showColumnMenu" class="column-menu-dropdown" @click.stop>
               <div class="column-menu-header">
-                <h4>Show/Hide Columns</h4>
+                <h4>Hiện/ẩn cột</h4>
                 <button class="btn-close-menu" @click="showColumnMenu = false">
                   <span class="material-symbols-outlined">close</span>
                 </button>
@@ -323,21 +323,21 @@
                     @change="toggleColumn(column.key)"
                   />
                   <span class="column-label">{{ column.label }}</span>
-                  <span v-if="column.required" class="required-badge">Required</span>
+                  <span v-if="column.required" class="required-badge">Bắt buộc</span>
                 </label>
               </div>
               <div class="column-menu-footer">
-                <button class="btn-reset-columns" @click="resetColumns">Reset to Default</button>
+                <button class="btn-reset-columns" @click="resetColumns">Đặt lại mặc định</button>
               </div>
             </div>
           </div>
-          <button class="btn-icon" @click="loadTestCases" title="Refresh" :disabled="loading">
+          <button class="btn-icon" @click="loadTestCases" title="Làm mới" :disabled="loading">
             <span class="material-symbols-outlined" :class="{ spinning: loading }">refresh</span>
           </button>
           <button
             class="btn-icon"
             @click="showExportPanel = !showExportPanel"
-            title="Export Options"
+            title="Tuỳ chọn xuất"
           >
             <span class="material-symbols-outlined">download</span>
           </button>
@@ -348,20 +348,20 @@
       <div v-if="showExportPanel" class="export-panel-toggle">
         <button class="btn-text" @click="showExportPanel = false">
           <span class="material-symbols-outlined">close</span>
-          Hide Export Options
+          Ẩn tuỳ chọn xuất
         </button>
       </div>
 
       <!-- Sorting Options -->
       <div class="sorting-section">
-        <span class="sort-label">Sort by:</span>
+        <span class="sort-label">Sắp xếp theo:</span>
         <div class="sort-options">
           <button
             class="sort-option"
             :class="{ active: sortBy === 'title' }"
             @click="setSort('title')"
           >
-            Title
+            Tiêu đề
             <span
               class="material-symbols-outlined sort-icon"
               :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -374,7 +374,7 @@
             :class="{ active: sortBy === 'priority' }"
             @click="setSort('priority')"
           >
-            Priority
+            Độ ưu tiên
             <span
               class="material-symbols-outlined sort-icon"
               :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -387,7 +387,7 @@
             :class="{ active: sortBy === 'status' }"
             @click="setSort('status')"
           >
-            Status
+            Trạng thái
             <span
               class="material-symbols-outlined sort-icon"
               :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -400,7 +400,7 @@
             :class="{ active: sortBy === 'executed_at' }"
             @click="setSort('executed_at')"
           >
-            Last Executed
+            Chạy lần cuối
             <span
               class="material-symbols-outlined sort-icon"
               :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -414,7 +414,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading test cases...</p>
+        <p>Đang tải test case...</p>
       </div>
 
       <!-- Test Cases Table -->
@@ -432,14 +432,14 @@
                   />
                 </th>
                 <th class="id-column">ID</th>
-                <th class="title-column">Title</th>
-                <th v-if="visibleColumns.type" class="type-column">Type</th>
-                <th v-if="visibleColumns.priority" class="priority-column">Priority</th>
-                <th class="status-column">Status</th>
-                <th v-if="visibleColumns.database_tables" class="tables-column">Database Tables</th>
-                <th v-if="visibleColumns.requirements" class="requirements-column">Requirements</th>
-                <th v-if="visibleColumns.last_executed" class="date-column">Last Executed</th>
-                <th class="actions-column">Actions</th>
+                <th class="title-column">Tiêu đề</th>
+                <th v-if="visibleColumns.type" class="type-column">Loại</th>
+                <th v-if="visibleColumns.priority" class="priority-column">Độ ưu tiên</th>
+                <th class="status-column">Trạng thái</th>
+                <th v-if="visibleColumns.database_tables" class="tables-column">Bảng dữ liệu</th>
+                <th v-if="visibleColumns.requirements" class="requirements-column">Yêu cầu</th>
+                <th v-if="visibleColumns.last_executed" class="date-column">Chạy lần cuối</th>
+                <th class="actions-column">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -526,13 +526,13 @@
                       "
                       class="no-requirements"
                     >
-                      No requirements
+                      Không có yêu cầu
                     </span>
                   </div>
                 </td>
                 <td v-if="visibleColumns.last_executed" class="date-column">
                   <span class="last-executed">
-                    {{ formatDate(testcase.executed_at) || 'Never' }}
+                    {{ formatDate(testcase.executed_at) || 'Chưa bao giờ' }}
                   </span>
                 </td>
                 <td class="actions-column">
@@ -540,23 +540,23 @@
                     <button
                       class="btn-icon success"
                       @click="executeTestcase(testcase._id)"
-                      :title="testcase.status === 'in_progress' ? 'In Progress' : 'Execute'"
+                      :title="testcase.status === 'in_progress' ? 'Đang thực hiện' : 'Chạy'"
                       :disabled="testcase.status === 'in_progress'"
                     >
                       <span class="material-symbols-outlined">
                         {{ testcase.status === 'in_progress' ? 'hourglass_empty' : 'play_arrow' }}
                       </span>
                     </button>
-                    <button class="btn-icon" @click="viewTestcase(testcase)" title="View Details">
+                    <button class="btn-icon" @click="viewTestcase(testcase)" title="Xem chi tiết">
                       <span class="material-symbols-outlined">visibility</span>
                     </button>
-                    <button class="btn-icon" @click="editTestcase(testcase)" title="Edit">
+                    <button class="btn-icon" @click="editTestcase(testcase)" title="Sửa">
                       <span class="material-symbols-outlined">edit</span>
                     </button>
                     <button
                       class="btn-icon danger"
                       @click="deleteTestcase(testcase._id)"
-                      title="Delete"
+                      title="Xoá"
                     >
                       <span class="material-symbols-outlined">delete</span>
                     </button>
@@ -569,16 +569,16 @@
           <!-- Empty State -->
           <div v-if="testCases.length === 0" class="empty-state">
             <span class="material-symbols-outlined">playlist_remove</span>
-            <h3>No test cases found</h3>
-            <p v-if="hasActiveFilters">Try adjusting your filters or search terms.</p>
+            <h3>Không tìm thấy test case</h3>
+            <p v-if="hasActiveFilters">Hãy thử đổi bộ lọc hoặc từ khoá tìm kiếm.</p>
             <p v-else>
-              Create your first test case or generate them automatically from requirements.
+              Tạo test case đầu tiên hoặc sinh tự động từ yêu cầu.
             </p>
             <div class="empty-state-actions">
               <button class="btn-primary" @click="showGenerateModal = true">
-                Generate Test Cases
+                Sinh test case
               </button>
-              <button class="btn-secondary" @click="showCreateModal = true">Create Manual</button>
+              <button class="btn-secondary" @click="showCreateModal = true">Tạo thủ công</button>
             </div>
           </div>
         </div>
@@ -586,8 +586,8 @@
         <!-- Pagination -->
         <div v-if="testCases.length > 0" class="pagination">
           <div class="pagination-info">
-            Showing {{ pagination.startIndex + 1 }} to {{ pagination.endIndex }} of
-            {{ testCases.length }} test cases
+            Hiển thị {{ pagination.startIndex + 1 }} to {{ pagination.endIndex }} /
+            {{ testCases.length }} test case
           </div>
           <div class="pagination-controls">
             <button class="btn-icon" @click="previousPage" :disabled="pagination.currentPage === 1">
@@ -613,7 +613,7 @@
             </button>
           </div>
           <div class="page-size-selector">
-            <label for="pageSize">Show:</label>
+            <label for="pageSize">Hiển thị:</label>
             <select
               id="pageSize"
               v-model="pagination.pageSize"
@@ -632,28 +632,28 @@
         <div v-if="selectedTestCases.length > 0" class="bulk-actions">
           <div class="bulk-info">
             <span class="material-symbols-outlined">check_circle</span>
-            {{ selectedTestCases.length }} test cases selected
+            {{ selectedTestCases.length }} test case đã chọn
           </div>
           <div class="bulk-buttons">
             <button class="btn-secondary" @click="bulkExecute('passed')" :disabled="loading">
               <span class="material-symbols-outlined">check_circle</span>
-              Mark as Passed
+              Đánh dấu đạt
             </button>
             <button class="btn-secondary" @click="bulkExecute('failed')" :disabled="loading">
               <span class="material-symbols-outlined">cancel</span>
-              Mark as Failed
+              Đánh dấu lỗi
             </button>
             <button class="btn-secondary" @click="bulkExecute('not_executed')" :disabled="loading">
               <span class="material-symbols-outlined">schedule</span>
-              Mark as Not Executed
+              Đánh dấu chưa chạy
             </button>
             <button class="btn-danger" @click="bulkDelete" :disabled="loading">
               <span class="material-symbols-outlined">delete</span>
-              Delete Selected
+              Xoá mục đã chọn
             </button>
             <button class="btn-secondary" @click="clearSelection" :disabled="loading">
               <span class="material-symbols-outlined">close</span>
-              Cancel
+              Huỷ
             </button>
           </div>
         </div>
@@ -773,11 +773,11 @@ export default {
 
     // Column visibility
     const columnOptions = [
-      { key: 'type', label: 'Type', required: false },
-      { key: 'priority', label: 'Priority', required: false },
-      { key: 'database_tables', label: 'Database Tables', required: false },
-      { key: 'requirements', label: 'Requirements', required: false },
-      { key: 'last_executed', label: 'Last Executed', required: false },
+      { key: 'type', label: 'Loại', required: false },
+      { key: 'priority', label: 'Độ ưu tiên', required: false },
+      { key: 'database_tables', label: 'Bảng dữ liệu', required: false },
+      { key: 'requirements', label: 'Yêu cầu', required: false },
+      { key: 'last_executed', label: 'Chạy lần cuối', required: false },
     ]
 
     const defaultVisibleColumns = {
@@ -990,7 +990,7 @@ export default {
       try {
         const projectId = route.params.id
         if (!projectId) {
-          toast.error('Project ID is required')
+          toast.error('Cần mã dự án')
           return
         }
 
@@ -1020,7 +1020,7 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching project:', error)
-        toast.error('Failed to load project data')
+        toast.error('Không tải được dữ liệu dự án')
       }
     }
 
@@ -1077,7 +1077,7 @@ export default {
         pagination.value.currentPage = 1
       } catch (error) {
         console.error('Error loading test cases:', error)
-        toast.error('Failed to load test cases')
+        toast.error('Không tải được test case')
         testCases.value = []
       } finally {
         loading.value = false
@@ -1151,7 +1151,7 @@ export default {
         exportProgress.value.progress = 100
         exportProgress.value.status = 'completed'
 
-        toast.success(`Successfully exported ${exportConfig.title}`)
+        toast.success(`Đã xuất ${exportConfig.title}`)
         showExportModal.value = false
 
         // Auto-close progress modal after 2 seconds
@@ -1171,7 +1171,7 @@ export default {
     const cancelExport = () => {
       exportProgress.value.show = false
       exportLoading.value = false
-      toast.info('Export cancelled')
+      toast.info('Đã huỷ xuất')
     }
 
     const formatTestCaseTitle = (testcase) => {
@@ -1183,12 +1183,12 @@ export default {
       const requirementIds = testcase.source_requirement_ids || []
 
       if (requirementIds.length === 0) {
-        return testcase.title || 'Untitled Test Case'
+        return testcase.title || 'Test case chưa đặt tên'
       }
 
       const firstReqId = requirementIds[0]
       const requirementName = getRequirementName(firstReqId)
-      const baseTitle = testcase.title || 'Test Scenario'
+      const baseTitle = testcase.title || 'Kịch bản kiểm thử'
 
       // Show requirement name instead of ID
       return requirementName ? `${requirementName} - ${baseTitle}` : baseTitle
@@ -1201,7 +1201,7 @@ export default {
         const searchId = String(requirementId || '')
         return reqId === searchId || reqId.toLowerCase() === searchId.toLowerCase()
       })
-      return requirement?.name || 'Unknown Requirement'
+      return requirement?.name || 'Yêu cầu không rõ'
     }
 
     const handleGenerateTestCases = async (savedTestCases) => {
@@ -1240,12 +1240,12 @@ export default {
       try {
         if (editingTestcase.value) {
           await testcaseApi.updateTestCase(editingTestcase.value._id, testcaseData)
-          toast.success('Test case updated successfully')
+          toast.success('Đã cập nhật test case')
         } else {
           await testcaseApi.saveTestCases(project.value._id, selectedVersionId.value, {
             testCases: [testcaseData],
           })
-          toast.success('Test case created successfully')
+          toast.success('Đã tạo test case')
         }
         await loadTestCases()
         closeModal()
@@ -1253,7 +1253,7 @@ export default {
         console.error('Error saving test case:', error)
         const { formatErrorForDisplay } = require('@/utils/errorMessages')
         const errorMessage = formatErrorForDisplay(error, 'An error occurred')
-        toast.error(`Failed to save test case: ${errorMessage}`)
+        toast.error(`Lưu test case thất bại: ${errorMessage}`)
       }
     }
 
@@ -1262,32 +1262,32 @@ export default {
       if (testcase) {
         executingTestcase.value = testcase
       } else {
-        toast.error('Test case not found')
+        toast.error('Không tìm thấy test case')
       }
     }
 
     const handleExecuteTestcase = async (executionData) => {
       if (!executingTestcase.value) {
-        toast.error('No test case selected for execution')
+        toast.error('Chưa chọn test case để chạy')
         return
       }
 
       try {
         await testcaseApi.executeTestCase(executingTestcase.value._id, executionData)
-        // toast.success('Test case executed successfully')
+        // toast.success('Đã chạy test case')
         await loadTestCases()
         executingTestcase.value = null
       } catch (error) {
         console.error('Error executing test case:', error)
         const { formatErrorForDisplay } = require('@/utils/errorMessages')
         const errorMessage = formatErrorForDisplay(error, 'An error occurred')
-        toast.error(`Failed to execute test case: ${errorMessage}`)
+        toast.error(`Chạy test case thất bại: ${errorMessage}`)
       }
     }
 
     const bulkExecute = async (status) => {
       if (selectedTestCases.value.length === 0) {
-        toast.warning('No test cases selected')
+        toast.warning('Chưa chọn test case')
         return
       }
 
@@ -1296,7 +1296,7 @@ export default {
           testCaseIds: selectedTestCases.value,
           executionData: { status },
         })
-        toast.success(`Marked ${selectedTestCases.value.length} test cases as ${status}`)
+        toast.success(`Đã đánh dấu ${selectedTestCases.value.length} test case là ${status}`)
         selectedTestCases.value = []
         selectAll.value = false
         await loadTestCases()
@@ -1304,18 +1304,18 @@ export default {
         console.error('Error bulk executing:', error)
         const { formatErrorForDisplay } = require('@/utils/errorMessages')
         const errorMessage = formatErrorForDisplay(error, 'An error occurred')
-        toast.error(`Failed to update test cases: ${errorMessage}`)
+        toast.error(`Cập nhật test case thất bại: ${errorMessage}`)
       }
     }
 
     const bulkDelete = async () => {
       if (selectedTestCases.value.length === 0) {
-        toast.warning('No test cases selected')
+        toast.warning('Chưa chọn test case')
         return
       }
 
       if (
-        !confirm(`Are you sure you want to delete ${selectedTestCases.value.length} test cases?`)
+        !confirm(`Bạn có chắc muốn xoá ${selectedTestCases.value.length} test case?`)
       ) {
         return
       }
@@ -1324,7 +1324,7 @@ export default {
         await testcaseApi.bulkDeleteTestCases(project.value._id, {
           testCaseIds: selectedTestCases.value,
         })
-        toast.success(`Deleted ${selectedTestCases.value.length} test cases`)
+        toast.success(`Đã xoá ${selectedTestCases.value.length} test case`)
         selectedTestCases.value = []
         selectAll.value = false
         await loadTestCases()
@@ -1332,7 +1332,7 @@ export default {
         console.error('Error bulk deleting:', error)
         const { formatErrorForDisplay } = require('@/utils/errorMessages')
         const errorMessage = formatErrorForDisplay(error, 'An error occurred')
-        toast.error(`Failed to delete test cases: ${errorMessage}`)
+        toast.error(`Xoá test case thất bại: ${errorMessage}`)
       }
     }
 
@@ -1342,19 +1342,19 @@ export default {
     }
 
     const deleteTestcase = async (testcaseId) => {
-      if (!confirm('Are you sure you want to delete this test case?')) {
+      if (!confirm('Bạn có chắc muốn xoá test case này?')) {
         return
       }
 
       try {
         await testcaseApi.deleteTestCase(testcaseId)
-        toast.success('Test case deleted successfully')
+        toast.success('Đã xoá test case')
         await loadTestCases()
       } catch (error) {
         console.error('Error deleting test case:', error)
         const { formatErrorForDisplay } = require('@/utils/errorMessages')
         const errorMessage = formatErrorForDisplay(error, 'An error occurred')
-        toast.error(`Failed to delete test case: ${errorMessage}`)
+        toast.error(`Xoá test case thất bại: ${errorMessage}`)
       }
     }
 
@@ -1413,22 +1413,22 @@ export default {
       loadTestCases()
     }
     const getStatusFilterLabel = () => {
-      if (statusFilter.value === '') return 'All Status'
+      if (statusFilter.value === '') return 'Tất cả trạng thái'
       const labels = {
         passed: 'Passed',
         failed: 'Failed',
         blocked: 'Blocked',
-        not_executed: 'Not Executed',
-        in_progress: 'In Progress',
+        not_executed: 'Chưa chạy',
+        in_progress: 'Đang thực hiện',
       }
-      return labels[statusFilter.value] || 'All Status'
+      return labels[statusFilter.value] || 'Tất cả trạng thái'
     }
     const getTypeFilterLabel = () => {
-      if (testTypeFilter.value === '') return 'All Types'
+      if (testTypeFilter.value === '') return 'Tất cả loại'
       return testTypeFilter.value.charAt(0).toUpperCase() + testTypeFilter.value.slice(1)
     }
     const getPriorityFilterLabel = () => {
-      if (priorityFilter.value === '') return 'All Priorities'
+      if (priorityFilter.value === '') return 'Tất cả mức ưu tiên'
       return priorityFilter.value.charAt(0).toUpperCase() + priorityFilter.value.slice(1)
     }
     const handleClickOutsideFilters = (event) => {
@@ -1497,7 +1497,7 @@ export default {
     const handleVersionSelect = (versionId) => {
       // Chỉ Owner mới được phép select version
       if (!checkIsOwner(project.value)) {
-        toast.warning('Only project owner can switch versions')
+        toast.warning('Chỉ chủ dự án mới được chuyển phiên bản')
         return
       }
       
@@ -1544,7 +1544,7 @@ export default {
       await loadAllData()
       const version = versions.value.find((v) => v._id === event.toVersionId)
       if (version) {
-        toast.info(`Version switched to: ${version.version_number || event.toVersionId}`)
+        toast.info(`Đã chuyển sang phiên bản: ${version.version_number || event.toVersionId}`)
       }
     }
 
@@ -1559,7 +1559,7 @@ export default {
         selectedVersionId.value = event.version._id
         saveSelectedVersion(project.value._id, event.version._id)
         await loadAllData()
-        toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+        toast.info(`Đã tạo phiên bản mới: ${event.version.version_number || event.version._id}`)
       }
     }
 
@@ -1620,10 +1620,10 @@ export default {
         await loadAllData()
 
         // Thông báo cho user
-        toast.success(`Switched to approved version: ${newVersion || versionId}`)
+        toast.success(`Đã chuyển sang phiên bản đã duyệt: ${newVersion || versionId}`)
       } catch (error) {
         console.error('❌ Error handling version-approved event:', error)
-        toast.error('Failed to switch to approved version')
+        toast.error('Không chuyển được sang phiên bản đã duyệt')
       }
     }
 
@@ -1646,19 +1646,19 @@ export default {
     const formatDate = (dateString) => {
       if (!dateString) return null
       try {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString('vi-VN', {
           year: 'numeric',
           month: 'short',
           day: 'numeric',
         })
       } catch (error) {
-        return 'Invalid Date'
+        return 'Ngày không hợp lệ'
       }
     }
 
     const openExportModal = () => {
       if (!project.value._id) {
-        toast.warning('Please wait for project data to load')
+        toast.warning('Vui lòng chờ tải xong dữ liệu dự án')
         return
       }
       showExportModal.value = true
@@ -1685,7 +1685,7 @@ export default {
     const resetColumns = () => {
       visibleColumns.value = { ...defaultVisibleColumns }
       saveColumnVisibility()
-      toast.info('Column visibility reset to default')
+      toast.info('Đã đặt lại hiển thị cột')
     }
 
     const loadAllData = async () => {
@@ -1697,7 +1697,7 @@ export default {
         await loadTestCases()
       } catch (error) {
         console.error('Error loading data:', error)
-        toast.error('Failed to load project data')
+        toast.error('Không tải được dữ liệu dự án')
       } finally {
         loading.value = false
       }

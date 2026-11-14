@@ -5,28 +5,28 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading database schema...</p>
+        <p>Đang tải lược đồ cơ sở dữ liệu...</p>
       </div>
 
       <!-- Error State -->
       <div v-else-if="error" class="error-state">
         <span class="material-symbols-outlined">error</span>
-        <h3>Failed to load database</h3>
+        <h3>Không tải được cơ sở dữ liệu</h3>
         <p>{{ error }}</p>
         <button class="btn-primary" @click="loadDatabaseData">
           <span class="material-symbols-outlined">refresh</span>
-          Retry
+          Thử lại
         </button>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="!database && !loading" class="empty-state">
         <span class="material-symbols-outlined">database</span>
-        <h3>No Database Schema</h3>
-        <p>Generate a database schema from your use cases to get started</p>
+        <h3>Chưa có lược đồ cơ sở dữ liệu</h3>
+        <p>Sinh lược đồ cơ sở dữ liệu từ use case để bắt đầu</p>
         <button class="btn-primary" @click="generateDatabaseSchema" :disabled="generatingSchema">
           <span class="material-symbols-outlined">auto_awesome</span>
-          {{ generatingSchema ? 'Generating...' : 'Generate Database Schema' }}
+          {{ generatingSchema ? 'Generating...' : 'Sinh lược đồ cơ sở dữ liệu' }}
         </button>
       </div>
 
@@ -34,31 +34,31 @@
       <div v-else-if="database" class="database-main-content">
         <div class="content-header">
           <div class="header-left">
-            <!-- <h2>Database Management</h2>
+            <!-- <h2>Quản lý cơ sở dữ liệu</h2>
             <p class="description">{{ database.description }}</p> -->
             <div class="database-meta">
               <span class="meta-item">
                 <span class="material-symbols-outlined">table</span>
-                {{ databaseStats.tables }} tables
+                {{ databaseStats.tables }} bảng
               </span>
               <span class="meta-item">
                 <span class="material-symbols-outlined">key</span>
-                {{ databaseStats.compositeKeys }} composite keys
+                {{ databaseStats.compositeKeys }} khoá phức hợp
               </span>
               <span class="meta-item">
                 <span class="material-symbols-outlined">link</span>
-                {{ databaseStats.relationships }} relationships
+                {{ databaseStats.relationships }} quan hệ
               </span>
             </div>
           </div>
           <div class="header-actions">
             <button class="btn-secondary" @click="showCompositeKeyModal = true">
               <span class="material-symbols-outlined">key</span>
-              Manage Composite Keys
+              Quản lý khoá phức hợp
             </button>
             <button class="btn-secondary" @click="showRelationshipModal = true">
               <span class="material-symbols-outlined">link</span>
-              Manage Relationships
+              Quản lý quan hệ
             </button>
             <button
               class="btn-secondary"
@@ -66,11 +66,11 @@
               :disabled="generatingSchema"
             >
               <span class="material-symbols-outlined">refresh</span>
-              {{ generatingSchema ? 'Regenerating...' : 'Regenerate' }}
+              {{ generatingSchema ? 'Đang sinh lại...' : 'Sinh lại' }}
             </button>
             <button class="btn-primary" @click="showCreateTableModal = true">
               <span class="material-symbols-outlined">add</span>
-              Create Table
+              Tạo bảng
             </button>
           </div>
         </div>
@@ -81,7 +81,7 @@
         <!-- Database Schema Visualization -->
         <div class="schema-section">
           <div class="section-header">
-            <h3>Database Schema</h3>
+            <h3>Lược đồ cơ sở dữ liệu</h3>
             <div class="view-options">
               <button
                 class="btn-secondary"
@@ -89,7 +89,7 @@
                 @click="viewMode = 'diagram'"
               >
                 <span class="material-symbols-outlined">schema</span>
-                Diagram View
+                Dạng sơ đồ
               </button>
               <button
                 class="btn-secondary"
@@ -97,15 +97,15 @@
                 @click="viewMode = 'list'"
               >
                 <span class="material-symbols-outlined">list</span>
-                List View
+                Dạng danh sách
               </button>
               <button class="btn-secondary" @click="exportSchema">
                 <span class="material-symbols-outlined">download</span>
-                Export Schema
+                Xuất lược đồ
               </button>
               <button class="btn-secondary" @click="exportSQL">
                 <span class="material-symbols-outlined">code</span>
-                Export SQL
+                Xuất SQL
               </button>
             </div>
           </div>
@@ -139,7 +139,7 @@
         <!-- SQL Preview với multiple dialects -->
         <div class="sql-preview-section">
           <div class="section-header">
-            <h3>SQL Preview</h3>
+            <h3>Xem trước SQL</h3>
             <div class="sql-actions">
               <!-- SQL Dialect Selector -->
               <div class="sql-dialect-selector">
@@ -202,11 +202,11 @@
 
               <button class="btn-secondary" @click="copySQL">
                 <span class="material-symbols-outlined">content_copy</span>
-                Copy SQL
+                Sao chép SQL
               </button>
               <button class="btn-primary" @click="downloadSQL">
                 <span class="material-symbols-outlined">download</span>
-                Download SQL File
+                Tải tệp SQL
               </button>
             </div>
           </div>
@@ -462,7 +462,7 @@ export default {
     handleVersionSelect(versionId) {
       // Chỉ Owner mới được phép select version
       if (!checkIsOwner(this.project)) {
-        this.toast.warning('Only project owner can switch versions')
+        this.toast.warning('Chỉ chủ dự án mới được chuyển phiên bản')
         return
       }
       
@@ -570,12 +570,12 @@ export default {
         await this.loadDatabaseData()
 
         // Thông báo cho user
-        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+        this.toast.success(`Đã chuyển sang phiên bản đã duyệt: ${newVersion || versionId}`)
 
         this.$forceUpdate()
       } catch (error) {
         console.error('❌ Error handling version-approved event:', error)
-        this.toast.error('Failed to switch to approved version')
+        this.toast.error('Không chuyển được sang phiên bản đã duyệt')
       }
     },
 
@@ -602,7 +602,7 @@ export default {
         }
       } catch (err) {
         console.error('Error fetching project details:', err)
-        this.toast.error('Failed to load project data')
+        this.toast.error('Không tải được dữ liệu dự án')
       }
     },
 
@@ -633,7 +633,7 @@ export default {
         }
       } catch (err) {
         console.error('Error loading database:', err)
-        this.error = err.response?.data?.message || 'Failed to load database schema'
+        this.error = err.response?.data?.message || 'Không tải được lược đồ cơ sở dữ liệu'
         this.toast.error(this.error)
       } finally {
         this.loading = false
@@ -1120,10 +1120,10 @@ export default {
     async copySQL() {
       try {
         await navigator.clipboard.writeText(this.generatedSQL)
-        this.toast.success('SQL copied to clipboard!')
+        this.toast.success('Đã sao chép SQL!')
       } catch (err) {
         console.error('Failed to copy SQL:', err)
-        this.toast.error('Failed to copy SQL')
+        this.toast.error('Sao chép SQL thất bại')
       }
     },
 
@@ -1150,10 +1150,10 @@ export default {
         link.click()
         URL.revokeObjectURL(url)
 
-        this.toast.success(`SQL exported successfully (${this.getDialectName(this.selectedSQLDialect)})`)
+        this.toast.success(`Đã xuất SQL (${this.getDialectName(this.selectedSQLDialect)})`)
       } catch (error) {
         console.error('Failed to export SQL:', error)
-        this.toast.error('Failed to export SQL')
+        this.toast.error('Xuất SQL thất bại')
       }
     },
 
@@ -1185,19 +1185,19 @@ export default {
         this.selectedCompositeKeyInfo = keyInfo.data || keyInfo
       } catch (error) {
         console.error('Failed to load composite key info:', error)
-        this.toast.error('Failed to load composite key details')
+        this.toast.error('Không tải được chi tiết khoá phức hợp')
       }
     },
 
     async createCompositeKey({ tableName, columnNames }) {
       try {
         await createCompositeKey(this.database._id, tableName, columnNames)
-        this.toast.success(`Composite key created for table ${tableName}`)
+        this.toast.success(`Đã tạo khoá phức hợp cho bảng ${tableName}`)
         await this.loadDatabaseData()
         this.showCompositeKeyModal = false
       } catch (error) {
         console.error('Failed to create composite key:', error)
-        this.toast.error(error.response?.data?.message || 'Failed to create composite key')
+        this.toast.error(error.response?.data?.message || 'Tạo khoá phức hợp thất bại')
       }
     },
 
@@ -1214,11 +1214,11 @@ export default {
       ) {
         try {
           await convertToSingleKey(this.database._id, table.name, suggestedColumn.name)
-          this.toast.success(`Converted to single key using ${suggestedColumn.name}`)
+          this.toast.success(`Đã chuyển sang khoá đơn bằng ${suggestedColumn.name}`)
           await this.loadDatabaseData()
         } catch (error) {
           console.error('Failed to convert to single key:', error)
-          this.toast.error(error.response?.data?.message || 'Failed to convert to single key')
+          this.toast.error(error.response?.data?.message || 'Chuyển sang khoá đơn thất bại')
         }
       }
     },
@@ -1252,10 +1252,10 @@ export default {
 
         this.updateStats()
         this.generateSQL()
-        this.toast.success('Relationship added successfully')
+        this.toast.success('Đã thêm quan hệ')
       } catch (err) {
         console.error('Error adding relationship:', err)
-        this.toast.error('Failed to add relationship')
+        this.toast.error('Thêm quan hệ thất bại')
       }
     },
 
@@ -1281,10 +1281,10 @@ export default {
 
         this.updateStats()
         this.generateSQL()
-        this.toast.success('Relationship removed successfully')
+        this.toast.success('Đã xoá quan hệ')
       } catch (err) {
         console.error('Error removing relationship:', err)
-        this.toast.error('Failed to remove relationship')
+        this.toast.error('Xoá quan hệ thất bại')
       }
     },
 
@@ -1315,7 +1315,7 @@ export default {
       } catch (error) {
         console.error('Failed to load available tables:', error)
         this.availableTables = []
-        this.toast.error('Failed to load available tables')
+        this.toast.error('Không tải được danh sách bảng')
       } finally {
         this.loadingAvailableTables = false
       }
@@ -1378,7 +1378,7 @@ export default {
 
       try {
         if (!this.database?._id) {
-          this.toast.error('No database selected')
+          this.toast.error('Chưa chọn cơ sở dữ liệu')
           return
         }
 
@@ -1405,7 +1405,7 @@ export default {
             }
           }
 
-          this.toast.success('Table updated successfully!')
+          this.toast.success('Đã cập nhật bảng!')
         } else {
           console.log('🆕 Creating new table:', tableData.name)
 
@@ -1417,7 +1417,7 @@ export default {
           const createdTable = data.data || data
           updatedTables.push(createdTable)
 
-          this.toast.success('Table created successfully!')
+          this.toast.success('Đã tạo bảng!')
         }
 
         this.databaseTables = updatedTables
@@ -1431,7 +1431,7 @@ export default {
         this.closeModal()
       } catch (err) {
         console.error('Error saving table:', err)
-        this.toast.error(err.response?.data?.message || 'Failed to save table')
+        this.toast.error(err.response?.data?.message || 'Lưu bảng thất bại')
       }
     },
 
@@ -1552,7 +1552,7 @@ export default {
         console.error('❌ Failed to save positions:', error)
         if (callback) callback(false)
         const errorMessage = error.response?.data?.message || error.message
-        this.toast.error(`Failed to save positions: ${errorMessage}`)
+        this.toast.error(`Lưu vị trí thất bại: ${errorMessage}`)
       }
     },
 
@@ -1619,7 +1619,7 @@ export default {
       // Thông báo cho user
       const version = this.versions.find((v) => v._id === toVersionId)
       if (version) {
-        this.toast.info(`Version switched to: ${version.version_number || toVersionId}`)
+        this.toast.info(`Đã chuyển sang phiên bản: ${version.version_number || toVersionId}`)
       }
     },
 
@@ -1644,7 +1644,7 @@ export default {
         this.selectedVersionId = event.version._id
         saveSelectedVersion(this.project._id, event.version._id)
         await this.loadDatabaseData()
-        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+        this.toast.info(`Đã tạo phiên bản mới: ${event.version.version_number || event.version._id}`)
       }
     },
   },

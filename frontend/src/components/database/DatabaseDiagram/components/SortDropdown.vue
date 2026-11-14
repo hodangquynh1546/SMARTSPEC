@@ -1,36 +1,36 @@
 <template>
   <div class="control-group">
-    <button class="btn-icon" @click="$emit('toggle-sort')" title="Sort Tables">
+    <button class="btn-icon" @click="$emit('toggle-sort')" title="Sắp xếp bảng">
       <span class="material-symbols-outlined">sort</span>
     </button>
     <div class="sort-dropdown" v-if="showSortOptions">
       <div class="sort-option" @click="$emit('sort', 'name-asc')">
         <span class="material-symbols-outlined">sort_by_alpha</span>
-        Name A-Z
+        Tên A-Z
       </div>
       <div class="sort-option" @click="$emit('sort', 'name-desc')">
         <span class="material-symbols-outlined">sort_by_alpha</span>
-        Name Z-A
+        Tên Z-A
       </div>
       <div class="sort-option" @click="$emit('sort', 'columns-asc')">
         <span class="material-symbols-outlined">expand_more</span>
-        Columns ↑
+        Số cột ↑
       </div>
       <div class="sort-option" @click="$emit('sort', 'columns-desc')">
         <span class="material-symbols-outlined">expand_less</span>
-        Columns ↓
+        Số cột ↓
       </div>
       <div class="sort-option" @click="$emit('sort', 'fk-asc')">
         <span class="material-symbols-outlined">expand_more</span>
-        FK Count ↑
+        Số khoá ngoại ↑
       </div>
       <div class="sort-option" @click="$emit('sort', 'fk-desc')">
         <span class="material-symbols-outlined">expand_less</span>
-        FK Count ↓
+        Số khoá ngoại ↓
       </div>
       <div class="sort-option" @click="$emit('sort', 'original')">
         <span class="material-symbols-outlined">restart_alt</span>
-        Original Order
+        Thứ tự gốc
       </div>
     </div>
     <div class="current-sort" v-if="currentSort">
@@ -52,8 +52,8 @@ export default {
       const sortNames = {
         'name-asc': 'A-Z',
         'name-desc': 'Z-A',
-        'columns-asc': 'Columns ↑',
-        'columns-desc': 'Columns ↓',
+        'columns-asc': 'Số cột ↑',
+        'columns-desc': 'Số cột ↓',
         'fk-asc': 'FK ↑',
         'fk-desc': 'FK ↓',
         original: 'Original',

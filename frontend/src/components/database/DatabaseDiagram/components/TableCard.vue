@@ -12,13 +12,13 @@
     <div class="table-header">
       <h4>{{ table.name }}</h4>
       <div class="table-actions">
-        <button class="btn-icon" @click="$emit('view')" title="View Details">
+        <button class="btn-icon" @click="$emit('view')" title="Xem chi tiết">
           <span class="material-symbols-outlined">visibility</span>
         </button>
-        <button class="btn-icon" @click="$emit('edit')" title="Edit">
+        <button class="btn-icon" @click="$emit('edit')" title="Sửa">
           <span class="material-symbols-outlined">edit</span>
         </button>
-        <button class="btn-icon danger" @click.stop="$emit('delete')" title="Delete">
+        <button class="btn-icon danger" @click.stop="$emit('delete')" title="Xoá">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>

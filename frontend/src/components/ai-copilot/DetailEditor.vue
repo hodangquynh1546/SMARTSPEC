@@ -1,7 +1,7 @@
 <template>
   <div class="detail-editor">
     <div v-if="!item" class="empty-state">
-      <p>Select an item from the tree to view/edit details</p>
+      <p>Chọn một mục trong cây để xem/sửa chi tiết</p>
     </div>
 
     <div v-else class="editor-container">
@@ -69,7 +69,7 @@
       <!-- Item Info -->
       <div class="item-info">
         <div class="info-badge">
-          <span class="info-label">Type:</span>
+          <span class="info-label">Loại:</span>
           <span class="info-value">{{ itemType }}</span>
         </div>
         <div class="info-badge" v-if="item._id">
@@ -116,19 +116,19 @@ const formFields = computed(() => {
   
   const fieldsMap = {
     usecase: [
-      { key: 'name', label: 'Name', type: 'text' },
-      { key: 'goal', label: 'Goal', type: 'textarea' },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'priority', label: 'Priority', type: 'select', options: ['low', 'medium', 'high'] }
+      { key: 'name', label: 'Tên', type: 'text' },
+      { key: 'goal', label: 'Mục tiêu', type: 'textarea' },
+      { key: 'description', label: 'Mô tả', type: 'textarea' },
+      { key: 'priority', label: 'Độ ưu tiên', type: 'select', options: ['low', 'medium', 'high'] }
     ],
     testcase: [
-      { key: 'title', label: 'Title', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' },
-      { key: 'test_type', label: 'Test Type', type: 'select', options: ['integration', 'api', 'ui', 'performance', 'security'] }
+      { key: 'title', label: 'Tiêu đề', type: 'text' },
+      { key: 'description', label: 'Mô tả', type: 'textarea' },
+      { key: 'test_type', label: 'Loại kiểm thử', type: 'select', options: ['integration', 'api', 'ui', 'performance', 'security'] }
     ],
     table: [
-      { key: 'name', label: 'Table Name', type: 'text' },
-      { key: 'description', label: 'Description', type: 'textarea' }
+      { key: 'name', label: 'Tên bảng', type: 'text' },
+      { key: 'description', label: 'Mô tả', type: 'textarea' }
     ]
   }
   

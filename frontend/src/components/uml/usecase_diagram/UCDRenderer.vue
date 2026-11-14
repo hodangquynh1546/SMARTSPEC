@@ -13,57 +13,57 @@
       <div class="toolbar-left">
         <!-- View Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="zoomOut" title="Zoom Out (Ctrl + -)">
+          <button class="toolbar-btn" @click="zoomOut" title="Thu nhỏ (Ctrl + -)">
             <span class="material-symbols-outlined">zoom_out</span>
           </button>
           <div class="zoom-display">{{ Math.round(internalZoom * 100) }}%</div>
-          <button class="toolbar-btn" @click="zoomIn" title="Zoom In (Ctrl + +)">
+          <button class="toolbar-btn" @click="zoomIn" title="Phóng to (Ctrl + +)">
             <span class="material-symbols-outlined">zoom_in</span>
           </button>
           <button
             class="toolbar-btn"
             @click="toggleFullscreen"
-            :title="isFullscreen ? 'Exit Fullscreen (F11)' : 'Enter Fullscreen (F11)'"
+            :title="isFullscreen ? 'Thoát toàn màn hình (F11)' : 'Vào toàn màn hình (F11)'"
           >
             <span class="material-symbols-outlined">{{
               isFullscreen ? 'fullscreen_exit' : 'fullscreen'
             }}</span>
           </button>
-          <button class="toolbar-btn" @click="resetZoom" title="Reset Zoom">
+          <button class="toolbar-btn" @click="resetZoom" title="Đặt lại thu phóng">
             <span class="material-symbols-outlined">refresh</span>
           </button>
-          <button class="toolbar-btn" @click="fitToViewport" title="Fit to Viewport">
+          <button class="toolbar-btn" @click="fitToViewport" title="Vừa khung nhìn">
             <span class="material-symbols-outlined">fit_screen</span>
           </button>
         </div>
 
         <!-- Undo/Redo Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="undo" :disabled="!canUndo" title="Undo (Ctrl+Z)">
+          <button class="toolbar-btn" @click="undo" :disabled="!canUndo" title="Hoàn tác (Ctrl+Z)">
             <span class="material-symbols-outlined">undo</span>
-            Undo
+            Hoàn tác
           </button>
-          <button class="toolbar-btn" @click="redo" :disabled="!canRedo" title="Redo (Ctrl+Y)">
+          <button class="toolbar-btn" @click="redo" :disabled="!canRedo" title="Làm lại (Ctrl+Y)">
             <span class="material-symbols-outlined">redo</span>
-            Redo
+            Làm lại
           </button>
         </div>
 
         <!-- CRUD Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Manage Diagram">
+          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Quản lý sơ đồ">
             <span class="material-symbols-outlined">settings</span>
-            Manage
+            Quản lý
           </button>
         </div>
 
         <!-- Export Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="exportAsSVG" title="Export as SVG">
+          <button class="toolbar-btn" @click="exportAsSVG" title="Xuất SVG">
             <span class="material-symbols-outlined">download</span>
             SVG
           </button>
-          <button class="toolbar-btn" @click="exportAsPNG" title="Export as PNG">
+          <button class="toolbar-btn" @click="exportAsPNG" title="Xuất PNG">
             <span class="material-symbols-outlined">image</span>
             PNG
           </button>
@@ -429,37 +429,37 @@
     <div v-if="!previewMode && !optimizeForPreview" class="status-bar-final">
       <div class="status-item">
         <span class="material-symbols-outlined">person</span>
-        {{ computedActors.length }} Actors
+        {{ computedActors.length }} Tác nhân
       </div>
       <div class="status-item">
         <span class="material-symbols-outlined">cases</span>
-        {{ computedUsecases.length }} Use Cases
+        {{ computedUsecases.length }} Use case
       </div>
       <div class="status-item">
         <span class="material-symbols-outlined">link</span>
-        {{ computedAssociations.length + computedRelationships.length }} Relationships
+        {{ computedAssociations.length + computedRelationships.length }} Quan hệ
       </div>
 
       <div class="status-item" v-if="selectedElement">
-        Selected: {{ selectedElement.name || selectedElement.title }}
+        Đã chọn: {{ selectedElement.name || selectedElement.title }}
       </div>
 
       <div class="status-item spacer"></div>
 
       <div class="status-item">
-        View: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
+        Chế độ xem: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
       </div>
       <div class="status-item">
-        Canvas: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
+        Khung vẽ: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
       </div>
-      <div class="status-item">Zoom: {{ Math.round(internalZoom * 100) }}%</div>
+      <div class="status-item">Thu phóng: {{ Math.round(internalZoom * 100) }}%</div>
     </div>
 
     <!-- Management Modal -->
     <div v-if="managementModal.visible" class="management-modal-overlay" @click="closeManagementModal">
       <div class="management-modal-content" @click.stop>
         <div class="management-modal-header">
-          <h2>Manage Use Case Diagram</h2>
+          <h2>Quản lý sơ đồ use case</h2>
           <button class="modal-close-btn" @click="closeManagementModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -485,10 +485,10 @@
           <!-- Actors Tab -->
           <div v-if="managementModal.activeTab === 'actors'" class="tab-panel">
             <div class="panel-header">
-              <h3>Actors</h3>
+              <h3>Tác nhân</h3>
               <button class="btn-add-item" @click="openCreateForm('actor')">
                 <span class="material-symbols-outlined">add</span>
-                Add Actor
+                Thêm tác nhân
               </button>
             </div>
             <div class="items-list">
@@ -502,13 +502,13 @@
                   <div v-if="actor.description" class="item-description">{{ actor.description }}</div>
                 </div>
                 <div class="item-actions">
-                  <button class="btn-edit" @click="openEditForm('actor', actor)" title="Edit">
+                  <button class="btn-edit" @click="openEditForm('actor', actor)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('actor', actor)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === actor.id"
                   >
                     <span 
@@ -522,7 +522,7 @@
               </div>
               <div v-if="computedActors.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">person_off</span>
-                <p>No actors yet</p>
+                <p>Chưa có tác nhân</p>
               </div>
             </div>
           </div>
@@ -530,14 +530,14 @@
           <!-- Usecases Tab -->
           <div v-if="managementModal.activeTab === 'usecases'" class="tab-panel">
             <div class="panel-header">
-              <h3>Use Cases</h3>
+              <h3>Use case</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('usecase')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Usecase
+                Thêm use case
               </button>
             </div>
             <div class="items-list">
@@ -551,13 +551,13 @@
                   <div v-if="uc.description" class="item-description">{{ uc.description }}</div>
                 </div>
                 <div class="item-actions">
-                  <button class="btn-edit" @click="openEditForm('usecase', uc)" title="Edit">
+                  <button class="btn-edit" @click="openEditForm('usecase', uc)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('usecase', uc)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === uc.id"
                   >
                     <span 
@@ -571,7 +571,7 @@
               </div>
               <div v-if="computedUsecases.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">cases</span>
-                <p>No use cases yet</p>
+                <p>Chưa có use case</p>
               </div>
             </div>
           </div>
@@ -579,14 +579,14 @@
           <!-- Associations Tab -->
           <div v-if="managementModal.activeTab === 'associations'" class="tab-panel">
             <div class="panel-header">
-              <h3>Associations</h3>
+              <h3>Liên kết</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('association')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Association
+                Thêm liên kết
               </button>
             </div>
             <div class="items-list">
@@ -597,17 +597,17 @@
               >
                 <div class="item-info">
                   <div class="item-name">
-                    {{ assoc.actor?.name || 'Unknown Actor' }} → {{ assoc.usecase?.title || 'Unknown Usecase' }}
+                    {{ assoc.actor?.name || 'Tác nhân không rõ' }} → {{ assoc.usecase?.title || 'Use case không rõ' }}
                   </div>
                 </div>
                 <div class="item-actions">
-                  <button class="btn-edit" @click="openEditForm('association', assoc)" title="Edit">
+                  <button class="btn-edit" @click="openEditForm('association', assoc)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('association', assoc)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === assoc.id"
                   >
                     <span 
@@ -621,7 +621,7 @@
               </div>
               <div v-if="computedAssociations.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">link_off</span>
-                <p>No associations yet</p>
+                <p>Chưa có liên kết</p>
               </div>
             </div>
           </div>
@@ -629,14 +629,14 @@
           <!-- Relationships Tab -->
           <div v-if="managementModal.activeTab === 'relationships'" class="tab-panel">
             <div class="panel-header">
-              <h3>Relationships</h3>
+              <h3>Quan hệ</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('relationship')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Relationship
+                Thêm quan hệ
               </button>
             </div>
             <div class="items-list">
@@ -647,19 +647,19 @@
               >
                 <div class="item-info">
                   <div class="item-name">
-                    {{ rel.source?.name || rel.source?.title || 'Unknown' }} 
+                    {{ rel.source?.name || rel.source?.title || 'Không rõ' }} 
                     <span class="relationship-type">{{ rel.type }}</span>
-                    {{ rel.target?.name || rel.target?.title || 'Unknown' }}
+                    {{ rel.target?.name || rel.target?.title || 'Không rõ' }}
                   </div>
                 </div>
                 <div class="item-actions">
-                  <button class="btn-edit" @click="openEditForm('relationship', rel)" title="Edit">
+                  <button class="btn-edit" @click="openEditForm('relationship', rel)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('relationship', rel)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === rel.id"
                   >
                     <span 
@@ -673,7 +673,7 @@
               </div>
               <div v-if="computedRelationships.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">link_off</span>
-                <p>No relationships yet</p>
+                <p>Chưa có quan hệ</p>
               </div>
             </div>
           </div>
@@ -685,7 +685,7 @@
     <div v-if="formModal.visible" class="form-modal-overlay" @click="closeFormModal">
       <div class="form-modal-content" @click.stop>
         <div class="form-modal-header">
-          <h3>{{ formModal.isEdit ? 'Edit' : 'Create' }} {{ formModal.type }}</h3>
+          <h3>{{ formModal.isEdit ? 'Sửa' : 'Create' }} {{ formModal.type }}</h3>
           <button class="modal-close-btn" @click="closeFormModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -694,19 +694,19 @@
           <!-- Actor Form -->
           <div v-if="formModal.type === 'actor'">
             <div class="form-group">
-              <label>Actor Name *</label>
+              <label>Tên tác nhân *</label>
               <input
                 v-model="formModal.data.name"
                 type="text"
-                placeholder="Enter actor name"
+                placeholder="Nhập tên tác nhân"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Description</label>
+              <label>Mô tả</label>
               <textarea
                 v-model="formModal.data.description"
-                placeholder="Enter description (optional)"
+                placeholder="Nhập mô tả (không bắt buộc)"
                 class="form-textarea"
                 rows="3"
               ></textarea>
@@ -716,19 +716,19 @@
           <!-- Usecase Form -->
           <div v-if="formModal.type === 'usecase'">
             <div class="form-group">
-              <label>Usecase Title *</label>
+              <label>Tên use case *</label>
               <input
                 v-model="formModal.data.title"
                 type="text"
-                placeholder="Enter usecase title"
+                placeholder="Nhập tên use case"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Description</label>
+              <label>Mô tả</label>
               <textarea
                 v-model="formModal.data.description"
-                placeholder="Enter description (optional)"
+                placeholder="Nhập mô tả (không bắt buộc)"
                 class="form-textarea"
                 rows="3"
               ></textarea>
@@ -738,9 +738,9 @@
           <!-- Association Form -->
           <div v-if="formModal.type === 'association'">
             <div class="form-group">
-              <label>Actor *</label>
+              <label>Tác nhân *</label>
               <select v-model="formModal.data.actor_id" class="form-input">
-                <option value="">Select Actor</option>
+                <option value="">Chọn tác nhân</option>
                 <option
                   v-for="actor in computedActors"
                   :key="actor.id"
@@ -751,9 +751,9 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Usecase *</label>
+              <label>Use case *</label>
               <select v-model="formModal.data.usecase_id" class="form-input">
-                <option value="">Select Usecase</option>
+                <option value="">Chọn use case</option>
                 <option
                   v-for="uc in computedUsecases"
                   :key="uc.id"
@@ -768,10 +768,10 @@
           <!-- Relationship Form -->
           <div v-if="formModal.type === 'relationship'">
             <div class="form-group">
-              <label>Source *</label>
+              <label>Nguồn *</label>
               <select v-model="formModal.data.source" class="form-input">
-                <option value="">Select Source</option>
-                <optgroup label="Actors">
+                <option value="">Chọn nguồn</option>
+                <optgroup label="Tác nhân">
                   <option
                     v-for="actor in computedActors"
                     :key="actor.id"
@@ -780,7 +780,7 @@
                     {{ actor.name }}
                   </option>
                 </optgroup>
-                <optgroup label="Use Cases">
+                <optgroup label="Use case">
                   <option
                     v-for="uc in computedUsecases"
                     :key="uc.id"
@@ -792,10 +792,10 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Target *</label>
+              <label>Đích *</label>
               <select v-model="formModal.data.target" class="form-input">
-                <option value="">Select Target</option>
-                <optgroup label="Actors">
+                <option value="">Chọn đích</option>
+                <optgroup label="Tác nhân">
                   <option
                     v-for="actor in computedActors"
                     :key="actor.id"
@@ -804,7 +804,7 @@
                     {{ actor.name }}
                   </option>
                 </optgroup>
-                <optgroup label="Use Cases">
+                <optgroup label="Use case">
                   <option
                     v-for="uc in computedUsecases"
                     :key="uc.id"
@@ -816,17 +816,17 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Type *</label>
+              <label>Loại *</label>
               <select v-model="formModal.data.type" class="form-input">
-                <option value="include">Include</option>
-                <option value="extend">Extend</option>
-                <option value="generalization">Generalization</option>
+                <option value="include">Bao gồm (include)</option>
+                <option value="extend">Mở rộng (extend)</option>
+                <option value="generalization">Tổng quát hoá</option>
               </select>
             </div>
           </div>
         </div>
         <div class="form-modal-footer">
-          <button class="btn-secondary" @click="closeFormModal">Cancel</button>
+          <button class="btn-secondary" @click="closeFormModal">Huỷ</button>
           <button class="btn-primary" @click="saveForm">{{ formModal.isEdit ? 'Update' : 'Create' }}</button>
         </div>
       </div>
@@ -951,10 +951,10 @@ export default {
         hasChanges: false, // Track if there were changes in the modal
       },
       managementTabs: [
-        { id: 'actors', label: 'Actors', icon: 'person' },
-        { id: 'usecases', label: 'Use Cases', icon: 'cases' },
-        { id: 'associations', label: 'Associations', icon: 'link' },
-        { id: 'relationships', label: 'Relationships', icon: 'account_tree' },
+        { id: 'actors', label: 'Tác nhân', icon: 'person' },
+        { id: 'usecases', label: 'Use case', icon: 'cases' },
+        { id: 'associations', label: 'Liên kết', icon: 'link' },
+        { id: 'relationships', label: 'Quan hệ', icon: 'account_tree' },
       ],
       formModal: {
         visible: false,
@@ -1017,7 +1017,7 @@ export default {
 
         return {
           id: this.normalizeId(actor._id) || this.normalizeId(actor.id) || `actor-${index}`,
-          name: actor.name || 'Unnamed Actor',
+          name: actor.name || 'Tác nhân chưa đặt tên',
           description: actor.description || '',
           x: position.x || this.virtualSpace.centerX - 200 + (index % 2) * 200,
           y: position.y || this.virtualSpace.centerY - 100 + Math.floor(index / 2) * 120,
@@ -1037,7 +1037,7 @@ export default {
 
         return {
           id: this.normalizeId(uc._id) || this.normalizeId(uc.id) || `uc-${index}`,
-          title: uc.title || 'Unnamed Use Case',
+          title: uc.title || 'Use case chưa đặt tên',
           description: uc.description || '',
           x: position.x || this.virtualSpace.centerX + (index % 4) * 150,
           y: position.y || this.virtualSpace.centerY - 150 + Math.floor(index / 4) * 100,
@@ -1308,11 +1308,11 @@ export default {
 
     getSaveStatusText() {
       if (this.isSaving) {
-        return 'Saving...'
+        return 'Đang lưu...'
       } else if (this.lastSaved) {
-        return 'Saved'
+        return 'Đã lưu'
       } else {
-        return 'No changes'
+        return 'Không có thay đổi'
       }
     },
 
@@ -1929,7 +1929,7 @@ export default {
 
         const allElements = [...this.computedActors, ...this.computedUsecases]
         if (allElements.length === 0) {
-          alert('No content to export!')
+          alert('Không có nội dung để xuất!')
           return
         }
 
@@ -1996,7 +1996,7 @@ export default {
         })
       } catch (err) {
         console.error('Error exporting PNG:', err)
-        alert('Error exporting PNG: ' + err.message)
+        alert('Lỗi khi xuất PNG:' + err.message)
       } finally {
         this.isExporting = false
       }
@@ -2005,7 +2005,7 @@ export default {
     exportAsSVG() {
       const allElements = [...this.computedActors, ...this.computedUsecases]
       if (allElements.length === 0) {
-        alert('No content to export!')
+        alert('Không có nội dung để xuất!')
         return
       }
 
@@ -2183,7 +2183,7 @@ export default {
     async saveForm() {
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id;
       if (!diagramId) {
-        alert('Diagram ID not found');
+        alert('Không tìm thấy mã sơ đồ');
         return;
       }
 
@@ -2195,7 +2195,7 @@ export default {
 
         if (this.formModal.type === 'actor') {
           if (!this.formModal.data.name.trim()) {
-            alert('Actor name is required');
+            alert('Cần nhập tên tác nhân');
             this.isCrudLoading = false
             this.hideSavingIndicator();
             return;
@@ -2218,7 +2218,7 @@ export default {
           }
         } else if (this.formModal.type === 'usecase') {
           if (!this.formModal.data.title.trim()) {
-            alert('Usecase title is required');
+            alert('Cần nhập tên use case');
             this.isCrudLoading = false
             this.hideSavingIndicator();
             return;
@@ -2241,7 +2241,7 @@ export default {
           }
         } else if (this.formModal.type === 'association') {
           if (!this.formModal.data.actor_id || !this.formModal.data.usecase_id) {
-            alert('Actor and Usecase are required');
+            alert('Cần có tác nhân và use case');
             this.isCrudLoading = false
             this.hideSavingIndicator();
             return;
@@ -2259,7 +2259,7 @@ export default {
           }
         } else if (this.formModal.type === 'relationship') {
           if (!this.formModal.data.source || !this.formModal.data.target || !this.formModal.data.type) {
-            alert('Source, Target, and Type are required');
+            alert('Cần có nguồn, đích và loại');
             this.isCrudLoading = false
             this.hideSavingIndicator();
             return;
@@ -2300,19 +2300,19 @@ export default {
         this.isCrudLoading = false
       } catch (error) {
         console.error('Error saving:', error);
-        alert('Failed to save: ' + (error.response?.data?.message || error.message));
+        alert('Lưu thất bại:' + (error.response?.data?.message || error.message));
         this.hideSavingIndicator();
         this.isCrudLoading = false
       }
     },
     async confirmDelete(type, element) {
-      if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+      if (!confirm(`Bạn có chắc muốn xoá ${type} này?`)) {
         return;
       }
 
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id;
       if (!diagramId) {
-        alert('Diagram ID not found');
+        alert('Không tìm thấy mã sơ đồ');
         return;
       }
 
@@ -2351,7 +2351,7 @@ export default {
         this.hideSavingIndicator();
       } catch (error) {
         console.error('Error deleting:', error);
-        alert('Failed to delete: ' + (error.response?.data?.message || error.message));
+        alert('Xoá thất bại:' + (error.response?.data?.message || error.message));
         this.hideSavingIndicator();
       }
     },

@@ -518,7 +518,7 @@ export default {
       // 4. Tải lại toàn bộ dữ liệu của version mới (nếu cần)
       const res = await getProjectDetail(this.project._id, this.selectedVersionId)
 
-      this.toast.info(`Switched to new version: ${version.version_number || version._id}`)
+      this.toast.info(`Đã chuyển sang phiên bản mới: ${version.version_number || version._id}`)
     },
 
     /**
@@ -581,12 +581,12 @@ export default {
         await this.fetchUseCases()
 
         // Thông báo cho user
-        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+        this.toast.success(`Đã chuyển sang phiên bản đã duyệt: ${newVersion || versionId}`)
 
         this.$forceUpdate()
       } catch (error) {
         console.error('❌ Error handling version-approved event:', error)
-        this.toast.error('Failed to switch to approved version')
+        this.toast.error('Không chuyển được sang phiên bản đã duyệt')
       }
     },
 
@@ -606,7 +606,7 @@ export default {
       // Fetch usecases cho version mới
       await this.fetchUseCases()
 
-      this.toast.info(`Switched to version: ${version.version_number || version._id}`)
+      this.toast.info(`Đã chuyển sang phiên bản: ${version.version_number || version._id}`)
       this.$forceUpdate()
     },
 
@@ -623,16 +623,16 @@ export default {
         if (this.versions.length > 0) {
           this.selectedVersionId = this.versions[0]._id
           await this.fetchProjectData(this.project._id)
-          this.toast.info(`Current version was deleted. Switched to latest version.`)
+          this.toast.info(`Phiên bản hiện tại đã bị xoá. Đã chuyển sang phiên bản mới nhất.`)
         } else {
           // Không còn version nào
           this.selectedVersionId = null
           this.useCases = []
           this.inputs = []
-          this.toast.info(`All versions deleted by team.`)
+          this.toast.info(`Nhóm đã xoá tất cả phiên bản.`)
         }
       } else {
-        this.toast.info(`A version was deleted by team.`)
+        this.toast.info(`Nhóm đã xoá một phiên bản.`)
       }
 
       this.$forceUpdate()
@@ -649,23 +649,23 @@ export default {
 
       switch (event.type) {
         case 'INPUT_CREATED':
-          this.toast.info(`New input added by team`)
+          this.toast.info(`Nhóm vừa thêm đầu vào mới`)
           this.handleRemoteInputCreated(event)
           break
         case 'INPUTS_ADDED_SUMMARY':
           if (event.newInputsCount > 0) {
-            this.toast.info(`${event.newInputsCount} new input(s) added by team`)
+            this.toast.info(`Nhóm vừa thêm ${event.newInputsCount} đầu vào mới`)
           }
           this.fetchProjectData(this.project._id)
           break
         case 'INPUT_DELETED':
           // 🚫 GIỜ SẼ KHÔNG CÓ EVENT NÀY NỮA
-          this.toast.info(`Input deleted by team`)
+          this.toast.info(`Đầu vào đã bị nhóm xoá`)
           this.handleRemoteInputDeleted(event)
           break
         case 'INPUT_DELETED_SUMMARY':
           // ✅ EVENT XÓA MỚI - CHỈ 1 TOAST
-          this.toast.info(`Input deleted by team`)
+          this.toast.info(`Đầu vào đã bị nhóm xoá`)
           this.fetchProjectData(this.project._id) // Refresh data
           break
         case 'INPUTS_RELOAD':
@@ -713,7 +713,7 @@ export default {
       this.showIncrementalButton = this.unprocessedInputsCount > 0 && !this.isProcessingIncremental
 
       // 🚫 COMMENT LẠI - KHÔNG HIỂN THỊ TOAST Ở ĐÂY
-      // this.toast.info(`Inputs updated - ${event.unprocessedCount} unprocessed`);
+      // this.toast.info(`Đầu vào đã cập nhật - ${event.unprocessedCount} chưa xử lý`);
 
       console.log(`📊 Updated unprocessed inputs: ${event.unprocessedCount}`)
     },
@@ -745,7 +745,7 @@ export default {
     },
 
     handleRemoteUsecaseCreated(event) {
-      this.toast.info(`New usecase created by team: ${event.usecase.name}`)
+      this.toast.info(`Nhóm vừa tạo use case mới: ${event.usecase.name}`)
 
       // Thêm usecase mới vào danh sách
       const usecaseId = String(event.usecase._id || event.usecase.id || '')
@@ -767,7 +767,7 @@ export default {
     },
 
     handleRemoteUsecaseUpdated(event) {
-      this.toast.info(`Usecase updated by team - ${event.usecase.id}`)
+      this.toast.info(`Nhóm vừa cập nhật use case - ${event.usecase.id}`)
 
       // Cập nhật usecase trong danh sách
       const index = this.useCases.findIndex((uc) => uc.id === event.usecase.id)
@@ -785,7 +785,7 @@ export default {
     },
 
     handleRemoteUsecaseDeleted(event) {
-      this.toast.info(`Usecase deleted by team: ${event.usecaseId}`)
+      this.toast.info(`Nhóm vừa xoá use case: ${event.usecaseId}`)
 
       // Xóa usecase khỏi danh sách
       this.useCases = this.useCases.filter((uc) => uc.id !== event.usecaseId)
@@ -795,7 +795,7 @@ export default {
     },
 
     handleRemoteUsecasesReload(event) {
-      this.toast.info('Usecases updated by team')
+      this.toast.info('Nhóm vừa cập nhật các use case')
       this.useCases = event.usecases
       this.$forceUpdate()
     },
@@ -857,7 +857,7 @@ export default {
         return true
       } catch (err) {
         console.error('Error fetching project details:', err)
-        this.toast.error('Failed to load project data')
+        this.toast.error('Không tải được dữ liệu dự án')
         return false
       }
     },
@@ -947,7 +947,7 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching use cases:', error)
-        this.toast.error('Failed to load use cases')
+        this.toast.error('Không tải được use case')
       }
     },
 
@@ -1058,7 +1058,7 @@ export default {
             }
           } else {
             payload.trigger = {
-              event: 'User initiates action',
+              event: 'Người dùng bắt đầu thao tác',
               source: 'UI'
             }
           }
@@ -1122,11 +1122,11 @@ export default {
             saveSelectedVersion(this.project._id, this.selectedVersionId)
             console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
           }
-          this.toast.success('Use case created successfully')
+          this.toast.success('Đã tạo use case')
           await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
         } else {
-          const errorMessage = response.data?.message || 'Failed to create use case'
+          const errorMessage = response.data?.message || 'Tạo use case thất bại'
           throw new Error(errorMessage)
         }
       } catch (error) {
@@ -1157,16 +1157,16 @@ export default {
             saveSelectedVersion(this.project._id, this.selectedVersionId)
             console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
           }
-          this.toast.success('Use case updated successfully')
+          this.toast.success('Đã cập nhật use case')
           await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
         } else {
-          throw new Error(response.data.message || 'Failed to update use case')
+          throw new Error(response.data.message || 'Cập nhật use case thất bại')
         }
       } catch (error) {
         console.error('Error updating use case:', error)
         this.toast.error(
-          error.response?.data?.error || error.message || 'Failed to update use case'
+          error.response?.data?.error || error.message || 'Cập nhật use case thất bại'
         )
         throw error
       } finally {
@@ -1186,16 +1186,16 @@ export default {
             saveSelectedVersion(this.project._id, this.selectedVersionId)
             console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
           }
-          this.toast.success('Use case deleted successfully')
+          this.toast.success('Đã xoá use case')
           await this.fetchUseCases()
           await this.fetchProjectData(this.project._id)
         } else {
-          throw new Error(response.data.message || 'Failed to delete use case')
+          throw new Error(response.data.message || 'Xoá use case thất bại')
         }
       } catch (error) {
         console.error('Error deleting use case:', error)
         this.toast.error(
-          error.response?.data?.error || error.message || 'Failed to delete use case'
+          error.response?.data?.error || error.message || 'Xoá use case thất bại'
         )
         throw error
       } finally {
@@ -1206,13 +1206,13 @@ export default {
     // ========== CONFLICT RESOLUTION ==========
     async findAndHandleConflicts() {
       if (!this.selectedVersionId) {
-        this.toast.error('Please select a version first.')
+        this.toast.error('Vui lòng chọn phiên bản trước.')
         return
       }
       this.isFindingConflicts = true
       try {
         await findProjectConflicts(this.project._id, this.selectedVersionId)
-        this.toast.success('Scan completed! Refreshing data...')
+        this.toast.success('Quét xong! Đang làm mới dữ liệu...')
         await this.fetchProjectData(this.project._id)
       } catch (error) {
         console.error('Error finding conflicts:', error)
@@ -1503,7 +1503,7 @@ export default {
           resolvedCount++
         }
 
-        this.toast.success(`${resolvedCount} conflict(s) resolved successfully!`)
+        this.toast.success(`Đã xử lý ${resolvedCount} xung đột!`)
         await this.fetchProjectData(this.project._id)
       } catch (error) {
         console.error('Error resolving conflicts:', error)
@@ -1527,7 +1527,7 @@ export default {
         delete savedResolutions[conflictId]
         
         await skipConflictApi(this.selectedVersionId, conflictId)
-        this.toast.success('Conflict skipped successfully')
+        this.toast.success('Đã bỏ qua xung đột')
 
         await this.fetchProjectData(this.project._id)
         
@@ -1611,11 +1611,11 @@ export default {
             this.startPolling(this.selectedVersionId, 'incremental')
           }, 500)
         } else {
-          throw new Error(response.data?.message || 'Failed to start incremental analysis')
+          throw new Error(response.data?.message || 'Không bắt đầu được phân tích gia tăng')
         }
       } catch (error) {
         console.error('Error starting incremental analysis:', error)
-        this.handleIncrementalError(error.message || 'Failed to start incremental analysis')
+        this.handleIncrementalError(error.message || 'Không bắt đầu được phân tích gia tăng')
       }
     },
 
@@ -1627,13 +1627,13 @@ export default {
     async handleVersionSelect(versionId) {
       try {
         if (!versionId) {
-          this.toast.warning('Please select a valid version')
+          this.toast.warning('Vui lòng chọn phiên bản hợp lệ')
           return
         }
 
         // Chỉ Owner mới được phép select version
         if (!checkIsOwner(this.project)) {
-          this.toast.warning('Only project owner can switch versions')
+          this.toast.warning('Chỉ chủ dự án mới được chuyển phiên bản')
           return
         }
 
@@ -1641,7 +1641,7 @@ export default {
 
         if (!res?.data) throw new Error('No response from server')
         if (res.data.status !== 'Success') {
-          throw new Error(res.data.message || 'Failed to switch version')
+          throw new Error(res.data.message || 'Chuyển phiên bản thất bại')
         }
 
         const oldVersionId = this.selectedVersionId
@@ -1667,10 +1667,10 @@ export default {
 
         await this.fetchProjectData(this.project._id)
         this.$forceUpdate()
-        this.toast.success('Switched to new working version')
+        this.toast.success('Đã chuyển sang phiên bản làm việc mới')
       } catch (error) {
         console.warn('⚠️ Version switch failed:', error?.message || error)
-        this.toast.error('Failed to switch version')
+        this.toast.error('Chuyển phiên bản thất bại')
       }
     },
     // ========== POLLING & LOADING MANAGEMENT ==========
@@ -1850,7 +1850,7 @@ export default {
       }
 
       const message =
-        mode === 'incremental' ? 'Incremental analysis completed!' : 'Retry completed successfully!'
+        mode === 'incremental' ? 'Phân tích gia tăng hoàn tất!' : 'Retry completed successfully!'
       //this.toast.success(message)
     },
 
@@ -1949,14 +1949,14 @@ export default {
             _isLoading: true,
             _isTemp: true,
             type: this.getFileType(file.type || ''),
-            cleaned_text: file.name || 'Unknown file',
-            clean_text: file.name || 'Unknown file',
-            raw_text: file.name || 'Unknown file',
+            cleaned_text: file.name || 'Tệp không rõ',
+            clean_text: file.name || 'Tệp không rõ',
+            raw_text: file.name || 'Tệp không rõ',
             is_processed: false,
             created_at: new Date().toISOString(),
             createdAt: new Date().toISOString(),
             metadata: {
-              filename: file.name || 'Unknown file',
+              filename: file.name || 'Tệp không rõ',
               size: file.size || 0
             }
           }
@@ -2006,7 +2006,7 @@ export default {
           // Xóa inputs tạm thời và fetch data mới
           this.inputs = this.inputs.filter(input => !input._isTemp)
           await this.fetchProjectData(this.project._id)
-          this.toast.success('Input added successfully!')
+          this.toast.success('Đã thêm đầu vào!')
         } else {
           // Đánh dấu inputs tạm thời là lỗi
           tempInputs.forEach(tempInput => {
@@ -2105,7 +2105,7 @@ export default {
             saveSelectedVersion(this.project._id, this.selectedVersionId)
             console.log('🔄 Updated selectedVersionId to new version:', this.selectedVersionId)
           }
-          this.toast.success('Input deleted successfully!')
+          this.toast.success('Đã xoá đầu vào!')
           await this.fetchProjectData(this.project._id)
         } else {
           const { formatErrorForDisplay } = require('@/utils/errorMessages')
@@ -2113,7 +2113,7 @@ export default {
         }
       } catch (err) {
         console.error(err)
-        this.toast.error('Error deleting input')
+        this.toast.error('Lỗi khi xoá đầu vào')
       } finally {
         this.isDeletingInput = null
       }
@@ -2308,7 +2308,7 @@ export default {
       console.log('🔄 Retry incremental analysis triggered')
 
       if (this.isProcessingIncremental || this.isRetrying) {
-        this.toast.warning('Analysis is already in progress')
+        this.toast.warning('Đang có phân tích chạy sẵn')
         return
       }
 
@@ -2323,12 +2323,12 @@ export default {
         )
 
         if (response.data && response.data.success) {
-          // this.toast.success('Retrying incremental analysis...')
+          // this.toast.success('Đang thử lại phân tích gia tăng...')
           setTimeout(() => {
             this.startPolling(this.selectedVersionId, 'incremental')
           }, 500)
         } else {
-          throw new Error(response.data?.message || 'Failed to retry incremental analysis')
+          throw new Error(response.data?.message || 'Thử lại phân tích gia tăng thất bại')
         }
       } catch (error) {
         console.error('Error retrying incremental analysis:', error)

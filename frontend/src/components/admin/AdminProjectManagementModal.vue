@@ -40,7 +40,7 @@
             <select v-model="filters.language" class="filter-select">
               <option value="all">Tất cả</option>
               <option value="vi-VN">Tiếng Việt</option>
-              <option value="en-US">English</option>
+              <option value="en-US">Tiếng Anh</option>
             </select>
           </div>
           <div class="filter-group">
@@ -447,7 +447,7 @@ const handleCreateProject = (projectData) => {
     members: [
       {
         user_id: '1', // current user
-        name: 'Admin User',
+        name: 'Quản trị viên',
         avatar_url: null,
         role: 'owner',
       },

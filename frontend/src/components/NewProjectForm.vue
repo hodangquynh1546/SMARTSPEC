@@ -5,8 +5,8 @@
       <template v-if="creationStatus === 'idle'">
         <div class="modal-header">
           <div class="header-text">
-            <h2>Create New Project</h2>
-            <p class="progress-indicator">Step {{ currentStep }} of 3</p>
+            <h2>Tạo dự án mới</h2>
+            <p class="progress-indicator">Bước {{ currentStep }} of 3</p>
           </div>
           <button class="close-btn" @click="handleClose">&times;</button>
         </div>
@@ -16,12 +16,12 @@
             <div v-if="currentStep === 1">
               <div class="form-group">
                 <label for="projectName"
-                  >Project Name <span class="required-asterisk">*</span></label
+                  >Tên dự án <span class="required-asterisk">*</span></label
                 >
                 <input
                   id="projectName"
                   v-model="projectData.name"
-                  placeholder="e.g., E-commerce Platform"
+                  placeholder="VD: Nền tảng thương mại điện tử"
                   required
                   @input="validateStep1"
                 />
@@ -31,12 +31,12 @@
               </div>
               <div class="form-group">
                 <label for="projectDescription"
-                  >Project Description <span class="required-asterisk">*</span></label
+                  >Mô tả dự án <span class="required-asterisk">*</span></label
                 >
                 <textarea
                   id="projectDescription"
                   v-model="projectData.description"
-                  placeholder="A platform to sell goods online"
+                  placeholder="Nền tảng bán hàng trực tuyến"
                   rows="5"
                   required
                   @input="validateStep1"
@@ -54,26 +54,26 @@
                 <span class="material-symbols-outlined" style="font-size: 16px; color: #ef4444"
                   >info</span
                 >
-                Please provide either Decribe Features or at least one attachment to continue.
+                Vui lòng nhập mô tả tính năng hoặc đính kèm ít nhất một tệp để tiếp tục.
               </div>
               <div class="form-group">
-                <label for="rawText">Decribe Features (Optional)</label>
+                <label for="rawText">Mô tả tính năng (không bắt buộc)</label>
                 <textarea
                   id="rawText"
                   v-model="projectData.rawText"
-                  placeholder="Paste requirements, user stories, or any context text here..."
+                  placeholder="Dán yêu cầu, user story hoặc nội dung bất kỳ tại đây..."
                   rows="5"
                 ></textarea>
               </div>
               <div class="form-group">
-                <label>Attachments (Optional)</label>
+                <label>Tệp đính kèm (không bắt buộc)</label>
                 <div class="file-info">
-                  <span class="file-count">{{ selectedFiles.length }} files selected</span>
-                  <span class="file-size">Total size: {{ formatFileSize(totalFileSize) }}</span>
+                  <span class="file-count">{{ selectedFiles.length }} tệp đã chọn</span>
+                  <span class="file-size">Tổng dung lượng: {{ formatFileSize(totalFileSize) }}</span>
                 </div>
                 <div class="attachment-trigger" @click="$refs.fileInput.click()">
                   <span class="material-symbols-outlined">upload_file</span>
-                  Click to choose files...
+                  Bấm để chọn tệp...
                 </div>
                 <input
                   type="file"
@@ -100,7 +100,7 @@
                   </div>
                 </div>
                 <div v-if="sizeLimitExceeded" class="error-message">
-                  Total file size exceeds the limit of 150KB. Please remove some files.
+                  Tổng dung lượng tệp vượt giới hạn 150KB. Vui lòng bỏ bớt tệp.
                 </div>
               </div>
             </div>
@@ -108,15 +108,15 @@
             <!-- Step 3 -->
             <div v-if="currentStep === 3">
               <div class="form-group">
-                <label>Select Language</label>
-                <p class="lang-description">Choose the primary language for the documentation.</p>
+                <label>Chọn ngôn ngữ</label>
+                <p class="lang-description">Chọn ngôn ngữ chính cho tài liệu.</p>
                 <div class="language-selector">
                   <div
                     class="lang-option"
                     :class="{ selected: projectData.language === 'vi-VN' }"
                     @click="projectData.language = 'vi-VN'"
                   >
-                    <img src="https://flagcdn.com/w40/vn.png" alt="Vietnam Flag" />
+                    <img src="https://flagcdn.com/w40/vn.png" alt="Cờ Việt Nam" />
                     <span>Tiếng Việt</span>
                   </div>
                   <div
@@ -124,8 +124,8 @@
                     :class="{ selected: projectData.language === 'en-US' }"
                     @click="projectData.language = 'en-US'"
                   >
-                    <img src="https://flagcdn.com/w40/us.png" alt="USA Flag" />
-                    <span>English</span>
+                    <img src="https://flagcdn.com/w40/us.png" alt="Cờ Mỹ" />
+                    <span>Tiếng Anh</span>
                   </div>
                 </div>
               </div>
@@ -134,7 +134,7 @@
             <!-- Footer -->
             <div class="modal-footer">
               <button type="button" class="cancel-btn" v-if="currentStep > 1" @click="prevStep">
-                Back
+                Quay lại
               </button>
               <button
                 type="button"
@@ -143,7 +143,7 @@
                 @click="nextStep"
                 :disabled="isNextButtonDisabled"
               >
-                Next
+                Tiếp
               </button>
               <button
                 type="submit"
@@ -151,7 +151,7 @@
                 v-if="currentStep === 3"
                 :disabled="sizeLimitExceeded"
               >
-                Create Project
+                Tạo dự án
               </button>
             </div>
           </form>
@@ -164,21 +164,21 @@
           <!-- COMPLETED -->
           <div v-if="creationStatus === 'completed'">
             <span class="status-icon success material-symbols-outlined"> check_circle </span>
-            <h3 class="status-title">Project Ready!</h3>
+            <h3 class="status-title">Dự án đã sẵn sàng!</h3>
             <div class="button-group">
-              <button class="cancel-btn" @click="handleCancelInStatus">Go Home</button>
-              <button class="create-btn" @click="goToEditor">View Detail</button>
+              <button class="cancel-btn" @click="handleCancelInStatus">Về trang chủ</button>
+              <button class="create-btn" @click="goToEditor">Xem chi tiết</button>
             </div>
           </div>
 
           <!-- FAILED -->
           <div v-if="creationStatus === 'failed'">
             <span class="status-icon fail material-symbols-outlined"> error </span>
-            <h3 class="status-title">Processing Failed</h3>
-            <p class="status-text">Something went wrong during the analysis.</p>
+            <h3 class="status-title">Xử lý thất bại</h3>
+            <p class="status-text">Đã xảy ra lỗi trong quá trình phân tích.</p>
             <div class="button-group">
-              <button class="cancel-btn" @click="handleCancelInStatus">Close</button>
-              <button class="create-btn" @click="handleRetry">Retry</button>
+              <button class="cancel-btn" @click="handleCancelInStatus">Đóng</button>
+              <button class="create-btn" @click="handleRetry">Thử lại</button>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@
       <!-- NÚT THOÁT KHI ĐANG LOADING -->
       <button class="close-loading-btn" @click="handleCloseDuringCreation">
         <span class="material-symbols-outlined">close</span>
-        Exit Creation
+        Thoát khỏi việc tạo
       </button>
       <div class="loading-box">
         <div class="spinner-flashlight"></div>
@@ -286,7 +286,7 @@ export default {
       const errors = { name: '', description: '' }
 
       if (!projectData.value.name.trim()) {
-        errors.name = 'Project name is required'
+        errors.name = 'Cần nhập tên dự án'
       }
 
       if (!projectData.value.description.trim()) {
@@ -426,7 +426,7 @@ export default {
         let hasError = false
 
         if (!projectData.value.name.trim()) {
-          errors.name = 'Project name is required'
+          errors.name = 'Cần nhập tên dự án'
           hasError = true
         }
 
@@ -445,11 +445,11 @@ export default {
       // Thêm validation cho bước 2
       if (currentStep.value === 2) {
         if (sizeLimitExceeded.value) {
-          alert('Please reduce total file size below 150KB before proceeding.')
+          alert('Vui lòng giảm tổng dung lượng tệp dưới 150KB trước khi tiếp tục.')
           return
         }
         if (!isStep2Valid.value) {
-          alert('Please provide either Raw Text or attach at least one file.')
+          alert('Vui lòng nhập nội dung hoặc đính kèm ít nhất một tệp.')
           return
         }
       }
@@ -550,12 +550,12 @@ export default {
             failedVersionId.value = versionId
             creationStatus.value = 'failed'
             processingError.value =
-              version?.processing_errors?.join('\n') || 'Analysis failed without specific errors!!'
+              version?.processing_errors?.join('\n') || 'Phân tích thất bại, không có lỗi cụ thể!'
             stopLoadingMessages()
           } else if (status === 'completed' || status === 'has_conflicts') {
             // ✅ Hoàn tất (có thể có conflict)
             processingProgress.value = 100
-            currentStage.value = 'Completed'
+            currentStage.value = 'Hoàn thành'
 
             setTimeout(() => {
               creationStatus.value = status // 'completed' hoặc 'has_conflicts'
@@ -564,7 +564,7 @@ export default {
             }, 1000)
           } else {
             // 🚨 Fallback nếu BE trả status lạ
-            currentStage.value = 'Unknown'
+            currentStage.value = 'Không rõ'
             failedVersionId.value = versionId
             creationStatus.value = 'failed'
             processingError.value = `Unexpected status: ${status}`
@@ -576,7 +576,7 @@ export default {
           failedVersionId.value = versionId
           creationStatus.value = 'failed'
           processingError.value =
-            error.response?.data?.message || 'Could not fetch processing status from the server!!'
+            error.response?.data?.message || 'Không lấy được trạng thái xử lý từ máy chủ!'
           stopLoadingMessages()
         }
       }, 3000)
@@ -584,7 +584,7 @@ export default {
 
     const handleCreateProject = async () => {
       if (sizeLimitExceeded.value) {
-        alert('Please reduce total file size below 20000KB before creating project.')
+        alert('Vui lòng giảm tổng dung lượng tệp dưới 20000KB trước khi tạo dự án.')
         return
       }
 
@@ -615,7 +615,7 @@ export default {
         startPolling(createdProject._id, createdProject.current_version)
       } catch (error) {
         creationStatus.value = 'failed'
-        processingError.value = error.response?.data?.message || 'Failed to create project!!'
+        processingError.value = error.response?.data?.message || 'Tạo dự án thất bại!'
         stopLoadingMessages()
       }
     }
@@ -633,7 +633,7 @@ export default {
 
     const handleRetry = async () => {
       if (!finalProjectData.value || !failedVersionId.value) {
-        alert('Cannot retry: Project or Version ID is missing.')
+        alert('Không thể thử lại: thiếu mã dự án hoặc phiên bản.')
         return
       }
 

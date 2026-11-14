@@ -17,8 +17,8 @@
       <div class="modal-footer">
         <button v-if="!isConfirmation" class="btn btn-secondary" @click="close">OK</button>
         <template v-else>
-          <button class="btn btn-danger" @click="confirmAction">Confirm</button>
-          <button class="btn btn-secondary" @click="close">Cancel</button>
+          <button class="btn btn-danger" @click="confirmAction">Xác nhận</button>
+          <button class="btn btn-secondary" @click="close">Huỷ</button>
         </template>
       </div>
     </div>

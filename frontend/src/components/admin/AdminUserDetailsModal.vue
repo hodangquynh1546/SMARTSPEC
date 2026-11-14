@@ -13,7 +13,7 @@
           <div class="profile-header">
             <div class="avatar-section">
               <div class="user-avatar large">
-                <img :src="userAvatar || defaultAvatar" alt="Avatar" />
+                <img :src="userAvatar || defaultAvatar" alt="Ảnh đại diện" />
               </div>
               <div class="user-basic-info">
                 <h2>{{ user.name }}</h2>
@@ -375,7 +375,7 @@ const formatLastLogin = (date) => {
 const getUserLanguage = (language) => {
   const languages = {
     vi: 'Tiếng Việt',
-    en: 'English',
+    en: 'Tiếng Anh',
   }
   return languages[language] || 'Tiếng Việt'
 }

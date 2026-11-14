@@ -111,8 +111,8 @@
       </div>
 
       <div class="edit-actions">
-        <button class="btn btn-cancel" @click.stop="cancelEdit">Cancel</button>
-        <button class="btn btn-save" @click.stop="saveProject">Save</button>
+        <button class="btn btn-cancel" @click.stop="cancelEdit">Huỷ</button>
+        <button class="btn btn-save" @click.stop="saveProject">Lưu</button>
       </div>
     </div>
   </div>
@@ -196,7 +196,7 @@ export default {
         return [
           {
             icon: 'logout',
-            title: 'Leave Project',
+            title: 'Rời dự án',
             type: 'leave',
             action: this.leaveProject,
             disabled: false,
@@ -206,28 +206,28 @@ export default {
       return [
         {
           icon: 'smart_toy',
-          title: 'AI Copilot',
+          title: 'Trợ lý AI',
           type: 'ai-copilot',
           action: this.openAICopilot,
           disabled: false,
         },
         {
           icon: 'edit',
-          title: 'Edit Project',
+          title: 'Sửa dự án',
           type: 'edit',
           action: this.startEditing,
           disabled: false,
         },
         {
           icon: 'share',
-          title: 'Share',
+          title: 'Chia sẻ',
           type: 'share',
           action: () => this.shareProject(),
           disabled: false,
         },
         {
           icon: 'delete',
-          title: 'Move to Trash',
+          title: 'Chuyển vào thùng rác',
           type: 'delete',
           action: this.confirmDelete,
           disabled: false,
@@ -431,7 +431,7 @@ export default {
       }
 
       if (!this.editForm.name.trim()) {
-        alert('Project name is required')
+        alert('Cần nhập tên dự án')
         return
       }
 
@@ -447,7 +447,7 @@ export default {
         this.isEditing = false
       } catch (error) {
         console.error('Error updating project:', error)
-        alert('Failed to update project')
+        alert('Cập nhật dự án thất bại')
       }
     },
 

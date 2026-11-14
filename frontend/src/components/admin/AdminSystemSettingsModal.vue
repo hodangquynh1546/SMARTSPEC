@@ -57,7 +57,7 @@
                     <label>Ngôn ngữ mặc định</label>
                     <select v-model="formData.defaultLanguage" class="form-input">
                       <option value="vi">Tiếng Việt</option>
-                      <option value="en">English</option>
+                      <option value="en">Tiếng Anh</option>
                     </select>
                   </div>
                 </div>
@@ -286,7 +286,7 @@
               </div>
 
               <div class="settings-section">
-                <h4>SSL & Encryption</h4>
+                <h4>SSL & mã hoá</h4>
                 <div class="form-grid">
                   <div class="form-group">
                     <label>Bắt buộc HTTPS</label>
@@ -356,8 +356,8 @@
                   <div class="form-group">
                     <label>Lưu trữ sao lưu</label>
                     <select v-model="formData.backupStorage" class="form-input">
-                      <option value="local">Local Server</option>
-                      <option value="cloud">Cloud Storage</option>
+                      <option value="local">Máy chủ nội bộ</option>
+                      <option value="cloud">Lưu trữ đám mây</option>
                       <option value="both">Cả hai</option>
                     </select>
                   </div>

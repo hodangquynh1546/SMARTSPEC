@@ -4,7 +4,7 @@
     <div class="back-button-container">
       <button @click="goBackToProjects" class="back-btn">
         <span class="material-symbols-outlined">arrow_back</span>
-        <span>Back to Projects</span>
+        <span>Danh sách dự án</span>
       </button>
     </div>
 
@@ -12,7 +12,7 @@
     <div class="project-selector">
       <div class="selector-header">
         <span class="material-symbols-outlined">folder</span>
-        <span>Select Project</span>
+        <span>Chọn dự án</span>
       </div>
       <select v-model="selectedProjectId" @change="handleProjectChange" class="project-select">
         <option v-for="proj in availableProjects" :key="proj._id" :value="proj._id">
@@ -24,15 +24,15 @@
     <!-- Statistics -->
     <div class="statistics">
       <div class="stat-item">
-        <span class="stat-label">Use Cases:</span>
+        <span class="stat-label">Use case:</span>
         <span class="stat-value">{{ usecasesCount }}</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Test Cases:</span>
+        <span class="stat-label">Test case:</span>
         <span class="stat-value">{{ testcasesCount }}</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Tables:</span>
+        <span class="stat-label">Bảng:</span>
         <span class="stat-value">{{ tablesCount }}</span>
       </div>
     </div>
@@ -43,7 +43,7 @@
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search..."
+        placeholder="Tìm kiếm..."
         class="search-input"
       />
     </div>
@@ -62,30 +62,30 @@
       />
     </div>
 
-    <div v-else class="loading">Loading...</div>
+    <div v-else class="loading">Đang tải...</div>
 
     <!-- Add Item Button -->
     <div class="tree-actions">
       <button @click="showAddMenu = !showAddMenu" class="add-btn">
         <span class="material-symbols-outlined">add</span>
-        <span>Add Item</span>
+        <span>Thêm mục</span>
       </button>
       <div v-if="showAddMenu" class="add-menu">
         <button @click="createItem('usecase')">
           <span class="material-symbols-outlined">description</span>
-          Use Case
+          Use case
         </button>
         <button @click="createItem('testcase')">
           <span class="material-symbols-outlined">checklist</span>
-          Test Case
+          Test case
         </button>
         <button @click="createItem('table')">
           <span class="material-symbols-outlined">table_chart</span>
-          Database Table
+          Bảng dữ liệu
         </button>
         <button @click="createItem('requirement')">
           <span class="material-symbols-outlined">article</span>
-          Requirement
+          Yêu cầu
         </button>
       </div>
     </div>
@@ -179,7 +179,7 @@ const filteredTree = computed(() => {
     },
     {
       id: 'requirements',
-      label: 'Requirements',
+      label: 'Yêu cầu',
       type: 'folder',
       children: filterItems(treeData.value.requirements, 'requirement'),
       icon: 'article'
@@ -270,7 +270,7 @@ const loadData = async () => {
             ...db,
             type: 'database',
             _id: db._id,
-            name: db.name || 'Database',
+            name: db.name || 'Cơ sở dữ liệu',
             children: (db.tables || []).map(table => ({
               ...table,
               type: 'table',
@@ -330,7 +330,7 @@ const handleItemDeleted = async (item, type) => {
       // Backend tìm usecase bằng field 'id' trong requirement_model, không phải '_id'
       const usecaseId = item.id || item._id
       if (!usecaseId) {
-        alert('Usecase ID not found')
+        alert('Không tìm thấy mã use case')
         return
       }
       console.log('Deleting usecase:', { versionId: props.versionId, usecaseId })
@@ -344,7 +344,7 @@ const handleItemDeleted = async (item, type) => {
   } catch (error) {
     console.error('Error deleting item:', error)
     const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message
-    alert('Failed to delete item: ' + errorMsg)
+    alert('Xoá mục thất bại:' + errorMsg)
   }
 }
 

@@ -13,45 +13,45 @@
       <div class="toolbar-left">
         <!-- View Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="zoomOut" title="Zoom Out (Ctrl + -)">
+          <button class="toolbar-btn" @click="zoomOut" title="Thu nhỏ (Ctrl + -)">
             <span class="material-symbols-outlined">zoom_out</span>
           </button>
           <div class="zoom-display">{{ Math.round(internalZoom * 100) }}%</div>
-          <button class="toolbar-btn" @click="zoomIn" title="Zoom In (Ctrl + +)">
+          <button class="toolbar-btn" @click="zoomIn" title="Phóng to (Ctrl + +)">
             <span class="material-symbols-outlined">zoom_in</span>
           </button>
           <button
             class="toolbar-btn"
             @click="toggleFullscreen"
-            :title="isFullscreen ? 'Exit Fullscreen (F11)' : 'Enter Fullscreen (F11)'"
+            :title="isFullscreen ? 'Thoát toàn màn hình (F11)' : 'Vào toàn màn hình (F11)'"
           >
             <span class="material-symbols-outlined">{{
               isFullscreen ? 'fullscreen_exit' : 'fullscreen'
             }}</span>
           </button>
-          <button class="toolbar-btn" @click="resetZoom" title="Reset Zoom">
+          <button class="toolbar-btn" @click="resetZoom" title="Đặt lại thu phóng">
             <span class="material-symbols-outlined">refresh</span>
           </button>
-          <button class="toolbar-btn" @click="fitToViewport" title="Fit to Viewport">
+          <button class="toolbar-btn" @click="fitToViewport" title="Vừa khung nhìn">
             <span class="material-symbols-outlined">fit_screen</span>
           </button>
         </div>
 
         <!-- CRUD Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Manage Diagram">
+          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Quản lý sơ đồ">
             <span class="material-symbols-outlined">settings</span>
-            Manage
+            Quản lý
           </button>
         </div>
 
         <!-- Export Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="exportAsSVG" title="Export as SVG">
+          <button class="toolbar-btn" @click="exportAsSVG" title="Xuất SVG">
             <span class="material-symbols-outlined">download</span>
             SVG
           </button>
-          <button class="toolbar-btn" @click="exportAsPNG" title="Export as PNG">
+          <button class="toolbar-btn" @click="exportAsPNG" title="Xuất PNG">
             <span class="material-symbols-outlined">image</span>
             PNG
           </button>
@@ -402,37 +402,37 @@
     <div v-if="!previewMode && !optimizeForPreview" class="status-bar">
       <div class="status-item">
         <span class="material-symbols-outlined">person</span>
-        {{ computedLifelines.length }} Lifelines
+        {{ computedLifelines.length }} Đường sống
       </div>
       <div class="status-item">
         <span class="material-symbols-outlined">chat</span>
-        {{ computedMessages.length }} Messages
+        {{ computedMessages.length }} Thông điệp
       </div>
       <div class="status-item">
         <span class="material-symbols-outlined">widgets</span>
-        {{ computedFragments.length }} Fragments
+        {{ computedFragments.length }} Khối kết hợp
       </div>
 
       <div class="status-item" v-if="selectedElement">
-        Selected: {{ selectedElement.name || selectedElement.content }}
+        Đã chọn: {{ selectedElement.name || selectedElement.content }}
       </div>
 
       <div class="status-item spacer"></div>
 
       <div class="status-item">
-        View: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
+        Chế độ xem: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
       </div>
       <div class="status-item">
-        Canvas: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
+        Khung vẽ: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
       </div>
-      <div class="status-item">Zoom: {{ Math.round(internalZoom * 100) }}%</div>
+      <div class="status-item">Thu phóng: {{ Math.round(internalZoom * 100) }}%</div>
     </div>
 
     <!-- Management Modal -->
     <div v-if="managementModal.visible" class="management-modal-overlay" @click="closeManagementModal">
       <div class="management-modal-content" @click.stop>
         <div class="management-modal-header">
-          <h2>Manage Sequence Diagram</h2>
+          <h2>Quản lý sơ đồ tuần tự</h2>
           <button class="modal-close-btn" @click="closeManagementModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -458,14 +458,14 @@
           <!-- Lifelines Tab -->
           <div v-if="managementModal.activeTab === 'lifelines'" class="tab-panel">
             <div class="panel-header">
-              <h3>Lifelines</h3>
+              <h3>Đường sống</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('lifeline')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Lifeline
+                Thêm đường sống
               </button>
             </div>
             <div class="items-list">
@@ -475,14 +475,14 @@
                 class="item-card"
               >
                 <div class="item-info">
-                  <div class="item-name">{{ lifeline.name || 'Unnamed Lifeline' }}</div>
+                  <div class="item-name">{{ lifeline.name || 'Đường sống chưa đặt tên' }}</div>
                   <div v-if="lifeline.description" class="item-description">{{ lifeline.description }}</div>
                 </div>
                 <div class="item-actions">
                   <button 
                     class="btn-edit" 
                     @click="openEditForm('lifeline', lifeline)" 
-                    title="Edit"
+                    title="Sửa"
                     :disabled="isCrudLoading"
                   >
                     <span class="material-symbols-outlined">edit</span>
@@ -490,7 +490,7 @@
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('lifeline', lifeline)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === lifeline.id"
                   >
                     <span 
@@ -504,7 +504,7 @@
               </div>
               <div v-if="originalLifelines.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">person_off</span>
-                <p>No lifelines yet</p>
+                <p>Chưa có đường sống</p>
               </div>
             </div>
           </div>
@@ -512,14 +512,14 @@
           <!-- Messages Tab -->
           <div v-if="managementModal.activeTab === 'messages'" class="tab-panel">
             <div class="panel-header">
-              <h3>Messages</h3>
+              <h3>Thông điệp</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('message')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Message
+                Thêm thông điệp
               </button>
             </div>
             
@@ -527,7 +527,7 @@
             <div class="message-section">
               <h4 class="section-title">
                 <span class="material-symbols-outlined">arrow_forward</span>
-                Outgoing Messages ({{ outgoingMessages.length }})
+                Thông điệp đi ({{ outgoingMessages.length }})
               </h4>
               <div class="items-list">
                 <div
@@ -537,7 +537,7 @@
                 >
                   <div class="item-info">
                     <div class="item-name">
-                      {{ message.from?.name || 'Unknown' }} → {{ message.to?.name || 'Unknown' }}
+                      {{ message.from?.name || 'Không rõ' }} → {{ message.to?.name || 'Không rõ' }}
                     </div>
                     <div v-if="message.content" class="item-description">{{ message.content }}</div>
                     <div class="item-meta">
@@ -548,7 +548,7 @@
                     <button 
                       class="btn-edit" 
                       @click="openEditForm('message', message)" 
-                      title="Edit"
+                      title="Sửa"
                       :disabled="isCrudLoading"
                     >
                       <span class="material-symbols-outlined">edit</span>
@@ -556,7 +556,7 @@
                     <button 
                       class="btn-delete" 
                       @click="confirmDelete('message', message)" 
-                      title="Delete"
+                      title="Xoá"
                       :disabled="isCrudLoading || deletingElementId === message.id"
                     >
                       <span 
@@ -570,7 +570,7 @@
                 </div>
                 <div v-if="outgoingMessages.length === 0" class="empty-state-small">
                   <span class="material-symbols-outlined">arrow_forward</span>
-                  <p>No outgoing messages</p>
+                  <p>Không có thông điệp đi</p>
                 </div>
               </div>
             </div>
@@ -579,7 +579,7 @@
             <div class="message-section">
               <h4 class="section-title">
                 <span class="material-symbols-outlined">arrow_back</span>
-                Incoming Messages ({{ incomingMessages.length }})
+                Thông điệp đến ({{ incomingMessages.length }})
               </h4>
               <div class="items-list">
                 <div
@@ -589,7 +589,7 @@
                 >
                   <div class="item-info">
                     <div class="item-name">
-                      {{ message.from?.name || 'Unknown' }} → {{ message.to?.name || 'Unknown' }}
+                      {{ message.from?.name || 'Không rõ' }} → {{ message.to?.name || 'Không rõ' }}
                     </div>
                     <div v-if="message.content" class="item-description">{{ message.content }}</div>
                     <div class="item-meta">
@@ -600,7 +600,7 @@
                     <button 
                       class="btn-edit" 
                       @click="openEditForm('message', message)" 
-                      title="Edit"
+                      title="Sửa"
                       :disabled="isCrudLoading"
                     >
                       <span class="material-symbols-outlined">edit</span>
@@ -608,7 +608,7 @@
                     <button 
                       class="btn-delete" 
                       @click="confirmDelete('message', message)" 
-                      title="Delete"
+                      title="Xoá"
                       :disabled="isCrudLoading || deletingElementId === message.id"
                     >
                       <span 
@@ -622,7 +622,7 @@
                 </div>
                 <div v-if="incomingMessages.length === 0" class="empty-state-small">
                   <span class="material-symbols-outlined">arrow_back</span>
-                  <p>No incoming messages</p>
+                  <p>Không có thông điệp đến</p>
                 </div>
               </div>
             </div>
@@ -631,14 +631,14 @@
           <!-- Fragments Tab -->
           <div v-if="managementModal.activeTab === 'fragments'" class="tab-panel">
             <div class="panel-header">
-              <h3>Fragments</h3>
+              <h3>Khối kết hợp</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('fragment')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Fragment
+                Thêm khối kết hợp
               </button>
             </div>
             <div class="items-list">
@@ -650,7 +650,7 @@
                 <div class="item-info">
                   <div class="item-name">{{ getFragmentLabel(fragment.type) || 'Fragment' }}</div>
                   <div v-if="fragment.guard_condition" class="item-description">
-                    Guard: {{ fragment.guard_condition }}
+                    Điều kiện chặn: {{ fragment.guard_condition }}
                   </div>
                   <div class="fragment-messages-info">
                     <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">chat</span>
@@ -664,31 +664,31 @@
                       class="fragment-message-item"
                     >
                       <span class="message-arrow">→</span>
-                      <span class="message-content">{{ msg.content || 'No content' }}</span>
+                      <span class="message-content">{{ msg.content || 'Không có nội dung' }}</span>
                       <span class="message-type-badge">{{ msg.type || 'sync' }}</span>
                     </div>
                   </div>
                   <div v-else class="fragment-no-messages">
                     <span class="material-symbols-outlined" style="font-size: 14px;">info</span>
-                    <span style="margin-left: 4px; font-size: 12px; color: #9ca3af;">No messages in this fragment</span>
+                    <span style="margin-left: 4px; font-size: 12px; color: #9ca3af;">Khối này chưa có thông điệp</span>
                   </div>
                 </div>
                 <div class="item-actions">
-                  <button class="btn-add-message" @click="openAddMessageToFragment(fragment)" title="Add Message">
+                  <button class="btn-add-message" @click="openAddMessageToFragment(fragment)" title="Thêm thông điệp">
                     <span class="material-symbols-outlined">add_comment</span>
-                    Add Message
+                    Thêm thông điệp
                   </button>
-                  <button class="btn-edit" @click="openEditForm('fragment', fragment)" title="Edit">
+                  <button class="btn-edit" @click="openEditForm('fragment', fragment)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
-                  <button class="btn-delete" @click="confirmDelete('fragment', fragment)" title="Delete">
+                  <button class="btn-delete" @click="confirmDelete('fragment', fragment)" title="Xoá">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
                 </div>
               </div>
               <div v-if="computedFragments.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">widgets</span>
-                <p>No fragments yet</p>
+                <p>Chưa có khối kết hợp</p>
               </div>
             </div>
           </div>
@@ -700,7 +700,7 @@
     <div v-if="formModal.visible" class="form-modal-overlay" @click="closeFormModal">
       <div class="form-modal-content" @click.stop>
         <div class="form-modal-header">
-          <h3>{{ formModal.isEdit ? 'Edit' : 'Create' }} {{ formModal.type }}</h3>
+          <h3>{{ formModal.isEdit ? 'Sửa' : 'Create' }} {{ formModal.type }}</h3>
           <button class="modal-close-btn" @click="closeFormModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -709,19 +709,19 @@
           <!-- Lifeline Form -->
           <div v-if="formModal.type === 'lifeline'">
             <div class="form-group">
-              <label>Lifeline Name *</label>
+              <label>Tên đường sống *</label>
               <input
                 v-model="formModal.data.name"
                 type="text"
-                placeholder="Enter lifeline name"
+                placeholder="Nhập tên đường sống"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Description</label>
+              <label>Mô tả</label>
               <textarea
                 v-model="formModal.data.description"
-                placeholder="Enter description (optional)"
+                placeholder="Nhập mô tả (không bắt buộc)"
                 class="form-textarea"
                 rows="3"
               ></textarea>
@@ -733,13 +733,13 @@
             <div v-if="formModal.data.fragment_id" class="form-group">
               <div class="info-badge">
                 <span class="material-symbols-outlined">info</span>
-                Adding message to fragment: {{ getFragmentName(formModal.data.fragment_id) }}
+                Thêm thông điệp vào khối: {{ getFragmentName(formModal.data.fragment_id) }}
               </div>
             </div>
             <div class="form-group">
-              <label>From Lifeline *</label>
+              <label>Đường sống nguồn *</label>
               <select v-model="formModal.data.from" class="form-input">
-                <option value="">Select From Lifeline</option>
+                <option value="">Chọn đường sống nguồn</option>
                 <option
                   v-for="lifeline in originalLifelines"
                   :key="lifeline.id"
@@ -750,9 +750,9 @@
               </select>
             </div>
             <div class="form-group">
-              <label>To Lifeline *</label>
+              <label>Đường sống đích *</label>
               <select v-model="formModal.data.to" class="form-input">
-                <option value="">Select To Lifeline</option>
+                <option value="">Chọn đường sống đích</option>
                 <option
                   v-for="lifeline in originalLifelines"
                   :key="lifeline.id"
@@ -763,20 +763,20 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Message Content *</label>
+              <label>Nội dung thông điệp *</label>
               <input
                 v-model="formModal.data.content"
                 type="text"
-                placeholder="Enter message content"
+                placeholder="Nhập nội dung thông điệp"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Message Type *</label>
+              <label>Loại thông điệp *</label>
               <select v-model="formModal.data.type" class="form-input">
-                <option value="sync">Sync</option>
-                <option value="async">Async</option>
-                <option value="reply">Reply</option>
+                <option value="sync">Đồng bộ</option>
+                <option value="async">Bất đồng bộ</option>
+                <option value="reply">Phản hồi</option>
               </select>
             </div>
           </div>
@@ -784,21 +784,21 @@
           <!-- Fragment Form -->
           <div v-if="formModal.type === 'fragment'">
             <div class="form-group">
-              <label>Fragment Type *</label>
+              <label>Loại khối *</label>
               <select v-model="formModal.data.type" class="form-input">
-                <option value="alt">Alt (Alternative)</option>
-                <option value="opt">Opt (Optional)</option>
-                <option value="loop">Loop</option>
-                <option value="par">Par (Parallel)</option>
-                <option value="ref">Ref (Reference)</option>
+                <option value="alt">Alt (Lựa chọn)</option>
+                <option value="opt">Opt (Tuỳ chọn)</option>
+                <option value="loop">Lặp</option>
+                <option value="par">Par (Song song)</option>
+                <option value="ref">Ref (Tham chiếu)</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Guard Condition</label>
+              <label>Điều kiện chặn</label>
               <input
                 v-model="formModal.data.guard_condition"
                 type="text"
-                placeholder="Enter guard condition (optional)"
+                placeholder="Nhập điều kiện chặn (không bắt buộc)"
                 class="form-input"
               />
             </div>
@@ -810,7 +810,7 @@
             @click="closeFormModal"
             :disabled="isCrudLoading"
           >
-            Cancel
+            Huỷ
           </button>
           <button 
             class="btn-primary" 
@@ -824,7 +824,7 @@
             >
               sync
             </span>
-            {{ isCrudLoading ? 'Saving...' : (formModal.isEdit ? 'Update' : 'Create') }}
+            {{ isCrudLoading ? 'Đang lưu...' : (formModal.isEdit ? 'Update' : 'Create') }}
           </button>
         </div>
       </div>
@@ -934,9 +934,9 @@ export default {
         hasChanges: false,
       },
       managementTabs: [
-        { id: 'lifelines', label: 'Lifelines', icon: 'person' },
-        { id: 'messages', label: 'Messages', icon: 'chat' },
-        { id: 'fragments', label: 'Fragments', icon: 'widgets' },
+        { id: 'lifelines', label: 'Đường sống', icon: 'person' },
+        { id: 'messages', label: 'Thông điệp', icon: 'chat' },
+        { id: 'fragments', label: 'Khối kết hợp', icon: 'widgets' },
       ],
       formModal: {
         visible: false,
@@ -1679,11 +1679,11 @@ export default {
 
     getSaveStatusText() {
       if (this.isSaving) {
-        return 'Saving...'
+        return 'Đang lưu...'
       } else if (this.lastSaved) {
-        return 'Saved'
+        return 'Đã lưu'
       } else {
-        return 'No changes'
+        return 'Không có thay đổi'
       }
     },
 
@@ -2089,7 +2089,7 @@ export default {
         this.isExporting = true
         const allElements = [...this.computedLifelines, ...this.computedFragments]
         if (allElements.length === 0) {
-          alert('No content to export!')
+          alert('Không có nội dung để xuất!')
           return
         }
 
@@ -2161,7 +2161,7 @@ export default {
         })
       } catch (err) {
         console.error('Error exporting PNG:', err)
-        alert('Error exporting PNG: ' + err.message)
+        alert('Lỗi khi xuất PNG:' + err.message)
       } finally {
         this.isExporting = false
       }
@@ -2170,7 +2170,7 @@ export default {
     exportAsSVG() {
       const allElements = [...this.computedLifelines, ...this.computedFragments]
       if (allElements.length === 0) {
-        alert('No content to export!')
+        alert('Không có nội dung để xuất!')
         return
       }
 
@@ -2380,7 +2380,7 @@ export default {
     async saveForm() {
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
       if (!diagramId) {
-        alert('Diagram ID not found')
+        alert('Không tìm thấy mã sơ đồ')
         return
       }
 
@@ -2392,7 +2392,7 @@ export default {
 
         if (this.formModal.type === 'lifeline') {
           if (!this.formModal.data.name.trim()) {
-            alert('Lifeline name is required')
+            alert('Cần nhập tên đường sống')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2404,14 +2404,14 @@ export default {
             })
           } else {
             // Note: Creating lifelines might need special handling
-            alert('Creating new lifelines is not yet supported via API')
+            alert('Chưa hỗ trợ tạo đường sống mới qua API')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
           }
         } else if (this.formModal.type === 'message') {
           if (!this.formModal.data.from || !this.formModal.data.to || !this.formModal.data.content) {
-            alert('From, To, and Content are required')
+            alert('Cần có nguồn, đích và nội dung')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2433,7 +2433,7 @@ export default {
           }
         } else if (this.formModal.type === 'fragment') {
           if (!this.formModal.data.type) {
-            alert('Fragment type is required')
+            alert('Cần chọn loại khối')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2469,19 +2469,19 @@ export default {
         this.isCrudLoading = false
       } catch (error) {
         console.error('Error saving:', error)
-        alert('Failed to save: ' + (error.response?.data?.message || error.message))
+        alert('Lưu thất bại:' + (error.response?.data?.message || error.message))
         this.hideSavingIndicator()
         this.isCrudLoading = false
       }
     },
     async confirmDelete(type, element) {
-      if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+      if (!confirm(`Bạn có chắc muốn xoá ${type} này?`)) {
         return
       }
 
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
       if (!diagramId) {
-        alert('Diagram ID not found')
+        alert('Không tìm thấy mã sơ đồ')
         return
       }
 
@@ -2517,7 +2517,7 @@ export default {
         this.deletingElementId = null
       } catch (error) {
         console.error('Error deleting:', error)
-        alert('Failed to delete: ' + (error.response?.data?.message || error.message))
+        alert('Xoá thất bại:' + (error.response?.data?.message || error.message))
         this.hideSavingIndicator()
         this.isCrudLoading = false
         this.deletingElementId = null

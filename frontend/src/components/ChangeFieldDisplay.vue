@@ -8,7 +8,7 @@
     >
       <div class="field-label">
         <span class="field-name">{{ formatFieldName(key) }}</span>
-        <span v-if="isImportantField(key)" class="important-badge">Important</span>
+        <span v-if="isImportantField(key)" class="important-badge">Quan trọng</span>
       </div>
       <div class="field-value">
         <FieldValueRenderer
@@ -23,6 +23,7 @@
 
 <script>
 import FieldValueRenderer from './FieldValueRenderer.vue'
+import { fieldLabel } from '@/utils/fieldLabels'
 
 export default {
   name: 'ChangeFieldDisplay',
@@ -100,9 +101,7 @@ export default {
     },
     formatFieldName(key) {
       // Format field name để hiển thị đẹp hơn
-      return key
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, (l) => l.toUpperCase())
+      return fieldLabel(key)
     },
     getFieldComponent(key) {
       return 'FieldValueRenderer'

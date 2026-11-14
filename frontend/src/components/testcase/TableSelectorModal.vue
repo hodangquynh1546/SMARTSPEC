@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h2>Select Database Tables</h2>
+        <h2>Chọn bảng cơ sở dữ liệu</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -13,14 +13,14 @@
           <!-- Loading State -->
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
-            <p>Loading database tables...</p>
+            <p>Đang tải các bảng...</p>
           </div>
 
           <!-- Error State -->
           <div v-else-if="error" class="error-state">
             <span class="material-symbols-outlined error-icon">error</span>
             <p>{{ error }}</p>
-            <button class="btn btn-primary" @click="loadTables">Retry</button>
+            <button class="btn btn-primary" @click="loadTables">Thử lại</button>
           </div>
 
           <!-- Content -->
@@ -32,7 +32,7 @@
                   v-model="searchQuery"
                   type="text"
                   class="search-input"
-                  placeholder="Search tables by name..."
+                  placeholder="Tìm bảng theo tên..."
                 />
               </div>
               <div class="filter-buttons">
@@ -49,7 +49,7 @@
 
             <div class="tables-grid">
               <div class="available-tables">
-                <h3 class="section-subtitle">Available Tables</h3>
+                <h3 class="section-subtitle">Bảng khả dụng</h3>
                 <div class="tables-list">
                   <div
                     v-for="table in filteredTables"
@@ -91,7 +91,7 @@
                       class="table-relationships"
                       v-if="table.relationships && table.relationships.length"
                     >
-                      <span class="relationships-label">Relationships:</span>
+                      <span class="relationships-label">Quan hệ:</span>
                       <div class="relationship-tags">
                         <span
                           v-for="rel in table.relationships.slice(0, 2)"
@@ -109,11 +109,11 @@
                     <div class="table-meta">
                       <div class="meta-item" v-if="table.column_count">
                         <span class="material-symbols-outlined meta-icon">view_column</span>
-                        <span class="meta-text">{{ table.column_count }} columns</span>
+                        <span class="meta-text">{{ table.column_count }} cột</span>
                       </div>
                       <div class="meta-item" v-if="table.has_foreign_keys">
                         <span class="material-symbols-outlined meta-icon">link</span>
-                        <span class="meta-text">Foreign Keys</span>
+                        <span class="meta-text">Khoá ngoại</span>
                       </div>
                     </div>
                   </div>
@@ -122,14 +122,14 @@
                 <!-- Empty State for Tables -->
                 <div v-if="filteredTables.length === 0 && !loading" class="empty-state">
                   <span class="material-symbols-outlined empty-icon">table</span>
-                  <p>No tables found</p>
-                  <span class="empty-hint">Try adjusting your search or filters</span>
+                  <p>Không tìm thấy bảng</p>
+                  <span class="empty-hint">Hãy thử đổi từ khoá hoặc bộ lọc</span>
                 </div>
               </div>
 
               <div class="selected-section">
                 <h3 class="section-subtitle">
-                  Selected Tables
+                  Bảng đã chọn
                   <span class="selected-count">({{ selectedTables.length }})</span>
                 </h3>
                 <div class="selected-tables-list">
@@ -145,25 +145,25 @@
                   </div>
                   <div v-if="selectedTables.length === 0" class="empty-state">
                     <span class="material-symbols-outlined empty-icon">table</span>
-                    <p>No tables selected</p>
-                    <span class="empty-hint">Select tables from the left panel</span>
+                    <p>Chưa chọn bảng</p>
+                    <span class="empty-hint">Chọn bảng ở khung bên trái</span>
                   </div>
                 </div>
 
                 <div class="selection-stats" v-if="selectedTables.length > 0">
-                  <h4>Selection Summary</h4>
+                  <h4>Tóm tắt lựa chọn</h4>
                   <div class="stats-grid">
                     <div class="stat-item">
                       <span class="stat-value">{{ selectedTables.length }}</span>
-                      <span class="stat-label">Tables</span>
+                      <span class="stat-label">Bảng</span>
                     </div>
                     <div class="stat-item">
                       <span class="stat-value">{{ totalColumns }}</span>
-                      <span class="stat-label">Columns</span>
+                      <span class="stat-label">Cột</span>
                     </div>
                     <div class="stat-item">
                       <span class="stat-value">{{ tablesWithRelationships }}</span>
-                      <span class="stat-label">With Relationships</span>
+                      <span class="stat-label">Có quan hệ</span>
                     </div>
                   </div>
                 </div>
@@ -173,13 +173,13 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-secondary" @click="$emit('close')">Huỷ</button>
           <button
             class="btn btn-primary"
             @click="applySelection"
             :disabled="selectedTables.length === 0 || loading"
           >
-            Select {{ selectedTables.length }} Table(s)
+            Chọn {{ selectedTables.length }} Bảng
           </button>
         </div>
       </div>
@@ -214,11 +214,11 @@ export default {
     const error = ref(null)
 
     const filters = [
-      { value: 'all', label: 'All Tables' },
-      { value: 'with_data', label: 'With Data' },
-      { value: 'no_data', label: 'Empty Tables' },
-      { value: 'relationships', label: 'With Relationships' },
-      { value: 'primary_keys', label: 'With Primary Keys' },
+      { value: 'all', label: 'Tất cả bảng' },
+      { value: 'with_data', label: 'Có dữ liệu' },
+      { value: 'no_data', label: 'Bảng trống' },
+      { value: 'relationships', label: 'Có quan hệ' },
+      { value: 'primary_keys', label: 'Có khoá chính' },
     ]
 
     const filteredTables = computed(() => {
@@ -287,7 +287,7 @@ export default {
       const tableNames = selectedTables.value.map((table) => table.name)
       emit('select-tables', tableNames)
       emit('close')
-      toast.success(`Selected ${selectedTables.value.length} tables`)
+      toast.success(`Đã chọn ${selectedTables.value.length} bảng`)
     }
 
     const extractTablesFromDatabase = (database) => {
@@ -372,17 +372,17 @@ export default {
           } else {
             console.log('❌ No tables found in final database object')
             databaseTables.value = []
-            toast.warning('No tables found in database schema')
+            toast.warning('Lược đồ chưa có bảng')
           }
         } else {
           console.log('❌ No database data available')
           databaseTables.value = []
-          toast.warning('No database schema found')
+          toast.warning('Chưa có lược đồ cơ sở dữ liệu')
         }
       } catch (err) {
         console.error('❌ Error loading database tables:', err)
-        error.value = err.response?.data?.message || 'Failed to load database tables'
-        toast.error('Failed to load database tables')
+        error.value = err.response?.data?.message || 'Không tải được các bảng'
+        toast.error('Không tải được các bảng')
       } finally {
         loading.value = false
       }

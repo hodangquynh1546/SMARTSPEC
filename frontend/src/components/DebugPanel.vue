@@ -1,35 +1,35 @@
 <template>
   <div v-if="showDebug" class="debug-panel">
     <div class="debug-header">
-      <h3> Debug Panel</h3>
+      <h3> Bảng gỡ lỗi</h3>
       <button @click="showDebug = false" class="close-btn">&times;</button>
     </div>
     
     <div class="debug-content">
       <div class="debug-section">
-        <h4> Authentication</h4>
-        <p><strong>Access Token:</strong> {{ hasAccessToken ? 'Present' : 'Missing' }}</p>
-        <p><strong>Admin Token:</strong> {{ hasAdminToken ? 'Present' : 'Missing' }}</p>
-        <p><strong>Token Preview:</strong> {{ tokenPreview }}</p>
+        <h4> Xác thực</h4>
+        <p><strong>Access token:</strong> {{ hasAccessToken ? 'Present' : 'Missing' }}</p>
+        <p><strong>Admin token:</strong> {{ hasAdminToken ? 'Present' : 'Missing' }}</p>
+        <p><strong>Xem trước token:</strong> {{ tokenPreview }}</p>
       </div>
       
       <div class="debug-section">
-        <h4> API Status</h4>
-        <p><strong>Base URL:</strong> {{ apiBaseUrl }}</p>
-        <p><strong>Last API Call:</strong> {{ lastApiCall || 'None' }}</p>
-        <p><strong>Last Error:</strong> {{ lastError || 'None' }}</p>
+        <h4> Trạng thái API</h4>
+        <p><strong>Địa chỉ gốc:</strong> {{ apiBaseUrl }}</p>
+        <p><strong>Lần gọi API gần nhất:</strong> {{ lastApiCall || 'None' }}</p>
+        <p><strong>Lỗi gần nhất:</strong> {{ lastError || 'None' }}</p>
       </div>
       
       <div class="debug-section">
-        <h4> Data Status</h4>
-        <p><strong>Users Count:</strong> {{ usersCount }}</p>
-        <p><strong>Loading State:</strong> {{ isLoading ? 'Loading...' : 'Idle' }}</p>
+        <h4> Trạng thái dữ liệu</h4>
+        <p><strong>Số người dùng:</strong> {{ usersCount }}</p>
+        <p><strong>Trạng thái tải:</strong> {{ isLoading ? 'Đang tải...' : 'Idle' }}</p>
       </div>
       
       <div class="debug-actions">
-        <button @click="testApi" class="btn-test">Test API</button>
-        <button @click="clearTokens" class="btn-clear">Clear Tokens</button>
-        <button @click="refreshData" class="btn-refresh">Refresh Data</button>
+        <button @click="testApi" class="btn-test">Thử API</button>
+        <button @click="clearTokens" class="btn-clear">Xoá token</button>
+        <button @click="refreshData" class="btn-refresh">Làm mới dữ liệu</button>
       </div>
     </div>
   </div>
@@ -63,14 +63,14 @@ const hasAdminToken = computed(() => {
 
 const tokenPreview = computed(() => {
   const token = localStorage.getItem('accessToken') || localStorage.getItem('adminToken')
-  if (!token) return 'No token found'
+  if (!token) return 'Không tìm thấy token'
   return token.substring(0, 20) + '...'
 })
 
 const testApi = async () => {
   try {
     isLoading.value = true
-    lastApiCall.value = new Date().toLocaleTimeString()
+    lastApiCall.value = new Date().toLocaleTimeString('vi-VN')
     lastError.value = ''
     
     console.log(' Testing API call...')
@@ -82,7 +82,7 @@ const testApi = async () => {
     }
   } catch (error) {
     console.error(' API test failed:', error)
-    lastError.value = error.message || 'Unknown error'
+    lastError.value = error.message || 'Lỗi không rõ'
     
     if (error.response) {
       lastError.value += ` (${error.response.status})`

@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h2>Test Data Templates</h2>
+        <h2>Mẫu dữ liệu kiểm thử</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -44,17 +44,17 @@
                     <h5 class="scenario-name">{{ scenario.name }}</h5>
                     <div class="scenario-data">
                       <div class="data-preview">
-                        <span class="data-label">Input:</span>
+                        <span class="data-label">Đầu vào:</span>
                         <code class="data-code">{{ previewData(scenario.input_payload) }}</code>
                       </div>
                       <div class="data-preview">
-                        <span class="data-label">Expected:</span>
+                        <span class="data-label">Mong đợi:</span>
                         <code class="data-code">{{ previewData(scenario.expected_output) }}</code>
                       </div>
                     </div>
                   </div>
                   <div v-if="template.scenarios.length > 2" class="more-scenarios">
-                    +{{ template.scenarios.length - 2 }} more scenarios
+                    +{{ template.scenarios.length - 2 }} kịch bản khác
                   </div>
                 </div>
 
@@ -80,14 +80,14 @@
 
                   <div class="scenario-data-grid">
                     <div class="data-section">
-                      <h5 class="data-title">Input Payload</h5>
+                      <h5 class="data-title">Dữ liệu đầu vào</h5>
                       <pre
                         class="data-json"
                       ><code>{{ JSON.stringify(scenario.input_payload, null, 2) }}</code></pre>
                     </div>
 
                     <div class="data-section">
-                      <h5 class="data-title">Expected Output</h5>
+                      <h5 class="data-title">Kết quả mong đợi</h5>
                       <pre
                         class="data-json"
                       ><code>{{ JSON.stringify(scenario.expected_output, null, 2) }}</code></pre>
@@ -95,7 +95,7 @@
                   </div>
 
                   <div class="validation-rules" v-if="scenario.validation_rules.length">
-                    <h5 class="rules-title">Validation Rules</h5>
+                    <h5 class="rules-title">Quy tắc kiểm tra hợp lệ</h5>
                     <ul class="rules-list">
                       <li
                         v-for="(rule, ruleIndex) in scenario.validation_rules"
@@ -113,9 +113,9 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-secondary" @click="$emit('close')">Huỷ</button>
           <button class="btn btn-primary" @click="applyTemplate" :disabled="!selectedTemplate">
-            Use This Template
+            Dùng mẫu này
           </button>
         </div>
       </div>
@@ -136,24 +136,24 @@ export default {
     const selectedTemplate = ref(null)
 
     const categories = [
-      { id: 'common', name: 'Common Scenarios' },
-      { id: 'auth', name: 'Authentication' },
-      { id: 'api', name: 'API Testing' },
-      { id: 'forms', name: 'Form Validation' },
-      { id: 'boundary', name: 'Boundary Values' },
-      { id: 'custom', name: 'My Templates' },
+      { id: 'common', name: 'Kịch bản thường gặp' },
+      { id: 'auth', name: 'Xác thực' },
+      { id: 'api', name: 'Kiểm thử API' },
+      { id: 'forms', name: 'Kiểm tra biểu mẫu' },
+      { id: 'boundary', name: 'Giá trị biên' },
+      { id: 'custom', name: 'Mẫu của tôi' },
     ]
 
     const templates = ref([
       {
         id: 'user-registration',
-        title: 'User Registration Scenarios',
-        description: 'Comprehensive test data for user registration flows',
+        title: 'Kịch bản đăng ký',
+        description: 'Dữ liệu kiểm thử đầy đủ cho luồng đăng ký',
         category: 'auth',
         tags: ['authentication', 'registration', 'validation'],
         scenarios: [
           {
-            name: 'Valid Registration',
+            name: 'Đăng ký hợp lệ',
             input_payload: {
               username: 'john_doe',
               email: 'john@example.com',
@@ -163,7 +163,7 @@ export default {
             expected_output: {
               success: true,
               user_id: 12345,
-              message: 'User registered successfully',
+              message: 'Đăng ký thành công',
             },
             validation_rules: [
               'Username must be unique',
@@ -172,7 +172,7 @@ export default {
             ],
           },
           {
-            name: 'Duplicate Username',
+            name: 'Trùng tên đăng nhập',
             input_payload: {
               username: 'existing_user',
               email: 'new@example.com',
@@ -181,7 +181,7 @@ export default {
             },
             expected_output: {
               success: false,
-              error: 'Username already exists',
+              error: 'Tên đăng nhập đã tồn tại',
               error_code: 'USERNAME_TAKEN',
             },
             validation_rules: ['Username uniqueness validation', 'Appropriate error message'],
@@ -190,29 +190,29 @@ export default {
       },
       {
         id: 'api-error-cases',
-        title: 'API Error Scenarios',
-        description: 'Test data for various API error responses',
+        title: 'Kịch bản lỗi API',
+        description: 'Dữ liệu kiểm thử cho các phản hồi lỗi API',
         category: 'api',
         tags: ['api', 'errors', 'http'],
         scenarios: [
           {
-            name: 'Invalid JSON',
+            name: 'JSON không hợp lệ',
             input_payload: {
               malformed: 'json{',
             },
             expected_output: {
-              error: 'Invalid JSON format',
+              error: 'Định dạng JSON không hợp lệ',
               status_code: 400,
             },
             validation_rules: ['Proper error response format', 'Correct HTTP status code'],
           },
           {
-            name: 'Missing Required Fields',
+            name: 'Thiếu trường bắt buộc',
             input_payload: {
               optional_field: 'value',
             },
             expected_output: {
-              error: 'Missing required fields: username, email',
+              error: 'Thiếu trường bắt buộc: username, email',
               status_code: 422,
               missing_fields: ['username', 'email'],
             },
@@ -242,7 +242,7 @@ export default {
       if (selectedTemplate.value) {
         emit('apply-template', selectedTemplate.value)
         emit('close')
-        toast.success('Test data template applied successfully')
+        toast.success('Đã áp dụng mẫu dữ liệu kiểm thử')
       }
     }
 

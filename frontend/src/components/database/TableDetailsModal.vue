@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h3>Table Details: {{ table.name }}</h3>
+        <h3>Chi tiết bảng: {{ table.name }}</h3>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,22 +11,22 @@
       <div class="modal-body">
         <!-- Table Information -->
         <div class="info-section">
-          <h4>Table Information</h4>
+          <h4>Thông tin bảng</h4>
           <div class="info-grid">
             <div class="info-item">
-              <label>Table Name</label>
+              <label>Tên bảng</label>
               <span class="info-value">{{ table.name }}</span>
             </div>
             <div class="info-item">
-              <label>Description</label>
-              <span class="info-value">{{ table.description || 'No description' }}</span>
+              <label>Mô tả</label>
+              <span class="info-value">{{ table.description || 'Chưa có mô tả' }}</span>
             </div>
             <div class="info-item">
-              <label>Total Columns</label>
+              <label>Tổng số cột</label>
               <span class="info-value">{{ table.columns?.length || 0 }}</span>
             </div>
             <div class="info-item">
-              <label>Relationships</label>
+              <label>Quan hệ</label>
               <span class="info-value">{{ relationships.length }}</span>
             </div>
           </div>
@@ -35,25 +35,25 @@
         <!-- Columns Section -->
         <div class="columns-section">
           <div class="section-header">
-            <h4>Columns ({{ table.columns?.length || 0 }})</h4>
+            <h4>Cột ({{ table.columns?.length || 0 }})</h4>
             <div class="column-stats">
               <span class="stat">
                 <span class="stat-dot primary"></span>
-                Primary Keys: {{ primaryKeyCount }}
+                Khoá chính: {{ primaryKeyCount }}
               </span>
               <span class="stat">
                 <span class="stat-dot foreign"></span>
-                Foreign Keys: {{ foreignKeyCount }}
+                Khoá ngoại: {{ foreignKeyCount }}
               </span>
             </div>
           </div>
 
           <div class="columns-table">
             <div class="table-header">
-              <div class="col-name">Column Name</div>
-              <div class="col-type">Data Type</div>
-              <div class="col-attributes">Attributes</div>
-              <div class="col-relations">Relations</div>
+              <div class="col-name">Tên cột</div>
+              <div class="col-type">Kiểu dữ liệu</div>
+              <div class="col-attributes">Thuộc tính</div>
+              <div class="col-relations">Quan hệ</div>
             </div>
 
             <div class="table-body">
@@ -79,12 +79,12 @@
 
                 <div class="col-attributes">
                   <div class="attribute-list">
-                    <span v-if="!column.nullable" class="attribute not-null" title="Not Null"
+                    <span v-if="!column.nullable" class="attribute not-null" title="Bắt buộc"
                       >NN</span
                     >
-                    <span v-if="column.unique" class="attribute unique" title="Unique">UQ</span>
-                    <span v-if="column.default" class="attribute default" title="Default Value">
-                      DEFAULT: {{ column.default }}
+                    <span v-if="column.unique" class="attribute unique" title="Duy nhất">UQ</span>
+                    <span v-if="column.default" class="attribute default" title="Giá trị mặc định">
+                      MẶC ĐỊNH: {{ column.default }}
                     </span>
                   </div>
                 </div>
@@ -92,7 +92,7 @@
                 <div class="col-relations">
                   <div v-if="column.is_foreign_key && column.references" class="relation-info">
                     <span class="material-symbols-outlined">arrow_right_alt</span>
-                    References {{ column.references }}.id
+                    Tham chiếu {{ column.references }}.id
                   </div>
                   <span v-else class="no-relation">—</span>
                 </div>
@@ -103,7 +103,7 @@
 
         <!-- Relationships Section -->
         <div v-if="relationships.length > 0" class="relationships-section">
-          <h4>Relationships ({{ relationships.length }})</h4>
+          <h4>Quan hệ ({{ relationships.length }})</h4>
           <div class="relationships-list">
             <div
               v-for="relationship in relationships"
@@ -116,7 +116,7 @@
                   formatRelationshipType(relationship.type)
                 }}</span>
                 <span class="relationship-direction">
-                  {{ relationship.from_table === table.name ? 'Outgoing' : 'Incoming' }}
+                  {{ relationship.from_table === table.name ? 'Outgoing' : 'Đến' }}
                 </span>
               </div>
 
@@ -147,21 +147,21 @@
 
         <!-- SQL Preview -->
         <div class="sql-section">
-          <h4>SQL Definition</h4>
+          <h4>Định nghĩa SQL</h4>
           <div class="sql-preview">
             <pre><code>{{ generateTableSQL() }}</code></pre>
           </div>
           <div class="sql-actions">
             <button class="btn-secondary" @click="copySQL">
               <span class="material-symbols-outlined">content_copy</span>
-              Copy SQL
+              Sao chép SQL
             </button>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-primary" @click="$emit('close')">Close</button>
+        <button class="btn-primary" @click="$emit('close')">Đóng</button>
       </div>
     </div>
   </div>
@@ -191,10 +191,10 @@ export default {
   methods: {
     formatRelationshipType(type) {
       const types = {
-        'one-to-one': 'One-to-One',
-        'one-to-many': 'One-to-Many',
-        'many-to-one': 'Many-to-One',
-        'many-to-many': 'Many-to-Many',
+        'one-to-one': 'Một-Một',
+        'one-to-many': 'Một-Nhiều',
+        'many-to-one': 'Nhiều-Một',
+        'many-to-many': 'Nhiều-Nhiều',
       }
       return types[type] || type
     },
@@ -216,7 +216,7 @@ export default {
         'many-to-many': `Many records in ${from_table} relate to many records in ${to_table}`,
       }
 
-      return descriptions[type] || 'Relationship between tables'
+      return descriptions[type] || 'Quan hệ giữa các bảng'
     },
 
     generateTableSQL() {

@@ -4,21 +4,21 @@
       <!-- Header với Actions -->
       <div class="content-header">
         <div class="header-left">
-          <h2>UML Diagram Management</h2>
-          <p class="subtitle">Manage and visualize your system diagrams</p>
+          <h2>Quản lý sơ đồ UML</h2>
+          <p class="subtitle">Quản lý và trực quan hoá các sơ đồ hệ thống</p>
         </div>
         <div class="header-actions">
           <button class="btn-secondary" @click="refreshDiagrams">
             <span class="material-symbols-outlined">refresh</span>
-            Refresh
+            Làm mới
           </button>
           <button class="btn-primary" @click="generateNewDiagram">
             <span class="material-symbols-outlined">auto_awesome</span>
-            Generate Diagram
+            Sinh sơ đồ
           </button>
           <button class="btn-secondary" @click="openManualEditor">
             <span class="material-symbols-outlined">draw</span>
-            Create Manually
+            Tạo thủ công
           </button>
         </div>
       </div>
@@ -26,7 +26,7 @@
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <div class="loading-spinner"></div>
-        <p>Loading diagrams...</p>
+        <p>Đang tải sơ đồ...</p>
       </div>
 
       <!-- Diagrams Display - 3 loại diagram trên 3 hàng -->
@@ -35,7 +35,7 @@
         <div class="diagram-section">
           <div class="section-header">
             <div class="section-title">
-              <h3>Use Case Diagrams</h3>
+              <h3>Sơ đồ use case</h3>
               <span class="diagram-count">({{ usecaseDiagrams.length }})</span>
             </div>
             <div class="section-controls">
@@ -44,7 +44,7 @@
                 <input
                   v-model="searchFilters.usecase"
                   type="text"
-                  placeholder="Search use case diagrams..."
+                  placeholder="Tìm sơ đồ use case..."
                   class="search-input"
                 />
               </div>
@@ -68,7 +68,7 @@
                       @click="setSortFilter('name')"
                     >
                       <span class="material-symbols-outlined">text_fields</span>
-                      Sort by Name
+                      Sắp xếp theo tên
                     </button>
                     <button 
                       class="filter-option" 
@@ -76,7 +76,7 @@
                       @click="setSortFilter('date')"
                     >
                       <span class="material-symbols-outlined">schedule</span>
-                      Sort by Date
+                      Sắp xếp theo ngày
                     </button>
                     <button 
                       class="filter-option" 
@@ -84,7 +84,7 @@
                       @click="setSortFilter('created')"
                     >
                       <span class="material-symbols-outlined">calendar_today</span>
-                      Sort by Created Date
+                      Sắp xếp theo ngày tạo
                     </button>
                     <button 
                       class="filter-option" 
@@ -92,7 +92,7 @@
                       @click="setSortFilter('actors')"
                     >
                       <span class="material-symbols-outlined">person</span>
-                      Sort by Actors
+                      Sắp xếp theo tác nhân
                     </button>
                     <button 
                       class="filter-option" 
@@ -100,7 +100,7 @@
                       @click="setSortFilter('usecases')"
                     >
                       <span class="material-symbols-outlined">task</span>
-                      Sort by Use Cases
+                      Sắp xếp theo use case
                     </button>
                   </div>
                 </div>
@@ -123,7 +123,7 @@
                       @click="setLangFilter('usecase', 'all')"
                     >
                       <span class="material-symbols-outlined">public</span>
-                      All Languages
+                      Tất cả ngôn ngữ
                     </button>
                     <button 
                       class="filter-option" 
@@ -131,7 +131,7 @@
                       @click="setLangFilter('usecase', 'en-US')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      English
+                      Tiếng Anh
                     </button>
                     <button 
                       class="filter-option" 
@@ -139,7 +139,7 @@
                       @click="setLangFilter('usecase', 'vi-VN')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      Vietnamese
+                      Tiếng Việt
                     </button>
                   </div>
                 </div>
@@ -147,7 +147,7 @@
                   class="btn-refresh-section" 
                   @click="refreshDiagramsByType('usecase')"
                   :disabled="refreshingDiagrams.usecase"
-                  title="Refresh Use Case Diagrams"
+                  title="Làm mới sơ đồ use case"
                 >
                   <span 
                     v-if="refreshingDiagrams.usecase" 
@@ -161,10 +161,10 @@
                 <button 
                   class="btn-generate-section" 
                   @click="generateSpecificDiagram('usecase')"
-                  title="Generate Use Case Diagram"
+                  title="Sinh sơ đồ use case"
                 >
                   <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate
+                  Sinh
                 </button>
               </div>
             </div>
@@ -200,7 +200,7 @@
                     />
                     <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
-                      <span>Generating preview...</span>
+                      <span>Đang tạo bản xem trước...</span>
                     </div>
                     <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
                     <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
@@ -220,7 +220,7 @@
                         <button
                           class="btn-icon export-toggle"
                           @click.stop="toggleExportDropdown(diagram)"
-                          title="Export"
+                          title="Xuất"
                         >
                           <span class="material-symbols-outlined">download</span>
                         </button>
@@ -230,34 +230,34 @@
                         >
                           <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
                             <span class="material-symbols-outlined">image</span>
-                            Export PNG
+                            Xuất PNG
                           </button>
                           <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
                             <span class="material-symbols-outlined">code</span>
-                            Export SVG
+                            Xuất SVG
                           </button>
                         </div>
                       </div>
                       <button
                         class="btn-icon danger"
                         @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                        title="Delete"
+                        title="Xoá"
                       >
                         <span class="material-symbols-outlined">delete</span>
                       </button>
                     </div>
                   </div>
                   <div class="diagram-info">
-                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <h4>{{ getSafeValue(diagram.name, 'Sơ đồ chưa đặt tên') }}</h4>
                     <p class="diagram-description">
-                      {{ getSafeValue(diagram.description, 'No description') }}
+                      {{ getSafeValue(diagram.description, 'Chưa có mô tả') }}
                     </p>
                     <div class="diagram-meta">
                       <span class="meta-item">
                         <span class="material-symbols-outlined">language</span>
                         {{ getLanguageCode(diagram.lang) }}
                       </span>
-                      <span class="meta-item diagram-type-badge type-usecase"> Use Case </span>
+                      <span class="meta-item diagram-type-badge type-usecase"> Use case </span>
                     </div>
                     <div class="diagram-stats">
                       <span class="stat-badge">
@@ -281,11 +281,11 @@
                   <div class="empty-icon">
                     <span class="material-symbols-outlined">account_tree</span>
                   </div>
-                  <h4>No Use Case Diagrams</h4>
-                  <p>Generate your first use case diagram to visualize system requirements.</p>
+                  <h4>Chưa có sơ đồ use case</h4>
+                  <p>Sinh sơ đồ use case đầu tiên để trực quan hoá yêu cầu hệ thống.</p>
                   <button class="btn-primary small" @click="generateSpecificDiagram('usecase')">
                     <span class="material-symbols-outlined">auto_awesome</span>
-                    Generate Use Case
+                    Sinh sơ đồ use case
                   </button>
                 </div>
               </div>
@@ -306,7 +306,7 @@
         <div class="diagram-section">
           <div class="section-header">
             <div class="section-title">
-              <h3>Activity Diagrams</h3>
+              <h3>Sơ đồ hoạt động</h3>
               <span class="diagram-count">({{ activityDiagrams.length }})</span>
             </div>
             <div class="section-controls">
@@ -315,7 +315,7 @@
                 <input
                   v-model="searchFilters.activity"
                   type="text"
-                  placeholder="Search activity diagrams..."
+                  placeholder="Tìm sơ đồ hoạt động..."
                   class="search-input"
                 />
               </div>
@@ -339,7 +339,7 @@
                       @click="setSortFilter('name')"
                     >
                       <span class="material-symbols-outlined">text_fields</span>
-                      Sort by Name
+                      Sắp xếp theo tên
                     </button>
                     <button 
                       class="filter-option" 
@@ -347,7 +347,7 @@
                       @click="setSortFilter('date')"
                     >
                       <span class="material-symbols-outlined">schedule</span>
-                      Sort by Date
+                      Sắp xếp theo ngày
                     </button>
                     <button 
                       class="filter-option" 
@@ -355,7 +355,7 @@
                       @click="setSortFilter('created')"
                     >
                       <span class="material-symbols-outlined">calendar_today</span>
-                      Sort by Created Date
+                      Sắp xếp theo ngày tạo
                     </button>
                     <button 
                       class="filter-option" 
@@ -363,7 +363,7 @@
                       @click="setSortFilter('nodes')"
                     >
                       <span class="material-symbols-outlined">play_arrow</span>
-                      Sort by Nodes
+                      Sắp xếp theo số nút
                     </button>
                   </div>
                 </div>
@@ -386,7 +386,7 @@
                       @click="setLangFilter('activity', 'all')"
                     >
                       <span class="material-symbols-outlined">public</span>
-                      All Languages
+                      Tất cả ngôn ngữ
                     </button>
                     <button 
                       class="filter-option" 
@@ -394,7 +394,7 @@
                       @click="setLangFilter('activity', 'en-US')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      English
+                      Tiếng Anh
                     </button>
                     <button 
                       class="filter-option" 
@@ -402,7 +402,7 @@
                       @click="setLangFilter('activity', 'vi-VN')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      Vietnamese
+                      Tiếng Việt
                     </button>
                   </div>
                 </div>
@@ -410,7 +410,7 @@
                   class="btn-refresh-section" 
                   @click="refreshDiagramsByType('activity')"
                   :disabled="refreshingDiagrams.activity"
-                  title="Refresh Activity Diagrams"
+                  title="Làm mới sơ đồ hoạt động"
                 >
                   <span 
                     v-if="refreshingDiagrams.activity" 
@@ -424,10 +424,10 @@
                 <button 
                   class="btn-generate-section" 
                   @click="generateSpecificDiagram('activity')"
-                  title="Generate Activity Diagram"
+                  title="Sinh sơ đồ hoạt động"
                 >
                   <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate
+                  Sinh
                 </button>
               </div>
             </div>
@@ -463,7 +463,7 @@
                     />
                     <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
-                      <span>Generating preview...</span>
+                      <span>Đang tạo bản xem trước...</span>
                     </div>
                     <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
                     <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
@@ -483,7 +483,7 @@
                         <button
                           class="btn-icon export-toggle"
                           @click.stop="toggleExportDropdown(diagram)"
-                          title="Export"
+                          title="Xuất"
                         >
                           <span class="material-symbols-outlined">download</span>
                         </button>
@@ -493,34 +493,34 @@
                         >
                           <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
                             <span class="material-symbols-outlined">image</span>
-                            Export PNG
+                            Xuất PNG
                           </button>
                           <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
                             <span class="material-symbols-outlined">code</span>
-                            Export SVG
+                            Xuất SVG
                           </button>
                         </div>
                       </div>
                       <button
                         class="btn-icon danger"
                         @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                        title="Delete"
+                        title="Xoá"
                       >
                         <span class="material-symbols-outlined">delete</span>
                       </button>
                     </div>
                   </div>
                   <div class="diagram-info">
-                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <h4>{{ getSafeValue(diagram.name, 'Sơ đồ chưa đặt tên') }}</h4>
                     <p class="diagram-description">
-                      {{ getSafeValue(diagram.description, 'No description') }}
+                      {{ getSafeValue(diagram.description, 'Chưa có mô tả') }}
                     </p>
                     <div class="diagram-meta">
                       <span class="meta-item">
                         <span class="material-symbols-outlined">language</span>
                         {{ getLanguageCode(diagram.lang) }}
                       </span>
-                      <span class="meta-item diagram-type-badge type-activity"> Activity </span>
+                      <span class="meta-item diagram-type-badge type-activity"> Hoạt động </span>
                     </div>
                     <div class="diagram-stats">
                       <span class="stat-badge">
@@ -540,11 +540,11 @@
                   <div class="empty-icon">
                     <span class="material-symbols-outlined">play_arrow</span>
                   </div>
-                  <h4>No Activity Diagrams</h4>
-                  <p>Generate activity diagrams to visualize workflow processes.</p>
+                  <h4>Chưa có sơ đồ hoạt động</h4>
+                  <p>Sinh sơ đồ hoạt động để trực quan hoá quy trình.</p>
                   <button class="btn-primary small" @click="generateSpecificDiagram('activity')">
                     <span class="material-symbols-outlined">auto_awesome</span>
-                    Generate Activity
+                    Sinh sơ đồ hoạt động
                   </button>
                 </div>
               </div>
@@ -565,7 +565,7 @@
         <div class="diagram-section">
           <div class="section-header">
             <div class="section-title">
-              <h3>Sequence Diagrams</h3>
+              <h3>Sơ đồ tuần tự</h3>
               <span class="diagram-count">({{ sequenceDiagrams.length }})</span>
             </div>
             <div class="section-controls">
@@ -574,7 +574,7 @@
                 <input
                   v-model="searchFilters.sequence"
                   type="text"
-                  placeholder="Search sequence diagrams..."
+                  placeholder="Tìm sơ đồ tuần tự..."
                   class="search-input"
                 />
               </div>
@@ -598,7 +598,7 @@
                       @click="setSortFilter('name')"
                     >
                       <span class="material-symbols-outlined">text_fields</span>
-                      Sort by Name
+                      Sắp xếp theo tên
                     </button>
                     <button 
                       class="filter-option" 
@@ -606,7 +606,7 @@
                       @click="setSortFilter('date')"
                     >
                       <span class="material-symbols-outlined">schedule</span>
-                      Sort by Date
+                      Sắp xếp theo ngày
                     </button>
                     <button 
                       class="filter-option" 
@@ -614,7 +614,7 @@
                       @click="setSortFilter('created')"
                     >
                       <span class="material-symbols-outlined">calendar_today</span>
-                      Sort by Created Date
+                      Sắp xếp theo ngày tạo
                     </button>
                     <button 
                       class="filter-option" 
@@ -622,7 +622,7 @@
                       @click="setSortFilter('lifelines')"
                     >
                       <span class="material-symbols-outlined">timeline</span>
-                      Sort by Lifelines
+                      Sắp xếp theo số đường sống
                     </button>
                   </div>
                 </div>
@@ -645,7 +645,7 @@
                       @click="setLangFilter('sequence', 'all')"
                     >
                       <span class="material-symbols-outlined">public</span>
-                      All Languages
+                      Tất cả ngôn ngữ
                     </button>
                     <button 
                       class="filter-option" 
@@ -653,7 +653,7 @@
                       @click="setLangFilter('sequence', 'en-US')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      English
+                      Tiếng Anh
                     </button>
                     <button 
                       class="filter-option" 
@@ -661,7 +661,7 @@
                       @click="setLangFilter('sequence', 'vi-VN')"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      Vietnamese
+                      Tiếng Việt
                     </button>
                   </div>
                 </div>
@@ -669,7 +669,7 @@
                   class="btn-refresh-section" 
                   @click="refreshDiagramsByType('sequence')"
                   :disabled="refreshingDiagrams.sequence"
-                  title="Refresh Sequence Diagrams"
+                  title="Làm mới sơ đồ tuần tự"
                 >
                   <span 
                     v-if="refreshingDiagrams.sequence" 
@@ -683,10 +683,10 @@
                 <button 
                   class="btn-generate-section" 
                   @click="generateSpecificDiagram('sequence')"
-                  title="Generate Sequence Diagram"
+                  title="Sinh sơ đồ tuần tự"
                 >
                   <span class="material-symbols-outlined">auto_awesome</span>
-                  Generate
+                  Sinh
                 </button>
               </div>
             </div>
@@ -722,7 +722,7 @@
                     />
                     <div v-else class="generating-preview">
                       <div class="loading-spinner-small"></div>
-                      <span>Generating preview...</span>
+                      <span>Đang tạo bản xem trước...</span>
                     </div>
                     <!-- Luôn render renderer để có thể export, ẩn khi đã có previewImage -->
                     <div class="preview-generator" :class="{ 'hidden-renderer': diagram.previewImage }">
@@ -742,7 +742,7 @@
                         <button
                           class="btn-icon export-toggle"
                           @click.stop="toggleExportDropdown(diagram)"
-                          title="Export"
+                          title="Xuất"
                         >
                           <span class="material-symbols-outlined">download</span>
                         </button>
@@ -752,34 +752,34 @@
                         >
                           <button class="export-option" @click.stop="exportDiagramAsPNG(diagram)">
                             <span class="material-symbols-outlined">image</span>
-                            Export PNG
+                            Xuất PNG
                           </button>
                           <button class="export-option" @click.stop="exportDiagramAsSVG(diagram)">
                             <span class="material-symbols-outlined">code</span>
-                            Export SVG
+                            Xuất SVG
                           </button>
                         </div>
                       </div>
                       <button
                         class="btn-icon danger"
                         @click.stop="deleteDiagram(diagram.id || diagram._id, $event)"
-                        title="Delete"
+                        title="Xoá"
                       >
                         <span class="material-symbols-outlined">delete</span>
                       </button>
                     </div>
                   </div>
                   <div class="diagram-info">
-                    <h4>{{ getSafeValue(diagram.name, 'Unnamed Diagram') }}</h4>
+                    <h4>{{ getSafeValue(diagram.name, 'Sơ đồ chưa đặt tên') }}</h4>
                     <p class="diagram-description">
-                      {{ getSafeValue(diagram.description, 'No description') }}
+                      {{ getSafeValue(diagram.description, 'Chưa có mô tả') }}
                     </p>
                     <div class="diagram-meta">
                       <span class="meta-item">
                         <span class="material-symbols-outlined">language</span>
                         {{ getLanguageCode(diagram.lang) }}
                       </span>
-                      <span class="meta-item diagram-type-badge type-sequence"> Sequence </span>
+                      <span class="meta-item diagram-type-badge type-sequence"> Tuần tự </span>
                     </div>
                     <div class="diagram-stats">
                       <span class="stat-badge">
@@ -799,11 +799,11 @@
                   <div class="empty-icon">
                     <span class="material-symbols-outlined">timeline</span>
                   </div>
-                  <h4>No Sequence Diagrams</h4>
-                  <p>Generate sequence diagrams to visualize object interactions.</p>
+                  <h4>Chưa có sơ đồ tuần tự</h4>
+                  <p>Sinh sơ đồ tuần tự để trực quan hoá tương tác giữa các đối tượng.</p>
                   <button class="btn-primary small" @click="generateSpecificDiagram('sequence')">
                     <span class="material-symbols-outlined">auto_awesome</span>
-                    Generate Sequence
+                    Sinh sơ đồ tuần tự
                   </button>
                 </div>
               </div>
@@ -825,7 +825,7 @@
       <div v-if="showGenerateModal" class="modal-overlay">
         <div class="modal-content">
           <div class="modal-header">
-            <h3>Generate {{ getDiagramTypeName() }}</h3>
+            <h3>Sinh {{ getDiagramTypeName() }}</h3>
             <button class="btn-close" @click="closeGenerateModal">
               <span class="material-symbols-outlined">close</span>
             </button>
@@ -838,9 +838,9 @@
 
               <!-- Sequence Diagram Options -->
               <div class="form-group" v-if="generateForm.type === 'sequence'">
-                <label class="required">Use Case</label>
+                <label class="required">Use case</label>
                 <select v-model="generateForm.usecaseId" required>
-                  <option value="">Select Use Case</option>
+                  <option value="">Chọn use case</option>
                   <option
                     v-for="usecase in availableUsecases"
                     :key="getUsecaseId(usecase)"
@@ -850,16 +850,16 @@
                   </option>
                 </select>
                 <div v-if="!availableUsecases.length" class="field-help">
-                  No use cases available. Please create use cases first.
+                  Chưa có use case. Hãy tạo use case trước.
                 </div>
               </div>
 
               <!-- Activity Diagram Options -->
               <div class="form-group" v-if="generateForm.type === 'activity'">
-                <label class="required">Generation Source</label>
+                <label class="required">Nguồn sinh</label>
                 <select v-model="generateForm.sourceType" required>
-                  <option value="usecase">From Use Case</option>
-                  <option value="actor">From Actor</option>
+                  <option value="usecase">Từ use case</option>
+                  <option value="actor">Từ tác nhân</option>
                 </select>
               </div>
 
@@ -868,9 +868,9 @@
                 class="form-group"
                 v-if="generateForm.type === 'activity' && generateForm.sourceType === 'usecase'"
               >
-                <label class="required">Use Case</label>
+                <label class="required">Use case</label>
                 <select v-model="generateForm.requirementId" required>
-                  <option value="">Select Use Case</option>
+                  <option value="">Chọn use case</option>
                   <option
                     v-for="usecase in availableUsecases"
                     :key="getUsecaseId(usecase)"
@@ -880,7 +880,7 @@
                   </option>
                 </select>
                 <div v-if="!availableUsecases.length" class="field-help">
-                  No use cases available. Please create use cases first.
+                  Chưa có use case. Hãy tạo use case trước.
                 </div>
               </div>
 
@@ -889,30 +889,30 @@
                 class="form-group"
                 v-if="generateForm.type === 'activity' && generateForm.sourceType === 'actor'"
               >
-                <label class="required">Actor</label>
+                <label class="required">Tác nhân</label>
                 <input
                   v-model="generateForm.actor"
                   type="text"
-                  placeholder="Enter actor name"
+                  placeholder="Nhập tên tác nhân"
                   required
                 />
               </div>
 
               <!-- <div class="form-group">
-                <label>Description</label>
+                <label>Mô tả</label>
                 <textarea
                   v-model="generateForm.description"
                   rows="3"
-                  placeholder="Enter diagram description"
+                  placeholder="Nhập mô tả sơ đồ"
                 ></textarea>
               </div> -->
 
               <div class="modal-actions">
                 <button type="button" class="btn-secondary" @click="closeGenerateModal">
-                  Cancel
+                  Huỷ
                 </button>
                 <button type="submit" class="btn-primary" :disabled="!canGenerate">
-                  {{ `Generate ${getDiagramTypeName()}` }}
+                  {{ `Sinh ${getDiagramTypeName()}` }}
                 </button>
               </div>
             </form>
@@ -1359,7 +1359,7 @@ export default {
         }
       } catch (err) {
         console.error('Error fetching project details:', err)
-        this.toast.error('Failed to load project data')
+        this.toast.error('Không tải được dữ liệu dự án')
       }
     },
     async loadAvailableUsecases() {
@@ -1374,7 +1374,7 @@ export default {
       } catch (error) {
         console.error('Error loading usecases:', error)
         this.availableUsecases = []
-        this.toast.error('Failed to load use cases')
+        this.toast.error('Không tải được use case')
       }
     },
     async loadDiagrams() {
@@ -1404,7 +1404,7 @@ export default {
         })
       } catch (err) {
         console.error('Error loading diagrams:', err)
-        this.toast.error('Failed to load diagrams')
+        this.toast.error('Không tải được sơ đồ')
         this.usecaseDiagrams = []
         this.activityDiagrams = []
         this.sequenceDiagrams = []
@@ -1431,16 +1431,16 @@ export default {
     // Diagram Type Helpers
     getDiagramTypeName(plural = false) {
       const names = {
-        usecase: plural ? 'Use Case Diagrams' : 'Use Case Diagram',
-        activity: plural ? 'Activity Diagrams' : 'Activity Diagram',
-        sequence: plural ? 'Sequence Diagrams' : 'Sequence Diagram',
+        usecase: plural ? 'Sơ đồ use case' : 'Use Case Diagram',
+        activity: plural ? 'Sơ đồ hoạt động' : 'Activity Diagram',
+        sequence: plural ? 'Sơ đồ tuần tự' : 'Sequence Diagram',
       }
       return names[this.generateForm.type] || 'Diagram'
     },
     getDiagramTypeLabel(diagram) {
       const type = diagram._type || this.generateForm.type
       const labels = {
-        usecase: 'Use Case',
+        usecase: 'Use case',
         activity: 'Activity',
         sequence: 'Sequence',
       }
@@ -1508,7 +1508,7 @@ export default {
           (type === 'activity' && this.generateForm.sourceType === 'usecase')) &&
         this.availableUsecases.length === 0
       ) {
-        this.toast.warning('Please create use cases first before generating diagrams')
+        this.toast.warning('Hãy tạo use case trước khi sinh sơ đồ')
         return
       }
 
@@ -1522,13 +1522,13 @@ export default {
     },
     async generateDiagram() {
       if (!this.selectedVersionId) {
-        this.toast.error('Please select a version first')
+        this.toast.error('Vui lòng chọn phiên bản trước')
         return
       }
 
       // Validate form
       if (!this.canGenerate) {
-        this.toast.error('Please fill all required fields')
+        this.toast.error('Vui lòng điền đủ các trường bắt buộc')
         return
       }
 
@@ -1595,7 +1595,7 @@ export default {
           // Chỉ đóng modal
           this.showGenerateModal = false
           
-          this.toast.success(`${diagramTypeName} generated successfully!`)
+          this.toast.success(`Đã sinh ${diagramTypeName} thành công!`)
 
           // Refresh diagrams from server to ensure data consistency
           await this.loadDiagrams()
@@ -1629,9 +1629,7 @@ export default {
         const diagramTypeName = diagramTypeNames[diagramType] || 'Diagram'
         
         this.toast.error(
-          `Failed to generate ${diagramTypeName}: ${
-            err.response?.data?.message || err.message
-          }`
+          `Sinh ${diagramTypeName} thất bại: ${ err.response?.data?.message || err.message }`
         )
       } finally {
         // Reset form sau khi hoàn thành (thành công hoặc lỗi)
@@ -1639,7 +1637,7 @@ export default {
       }
     },
     openManualEditor() {
-      this.toast.info('Manual editor will be implemented in next version')
+      this.toast.info('Trình soạn thảo thủ công sẽ có ở phiên bản sau')
     },
     editDiagram(diagram) {
       this.editingDiagram = { ...diagram }
@@ -1770,7 +1768,7 @@ export default {
       const diagram = this.findDiagramById(diagramId)
       if (!diagram) return
 
-      const diagramName = diagram?.name || 'Unnamed Diagram'
+      const diagramName = diagram?.name || 'Sơ đồ chưa đặt tên'
       const diagramType = diagram._type || 'usecase'
 
       if (
@@ -1818,7 +1816,7 @@ export default {
           this.closeEditor()
         }
 
-        this.toast.success(`Diagram deleted successfully`)
+        this.toast.success(`Đã xoá sơ đồ`)
       } catch (err) {
         console.error('Error deleting diagram:', err)
         this.toast.error(err.response?.data?.message || err.message)
@@ -1898,19 +1896,19 @@ export default {
         
         if (renderer && typeof renderer.exportAsPNG === 'function') {
           await renderer.exportAsPNG()
-          this.toast.success('Diagram exported as PNG successfully!')
+          this.toast.success('Đã xuất sơ đồ dạng PNG!')
         } else {
           console.error('Renderer not found or exportAsPNG method not available', {
             rendererRef,
             hasRef: !!this.$refs[rendererRef],
             renderer,
           })
-          this.toast.error('Export function not available. Please try again.')
+          this.toast.error('Chức năng xuất chưa sẵn sàng. Vui lòng thử lại.')
         }
         this.closeExportDropdown()
       } catch (err) {
         console.error('Error exporting PNG:', err)
-        this.toast.error('Failed to export PNG: ' + (err.message || 'Unknown error'))
+        this.toast.error('Xuất PNG thất bại:' + (err.message || 'Lỗi không rõ'))
       }
     },
     async exportDiagramAsSVG(diagram) {
@@ -1933,19 +1931,19 @@ export default {
         
         if (renderer && typeof renderer.exportAsSVG === 'function') {
           renderer.exportAsSVG()
-          this.toast.success('Diagram exported as SVG successfully!')
+          this.toast.success('Đã xuất sơ đồ dạng SVG!')
         } else {
           console.error('Renderer not found or exportAsSVG method not available', {
             rendererRef,
             hasRef: !!this.$refs[rendererRef],
             renderer,
           })
-          this.toast.error('Export function not available. Please try again.')
+          this.toast.error('Chức năng xuất chưa sẵn sàng. Vui lòng thử lại.')
         }
         this.closeExportDropdown()
       } catch (err) {
         console.error('Error exporting SVG:', err)
-        this.toast.error('Failed to export SVG: ' + (err.message || 'Unknown error'))
+        this.toast.error('Xuất SVG thất bại:' + (err.message || 'Lỗi không rõ'))
       }
     },
     // Helper methods
@@ -1965,8 +1963,8 @@ export default {
       return codes[lang] || 'EN'
     },
     formatDate(dateString) {
-      if (!dateString) return 'Not available'
-      return new Date(dateString).toLocaleDateString()
+      if (!dateString) return 'Không có'
+      return new Date(dateString).toLocaleDateString('vi-VN')
     },
     resetGenerateForm() {
       this.generateForm = {
@@ -1982,7 +1980,7 @@ export default {
     handleVersionSelect(versionId) {
       // Chỉ Owner mới được phép select version
       if (!checkIsOwner(this.project)) {
-        this.toast.warning('Only project owner can switch versions')
+        this.toast.warning('Chỉ chủ dự án mới được chuyển phiên bản')
         return
       }
 
@@ -2064,12 +2062,12 @@ export default {
         await this.loadDiagrams()
 
         // Thông báo cho user
-        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+        this.toast.success(`Đã chuyển sang phiên bản đã duyệt: ${newVersion || versionId}`)
 
         this.$forceUpdate()
       } catch (error) {
         console.error('❌ Error handling version-approved event:', error)
-        this.toast.error('Failed to switch to approved version')
+        this.toast.error('Không chuyển được sang phiên bản đã duyệt')
       }
     },
     goBack() {
@@ -2078,11 +2076,11 @@ export default {
     async refreshDiagrams() {
       await this.loadAvailableUsecases()
       await this.loadDiagrams()
-      this.toast.success('Diagrams refreshed')
+      this.toast.success('Đã làm mới sơ đồ')
     },
     async refreshDiagramsByType(type) {
       if (!this.selectedVersionId) {
-        this.toast.error('Please select a version first')
+        this.toast.error('Vui lòng chọn phiên bản trước')
         return
       }
 
@@ -2117,14 +2115,14 @@ export default {
         })
 
         const typeNames = {
-          usecase: 'Use Case',
+          usecase: 'Use case',
           activity: 'Activity',
           sequence: 'Sequence',
         }
-        this.toast.success(`${typeNames[type]} diagrams refreshed`)
+        this.toast.success(`Đã làm mới ${typeNames[type]}`)
       } catch (err) {
         console.error(`Error refreshing ${type} diagrams:`, err)
-        this.toast.error(`Failed to refresh ${type} diagrams`)
+        this.toast.error(`Làm mới sơ đồ ${type} thất bại`)
       } finally {
         this.refreshingDiagrams[type] = false
       }
@@ -2201,7 +2199,7 @@ export default {
       await this.loadDiagrams()
       const version = this.versions.find((v) => v._id === event.toVersionId)
       if (version) {
-        this.toast.info(`Version switched to: ${version.version_number || event.toVersionId}`)
+        this.toast.info(`Đã chuyển sang phiên bản: ${version.version_number || event.toVersionId}`)
       }
     },
 
@@ -2222,7 +2220,7 @@ export default {
         this.loadPreviewCache()
         await this.loadAvailableUsecases()
         await this.loadDiagrams()
-        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+        this.toast.info(`Đã tạo phiên bản mới: ${event.version.version_number || event.version._id}`)
       }
     },
 
@@ -2337,21 +2335,21 @@ export default {
     },
     getSortLabel(value) {
       const labels = {
-        name: 'Sort by Name',
-        date: 'Sort by Date',
-        created: 'Sort by Created Date',
-        actors: 'Sort by Actors',
-        usecases: 'Sort by Use Cases',
-        nodes: 'Sort by Nodes',
-        lifelines: 'Sort by Lifelines',
+        name: 'Sắp xếp theo tên',
+        date: 'Sắp xếp theo ngày',
+        created: 'Sắp xếp theo ngày tạo',
+        actors: 'Sắp xếp theo tác nhân',
+        usecases: 'Sắp xếp theo use case',
+        nodes: 'Sắp xếp theo số nút',
+        lifelines: 'Sắp xếp theo số đường sống',
       }
-      return labels[value] || 'Sort'
+      return labels[value] || 'Sắp xếp'
     },
     getLangLabel(value) {
       const labels = {
-        all: 'All Languages',
-        'en-US': 'English',
-        'vi-VN': 'Vietnamese',
+        all: 'Tất cả ngôn ngữ',
+        'en-US': 'Tiếng Anh',
+        'vi-VN': 'Tiếng Việt',
       }
       return labels[value] || 'Language'
     },
@@ -2444,7 +2442,7 @@ export default {
           this.$refs.diagramEditor.onSaveComplete(false)
         }
 
-        this.toast.error('Failed to save positions')
+        this.toast.error('Lưu vị trí thất bại')
       }
     },
 
@@ -2735,7 +2733,7 @@ export default {
         })
       } catch (error) {
         console.error('Error refreshing diagram after update:', error)
-        this.toast.error('Failed to refresh diagram data')
+        this.toast.error('Làm mới dữ liệu sơ đồ thất bại')
       }
     },
     debounceSave() {

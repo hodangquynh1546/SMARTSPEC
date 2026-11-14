@@ -25,7 +25,7 @@
         />
         <span v-else class="simple-value">{{ formatSimpleValue(item) }}</span>
       </div>
-      <div v-if="value.length === 0" class="empty-array">Empty</div>
+      <div v-if="value.length === 0" class="empty-array">Trống</div>
     </div>
 
     <!-- Object value -->
@@ -44,12 +44,13 @@
 
     <!-- Null/Undefined -->
     <div v-else class="value-null">
-      <span class="null-badge">Not set</span>
+      <span class="null-badge">Chưa đặt</span>
     </div>
   </div>
 </template>
 
 <script>
+import { fieldLabel } from '@/utils/fieldLabels'
 export default {
   name: 'FieldValueRenderer',
   props: {
@@ -84,7 +85,7 @@ export default {
   },
   methods: {
     formatKey(key) {
-      return key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+      return fieldLabel(key)
     },
     isComplexValue(val) {
       return (
@@ -94,7 +95,7 @@ export default {
       )
     },
     formatSimpleValue(val) {
-      if (val === null || val === undefined) return 'Not set'
+      if (val === null || val === undefined) return 'Chưa đặt'
       if (typeof val === 'boolean') return val ? 'Yes' : 'No'
       return String(val)
     },

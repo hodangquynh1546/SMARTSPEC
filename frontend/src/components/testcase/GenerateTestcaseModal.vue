@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="handleClose">
     <div class="modal-content large">
       <div class="modal-header">
-        <h2>Generate Test Cases</h2>
+        <h2>Sinh test case</h2>
         <button class="btn-close" @click="handleClose">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,14 +11,14 @@
       <div class="modal-body">
         <!-- Requirements Selection -->
         <div class="selection-section">
-          <h3 class="section-title">Select Requirements</h3>
-          <p class="section-subtitle">Choose requirements to generate test cases from</p>
+          <h3 class="section-title">Chọn yêu cầu</h3>
+          <p class="section-subtitle">Chọn yêu cầu để sinh test case</p>
 
           <div class="selection-container">
             <div class="selection-header">
               <div class="selection-info">
-                <span class="selected-count">{{ selectedRequirements.length }} selected</span>
-                <span class="total-count">{{ filteredRequirements.length }} of {{ requirements.length }} total</span>
+                <span class="selected-count">{{ selectedRequirements.length }} đã chọn</span>
+                <span class="total-count">{{ filteredRequirements.length }} / {{ requirements.length }} tổng</span>
               </div>
               <div class="selection-actions">
                 <button
@@ -26,9 +26,9 @@
                   @click="selectAll"
                   :disabled="requirements.length === 0"
                 >
-                  Select All
+                  Chọn tất cả
                 </button>
-                <button class="btn btn-sm btn-secondary" @click="clearSelection">Clear All</button>
+                <button class="btn btn-sm btn-secondary" @click="clearSelection">Bỏ tất cả</button>
               </div>
             </div>
 
@@ -38,7 +38,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search requirements by name or goal..."
+                placeholder="Tìm yêu cầu theo tên hoặc mục tiêu..."
                 class="search-input"
                 @input="handleSearch"
               />
@@ -46,7 +46,7 @@
                 v-if="searchQuery"
                 class="clear-search-btn"
                 @click="clearSearch"
-                title="Clear search"
+                title="Xoá tìm kiếm"
               >
                 <span class="material-symbols-outlined">close</span>
               </button>
@@ -73,13 +73,13 @@
 
               <div v-if="requirements.length === 0" class="empty-selection">
                 <span class="material-symbols-outlined">list_alt</span>
-                <p>No requirements available for this version</p>
-                <p class="empty-hint">Please create requirements first</p>
+                <p>Phiên bản này chưa có yêu cầu</p>
+                <p class="empty-hint">Hãy tạo yêu cầu trước</p>
               </div>
               <div v-else-if="filteredRequirements.length === 0" class="empty-selection">
                 <span class="material-symbols-outlined">search_off</span>
-                <p>No requirements found matching "{{ searchQuery }}"</p>
-                <p class="empty-hint">Try a different search term</p>
+                <p>Không có yêu cầu nào khớp "{{ searchQuery }}"</p>
+                <p class="empty-hint">Hãy thử từ khoá khác</p>
               </div>
             </div>
           </div>
@@ -87,32 +87,32 @@
 
         <!-- Configuration Options -->
         <div class="configuration-section">
-          <h3 class="section-title">Generation Options</h3>
+          <h3 class="section-title">Tuỳ chọn sinh</h3>
 
           <div class="configuration-grid">
             <div class="form-group">
-              <label class="form-label">Test Type</label>
+              <label class="form-label">Loại kiểm thử</label>
               <select v-model="configuration.testType" class="form-select">
-                <option value="all">All Types</option>
-                <!-- <option value="unit">Unit</option> -->
-                <option value="integration">Integration</option>
+                <option value="all">Tất cả loại</option>
+                <!-- <option value="unit">Đơn vị</option> -->
+                <option value="integration">Tích hợp</option>
                 <option value="api">API</option>
                 <option value="ui">UI</option>
-                <option value="performance">Performance</option>
-                <option value="security">Security</option>
+                <option value="performance">Hiệu năng</option>
+                <option value="security">Bảo mật</option>
               </select>
             </div>
 
             <!-- Language is automatically set from project settings -->
 
             <div class="form-group">
-              <label class="form-label">Priority Level</label>
+              <label class="form-label">Mức ưu tiên</label>
               <select v-model="configuration.priority" class="form-select">
-                <option value="auto">Auto-detect</option>
-                <option value="critical">Critical</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
+                <option value="auto">Tự nhận diện</option>
+                <option value="critical">Nghiêm trọng</option>
+                <option value="high">Cao</option>
+                <option value="medium">Trung bình</option>
+                <option value="low">Thấp</option>
               </select>
             </div>
           </div>
@@ -123,7 +123,7 @@
         <!-- Actions -->
         <div class="action-section">
           <div class="action-buttons">
-            <button class="btn btn-secondary" @click="handleClose">Cancel</button>
+            <button class="btn btn-secondary" @click="handleClose">Huỷ</button>
 
             <div class="primary-actions">
               <button
@@ -131,7 +131,7 @@
                 @click="generateTestCases"
                 :disabled="selectedRequirements.length === 0"
               >
-                Generate & Save Test Cases ({{ selectedRequirements.length }})
+                Sinh & lưu test case ({{ selectedRequirements.length }})
               </button>
             </div>
           </div>
@@ -274,12 +274,12 @@ export default {
 
     const generateTestCases = async () => {
       if (selectedRequirements.value.length === 0) {
-        toast.error('Please select at least one requirement')
+        toast.error('Vui lòng chọn ít nhất một yêu cầu')
         return
       }
 
       if (!props.projectId || !props.versionId) {
-        toast.error('Project and version must be selected')
+        toast.error('Phải chọn dự án và phiên bản')
         return
       }
 
@@ -288,12 +288,12 @@ export default {
         .filter((id) => id != null && id !== '' && String(id).trim() !== '' && String(id).toLowerCase() !== 'null' && String(id).toLowerCase() !== 'undefined')
 
       if (validRequirementIds.length === 0) {
-        toast.error('Please select at least one valid requirement')
+        toast.error('Vui lòng chọn ít nhất một yêu cầu hợp lệ')
         return
       }
 
       if (!props.projectId || !props.versionId) {
-        toast.error('Project and version must be selected')
+        toast.error('Phải chọn dự án và phiên bản')
         return
       }
 
@@ -329,9 +329,9 @@ export default {
         })
 
         /*if (savedCount === 0) {
-          toast.warning('No test cases were generated. Please try different requirements or options.')
+          toast.warning('Chưa sinh được test case. Hãy thử yêu cầu hoặc tuỳ chọn khác.')
         } else {
-          toast.success(`Successfully generated and saved ${savedCount} test cases`)
+          toast.success(`Đã sinh và lưu ${savedCount} test case`)
           // Emit event để parent refresh test cases
           emit('generate', savedTestCases)
         }*/

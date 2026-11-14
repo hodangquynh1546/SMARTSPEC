@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h2>Select Requirements</h2>
+        <h2>Chọn yêu cầu</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -13,14 +13,14 @@
           <!-- Loading State -->
           <div v-if="loading" class="loading-state">
             <div class="spinner"></div>
-            <p>Loading requirements...</p>
+            <p>Đang tải yêu cầu...</p>
           </div>
 
           <!-- Error State -->
           <div v-else-if="error" class="error-state">
             <span class="material-symbols-outlined error-icon">error</span>
             <p>{{ error }}</p>
-            <button class="btn btn-primary" @click="loadRequirements">Retry</button>
+            <button class="btn btn-primary" @click="loadRequirements">Thử lại</button>
           </div>
 
           <!-- Content -->
@@ -32,21 +32,21 @@
                   v-model="searchQuery"
                   type="text"
                   class="search-input"
-                  placeholder="Search by use case name or description..."
+                  placeholder="Tìm theo tên hoặc mô tả use case..."
                 />
               </div>
               <div class="filter-controls">
                 <select v-model="statusFilter" class="form-select small">
-                  <option value="all">All Status</option>
-                  <option value="approved">Approved</option>
-                  <option value="pending">Pending</option>
-                  <option value="rejected">Rejected</option>
+                  <option value="all">Tất cả trạng thái</option>
+                  <option value="approved">Đã duyệt</option>
+                  <option value="pending">Đang chờ</option>
+                  <option value="rejected">Bị từ chối</option>
                 </select>
                 <select v-model="priorityFilter" class="form-select small">
-                  <option value="all">All Priority</option>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
+                  <option value="all">Mọi mức ưu tiên</option>
+                  <option value="high">Cao</option>
+                  <option value="medium">Trung bình</option>
+                  <option value="low">Thấp</option>
                 </select>
               </div>
             </div>
@@ -54,7 +54,7 @@
             <div class="requirements-grid">
               <div class="available-requirements">
                 <h3 class="section-subtitle">
-                  Available Requirements
+                  Yêu cầu khả dụng
                   <span class="total-count">({{ filteredRequirements.length }})</span>
                 </h3>
                 <div class="requirements-list">
@@ -70,7 +70,7 @@
                     <div class="requirement-header">
                       <div class="requirement-info">
                         <h4 class="requirement-id">
-                          {{ requirement.title || requirement.name || 'Unnamed Requirement' }}
+                          {{ requirement.title || requirement.name || 'Yêu cầu chưa đặt tên' }}
                         </h4>
                         <span :class="['status-badge', requirement.status]">
                           {{ requirement.status }}
@@ -95,7 +95,7 @@
                     <div class="requirement-meta">
                       <div class="meta-item">
                         <span class="material-symbols-outlined meta-icon">person</span>
-                        <span class="meta-text">{{ requirement.owner || 'Unknown' }}</span>
+                        <span class="meta-text">{{ requirement.owner || 'Không rõ' }}</span>
                       </div>
                       <div class="meta-item">
                         <span class="material-symbols-outlined meta-icon">event</span>
@@ -103,7 +103,7 @@
                       </div>
                       <div class="meta-item" v-if="requirement.test_cases_count > 0">
                         <span class="material-symbols-outlined meta-icon">checklist</span>
-                        <span class="meta-text">{{ requirement.test_cases_count }} test cases</span>
+                        <span class="meta-text">{{ requirement.test_cases_count }} test case</span>
                       </div>
                     </div>
                   </div>
@@ -112,14 +112,14 @@
                 <!-- Empty State for Requirements -->
                 <div v-if="filteredRequirements.length === 0 && !loading" class="empty-state">
                   <span class="material-symbols-outlined empty-icon">description</span>
-                  <p>No requirements available. Use cases will appear here once they are created.</p>
-                  <span class="empty-hint">Try adjusting your search or filters</span>
+                  <p>Chưa có yêu cầu. Use case sẽ hiện ở đây sau khi được tạo.</p>
+                  <span class="empty-hint">Hãy thử đổi từ khoá hoặc bộ lọc</span>
                 </div>
               </div>
 
               <div class="selected-section">
                 <h3 class="section-subtitle">
-                  Selected Requirements
+                  Yêu cầu đã chọn
                   <span class="selected-count">({{ selectedRequirements.length }})</span>
                 </h3>
                 <div class="selected-requirements-list">
@@ -142,25 +142,25 @@
                   </div>
                   <div v-if="selectedRequirements.length === 0" class="empty-state">
                     <span class="material-symbols-outlined empty-icon">description</span>
-                    <p>No requirements selected</p>
-                    <span class="empty-hint">Select requirements from the left panel</span>
+                    <p>Chưa chọn yêu cầu</p>
+                    <span class="empty-hint">Chọn yêu cầu ở khung bên trái</span>
                   </div>
                 </div>
 
                 <div class="coverage-stats" v-if="selectedRequirements.length > 0">
-                  <h4>Coverage Summary</h4>
+                  <h4>Tóm tắt độ phủ</h4>
                   <div class="stats-grid">
                     <div class="stat-item">
                       <span class="stat-value">{{ selectedRequirements.length }}</span>
-                      <span class="stat-label">Selected</span>
+                      <span class="stat-label">Đã chọn</span>
                     </div>
                     <div class="stat-item">
                       <span class="stat-value">{{ coverageStats.highPriority }}</span>
-                      <span class="stat-label">High Priority</span>
+                      <span class="stat-label">Ưu tiên cao</span>
                     </div>
                     <div class="stat-item">
                       <span class="stat-value">{{ coverageStats.approved }}</span>
-                      <span class="stat-label">Approved</span>
+                      <span class="stat-label">Đã duyệt</span>
                     </div>
                   </div>
                 </div>
@@ -170,13 +170,13 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-secondary" @click="$emit('close')">Huỷ</button>
           <button
             class="btn btn-primary"
             @click="applySelection"
             :disabled="selectedRequirements.length === 0 || loading"
           >
-            Select {{ selectedRequirements.length }} Requirement(s)
+            Chọn {{ selectedRequirements.length }} Yêu cầu
           </button>
         </div>
       </div>
@@ -273,8 +273,8 @@ export default {
     }
 
     const formatDate = (dateString) => {
-      if (!dateString) return 'Unknown date'
-      return new Date(dateString).toLocaleDateString()
+      if (!dateString) return 'Ngày không rõ'
+      return new Date(dateString).toLocaleDateString('vi-VN')
     }
 
     const applySelection = () => {
@@ -284,14 +284,14 @@ export default {
         .filter((id) => id && id !== '' && id !== 'null' && id !== 'undefined')
       
       if (requirementIds.length === 0) {
-        toast.error('Please select at least one requirement')
+        toast.error('Vui lòng chọn ít nhất một yêu cầu')
         return
       }
       
       console.log('📤 Applying selection with requirement IDs:', requirementIds)
       emit('select-requirements', requirementIds)
       emit('close')
-      toast.success(`Selected ${requirementIds.length} requirements`)
+      toast.success(`Đã chọn ${requirementIds.length} yêu cầu`)
     }
 
     const loadRequirements = async () => {
@@ -327,7 +327,7 @@ export default {
               description: usecase.goal,
               status: 'approved', // Default status for usecases
               priority: usecase.priority || 'medium',
-              owner: usecase.role?.name || usecase.role || 'Unknown',
+              owner: usecase.role?.name || usecase.role || 'Không rõ',
               created_at: usecase.created_at || new Date().toISOString(),
               test_cases_count: usecase.test_cases_count || 0,
             }
@@ -346,7 +346,7 @@ export default {
               description: usecase.goal,
               status: 'approved',
               priority: usecase.priority || 'medium',
-              owner: usecase.role?.name || usecase.role || 'Unknown',
+              owner: usecase.role?.name || usecase.role || 'Không rõ',
               created_at: usecase.created_at || new Date().toISOString(),
               test_cases_count: usecase.test_cases_count || 0,
             }
@@ -358,8 +358,8 @@ export default {
         }
       } catch (err) {
         console.error('Error loading requirements:', err)
-        error.value = err.response?.data?.message || 'Failed to load requirements'
-        toast.error('Failed to load requirements')
+        error.value = err.response?.data?.message || 'Không tải được yêu cầu'
+        toast.error('Không tải được yêu cầu')
       } finally {
         loading.value = false
       }

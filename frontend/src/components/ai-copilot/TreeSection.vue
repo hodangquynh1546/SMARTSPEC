@@ -23,14 +23,14 @@
           <button 
             class="action-btn edit-btn"
             @click.stop="handleEdit(item)"
-            title="Edit"
+            title="Sửa"
           >
             ✏️
           </button>
           <button 
             class="action-btn delete-btn"
             @click.stop="handleDelete(item)"
-            title="Delete"
+            title="Xoá"
           >
             🗑️
           </button>
@@ -40,9 +40,9 @@
       <button 
         class="add-item-btn"
         @click="handleAdd"
-        title="Add new item"
+        title="Thêm mục mới"
       >
-        + Add {{ title.slice(0, -1) }}
+        + Thêm {{ title.slice(0, -1) }}
       </button>
     </div>
   </div>
@@ -83,7 +83,7 @@ const handleEdit = (item) => {
 }
 
 const handleDelete = async (item) => {
-  if (confirm(`Are you sure you want to delete this ${props.itemType}?`)) {
+  if (confirm(`Bạn có chắc muốn xoá ${props.itemType} này?`)) {
     emit('delete', props.itemType, item._id || item.id)
   }
 }

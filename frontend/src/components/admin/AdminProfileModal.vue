@@ -11,7 +11,7 @@
         <div class="avatar-section">
           <div class="avatar-upload">
             <div class="avatar-preview">
-              <img :src="formData.avatar" alt="Avatar" />
+              <img :src="formData.avatar" alt="Ảnh đại diện" />
               <div class="avatar-overlay">
                 <span class="material-symbols-outlined">photo_camera</span>
               </div>
@@ -103,7 +103,7 @@
               <label>Ngôn ngữ</label>
               <select v-model="formData.preferences.language" class="form-input">
                 <option value="vi">Tiếng Việt</option>
-                <option value="en">English</option>
+                <option value="en">Tiếng Anh</option>
               </select>
             </div>
             <div class="preference-item">

@@ -31,12 +31,12 @@
         <!-- Filters -->
         <div class="filters-section">
           <div class="filter-group">
-            <label>Level:</label>
+            <label>Mức:</label>
             <select v-model="filters.level" class="filter-select">
               <option value="all">Tất cả</option>
-              <option value="info">Info</option>
-              <option value="warning">Warning</option>
-              <option value="error">Error</option>
+              <option value="info">Thông tin</option>
+              <option value="warning">Cảnh báo</option>
+              <option value="error">Lỗi</option>
             </select>
           </div>
           <div class="filter-group">
@@ -47,7 +47,7 @@
               <option value="system">Hệ thống</option>
               <option value="api">API</option>
               <option value="project">Dự án</option>
-              <option value="database">Database</option>
+              <option value="database">Cơ sở dữ liệu</option>
             </select>
           </div>
           <div class="filter-group">
@@ -93,7 +93,7 @@
               </div>
               <div class="stat-content">
                 <h3>{{ stats.info }}</h3>
-                <p>Info</p>
+                <p>Thông tin</p>
               </div>
             </div>
             <div class="stat-card">
@@ -102,7 +102,7 @@
               </div>
               <div class="stat-content">
                 <h3>{{ stats.warning }}</h3>
-                <p>Warning</p>
+                <p>Cảnh báo</p>
               </div>
             </div>
             <div class="stat-card">
@@ -111,7 +111,7 @@
               </div>
               <div class="stat-content">
                 <h3>{{ stats.error }}</h3>
-                <p>Error</p>
+                <p>Lỗi</p>
               </div>
             </div>
             <div class="stat-card">
@@ -132,7 +132,7 @@
             <thead>
               <tr>
                 <th>Thời gian</th>
-                <th>Level</th>
+                <th>Mức</th>
                 <th>Loại</th>
                 <th>Thông điệp</th>
                 <th>Người dùng</th>
@@ -174,11 +174,11 @@
                 <td>
                   <div class="user-info" v-if="log.user_id">
                     <div class="user-avatar small">
-                      <img :src="getUserAvatar(log.user_id)" alt="User" />
+                      <img :src="getUserAvatar(log.user_id)" alt="Người dùng" />
                     </div>
                     <span class="user-name">{{ getUserName(log.user_id) }}</span>
                   </div>
-                  <span v-else class="no-user">System</span>
+                  <span v-else class="no-user">Hệ thống</span>
                 </td>
                 <td>
                   <span class="project-name" v-if="log.project_id">
@@ -187,7 +187,7 @@
                   <span v-else class="no-project">-</span>
                 </td>
                 <td>
-                  <code class="ip-address">{{ log.ip || 'Not available' }}</code>
+                  <code class="ip-address">{{ log.ip || 'Không có' }}</code>
                 </td>
                 <td>
                   <div class="action-buttons">
@@ -330,7 +330,7 @@ const sampleLogs = [
     action: 'login',
     target_type: 'system',
     details: {
-      message: 'User logged in successfully',
+      message: 'Người dùng đăng nhập thành công',
     },
     user_id: '1',
     project_id: null,
@@ -344,7 +344,7 @@ const sampleLogs = [
     action: 'api_rate_limit',
     target_type: 'api',
     details: {
-      message: 'API rate limit approaching threshold',
+      message: 'Sắp chạm giới hạn tốc độ API',
     },
     user_id: '2',
     project_id: '1',
@@ -358,7 +358,7 @@ const sampleLogs = [
     action: 'database_connection',
     target_type: 'database',
     details: {
-      message: 'Database connection failed - automatically recovered',
+      message: 'Mất kết nối cơ sở dữ liệu - đã tự phục hồi',
       before: null,
       after: null,
     },
@@ -374,7 +374,7 @@ const sampleLogs = [
     action: 'create_project',
     target_type: 'project',
     details: {
-      message: 'Project created: E-commerce Platform',
+      message: 'Đã tạo dự án: Nền tảng thương mại điện tử',
     },
     user_id: '1',
     project_id: '1',
@@ -385,7 +385,7 @@ const sampleLogs = [
 ]
 
 const sampleUsers = [
-  { id: '1', name: 'Admin User', avatar_url: null },
+  { id: '1', name: 'Quản trị viên', avatar_url: null },
   { id: '2', name: 'Nguyễn Văn A', avatar_url: null },
 ]
 
@@ -565,7 +565,7 @@ const getTypeDisplay = (type) => {
     user: 'User',
     api: 'API',
     project: 'Project',
-    database: 'Database',
+    database: 'Cơ sở dữ liệu',
   }
   return types[type] || type
 }
@@ -590,12 +590,12 @@ const getUserAvatar = (userId) => {
 
 const getUserName = (userId) => {
   const user = users.value.find((u) => u.id === userId)
-  return user?.name || 'Unknown'
+  return user?.name || 'Không rõ'
 }
 
 const getProjectName = (projectId) => {
   const project = projects.value.find((p) => p.id === projectId)
-  return project?.name || 'Unknown'
+  return project?.name || 'Không rõ'
 }
 
 const formatDate = (date) => {

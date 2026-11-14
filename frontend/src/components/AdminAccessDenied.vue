@@ -5,15 +5,15 @@
         <i class="fa-solid fa-shield-halved"></i>
       </div>
       
-      <h1>Access Denied</h1>
+      <h1>Không có quyền truy cập</h1>
       <p class="message">
         Bạn không có quyền truy cập vào Admin Panel. 
         Chỉ có quyền ADMIN mới có thể truy cập trang này.
       </p>
       
       <div class="user-info" v-if="userInfo">
-        <p><strong>User:</strong> {{ userInfo.name || userInfo.email }}</p>
-        <p><strong>Role:</strong> {{ userInfo.role || 'PARTICIPANT' }}</p>
+        <p><strong>Người dùng:</strong> {{ userInfo.name || userInfo.email }}</p>
+        <p><strong>Vai trò:</strong> {{ userInfo.role || 'PARTICIPANT' }}</p>
       </div>
       
       <div class="actions">

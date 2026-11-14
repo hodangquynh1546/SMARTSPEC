@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content xlarge">
       <div class="modal-header">
-        <h2>{{ isEdit ? 'Edit Test Case' : 'Create New Test Case' }}</h2>
+        <h2>{{ isEdit ? 'Sửa test case' : 'Tạo test case mới' }}</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -35,69 +35,69 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">info</span>
-                Basic Information
+                Thông tin cơ bản
               </h3>
 
               <div class="form-grid">
                 <div class="form-group full-width">
-                  <label class="form-label required">Title</label>
+                  <label class="form-label required">Tiêu đề</label>
                   <input
                     v-model="formData.title"
                     type="text"
                     class="form-input"
-                    placeholder="Enter test case title"
+                    placeholder="Nhập tiêu đề test case"
                     required
                     :class="{ error: !formData.title && submitted }"
                     @blur="autoFormatTitle"
                   />
-                  <div class="title-format-hint">Format: UC{number} - {Feature} - {Scenario}</div>
+                  <div class="title-format-hint">Định dạng: UC{số} - {Tính năng} - {Kịch bản}</div>
                   <div v-if="!formData.title && submitted" class="error-message">
-                    Title is required
+                    Cần nhập tiêu đề
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label required">Test Type</label>
+                  <label class="form-label required">Loại kiểm thử</label>
                   <select v-model="formData.test_type" class="form-select" required>
-                    <option value="">Select type</option>
-                    <option value="unit">Unit Test</option>
-                    <option value="integration">Integration Test</option>
-                    <option value="api">API Test</option>
-                    <option value="ui">UI Test</option>
-                    <option value="performance">Performance Test</option>
-                    <option value="security">Security Test</option>
+                    <option value="">Chọn kiểu</option>
+                    <option value="unit">Kiểm thử đơn vị</option>
+                    <option value="integration">Kiểm thử tích hợp</option>
+                    <option value="api">Kiểm thử API</option>
+                    <option value="ui">Kiểm thử giao diện</option>
+                    <option value="performance">Kiểm thử hiệu năng</option>
+                    <option value="security">Kiểm thử bảo mật</option>
                   </select>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label required">Priority</label>
+                  <label class="form-label required">Độ ưu tiên</label>
                   <select v-model="formData.priority" class="form-select" required>
-                    <option value="">Select priority</option>
-                    <option value="critical">Critical</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                    <option value="">Chọn mức ưu tiên</option>
+                    <option value="critical">Nghiêm trọng</option>
+                    <option value="high">Cao</option>
+                    <option value="medium">Trung bình</option>
+                    <option value="low">Thấp</option>
                   </select>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label required">Status</label>
+                  <label class="form-label required">Trạng thái</label>
                   <select v-model="formData.status" class="form-select" required>
-                    <option value="not_executed">Not Executed</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="passed">Passed</option>
-                    <option value="failed">Failed</option>
-                    <option value="blocked">Blocked</option>
+                    <option value="not_executed">Chưa chạy</option>
+                    <option value="in_progress">Đang thực hiện</option>
+                    <option value="passed">Đạt</option>
+                    <option value="failed">Thất bại</option>
+                    <option value="blocked">Bị chặn</option>
                   </select>
                 </div>
 
                 <div class="form-group full-width">
-                  <label class="form-label">Description</label>
+                  <label class="form-label">Mô tả</label>
                   <textarea
                     v-model="formData.description"
                     class="form-textarea"
                     rows="3"
-                    placeholder="Describe the purpose of this test case..."
+                    placeholder="Mô tả mục đích của test case..."
                   ></textarea>
                 </div>
               </div>
@@ -110,12 +110,12 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">assignment</span>
-                Preconditions & Postconditions
+                Điều kiện tiên quyết & điều kiện sau
               </h3>
 
               <div class="condition-grid">
                 <div class="condition-group">
-                  <label class="form-label">Preconditions</label>
+                  <label class="form-label">Điều kiện tiên quyết</label>
                   <div class="list-container">
                     <div
                       v-for="(condition, index) in formData.preconditions"
@@ -126,7 +126,7 @@
                         v-model="formData.preconditions[index]"
                         class="form-textarea small"
                         rows="2"
-                        placeholder="Enter precondition..."
+                        placeholder="Nhập điều kiện tiên quyết..."
                       ></textarea>
                       <button
                         type="button"
@@ -139,13 +139,13 @@
                     </div>
                     <button type="button" class="btn-add-item" @click="addPrecondition">
                       <span class="material-symbols-outlined">add</span>
-                      Add Precondition
+                      Thêm điều kiện tiên quyết
                     </button>
                   </div>
                 </div>
 
                 <div class="condition-group">
-                  <label class="form-label">Postconditions</label>
+                  <label class="form-label">Điều kiện sau</label>
                   <div class="list-container">
                     <div
                       v-for="(condition, index) in formData.postconditions"
@@ -156,7 +156,7 @@
                         v-model="formData.postconditions[index]"
                         class="form-textarea small"
                         rows="2"
-                        placeholder="Enter postcondition..."
+                        placeholder="Nhập điều kiện sau..."
                       ></textarea>
                       <button
                         type="button"
@@ -169,7 +169,7 @@
                     </div>
                     <button type="button" class="btn-add-item" @click="addPostcondition">
                       <span class="material-symbols-outlined">add</span>
-                      Add Postcondition
+                      Thêm điều kiện sau
                     </button>
                   </div>
                 </div>
@@ -180,10 +180,10 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">list</span>
-                Test Steps
+                Các bước kiểm thử
                 <button type="button" class="btn-text" @click="showStepTemplates = true">
                   <span class="material-symbols-outlined">mobile_layout</span>
-                  Use Template
+                  Dùng mẫu
                 </button>
               </h3>
 
@@ -201,7 +201,7 @@
                           <button type="button" class="btn-icon drag-handle">
                             <span class="material-symbols-outlined">drag_indicator</span>
                           </button>
-                          <span class="step-number">Step {{ step.step_number }}</span>
+                          <span class="step-number">Bước {{ step.step_number }}</span>
                         </div>
                         <button
                           type="button"
@@ -215,19 +215,19 @@
 
                       <div class="step-content">
                         <div class="form-group full-width">
-                          <label class="form-label">Action</label>
+                          <label class="form-label">Hành động</label>
                           <div class="action-input-group">
                             <textarea
                               v-model="step.action"
                               class="form-textarea"
                               rows="3"
-                              placeholder="Describe the action to perform..."
+                              placeholder="Mô tả hành động cần thực hiện..."
                             ></textarea>
                             <button
                               type="button"
                               class="btn-icon suggestion-btn"
                               @click="showActionSuggestions(index)"
-                              title="Action suggestions"
+                              title="Gợi ý hành động"
                             >
                               <span class="material-symbols-outlined">lightbulb</span>
                             </button>
@@ -235,7 +235,7 @@
                         </div>
 
                         <div class="form-group full-width">
-                          <label class="form-label">Input Data</label>
+                          <label class="form-label">Dữ liệu đầu vào</label>
                           <div class="json-input-container">
                             <div class="json-input-tabs">
                               <button
@@ -243,7 +243,7 @@
                                 :class="['tab-btn', step.jsonViewMode === 'form' ? 'active' : '']"
                                 @click="step.jsonViewMode = 'form'"
                               >
-                                Form
+                                Biểu mẫu
                               </button>
                               <button
                                 type="button"
@@ -264,14 +264,14 @@
                                   v-model="item.key"
                                   type="text"
                                   class="form-input key-input"
-                                  placeholder="Key"
+                                  placeholder="Khoá"
                                   @blur="updateStepJsonFromForm(step)"
                                 />
                                 <input
                                   v-model="item.value"
                                   type="text"
                                   class="form-input value-input"
-                                  placeholder="Value"
+                                  placeholder="Giá trị"
                                   @blur="updateStepJsonFromForm(step)"
                                 />
                                 <button
@@ -288,7 +288,7 @@
                                 @click="addKeyValue(step.input_data_form)"
                               >
                                 <span class="material-symbols-outlined">add</span>
-                                Add Field
+                                Thêm trường
                               </button>
                             </div>
 
@@ -297,7 +297,7 @@
                               v-model="step.input_data_json"
                               class="form-textarea json-textarea"
                               rows="4"
-                              placeholder="Paste JSON or use form view"
+                              placeholder="Dán JSON hoặc dùng dạng biểu mẫu"
                               :class="{ error: step.input_data_error }"
                               @blur="validateStepJson(step, 'input_data')"
                               @paste="handleJsonPaste($event, step)"
@@ -310,12 +310,12 @@
                         </div>
 
                         <div class="form-group full-width">
-                          <label class="form-label">Expected Immediate Result</label>
+                          <label class="form-label">Kết quả tức thời mong đợi</label>
                           <textarea
                             v-model="step.expected_immediate_result"
                             class="form-textarea"
                             rows="2"
-                            placeholder="What should happen immediately after this step?"
+                            placeholder="Ngay sau bước này cần xảy ra điều gì?"
                           ></textarea>
                         </div>
                       </div>
@@ -326,11 +326,11 @@
                 <div class="step-actions">
                   <button type="button" class="btn-add-step" @click="addStep">
                     <span class="material-symbols-outlined">add</span>
-                    Add Step
+                    Thêm bước
                   </button>
                   <button type="button" class="btn-text" @click="duplicateLastStep">
                     <span class="material-symbols-outlined">content_copy</span>
-                    Duplicate Last
+                    Nhân bản dòng cuối
                   </button>
                 </div>
               </div>
@@ -342,12 +342,12 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">check_circle</span>
-                Expected Results
+                Kết quả mong đợi
               </h3>
 
               <div class="expected-results-grid">
                 <div class="result-level">
-                  <h4 class="result-title">UI Level Results</h4>
+                  <h4 class="result-title">Kết quả mức giao diện</h4>
                   <div class="list-container">
                     <div
                       v-for="(result, index) in formData.expected_results.ui_level"
@@ -358,7 +358,7 @@
                         v-model="formData.expected_results.ui_level[index]"
                         type="text"
                         class="form-input"
-                        placeholder="Enter UI level expected result..."
+                        placeholder="Nhập kết quả mong đợi mức giao diện..."
                       />
                       <button
                         type="button"
@@ -371,16 +371,16 @@
                     </div>
                     <button type="button" class="btn-add-item" @click="addUIResult">
                       <span class="material-symbols-outlined">add</span>
-                      Add UI Result
+                      Thêm kết quả giao diện
                     </button>
                   </div>
                 </div>
 
                 <div class="result-level">
-                  <h4 class="result-title">API Level Results</h4>
+                  <h4 class="result-title">Kết quả mức API</h4>
                   <div class="api-results-form">
                     <div class="form-group">
-                      <label class="form-label">Status Code</label>
+                      <label class="form-label">Mã trạng thái</label>
                       <input
                         v-model="formData.expected_results.api_level.status_code"
                         type="number"
@@ -389,7 +389,7 @@
                       />
                     </div>
                     <div class="form-group full-width">
-                      <label class="form-label">Response Schema</label>
+                      <label class="form-label">Lược đồ phản hồi</label>
                       <div class="json-input-container">
                         <div class="json-input-tabs">
                           <button
@@ -402,7 +402,7 @@
                             ]"
                             @click="formData.expected_results.api_level.jsonViewMode = 'form'"
                           >
-                            Form
+                            Biểu mẫu
                           </button>
                           <button
                             type="button"
@@ -432,14 +432,14 @@
                               v-model="item.key"
                               type="text"
                               class="form-input key-input"
-                              placeholder="Key"
+                              placeholder="Khoá"
                               @blur="updateApiSchemaFromForm"
                             />
                             <input
                               v-model="item.value"
                               type="text"
                               class="form-input value-input"
-                              placeholder="Value"
+                              placeholder="Giá trị"
                               @blur="updateApiSchemaFromForm"
                             />
                             <button
@@ -463,7 +463,7 @@
                             "
                           >
                             <span class="material-symbols-outlined">add</span>
-                            Add Field
+                            Thêm trường
                           </button>
                         </div>
 
@@ -472,7 +472,7 @@
                           v-model="formData.expected_results.api_level.response_schema_json"
                           class="form-textarea json-textarea"
                           rows="4"
-                          placeholder="Paste JSON or use form view"
+                          placeholder="Dán JSON hoặc dùng dạng biểu mẫu"
                           :class="{
                             error: formData.expected_results.api_level.response_schema_error,
                           }"
@@ -491,7 +491,7 @@
                 </div>
 
                 <div class="result-level">
-                  <h4 class="result-title">Database Level Results</h4>
+                  <h4 class="result-title">Kết quả mức cơ sở dữ liệu</h4>
                   <div class="list-container">
                     <div
                       v-for="(result, index) in formData.expected_results.database_level"
@@ -502,7 +502,7 @@
                         v-model="formData.expected_results.database_level[index]"
                         type="text"
                         class="form-input"
-                        placeholder="Enter database level expected result..."
+                        placeholder="Nhập kết quả mong đợi mức cơ sở dữ liệu..."
                       />
                       <button
                         type="button"
@@ -515,18 +515,18 @@
                     </div>
                     <button type="button" class="btn-add-item" @click="addDBResult">
                       <span class="material-symbols-outlined">add</span>
-                      Add Database Result
+                      Thêm kết quả cơ sở dữ liệu
                     </button>
                   </div>
                 </div>
 
                 <div class="result-level full-width">
-                  <h4 class="result-title">Business Level Result</h4>
+                  <h4 class="result-title">Kết quả mức nghiệp vụ</h4>
                   <textarea
                     v-model="formData.expected_results.business_level"
                     class="form-textarea"
                     rows="3"
-                    placeholder="Describe the business-level expected outcome..."
+                    placeholder="Mô tả kết quả mong đợi mức nghiệp vụ..."
                   ></textarea>
                 </div>
               </div>
@@ -539,16 +539,16 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">database</span>
-                Database Integration
+                Tích hợp cơ sở dữ liệu
                 <button type="button" class="btn-text" @click="showTableSelector = true">
                   <span class="material-symbols-outlined">search</span>
-                  Select Tables
+                  Chọn bảng
                 </button>
               </h3>
 
               <div class="form-grid">
                 <div class="form-group full-width">
-                  <label class="form-label">Database Tables</label>
+                  <label class="form-label">Bảng dữ liệu</label>
                   <div class="tags-input">
                     <div class="selected-tags">
                       <span v-for="table in formData.database_tables" :key="table" class="tag">
@@ -563,7 +563,7 @@
                         v-model="newTable"
                         type="text"
                         class="form-input tag-input"
-                        placeholder="Enter table name or select from list..."
+                        placeholder="Nhập tên bảng hoặc chọn từ danh sách..."
                         @keydown.enter.prevent="addTable"
                         @focus="showTableSuggestions = true"
                       />
@@ -573,7 +573,7 @@
                         @click="addTable"
                         :disabled="!newTable.trim()"
                       >
-                        Add Table
+                        Thêm bảng
                       </button>
                     </div>
 
@@ -589,14 +589,14 @@
                         @click="selectTable(table)"
                       >
                         <span class="table-name">{{ table.name }}</span>
-                        <span class="table-columns">{{ table.columns.length }} columns</span>
+                        <span class="table-columns">{{ table.columns.length }} cột</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div class="form-group full-width">
-                  <label class="form-label">Database Operations</label>
+                  <label class="form-label">Thao tác cơ sở dữ liệu</label>
                   <div class="checkbox-group">
                     <label
                       v-for="operation in databaseOperations"
@@ -620,10 +620,10 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">data_table</span>
-                Test Data
+                Dữ liệu kiểm thử
                 <button type="button" class="btn-text" @click="showTestDataTemplates = true">
                   <span class="material-symbols-outlined">mobile_layout</span>
-                  Use Template
+                  Dùng mẫu
                 </button>
               </h3>
 
@@ -638,14 +638,14 @@
                       v-model="data.name"
                       type="text"
                       class="form-input data-name"
-                      placeholder="Test data scenario name"
+                      placeholder="Tên kịch bản dữ liệu kiểm thử"
                     />
                     <div class="data-actions">
                       <button
                         type="button"
                         class="btn-icon"
                         @click="duplicateTestData(index)"
-                        title="Duplicate scenario"
+                        title="Nhân bản kịch bản"
                       >
                         <span class="material-symbols-outlined">content_copy</span>
                       </button>
@@ -662,7 +662,7 @@
 
                   <div class="data-grid">
                     <div class="data-field">
-                      <label class="form-label">Input Payload</label>
+                      <label class="form-label">Dữ liệu đầu vào</label>
                       <div class="json-input-container">
                         <div class="json-input-tabs">
                           <button
@@ -673,7 +673,7 @@
                             ]"
                             @click="data.inputPayloadViewMode = 'form'"
                           >
-                            Form
+                            Biểu mẫu
                           </button>
                           <button
                             type="button"
@@ -697,14 +697,14 @@
                               v-model="item.key"
                               type="text"
                               class="form-input key-input"
-                              placeholder="Key"
+                              placeholder="Khoá"
                               @blur="updateTestDataJsonFromForm(data, 'input_payload')"
                             />
                             <input
                               v-model="item.value"
                               type="text"
                               class="form-input value-input"
-                              placeholder="Value"
+                              placeholder="Giá trị"
                               @blur="updateTestDataJsonFromForm(data, 'input_payload')"
                             />
                             <button
@@ -721,7 +721,7 @@
                             @click="addKeyValue(data.input_payload_form)"
                           >
                             <span class="material-symbols-outlined">add</span>
-                            Add Field
+                            Thêm trường
                           </button>
                         </div>
 
@@ -730,7 +730,7 @@
                           v-model="data.input_payload_json"
                           class="form-textarea json-textarea"
                           rows="4"
-                          placeholder="Paste JSON or use form view"
+                          placeholder="Dán JSON hoặc dùng dạng biểu mẫu"
                           :class="{ error: data.input_payload_error }"
                           @blur="validateTestDataJson(data, 'input_payload')"
                           @paste="handleTestDataJsonPaste($event, data, 'input_payload')"
@@ -742,7 +742,7 @@
                     </div>
 
                     <div class="data-field">
-                      <label class="form-label">Expected Output</label>
+                      <label class="form-label">Kết quả mong đợi</label>
                       <div class="json-input-container">
                         <div class="json-input-tabs">
                           <button
@@ -753,7 +753,7 @@
                             ]"
                             @click="data.expectedOutputViewMode = 'form'"
                           >
-                            Form
+                            Biểu mẫu
                           </button>
                           <button
                             type="button"
@@ -777,14 +777,14 @@
                               v-model="item.key"
                               type="text"
                               class="form-input key-input"
-                              placeholder="Key"
+                              placeholder="Khoá"
                               @blur="updateTestDataJsonFromForm(data, 'expected_output')"
                             />
                             <input
                               v-model="item.value"
                               type="text"
                               class="form-input value-input"
-                              placeholder="Value"
+                              placeholder="Giá trị"
                               @blur="updateTestDataJsonFromForm(data, 'expected_output')"
                             />
                             <button
@@ -801,7 +801,7 @@
                             @click="addKeyValue(data.expected_output_form)"
                           >
                             <span class="material-symbols-outlined">add</span>
-                            Add Field
+                            Thêm trường
                           </button>
                         </div>
 
@@ -810,7 +810,7 @@
                           v-model="data.expected_output_json"
                           class="form-textarea json-textarea"
                           rows="4"
-                          placeholder="Paste JSON or use form view"
+                          placeholder="Dán JSON hoặc dùng dạng biểu mẫu"
                           :class="{ error: data.expected_output_error }"
                           @blur="validateTestDataJson(data, 'expected_output')"
                           @paste="handleTestDataJsonPaste($event, data, 'expected_output')"
@@ -822,7 +822,7 @@
                     </div>
 
                     <div class="data-field full-width">
-                      <label class="form-label">Validation Rules</label>
+                      <label class="form-label">Quy tắc kiểm tra hợp lệ</label>
                       <div class="list-container">
                         <div
                           v-for="(rule, ruleIndex) in data.validation_rules"
@@ -833,7 +833,7 @@
                             v-model="data.validation_rules[ruleIndex]"
                             type="text"
                             class="form-input"
-                            placeholder="Enter validation rule..."
+                            placeholder="Nhập quy tắc kiểm tra..."
                           />
                           <button
                             type="button"
@@ -846,7 +846,7 @@
                         </div>
                         <button type="button" class="btn-add-item" @click="addValidationRule(data)">
                           <span class="material-symbols-outlined">add</span>
-                          Add Validation Rule
+                          Thêm quy tắc kiểm tra
                         </button>
                       </div>
                     </div>
@@ -856,11 +856,11 @@
                 <div class="test-data-actions">
                   <button type="button" class="btn-add-data" @click="addTestData">
                     <span class="material-symbols-outlined">add</span>
-                    Add Test Data Scenario
+                    Thêm kịch bản dữ liệu
                   </button>
                   <button type="button" class="btn-text" @click="importTestDataFromClipboard">
                     <span class="material-symbols-outlined">content_paste</span>
-                    Import from Clipboard
+                    Nhập từ bộ nhớ tạm
                   </button>
                 </div>
               </div>
@@ -873,15 +873,15 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">link</span>
-                Requirements
+                Yêu cầu
                 <button type="button" class="btn-text" @click="showRequirementSelector = true">
                   <span class="material-symbols-outlined">search</span>
-                  Select Requirements
+                  Chọn yêu cầu
                 </button>
               </h3>
 
               <div class="form-group full-width">
-                <label class="form-label">Source Requirement IDs</label>
+                <label class="form-label">Mã yêu cầu nguồn</label>
                 <div class="tags-input">
                   <div class="selected-tags">
                     <span v-for="reqId in formData.source_requirement_ids" :key="reqId" class="tag">
@@ -896,7 +896,7 @@
                       v-model="newRequirement"
                       type="text"
                       class="form-input tag-input"
-                      placeholder="Enter requirement ID or select from list..."
+                      placeholder="Nhập mã yêu cầu hoặc chọn từ danh sách..."
                       @keydown.enter.prevent="addRequirement"
                       @focus="showRequirementSuggestions = true"
                     />
@@ -906,7 +906,7 @@
                       @click="addRequirement"
                       :disabled="!newRequirement.trim()"
                     >
-                      Add Requirement
+                      Thêm yêu cầu
                     </button>
                   </div>
 
@@ -933,7 +933,7 @@
             <div class="form-section">
               <h3 class="section-title">
                 <span class="material-symbols-outlined">smart_toy</span>
-                Automation
+                Tự động hoá
               </h3>
 
               <div class="automation-section">
@@ -941,9 +941,9 @@
                   <input type="checkbox" v-model="formData.automation.is_automated" />
                   <span class="checkmark"></span>
                   <div class="checkbox-content">
-                    <span class="checkbox-title">Automated Test Case</span>
+                    <span class="checkbox-title">Test case tự động</span>
                     <span class="checkbox-description"
-                      >This test case is automated with scripts</span
+                      >Test case này được tự động hoá bằng script</span
                     >
                   </div>
                 </label>
@@ -951,20 +951,20 @@
                 <div v-if="formData.automation.is_automated" class="automation-details">
                   <div class="form-grid">
                     <div class="form-group">
-                      <label class="form-label">Script Path</label>
+                      <label class="form-label">Đường dẫn script</label>
                       <div class="script-path-group">
                         <input
                           v-model="formData.automation.script_path"
                           type="text"
                           class="form-input"
-                          placeholder="e.g., /tests/login/test_login.py"
+                          placeholder="VD: /tests/login/test_login.py"
                           @blur="autoGenerateScriptPath"
                         />
                         <button
                           type="button"
                           class="btn-icon"
                           @click="suggestScriptPath"
-                          title="Suggest script path"
+                          title="Gợi ý đường dẫn script"
                         >
                           <span class="material-symbols-outlined">auto_awesome</span>
                         </button>
@@ -972,17 +972,17 @@
                     </div>
 
                     <div class="form-group">
-                      <label class="form-label">Test Command</label>
+                      <label class="form-label">Lệnh chạy</label>
                       <input
                         v-model="formData.automation.test_command"
                         type="text"
                         class="form-input"
-                        placeholder="e.g., pytest tests/login/test_login.py::test_login_long_username"
+                        placeholder="VD: pytest tests/login/test_login.py::test_login_long_username"
                       />
                     </div>
 
                     <div class="form-group full-width">
-                      <label class="form-label">Tags</label>
+                      <label class="form-label">Thẻ</label>
                       <div class="tags-input">
                         <div class="selected-tags">
                           <span v-for="tag in formData.automation.tags" :key="tag" class="tag">
@@ -1001,7 +1001,7 @@
                             v-model="newAutomationTag"
                             type="text"
                             class="form-input tag-input"
-                            placeholder="Enter automation tag..."
+                            placeholder="Nhập thẻ tự động hoá..."
                             @keydown.enter.prevent="addAutomationTag"
                             @focus="showTagSuggestions = true"
                           />
@@ -1011,7 +1011,7 @@
                             @click="addAutomationTag"
                             :disabled="!newAutomationTag.trim()"
                           >
-                            Add Tag
+                            Thêm thẻ
                           </button>
                         </div>
 
@@ -1046,12 +1046,12 @@
               :disabled="currentStep === 0"
             >
               <span class="material-symbols-outlined">arrow_back</span>
-              Previous
+              Trước
             </button>
 
             <div class="nav-right">
               <button type="button" class="btn btn-outline" @click="saveDraft" :disabled="saving">
-                Save Draft
+                Lưu nháp
               </button>
 
               <button
@@ -1060,13 +1060,13 @@
                 class="btn btn-primary"
                 @click="nextStep"
               >
-                Next
+                Tiếp
                 <span class="material-symbols-outlined">arrow_forward</span>
               </button>
 
               <button v-else type="submit" class="btn btn-primary" :disabled="saving">
                 <span v-if="saving" class="spinner"></span>
-                {{ saving ? 'Saving...' : isEdit ? 'Update Test Case' : 'Create Test Case' }}
+                {{ saving ? 'Đang lưu...' : isEdit ? 'Cập nhật test case' : 'Tạo test case' }}
               </button>
             </div>
           </div>
@@ -1144,11 +1144,11 @@ export default {
 
     // Define steps
     const steps = ref([
-      { id: 'basic', label: 'Basic Information' },
-      { id: 'conditions', label: 'Conditions & Steps' },
-      { id: 'results', label: 'Expected Results' },
-      { id: 'data', label: 'Test Data & Database' },
-      { id: 'final', label: 'Requirements & Automation' },
+      { id: 'basic', label: 'Thông tin cơ bản' },
+      { id: 'conditions', label: 'Điều kiện & các bước' },
+      { id: 'results', label: 'Kết quả mong đợi' },
+      { id: 'data', label: 'Dữ liệu kiểm thử & cơ sở dữ liệu' },
+      { id: 'final', label: 'Yêu cầu & tự động hoá' },
     ])
 
     // Modal states
@@ -1180,10 +1180,10 @@ export default {
     ])
 
     const availableRequirements = ref([
-      { id: 'REQ-001', title: 'User authentication system' },
-      { id: 'REQ-002', title: 'Product catalog management' },
-      { id: 'REQ-003', title: 'Order processing workflow' },
-      { id: 'REQ-004', title: 'Payment integration' },
+      { id: 'REQ-001', title: 'Hệ thống xác thực người dùng' },
+      { id: 'REQ-002', title: 'Quản lý danh mục sản phẩm' },
+      { id: 'REQ-003', title: 'Quy trình xử lý đơn hàng' },
+      { id: 'REQ-004', title: 'Tích hợp thanh toán' },
     ])
 
     const availableTags = ref([
@@ -1234,7 +1234,7 @@ export default {
       database_operations: ['select'],
       test_data: [
         {
-          name: 'Default Scenario',
+          name: 'Kịch bản mặc định',
           input_payload: {},
           input_payload_json: '{}',
           input_payload_form: [{ key: '', value: '' }],
@@ -1408,7 +1408,7 @@ export default {
           database_operations: props.testcase.database_operations || ['select'],
           test_data: props.testcase.test_data?.length
             ? props.testcase.test_data.map((data) => ({
-                name: data.name || 'Test Data',
+                name: data.name || 'Dữ liệu kiểm thử',
                 input_payload: data.input_payload || {},
                 input_payload_json: JSON.stringify(data.input_payload || {}, null, 2),
                 input_payload_form: convertJsonToForm(JSON.stringify(data.input_payload || {})),
@@ -1475,7 +1475,7 @@ export default {
 
     // Action Suggestions
     const showActionSuggestions = (index) => {
-      toast.info(`Showing action suggestions for step ${index + 1}`)
+      toast.info(`Gợi ý hành động cho bước ${index + 1}`)
     }
 
     // JSON Form Management
@@ -1560,7 +1560,7 @@ export default {
 
         step.input_data_error = ''
         event.preventDefault()
-        toast.success('JSON pasted successfully and converted to form view')
+        toast.success('Đã dán JSON và chuyển sang dạng biểu mẫu')
       } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
@@ -1581,7 +1581,7 @@ export default {
 
         apiLevel.response_schema_error = ''
         event.preventDefault()
-        toast.success('JSON pasted successfully and converted to form view')
+        toast.success('Đã dán JSON và chuyển sang dạng biểu mẫu')
       } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
@@ -1607,7 +1607,7 @@ export default {
 
         data[errorField] = ''
         event.preventDefault()
-        toast.success('JSON pasted successfully and converted to form view')
+        toast.success('Đã dán JSON và chuyển sang dạng biểu mẫu')
       } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
@@ -1711,10 +1711,10 @@ export default {
         const text = await navigator.clipboard.readText()
         const lines = text.split('\n').filter((line) => line.trim())
         if (lines.length > 0) {
-          toast.info('Clipboard data detected - implement your import logic here')
+          toast.info('Phát hiện dữ liệu trong bộ nhớ tạm - hãy bổ sung logic nhập tại đây')
         }
       } catch {
-        toast.error('Cannot read clipboard data')
+        toast.error('Không đọc được bộ nhớ tạm')
       }
     }
 
@@ -1764,7 +1764,7 @@ export default {
 
     const suggestScriptPath = () => {
       autoGenerateScriptPath()
-      toast.info('Script path suggested based on test case title')
+      toast.info('Đã gợi ý đường dẫn script theo tiêu đề test case')
     }
 
     // Template Application
@@ -1780,7 +1780,7 @@ export default {
           : [{ key: '', value: '' }],
         jsonViewMode: 'form',
       }))
-      toast.success('Step template applied successfully')
+      toast.success('Đã áp dụng mẫu bước')
     }
 
     const applyTestDataTemplate = (template) => {
@@ -1801,7 +1801,7 @@ export default {
         inputPayloadViewMode: 'form',
         expectedOutputViewMode: 'form',
       }))
-      toast.success('Test data template applied successfully')
+      toast.success('Đã áp dụng mẫu dữ liệu kiểm thử')
     }
 
     // Conditions Management
@@ -1933,7 +1933,7 @@ export default {
 
     const handleSubmit = async () => {
       if (!validateForm()) {
-        toast.error('Please fix the form errors before submitting')
+        toast.error('Vui lòng sửa lỗi trong biểu mẫu trước khi gửi')
         return
       }
 
@@ -1982,7 +1982,7 @@ export default {
     }
 
     const saveDraft = () => {
-      toast.success('Draft saved successfully')
+      toast.success('Đã lưu nháp')
     }
 
     onMounted(() => {

@@ -11,7 +11,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ pendingConflicts.length }}</h3>
-          <p>Total Conflicts</p>
+          <p>Tổng số xung đột</p>
         </div>
       </div>
       <div class="stat-card resolved">
@@ -20,7 +20,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ resolvedConflictsCount }}</h3>
-          <p>Resolved</p>
+          <p>Đã xử lý</p>
         </div>
       </div>
       <div class="stat-card pending">
@@ -29,7 +29,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ pendingConflicts.length - resolvedConflictsCount }}</h3>
-          <p>Pending</p>
+          <p>Đang chờ</p>
         </div>
       </div>
       <div class="stat-card progress">
@@ -38,7 +38,7 @@
         </div>
         <div class="stat-info">
           <h3>{{ Math.round((resolvedConflictsCount / pendingConflicts.length) * 100) || 0 }}%</h3>
-          <p>Completion</p>
+          <p>Hoàn thành</p>
         </div>
       </div>
     </div>
@@ -46,16 +46,15 @@
     <div v-if="hasConflicts" class="conflicts-section">
       <div class="section-header">
         <div class="header-content">
-          <h3>Duplicate Use Cases Detected</h3>
+          <h3>Phát hiện use case trùng lặp</h3>
           <p>
-            We found {{ pendingConflicts.length }} group(s) of duplicate use cases. Please select one
-            version to keep from each group, or skip conflicts you want to handle later.
+            Phát hiện {{ pendingConflicts.length }} nhóm use case trùng lặp. Hãy chọn một phiên bản giữ lại ở mỗi nhóm, hoặc bỏ qua xung đột muốn xử lý sau.
           </p>
         </div>
         <button
           class="section-collapse-toggle"
           @click="toggleConflictsSection"
-          :title="isConflictsSectionCollapsed ? 'Expand conflicts section' : 'Collapse conflicts section'"
+          :title="isConflictsSectionCollapsed ? 'Mở rộng mục xung đột' : 'Thu gọn mục xung đột'"
         >
           <span class="material-symbols-outlined">
             {{ isConflictsSectionCollapsed ? 'expand_more' : 'expand_less' }}
@@ -82,8 +81,8 @@
                 </span>
               </button>
               <div class="title-content">
-                <h4>Conflict Group {{ index + 1 }}</h4>
-                <span class="conflict-id">Reference: {{ formatConflictId(conflict.conflict_id) }}</span>
+                <h4>Nhóm xung đột {{ index + 1 }}</h4>
+                <span class="conflict-id">Tham chiếu: {{ formatConflictId(conflict.conflict_id) }}</span>
               </div>
             </div>
             <div class="conflict-actions">
@@ -91,10 +90,10 @@
                 class="btn-secondary"
                 @click="$emit('skip-conflict', conflict.conflict_id)"
                 :disabled="isSkippingConflict"
-                title="Skip this conflict for now"
+                title="Tạm bỏ qua xung đột này"
               >
                 <span class="material-symbols-outlined">close</span>
-                Skip
+                Bỏ qua
               </button>
             </div>
           </div>
@@ -121,7 +120,7 @@
                   >
                   <span v-else class="material-symbols-outlined">radio_button_unchecked</span>
                   {{
-                    selectedResolutions[conflict.conflict_id] === getUsecaseId(useCase) ? 'Deselect' : 'Select'
+                    selectedResolutions[conflict.conflict_id] === getUsecaseId(useCase) ? 'Deselect' : 'Chọn'
                   }}
                 </button>
               </div>
@@ -133,7 +132,7 @@
                 <div class="use-case-actions">
                   <button class="btn-outline" @click.stop="$emit('show-detail', useCase)">
                     <span class="material-symbols-outlined">visibility</span>
-                    View Details
+                    Xem chi tiết
                   </button>
                 </div>
               </div>
@@ -147,7 +146,7 @@
         <div v-show="!isConflictsSectionCollapsed" class="conflicts-footer">
         <div class="footer-info">
           <span class="resolved-count">
-            Resolved: <strong>{{ resolvedConflictsCount }}/{{ pendingConflicts.length }}</strong>
+            Đã xử lý: <strong>{{ resolvedConflictsCount }}/{{ pendingConflicts.length }}</strong>
           </span>
           <span class="completion-text">
             {{ completionStatus }}
@@ -221,8 +220,8 @@ export default {
       const percentage = Math.round(
         (this.resolvedConflictsCount / this.pendingConflicts.length) * 100
       )
-      if (percentage === 0) return 'No conflicts resolved yet'
-      if (percentage === 100) return 'All conflicts resolved!'
+      if (percentage === 0) return 'Chưa xử lý xung đột nào'
+      if (percentage === 100) return 'Đã xử lý hết xung đột!'
       return `${percentage}% complete`
     },
   },
@@ -275,7 +274,7 @@ export default {
     getUsecaseDisplayName(uc) {
       if (!uc) {
         console.warn('⚠️ getUsecaseDisplayName: uc is null/undefined')
-        return 'Unknown Use Case'
+        return 'Use case không rõ'
       }
       
       // Check if uc is a populated usecase object
@@ -294,7 +293,7 @@ export default {
         return `Use Case ID: ${this.getUsecaseId(uc)}`
       }
       
-      return uc.name || uc.goal || 'Unnamed Use Case'
+      return uc.name || uc.goal || 'Use case chưa đặt tên'
     },
     // Helper: Get usecase description
     getUsecaseDescription(uc) {

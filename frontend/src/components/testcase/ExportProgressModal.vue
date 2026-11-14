@@ -61,7 +61,7 @@
             @click="$emit('cancel')"
           >
             <span class="material-symbols-outlined">cancel</span>
-            Cancel Export
+            Huỷ xuất
           </button>
           <button
             v-else-if="progress.status === 'completed'"
@@ -69,7 +69,7 @@
             @click="$emit('close')"
           >
             <span class="material-symbols-outlined">check</span>
-            Done
+            Xong
           </button>
           <button
             v-else-if="progress.status === 'error'"
@@ -77,11 +77,11 @@
             @click="$emit('retry')"
           >
             <span class="material-symbols-outlined">refresh</span>
-            Retry
+            Thử lại
           </button>
           <button v-else class="btn-secondary" @click="$emit('close')">
             <span class="material-symbols-outlined">close</span>
-            Close
+            Đóng
           </button>
         </div>
       </div>
@@ -110,19 +110,19 @@ export default {
       const statusMap = {
         preparing: 'Preparing export...',
         exporting: 'Exporting data...',
-        completed: 'Export completed!',
-        error: 'Export failed',
-        idle: 'Ready to export',
+        completed: 'Xuất hoàn tất!',
+        error: 'Xuất thất bại',
+        idle: 'Sẵn sàng xuất',
       }
-      return statusMap[props.progress.status] || 'Processing...'
+      return statusMap[props.progress.status] || 'Đang xử lý...'
     }
 
     const getStatusTitle = () => {
       const titleMap = {
-        preparing: 'Preparing Data',
-        exporting: 'Generating Report',
-        completed: 'Export Complete',
-        error: 'Export Failed',
+        preparing: 'Đang chuẩn bị dữ liệu',
+        exporting: 'Đang tạo báo cáo',
+        completed: 'Xuất hoàn tất',
+        error: 'Xuất thất bại',
         idle: 'Ready',
       }
       return titleMap[props.progress.status] || 'Processing'

@@ -11,7 +11,7 @@
         <!-- Enhanced Activity Logs Section -->
         <div class="activity-logs-section">
           <div class="section-header">
-            <h3>Activity Logs</h3>
+            <h3>Nhật ký hoạt động</h3>
             <div class="controls-header">
               <!-- Compact Filter Controls -->
               <div class="compact-filter-controls">
@@ -35,7 +35,7 @@
                         @click="setTypeFilter('all')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Types
+                        Tất cả loại
                       </button>
                       <button 
                         class="filter-option" 
@@ -43,7 +43,7 @@
                         @click="setTypeFilter('testcase')"
                       >
                         <span class="material-symbols-outlined">play_arrow</span>
-                        Test Cases
+                        Test case
                       </button>
                       <button 
                         class="filter-option" 
@@ -51,7 +51,7 @@
                         @click="setTypeFilter('database')"
                       >
                         <span class="material-symbols-outlined">storage</span>
-                        Database
+                        Cơ sở dữ liệu
                       </button>
                       <button 
                         class="filter-option" 
@@ -59,7 +59,7 @@
                         @click="setTypeFilter('uml')"
                       >
                         <span class="material-symbols-outlined">schema</span>
-                        UML Diagrams
+                        Sơ đồ UML
                       </button>
                       <button 
                         class="filter-option" 
@@ -67,7 +67,7 @@
                         @click="setTypeFilter('version')"
                       >
                         <span class="material-symbols-outlined">history</span>
-                        Versions
+                        Phiên bản
                       </button>
                       <button 
                         class="filter-option" 
@@ -75,7 +75,7 @@
                         @click="setTypeFilter('project')"
                       >
                         <span class="material-symbols-outlined">folder</span>
-                        Projects
+                        Dự án
                       </button>
                     </div>
                   </div>
@@ -98,7 +98,7 @@
                         @click="setActionFilter('all')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Actions
+                        Tất cả hành động
                       </button>
                       <button 
                         class="filter-option" 
@@ -106,7 +106,7 @@
                         @click="setActionFilter('create')"
                       >
                         <span class="material-symbols-outlined">add</span>
-                        Create
+                        Tạo
                       </button>
                       <button 
                         class="filter-option" 
@@ -114,7 +114,7 @@
                         @click="setActionFilter('update')"
                       >
                         <span class="material-symbols-outlined">edit</span>
-                        Update
+                        Cập nhật
                       </button>
                       <button 
                         class="filter-option" 
@@ -122,7 +122,7 @@
                         @click="setActionFilter('delete')"
                       >
                         <span class="material-symbols-outlined">delete</span>
-                        Delete
+                        Xoá
                       </button>
                       <button 
                         class="filter-option" 
@@ -130,7 +130,7 @@
                         @click="setActionFilter('execute')"
                       >
                         <span class="material-symbols-outlined">play_arrow</span>
-                        Execute
+                        Chạy
                       </button>
                       <button 
                         class="filter-option" 
@@ -138,7 +138,7 @@
                         @click="setActionFilter('export')"
                       >
                         <span class="material-symbols-outlined">download</span>
-                        Export
+                        Xuất
                       </button>
                     </div>
                   </div>
@@ -161,7 +161,7 @@
                         @click="setUserFilter('all')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Users
+                        Tất cả người dùng
                       </button>
                       <button 
                         v-for="user in uniqueUsers" 
@@ -191,7 +191,7 @@
                     <input
                       v-model="searchQuery"
                       @input="debouncedSearch"
-                      placeholder="Search logs..."
+                      placeholder="Tìm nhật ký..."
                       type="text"
                     />
                   </div>
@@ -215,14 +215,14 @@
             <!-- Loading State for Logs Only -->
             <div v-if="logsLoading" class="logs-loading-container">
               <div class="loading-spinner small"></div>
-              <p>Loading activity logs...</p>
+              <p>Đang tải nhật ký hoạt động...</p>
             </div>
 
             <!-- Error State for Logs Only -->
             <div v-else-if="logsError" class="logs-error-container">
               <span class="material-symbols-outlined">error</span>
               <p>{{ logsError }}</p>
-              <button @click="loadRecentActivities" class="retry-button">Retry</button>
+              <button @click="loadRecentActivities" class="retry-button">Thử lại</button>
             </div>
 
             <!-- Logs Content -->
@@ -283,7 +283,7 @@
                           <span v-else class="material-symbols-outlined">person</span>
                         </div>
                         <span class="log-user-name">{{ activity.user_id?.name || 'System' }}</span>
-                        <span v-if="activity.performed_by_ai" class="ai-badge" title="Performed by AI">
+                        <span v-if="activity.performed_by_ai" class="ai-badge" title="Thực hiện bởi AI">
                           <span class="material-symbols-outlined">smart_toy</span>
                           AI
                         </span>
@@ -308,9 +308,9 @@
                           <span class="material-symbols-outlined">schedule</span>
                           {{ formatTime(activity.created_at) }}
                         </span>
-                        <span v-if="activity.affects_requirement" class="log-requirement-badge" title="Affects requirements">
+                        <span v-if="activity.affects_requirement" class="log-requirement-badge" title="Ảnh hưởng đến yêu cầu">
                           <span class="material-symbols-outlined">description</span>
-                          Requirement
+                          Yêu cầu
                         </span>
                       </div>
                     </div>
@@ -322,7 +322,7 @@
             <!-- Pagination -->
             <div v-if="filteredActivities.length > 0 && !logsLoading" class="pagination-controls">
               <div class="pagination-info">
-                Showing {{ pagination.startIndex + 1 }}-{{ pagination.endIndex }} of
+                Hiển thị {{ pagination.startIndex + 1 }}-{{ pagination.endIndex }} /
                 {{ filteredActivities.length }} logs
               </div>
 
@@ -357,7 +357,7 @@
               </div>
 
               <div class="page-size-selector">
-                <label>Show:</label>
+                <label>Hiển thị:</label>
                 <select v-model="pagination.pageSize" @change="updatePagination">
                   <option value="10">10</option>
                   <option value="20">20</option>
@@ -376,6 +376,7 @@
 <script>
 import { getProjectDetail } from '@/api/project'
 import { escapeHtml, escapeRegExp, sanitizeHtml } from '@/utils/sanitize'
+import { actionLabel, targetLabel } from '@/utils/logLabels'
 import { getTestStatistics } from '@/api/testcase'
 import { getDatabasesByVersion } from '@/api/project'
 import { getProjectLogs } from '@/api/output'
@@ -634,7 +635,7 @@ export default {
       try {
         const projectId = this.$route.params.id
         if (!projectId) {
-          throw new Error('Project ID is required')
+          throw new Error('Cần mã dự án')
         }
 
         await this.fetchProjectData(projectId)
@@ -644,7 +645,7 @@ export default {
         this.initSocketConnection(projectId)
       } catch (err) {
         console.error('Error initializing data:', err)
-        this.toast.error('Failed to load project data')
+        this.toast.error('Không tải được dữ liệu dự án')
       }
     },
 
@@ -652,10 +653,10 @@ export default {
       try {
         this.refreshing = true
         await this.loadRecentActivities()
-        this.toast.success('Activities refreshed')
+        this.toast.success('Đã làm mới hoạt động')
       } catch (err) {
         console.error('Error refreshing activities:', err)
-        this.toast.error('Failed to refresh activities')
+        this.toast.error('Làm mới hoạt động thất bại')
       } finally {
         this.refreshing = false
       }
@@ -759,7 +760,7 @@ export default {
       } catch (err) {
         console.error('Error loading recent activities:', err)
         this.logsError =
-          err.response?.data?.message || err.message || 'Failed to load activity logs'
+          err.response?.data?.message || err.message || 'Không tải được nhật ký hoạt động'
         this.recentActivities = []
       } finally {
         this.logsLoading = false
@@ -866,93 +867,74 @@ export default {
       }
 
       // Fallback to default formatting with better messages
-      const userName = activity.user_id?.name || 'System'
+      const userName = activity.user_id?.name || 'Hệ thống'
       const action = activity.action
       const targetType = activity.target_type
 
       // Enhanced action mapping with more context
+      const after = activity.details?.after || {}
+      const tgt = targetLabel(targetType).toLowerCase()
       const actionMap = {
-        // Input operations
-        create_input: `${userName} added new input`,
-        update_input: `${userName} updated input`,
-        delete_input: `${userName} removed input`,
-
-        // Test cases
-        generate_output: activity.target_type === 'testcases' 
-          ? `${userName} generated ${activity.details?.after?.count || 'test cases'}`
+        create_input: `${userName} đã thêm đầu vào mới`,
+        update_input: `${userName} đã sửa đầu vào`,
+        delete_input: `${userName} đã xoá đầu vào`,
+        generate_output: activity.target_type === 'testcases'
+          ? `${userName} đã sinh ${after.count || 'test case'}`
           : activity.target_type === 'activity_diagrams'
-          ? `${userName} generated activity diagram "${activity.details?.after?.name || ''}"`
+          ? `${userName} đã sinh sơ đồ hoạt động "${after.name || ''}"`
           : activity.target_type === 'sequence_diagrams'
-          ? `${userName} generated sequence diagram "${activity.details?.after?.name || ''}"`
+          ? `${userName} đã sinh sơ đồ tuần tự "${after.name || ''}"`
           : activity.target_type === 'usecase_diagrams'
-          ? `${userName} generated usecase diagram "${activity.details?.after?.name || ''}"`
-          : `${userName} generated ${targetType}`,
-        update_output: `${userName} updated ${targetType}`,
-        delete_output: `${userName} deleted ${targetType}`,
-        export_data: `${userName} exported ${targetType}`,
-
-        // Database operations
-        create_table: `${userName} created table "${activity.details?.after?.name || ''}"`,
-        update_table: `${userName} updated table`,
-        delete_table: `${userName} deleted table`,
-        create_column: `${userName} added column`,
-        update_column: `${userName} updated column`,
-        delete_column: `${userName} removed column`,
-        create_relation: `${userName} created relationship`,
-        update_relation: `${userName} updated relationship`,
-        delete_relation: `${userName} deleted relationship`,
-
-        // Version operations
-        create_version: `${userName} created version ${activity.version_number || ''}`,
-        update_version: `${userName} updated version ${activity.version_number || ''}`,
-        delete_version: `${userName} deleted version ${activity.version_number || ''}`,
-        rollback: `${userName} rolled back to version ${activity.details?.after?.version_number || ''}`,
-
-        // Project operations
-        create_project: `${userName} created project "${activity.details?.after?.name || ''}"`,
-        update_project: `${userName} updated project`,
-        delete_project: `${userName} deleted project`,
-        restore_project: `${userName} restored project`,
-
-        // Usecase/Requirement operations
-        generate_data: `${userName} generated usecase${activity.details?.after?.length ? ` (${activity.details.after.length} items)` : ''}`,
-        update_data: `${userName} updated usecase`,
-        delete_data: `${userName} deleted usecase`,
-        resolve_conflict: `${userName} resolved conflict`,
-
-        // Member operations
-        invite_member: `${userName} invited member`,
-        accept_invite: `${userName} accepted invitation`,
-        reject_invite: `${userName} rejected invitation`,
-        cancel_invite: `${userName} cancelled invitation`,
-        remove_member: `${userName} removed member`,
-        leave_project: `${userName} left project`,
-        change_member_role: `${userName} changed member role`,
-
-        // User operations
-        create_user: `${userName} created user account`,
-        update_user: `${userName} updated user account`,
-        login: `${userName} logged in`,
-        logout: `${userName} logged out`,
-        failed_login: `Failed login attempt`,
+          ? `${userName} đã sinh sơ đồ use case "${after.name || ''}"`
+          : `${userName} đã sinh ${tgt}`,
+        update_output: `${userName} đã cập nhật ${tgt}`,
+        delete_output: `${userName} đã xoá ${tgt}`,
+        export_data: `${userName} đã xuất ${tgt}`,
+        create_table: `${userName} đã tạo bảng "${after.name || ''}"`,
+        update_table: `${userName} đã sửa bảng`,
+        delete_table: `${userName} đã xoá bảng`,
+        create_column: `${userName} đã thêm cột`,
+        update_column: `${userName} đã sửa cột`,
+        delete_column: `${userName} đã xoá cột`,
+        create_relation: `${userName} đã tạo quan hệ`,
+        update_relation: `${userName} đã sửa quan hệ`,
+        delete_relation: `${userName} đã xoá quan hệ`,
+        create_version: `${userName} đã tạo phiên bản ${activity.version_number || ''}`,
+        update_version: `${userName} đã cập nhật phiên bản ${activity.version_number || ''}`,
+        delete_version: `${userName} đã xoá phiên bản ${activity.version_number || ''}`,
+        rollback: `${userName} đã quay lui về phiên bản ${after.version_number || ''}`,
+        create_project: `${userName} đã tạo dự án "${after.name || ''}"`,
+        update_project: `${userName} đã cập nhật dự án`,
+        delete_project: `${userName} đã xoá dự án`,
+        restore_project: `${userName} đã khôi phục dự án`,
+        generate_data: `${userName} đã sinh use case${after.length ? ` (${after.length} mục)` : ''}`,
+        update_data: `${userName} đã cập nhật use case`,
+        delete_data: `${userName} đã xoá use case`,
+        resolve_conflict: `${userName} đã xử lý xung đột`,
+        invite_member: `${userName} đã mời thành viên`,
+        accept_invite: `${userName} đã chấp nhận lời mời`,
+        reject_invite: `${userName} đã từ chối lời mời`,
+        cancel_invite: `${userName} đã huỷ lời mời`,
+        remove_member: `${userName} đã gỡ thành viên`,
+        leave_project: `${userName} đã rời dự án`,
+        change_member_role: `${userName} đã đổi vai trò thành viên`,
+        create_user: `${userName} đã tạo tài khoản`,
+        update_user: `${userName} đã cập nhật tài khoản`,
+        login: `${userName} đã đăng nhập`,
+        logout: `${userName} đã đăng xuất`,
+        failed_login: `Đăng nhập thất bại`,
       }
 
-      return actionMap[action] || `${userName} performed ${action.replace(/_/g, ' ')} on ${targetType}`
+      return actionMap[action] || `${userName}: ${actionLabel(action)} (${targetLabel(targetType)})`
     },
 
     formatAction(action) {
-      return action
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+      return actionLabel(action)
     },
 
     formatTarget(targetType) {
       if (!targetType) return ''
-      return targetType
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+      return targetLabel(targetType)
     },
 
     highlightKeywords(text) {
@@ -1069,22 +1051,22 @@ export default {
       this.applyFilters()
     },
     getTypeFilterLabel() {
-      if (this.filters.type === 'all') return 'All Types'
+      if (this.filters.type === 'all') return 'Tất cả loại'
       const labels = {
-        testcase: 'Test Cases',
-        database: 'Database',
-        uml: 'UML Diagrams',
-        version: 'Versions',
+        testcase: 'Test case',
+        database: 'Cơ sở dữ liệu',
+        uml: 'Sơ đồ UML',
+        version: 'Phiên bản',
         project: 'Projects',
       }
       return labels[this.filters.type] || this.filters.type
     },
     getActionFilterLabel() {
-      if (this.filters.action === 'all') return 'All Actions'
+      if (this.filters.action === 'all') return 'Tất cả hành động'
       return this.filters.action.charAt(0).toUpperCase() + this.filters.action.slice(1)
     },
     getUserFilterLabel() {
-      if (this.filters.user === 'all') return 'All Users'
+      if (this.filters.user === 'all') return 'Tất cả người dùng'
       return this.filters.user
     },
     handleClickOutsideFilters(event) {
@@ -1140,7 +1122,7 @@ export default {
     handleVersionSelect(versionId) {
       // Chỉ Owner mới được phép select version
       if (!checkIsOwner(this.project)) {
-        this.toast.warning('Only project owner can switch versions')
+        this.toast.warning('Chỉ chủ dự án mới được chuyển phiên bản')
         return
       }
       
@@ -1223,12 +1205,12 @@ export default {
         this.loadLogStats()
 
         // Thông báo cho user
-        this.toast.success(`Switched to approved version: ${newVersion || versionId}`)
+        this.toast.success(`Đã chuyển sang phiên bản đã duyệt: ${newVersion || versionId}`)
 
         this.$forceUpdate()
       } catch (error) {
         console.error('❌ Error handling version-approved event:', error)
-        this.toast.error('Failed to switch to approved version')
+        this.toast.error('Không chuyển được sang phiên bản đã duyệt')
       }
     },
 
@@ -1278,7 +1260,7 @@ export default {
       this.loadLogStats()
       const version = this.versions.find((v) => v._id === event.toVersionId)
       if (version) {
-        this.toast.info(`Version switched to: ${version.version_number || event.toVersionId}`)
+        this.toast.info(`Đã chuyển sang phiên bản: ${version.version_number || event.toVersionId}`)
       }
     },
 
@@ -1293,7 +1275,7 @@ export default {
         this.selectedVersionId = event.version._id
         saveSelectedVersion(this.project._id, event.version._id)
         this.loadLogStats()
-        this.toast.info(`New version created: ${event.version.version_number || event.version._id}`)
+        this.toast.info(`Đã tạo phiên bản mới: ${event.version.version_number || event.version._id}`)
       }
     },
   },

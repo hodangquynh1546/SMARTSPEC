@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h3>{{ table ? 'Edit Table' : 'Create New Table' }}</h3>
+        <h3>{{ table ? 'Sửa bảng' : 'Tạo bảng mới' }}</h3>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -13,14 +13,14 @@
           <!-- Table Basic Info -->
           <div class="form-row">
             <div class="form-group">
-              <label>Table Name <span class="required">*</span></label>
+              <label>Tên bảng <span class="required">*</span></label>
               <input
                 v-model="tableForm.name"
                 type="text"
                 required
-                placeholder="e.g., users, products, orders"
+                placeholder="VD: users, products, orders"
                 pattern="[a-zA-Z_][a-zA-Z0-9_]*"
-                title="Table name must start with a letter or underscore and contain only letters, numbers, and underscores"
+                title="Tên bảng phải bắt đầu bằng chữ cái hoặc dấu gạch dưới và chỉ gồm chữ cái, số, gạch dưới"
                 :class="{
                   error: !isValidTableName(tableForm.name) && tableForm.name,
                   warning: tableForm.name.length > 50,
@@ -30,17 +30,17 @@
               />
               <div class="form-hint">
                 <span v-if="tableForm.name.length > 50" class="warning-text">
-                  ⚠️ Table name should be under 50 characters for better readability
+                  ⚠️ Tên bảng nên dưới 50 ký tự để dễ đọc
                 </span>
-                <span v-else>Use snake_case format (e.g., user_profiles)</span>
+                <span v-else>Dùng định dạng snake_case (VD: user_profiles)</span>
               </div>
             </div>
             <div class="form-group">
-              <label>Description</label>
+              <label>Mô tả</label>
               <textarea
                 v-model="tableForm.description"
                 rows="2"
-                placeholder="Describe what this table stores..."
+                placeholder="Mô tả bảng này lưu gì..."
                 @input="checkForChanges"
               ></textarea>
             </div>
@@ -50,10 +50,10 @@
           <div v-if="primaryKeyCount > 1" class="composite-key-section">
             <div class="composite-key-header">
               <span class="material-symbols-outlined">key</span>
-              <span>Composite Primary Key Configuration</span>
+              <span>Cấu hình khoá chính phức hợp</span>
             </div>
             <div class="composite-key-info">
-              <p>This table uses a composite primary key with {{ primaryKeyCount }} columns.</p>
+              <p>Bảng này dùng khoá chính phức hợp gồm {{ primaryKeyCount }} cột.</p>
               <div class="composite-key-order">
                 <div
                   v-for="pkColumn in sortedPrimaryKeys"
@@ -67,7 +67,7 @@
               </div>
               <div class="composite-key-hint">
                 <span class="material-symbols-outlined">info</span>
-                Primary key order determines the sequence in composite key constraints
+                Thứ tự khoá chính quyết định trình tự trong ràng buộc khoá phức hợp
               </div>
             </div>
           </div>
@@ -76,20 +76,20 @@
           <div class="table-stats" v-if="tableForm.columns.length > 0">
             <div class="stat-item">
               <span class="stat-number">{{ tableForm.columns.length }}</span>
-              <span class="stat-label">Columns</span>
+              <span class="stat-label">Cột</span>
             </div>
             <div class="stat-item">
               <span class="stat-number">{{ primaryKeyCount }}</span>
-              <span class="stat-label">Primary Keys</span>
-              <span v-if="primaryKeyCount > 1" class="stat-badge composite">Composite</span>
+              <span class="stat-label">Khoá chính</span>
+              <span v-if="primaryKeyCount > 1" class="stat-badge composite">Phức hợp</span>
             </div>
             <div class="stat-item">
               <span class="stat-number">{{ foreignKeyCount }}</span>
-              <span class="stat-label">Foreign Keys</span>
+              <span class="stat-label">Khoá ngoại</span>
             </div>
             <div class="stat-item">
               <span class="stat-number">{{ indexedColumnCount }}</span>
-              <span class="stat-label">Indexed</span>
+              <span class="stat-label">Có chỉ mục</span>
             </div>
           </div>
 
@@ -97,23 +97,23 @@
           <div v-if="hasPerformanceWarnings" class="performance-warnings">
             <div class="warning-header">
               <span class="material-symbols-outlined">warning</span>
-              <span>Performance Considerations</span>
+              <span>Lưu ý hiệu năng</span>
             </div>
             <ul>
               <li v-if="indexedColumnCount > 10">
-                ⚠️ High number of indexed columns ({{ indexedColumnCount }}) may impact performance
+                ⚠️ Số cột có chỉ mục lớn ({{ indexedColumnCount }}) có thể ảnh hưởng hiệu năng
               </li>
               <li v-if="largeColumnCount > 3">
-                ⚠️ Consider normalizing {{ largeColumnCount }} large object columns
+                ⚠️ Cân nhắc chuẩn hoá {{ largeColumnCount }} cột đối tượng lớn
               </li>
               <li v-if="primaryKeyCount > 4">
-                ⚠️ Large composite key ({{ primaryKeyCount }} columns) may impact performance
+                ⚠️ Khoá phức hợp lớn ({{ primaryKeyCount }} cột) có thể ảnh hưởng hiệu năng
               </li>
               <li v-if="!hasTimestamps">
-                💡 Consider adding 'created_at' and 'updated_at' for audit trail
+                💡 Cân nhắc thêm 'created_at' và 'updated_at' để theo dõi thay đổi
               </li>
               <li v-if="!hasSoftDelete">
-                💡 Consider adding 'deleted_at' for soft delete functionality
+                💡 Cân nhắc thêm 'deleted_at' để xoá mềm
               </li>
             </ul>
           </div>
@@ -121,10 +121,10 @@
           <!-- Columns Section -->
           <div class="form-section">
             <div class="section-header">
-              <h4>Columns</h4>
+              <h4>Cột</h4>
               <button type="button" class="btn-secondary small" @click="addColumn">
                 <span class="material-symbols-outlined">add</span>
-                Add Column
+                Thêm cột
               </button>
             </div>
 
@@ -162,7 +162,7 @@
                 <div class="column-main">
                   <!-- Column Name -->
                   <div class="input-group">
-                    <label>Column Name</label>
+                    <label>Tên cột</label>
                     <input
                       v-model="column.name"
                       type="text"
@@ -177,21 +177,21 @@
                       @input="checkForChanges"
                     />
                     <div class="form-hint small" v-if="column.name.length > 50">
-                      ⚠️ Long column names may cause issues
+                      ⚠️ Tên cột quá dài có thể gây lỗi
                     </div>
                   </div>
 
                   <!-- Data Type -->
                   <div class="input-group">
-                    <label>Data Type</label>
+                    <label>Kiểu dữ liệu</label>
                     <select
                       v-model="column.type"
                       required
                       :class="{ error: !column.type }"
                       @change="handleTypeChange(column, index)"
                     >
-                      <option value="">Select type</option>
-                      <optgroup label="Numeric">
+                      <option value="">Chọn kiểu</option>
+                      <optgroup label="Số">
                         <option value="INT">INT</option>
                         <option value="BIGINT">BIGINT</option>
                         <option value="SMALLINT">SMALLINT</option>
@@ -200,23 +200,23 @@
                         <option value="FLOAT">FLOAT</option>
                         <option value="DOUBLE">DOUBLE</option>
                       </optgroup>
-                      <optgroup label="String">
+                      <optgroup label="Chuỗi">
                         <option value="VARCHAR">VARCHAR</option>
                         <option value="CHAR">CHAR</option>
                         <option value="TEXT">TEXT</option>
                         <option value="LONGTEXT">LONGTEXT</option>
                       </optgroup>
-                      <optgroup label="Date & Time">
+                      <optgroup label="Ngày & giờ">
                         <option value="DATE">DATE</option>
                         <option value="DATETIME">DATETIME</option>
                         <option value="TIMESTAMP">TIMESTAMP</option>
                         <option value="TIME">TIME</option>
                       </optgroup>
-                      <optgroup label="Boolean">
+                      <optgroup label="Đúng/Sai">
                         <option value="BOOLEAN">BOOLEAN</option>
                         <option value="TINYINT(1)">TINYINT(1)</option>
                       </optgroup>
-                      <optgroup label="Binary">
+                      <optgroup label="Nhị phân">
                         <option value="BLOB">BLOB</option>
                         <option value="LONGBLOB">LONGBLOB</option>
                       </optgroup>
@@ -225,7 +225,7 @@
 
                   <!-- Length/Precision -->
                   <div class="input-group">
-                    <label v-if="showLengthInput(column.type)">Length/Precision</label>
+                    <label v-if="showLengthInput(column.type)">Độ dài/Độ chính xác</label>
                     <div v-if="showLengthInput(column.type)" class="length-input-container">
                       <input
                         v-model="column.length"
@@ -237,7 +237,7 @@
                         @input="checkForChanges"
                       />
                       <div v-if="column.type === 'DECIMAL'" class="form-hint small">
-                        Format: precision,scale (e.g., 10,2)
+                        Định dạng: độ chính xác,số lẻ (VD: 10,2)
                       </div>
                     </div>
                     <div v-else class="empty-space"></div>
@@ -245,7 +245,7 @@
 
                   <!-- Default Value -->
                   <div class="input-group">
-                    <label>Default Value</label>
+                    <label>Giá trị mặc định</label>
                     <div class="default-input-container">
                       <input
                         v-model="column.default"
@@ -269,8 +269,8 @@
                         class="checkbox-label primary"
                         :title="
                           column.is_primary_key
-                            ? 'Primary keys are automatically NOT NULL and UNIQUE'
-                            : 'Mark as primary key'
+                            ? 'Khoá chính tự động bắt buộc và duy nhất'
+                            : 'Đánh dấu là khoá chính'
                         "
                       >
                         <input
@@ -279,12 +279,12 @@
                           @change="handlePrimaryKeyChange(index)"
                         />
                         <span class="checkbox-custom"></span>
-                        <span class="option-text">Primary Key</span>
+                        <span class="option-text">Khoá chính</span>
                       </label>
 
                       <label
                         class="checkbox-label"
-                        :title="column.nullable ? 'Allows NULL values' : 'Requires a value'"
+                        :title="column.nullable ? 'Cho phép giá trị NULL' : 'Bắt buộc có giá trị'"
                       >
                         <input
                           v-model="column.nullable"
@@ -293,12 +293,12 @@
                           @change="checkForChanges"
                         />
                         <span class="checkbox-custom"></span>
-                        <span class="option-text">Nullable</span>
+                        <span class="option-text">Cho phép rỗng</span>
                       </label>
                     </div>
 
                     <div class="options-group">
-                      <label class="checkbox-label" title="Values must be unique across the table">
+                      <label class="checkbox-label" title="Giá trị phải duy nhất trong bảng">
                         <input
                           v-model="column.unique"
                           type="checkbox"
@@ -306,10 +306,10 @@
                           @change="checkForChanges"
                         />
                         <span class="checkbox-custom"></span>
-                        <span class="option-text">Unique</span>
+                        <span class="option-text">Duy nhất</span>
                       </label>
 
-                      <label class="checkbox-label foreign" title="References another table">
+                      <label class="checkbox-label foreign" title="Tham chiếu tới bảng khác">
                         <input
                           v-model="column.is_foreign_key"
                           type="checkbox"
@@ -317,7 +317,7 @@
                           @change="handleForeignKeyChange(index)"
                         />
                         <span class="checkbox-custom"></span>
-                        <span class="option-text">Foreign Key</span>
+                        <span class="option-text">Khoá ngoại</span>
                       </label>
                     </div>
                   </div>
@@ -328,7 +328,7 @@
                     class="btn-icon danger"
                     @click="removeColumn(index)"
                     :disabled="tableForm.columns.length <= 1"
-                    title="Remove column"
+                    title="Xoá cột"
                   >
                     <span class="material-symbols-outlined">delete</span>
                   </button>
@@ -338,11 +338,11 @@
                 <div v-if="column.is_foreign_key" class="foreign-key-section">
                   <div class="foreign-key-header">
                     <span class="material-symbols-outlined">link</span>
-                    <span>Foreign Key Reference</span>
+                    <span>Tham chiếu khoá ngoại</span>
                   </div>
                   <div class="foreign-key-row">
                     <div class="input-group">
-                      <label>References Table <span class="required">*</span></label>
+                      <label>Bảng tham chiếu <span class="required">*</span></label>
                       <select
                         v-model="column.references"
                         required
@@ -350,7 +350,7 @@
                         :class="{ error: column.is_foreign_key && !column.references }"
                         @change="handleForeignKeyTableChange(column)"
                       >
-                        <option value="">Select table to reference</option>
+                        <option value="">Chọn bảng để tham chiếu</option>
                         <option
                           v-for="availableTable in normalizedAvailableTables"
                           :key="availableTable.name"
@@ -376,7 +376,7 @@
                     <div v-if="column.references" class="foreign-key-info">
                       <div class="form-hint">
                         <span class="material-symbols-outlined">info</span>
-                        Foreign key will reference primary key of
+                        Khoá ngoại sẽ tham chiếu tới khoá chính của
                         <strong>{{ column.references }}</strong>
                         <template v-if="getReferencedTablePrimaryKey(column.references)">
                           ({{ getReferencedTablePrimaryKeyType(column.references) }})
@@ -404,10 +404,10 @@
 
             <div v-if="tableForm.columns.length === 0" class="no-columns">
               <span class="material-symbols-outlined">table</span>
-              <p>Add at least one column to the table</p>
+              <p>Thêm ít nhất một cột cho bảng</p>
               <button type="button" class="btn-secondary" @click="addColumn">
                 <span class="material-symbols-outlined">add</span>
-                Add First Column
+                Thêm cột đầu tiên
               </button>
             </div>
           </div>
@@ -416,7 +416,7 @@
           <div v-if="hasFormErrors" class="validation-summary error">
             <span class="material-symbols-outlined">error</span>
             <div>
-              <strong>Please fix the following errors:</strong>
+              <strong>Vui lòng sửa các lỗi sau:</strong>
               <ul>
                 <li v-for="error in formErrors" :key="error">{{ error }}</li>
               </ul>
@@ -426,10 +426,10 @@
           <!-- SQL Preview -->
           <div class="form-section">
             <div class="section-header">
-              <h4>SQL Preview</h4>
+              <h4>Xem trước SQL</h4>
               <button type="button" class="btn-secondary small" @click="copySQL">
                 <span class="material-symbols-outlined">content_copy</span>
-                Copy SQL
+                Sao chép SQL
               </button>
             </div>
             <div class="sql-preview">
@@ -441,11 +441,11 @@
           <div class="modal-actions">
             <button type="button" class="btn-secondary" @click="$emit('close')">
               <span class="material-symbols-outlined">cancel</span>
-              Cancel
+              Huỷ
             </button>
             <button type="submit" class="btn-primary" :disabled="!isFormValid || saving">
               <span class="material-symbols-outlined">{{ table ? 'save' : 'add' }}</span>
-              {{ saving ? 'Saving...' : table ? 'Update' : 'Create' }} Table
+              {{ saving ? 'Đang lưu...' : table ? 'Update' : 'Create' }} Bảng
             </button>
           </div>
         </form>
@@ -546,7 +546,7 @@ export default {
       // Table name errors
       if (this.tableForm.name && !this.isValidTableName(this.tableForm.name)) {
         errors.push(
-          'Table name must start with a letter or underscore and contain only letters, numbers, and underscores'
+          'Tên bảng phải bắt đầu bằng chữ cái hoặc dấu gạch dưới và chỉ gồm chữ cái, số, gạch dưới'
         )
       }
 
@@ -934,7 +934,7 @@ export default {
     getLengthPlaceholder(type) {
       const baseType = type.split('(')[0].toUpperCase()
       if (baseType === 'DECIMAL') return '10,2'
-      if (['INT', 'BIGINT', 'SMALLINT', 'TINYINT'].includes(baseType)) return 'Length (optional)'
+      if (['INT', 'BIGINT', 'SMALLINT', 'TINYINT'].includes(baseType)) return 'Độ dài (không bắt buộc)'
       return 'Length'
     },
 
@@ -954,21 +954,21 @@ export default {
         FLOAT: '0.0',
         DOUBLE: '0.0',
       }
-      return placeholders[baseType] || 'Default value'
+      return placeholders[baseType] || 'Giá trị mặc định'
     },
 
     getDefaultHint(type) {
       const hints = {
         BOOLEAN: 'true/false',
         'TINYINT(1)': '1/0',
-        DATETIME: 'MySQL time function',
-        TIMESTAMP: 'MySQL time function',
-        DATE: 'MySQL date function',
-        TIME: 'MySQL time function',
-        VARCHAR: 'Use quotes for text',
-        TEXT: 'Use quotes for text',
+        DATETIME: 'Hàm thời gian MySQL',
+        TIMESTAMP: 'Hàm thời gian MySQL',
+        DATE: 'Hàm ngày MySQL',
+        TIME: 'Hàm thời gian MySQL',
+        VARCHAR: 'Dùng dấu nháy cho văn bản',
+        TEXT: 'Dùng dấu nháy cho văn bản',
       }
-      return hints[type] || 'Default value'
+      return hints[type] || 'Giá trị mặc định'
     },
 
     isValidTableName(name) {
@@ -1103,7 +1103,7 @@ export default {
 
     generateTableSQL() {
       if (!this.tableForm.name || this.tableForm.columns.length === 0) {
-        return '-- Complete the form to see SQL preview'
+        return '-- Hoàn tất biểu mẫu để xem trước SQL'
       }
 
       const columns = this.tableForm.columns

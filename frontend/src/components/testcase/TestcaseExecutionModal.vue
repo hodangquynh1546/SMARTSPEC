@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content xlarge">
       <div class="modal-header">
-        <h2>Execute Test Case</h2>
+        <h2>Chạy test case</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,7 +11,7 @@
       <div class="modal-body">
         <!-- Test Case Info -->
         <div class="testcase-info">
-          <h3>{{ testcase.title || 'Untitled Test Case' }}</h3>
+          <h3>{{ testcase.title || 'Test case chưa đặt tên' }}</h3>
           <div class="testcase-meta">
             <span class="badge type" :class="testcase.test_type">
               {{ testcase.test_type }}
@@ -20,7 +20,7 @@
               {{ testcase.priority }}
             </span>
             <span class="current-status"
-              >Current Status: {{ formatStatus(testcase.status) || 'Not Executed' }}</span
+              >Trạng thái hiện tại: {{ formatStatus(testcase.status) || 'Chưa chạy' }}</span
             >
           </div>
           <p v-if="testcase.description" class="testcase-description">{{ testcase.description }}</p>
@@ -31,7 +31,7 @@
           <div class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">play_circle</span>
-              Execution Result
+              Kết quả thực thi
             </h4>
 
             <div class="status-options">
@@ -62,7 +62,7 @@
           <div class="form-section" v-if="testcase.steps && testcase.steps.length > 0">
             <h4 class="section-title">
               <span class="material-symbols-outlined">playlist_play</span>
-              Step-by-Step Execution
+              Thực thi từng bước
             </h4>
 
             <div class="steps-execution">
@@ -72,17 +72,17 @@
                 class="execution-step"
               >
                 <div class="step-header">
-                  <div class="step-number">Step {{ step.step_number || index + 1 }}</div>
+                  <div class="step-number">Bước {{ step.step_number || index + 1 }}</div>
                   <div class="step-status">
                     <select
                       v-model="getStepResult(index).status"
                       class="form-select small"
                       @change="updateStepStatus(index)"
                     >
-                      <option value="not_executed">Not Executed</option>
-                      <option value="passed">Passed</option>
-                      <option value="failed">Failed</option>
-                      <option value="skipped">Skipped</option>
+                      <option value="not_executed">Chưa chạy</option>
+                      <option value="passed">Đạt</option>
+                      <option value="failed">Thất bại</option>
+                      <option value="skipped">Bỏ qua</option>
                     </select>
                   </div>
                 </div>
@@ -94,24 +94,24 @@
                     v-if="step.input_data && Object.keys(step.input_data).length > 0"
                     class="step-input-data"
                   >
-                    <strong>Input Data:</strong>
+                    <strong>Dữ liệu đầu vào:</strong>
                     <pre class="json-data small">{{ formatJson(step.input_data) }}</pre>
                   </div>
 
                   <div class="step-actual-result">
                     <label class="form-label"
-                      >Actual Result for Step {{ step.step_number || index + 1 }}</label
+                      >Kết quả thực tế của bước {{ step.step_number || index + 1 }}</label
                     >
                     <textarea
                       v-model="getStepResult(index).actual_result"
                       class="form-textarea small"
                       rows="2"
-                      placeholder="What actually happened in this step..."
+                      placeholder="Thực tế đã xảy ra gì ở bước này..."
                     ></textarea>
                   </div>
 
                   <div v-if="step.expected_immediate_result" class="step-expected">
-                    <strong>Expected:</strong> {{ step.expected_immediate_result }}
+                    <strong>Mong đợi:</strong> {{ step.expected_immediate_result }}
                   </div>
                 </div>
               </div>
@@ -122,7 +122,7 @@
           <div class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">description</span>
-              Overall Actual Result
+              Kết quả thực tế tổng thể
             </h4>
 
             <div class="form-group">
@@ -130,7 +130,7 @@
                 v-model="formData.actual_result"
                 class="form-textarea"
                 rows="4"
-                placeholder="Describe the overall actual result of the test execution..."
+                placeholder="Mô tả kết quả thực tế tổng thể của lần chạy..."
                 required
               ></textarea>
             </div>
@@ -140,12 +140,12 @@
           <div class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">computer</span>
-              Execution Environment
+              Môi trường thực thi
             </h4>
 
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">Operating System</label>
+                <label class="form-label">Hệ điều hành</label>
                 <input
                   v-model="formData.environment.os"
                   type="text"
@@ -155,7 +155,7 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Browser</label>
+                <label class="form-label">Trình duyệt</label>
                 <input
                   v-model="formData.environment.browser"
                   type="text"
@@ -165,12 +165,12 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Device</label>
+                <label class="form-label">Thiết bị</label>
                 <input
                   v-model="formData.environment.device"
                   type="text"
                   class="form-input"
-                  placeholder="Desktop, Mobile iPhone 15, Tablet iPad..."
+                  placeholder="Máy tính, iPhone 15, iPad..."
                 />
               </div>
 
@@ -180,7 +180,7 @@
                   v-model="formData.environment.url"
                   type="text"
                   class="form-input"
-                  placeholder="https://example.com/test-environment"
+                  placeholder="https://example.com/moi-truong-kiem-thu"
                 />
               </div>
             </div>
@@ -190,7 +190,7 @@
           <div v-if="hasTestData" class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">data_table</span>
-              Test Data Execution Results
+              Kết quả chạy dữ liệu kiểm thử
             </h4>
 
             <div class="test-data-results">
@@ -202,22 +202,22 @@
                 <div class="data-header">
                   <h5>{{ data.name || `Test Data ${index + 1}` }}</h5>
                   <select v-model="data.execution_status" class="form-select small">
-                    <option value="not_executed">Not Executed</option>
-                    <option value="passed">Passed</option>
-                    <option value="failed">Failed</option>
+                    <option value="not_executed">Chưa chạy</option>
+                    <option value="passed">Đạt</option>
+                    <option value="failed">Thất bại</option>
                   </select>
                 </div>
 
                 <div class="data-content">
                   <div class="data-original">
                     <div class="data-field">
-                      <label class="form-label">Input Payload</label>
+                      <label class="form-label">Dữ liệu đầu vào</label>
                       <pre class="json-data small">{{
                         formatJson(testcase.test_data[index]?.input_payload || {})
                       }}</pre>
                     </div>
                     <div class="data-field">
-                      <label class="form-label">Expected Output</label>
+                      <label class="form-label">Kết quả mong đợi</label>
                       <pre class="json-data small">{{
                         formatJson(testcase.test_data[index]?.expected_output || {})
                       }}</pre>
@@ -225,7 +225,7 @@
                   </div>
 
                   <div class="data-actual">
-                    <label class="form-label">Actual Outputs (JSON)</label>
+                    <label class="form-label">Đầu ra thực tế (JSON)</label>
                     <textarea
                       v-model="data.actual_outputs_json"
                       class="form-textarea json-textarea"
@@ -248,13 +248,13 @@
           <div class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">list</span>
-              Execution Logs
+              Nhật ký thực thi
             </h4>
 
             <div class="logs-container">
               <div v-for="(log, index) in formData.execution_logs" :key="index" class="log-item">
                 <div class="log-timestamp">
-                  {{ new Date().toLocaleTimeString() }}
+                  {{ new Date().toLocaleTimeString('vi-VN') }}
                 </div>
                 <input
                   v-model="formData.execution_logs[index]"
@@ -274,7 +274,7 @@
 
               <button type="button" class="btn-add-log" @click="addLog">
                 <span class="material-symbols-outlined">add</span>
-                Add Log Entry
+                Thêm dòng nhật ký
               </button>
             </div>
           </div>
@@ -283,7 +283,7 @@
           <div v-if="showExceptionsSection" class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">error</span>
-              Exceptions & Issues
+              Ngoại lệ & vấn đề
             </h4>
 
             <div class="exceptions-container">
@@ -297,25 +297,25 @@
                     v-model="exception.message"
                     type="text"
                     class="form-input"
-                    placeholder="Exception message or issue description"
+                    placeholder="Thông báo lỗi hoặc mô tả vấn đề"
                     required
                   />
                   <select v-model="exception.type" class="form-select">
-                    <option value="validation">Validation Error</option>
-                    <option value="runtime">Runtime Error</option>
-                    <option value="assertion">Assertion Failed</option>
-                    <option value="system">System Error</option>
-                    <option value="network">Network Issue</option>
-                    <option value="timeout">Timeout</option>
-                    <option value="data">Data Issue</option>
-                    <option value="environment">Environment Issue</option>
-                    <option value="other">Other</option>
+                    <option value="validation">Lỗi kiểm tra hợp lệ</option>
+                    <option value="runtime">Lỗi khi chạy</option>
+                    <option value="assertion">Kiểm tra không đạt</option>
+                    <option value="system">Lỗi hệ thống</option>
+                    <option value="network">Sự cố mạng</option>
+                    <option value="timeout">Quá hạn</option>
+                    <option value="data">Sự cố dữ liệu</option>
+                    <option value="environment">Sự cố môi trường</option>
+                    <option value="other">Khác</option>
                   </select>
                 </div>
 
                 <div class="exception-details">
                   <div class="form-group compact">
-                    <label class="form-label">Step Number</label>
+                    <label class="form-label">Số bước</label>
                     <select v-model="exception.occurred_at_step" class="form-select">
                       <option value="">N/A</option>
                       <option
@@ -323,25 +323,25 @@
                         :key="step.step_number"
                         :value="step.step_number"
                       >
-                        Step {{ step.step_number }}
+                        Bước {{ step.step_number }}
                       </option>
                     </select>
                   </div>
 
                   <div class="form-group compact">
-                    <label class="form-label">Severity</label>
+                    <label class="form-label">Mức độ nghiêm trọng</label>
                     <select v-model="exception.severity" class="form-select">
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="critical">Critical</option>
+                      <option value="low">Thấp</option>
+                      <option value="medium">Trung bình</option>
+                      <option value="high">Cao</option>
+                      <option value="critical">Nghiêm trọng</option>
                     </select>
                   </div>
 
                   <label class="checkbox-item">
                     <input type="checkbox" v-model="exception.resolved" />
                     <span class="checkmark"></span>
-                    <span class="checkbox-label">Resolved</span>
+                    <span class="checkbox-label">Đã xử lý</span>
                   </label>
                 </div>
 
@@ -352,7 +352,7 @@
 
               <button type="button" class="btn-add-exception" @click="addException">
                 <span class="material-symbols-outlined">add</span>
-                Add Exception
+                Thêm ngoại lệ
               </button>
             </div>
           </div>
@@ -361,7 +361,7 @@
           <div class="form-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">image</span>
-              Screenshots & Attachments
+              Ảnh chụp & tệp đính kèm
             </h4>
 
             <div class="attachments-container">
@@ -379,7 +379,7 @@
                       v-model="attachment.name"
                       type="text"
                       class="form-input"
-                      placeholder="Attachment name"
+                      placeholder="Tên đính kèm"
                     />
                     <input
                       v-model="attachment.path"
@@ -396,7 +396,7 @@
 
               <button type="button" class="btn-add-attachment" @click="addAttachment">
                 <span class="material-symbols-outlined">add</span>
-                Add Attachment
+                Thêm đính kèm
               </button>
             </div>
           </div>
@@ -405,28 +405,28 @@
           <div class="form-section summary-section">
             <h4 class="section-title">
               <span class="material-symbols-outlined">summarize</span>
-              Execution Summary
+              Tóm tắt thực thi
             </h4>
 
             <div class="summary-grid">
               <div class="summary-item">
-                <label>Total Steps:</label>
+                <label>Tổng số bước:</label>
                 <span>{{ testcase.steps?.length || 0 }}</span>
               </div>
               <div class="summary-item">
-                <label>Passed Steps:</label>
+                <label>Bước đạt:</label>
                 <span class="passed">{{ passedStepsCount }}</span>
               </div>
               <div class="summary-item">
-                <label>Failed Steps:</label>
+                <label>Bước lỗi:</label>
                 <span class="failed">{{ failedStepsCount }}</span>
               </div>
               <div class="summary-item">
-                <label>Execution Time:</label>
-                <span>{{ formData.execution_duration || 0 }} seconds</span>
+                <label>Thời gian chạy:</label>
+                <span>{{ formData.execution_duration || 0 }} giây</span>
               </div>
               <div class="summary-item">
-                <label>Test Data Executed:</label>
+                <label>Dữ liệu đã chạy:</label>
                 <span
                   >{{ executedTestDataCount }}/{{ formData.test_data_results?.length || 0 }}</span
                 >
@@ -438,12 +438,12 @@
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" @click="$emit('close')">
               <span class="material-symbols-outlined">cancel</span>
-              Cancel
+              Huỷ
             </button>
             <button type="submit" class="btn btn-primary" :disabled="executing || !formData.status">
               <span v-if="executing" class="spinner"></span>
               <span class="material-symbols-outlined" v-else>save</span>
-              {{ executing ? 'Saving Execution...' : 'Save Execution Result' }}
+              {{ executing ? 'Saving Execution...' : 'Lưu kết quả chạy' }}
             </button>
           </div>
         </form>
@@ -470,16 +470,16 @@ export default {
     const executing = ref(false)
 
     const executionStatuses = [
-      { value: 'passed', label: 'Passed', icon: 'check_circle' },
-      { value: 'failed', label: 'Failed', icon: 'cancel' },
-      { value: 'blocked', label: 'Blocked', icon: 'block' },
-      { value: 'in_progress', label: 'In Progress', icon: 'hourglass_empty' },
+      { value: 'passed', label: 'Đạt', icon: 'check_circle' },
+      { value: 'failed', label: 'Thất bại', icon: 'cancel' },
+      { value: 'blocked', label: 'Bị chặn', icon: 'block' },
+      { value: 'in_progress', label: 'Đang thực hiện', icon: 'hourglass_empty' },
     ]
 
     const formData = ref({
       status: '',
       actual_result: '',
-      execution_logs: ['Test execution started at ' + new Date().toLocaleString()],
+      execution_logs: ['Test execution started at ' + new Date().toLocaleString('vi-VN')],
       environment: {
         os: '',
         browser: '',
@@ -532,8 +532,8 @@ export default {
 
     const formatStatus = (status) => {
       const statusMap = {
-        not_executed: 'Not Executed',
-        in_progress: 'In Progress',
+        not_executed: 'Chưa chạy',
+        in_progress: 'Đang thực hiện',
         passed: 'Passed',
         failed: 'Failed',
         blocked: 'Blocked',
@@ -578,7 +578,7 @@ export default {
           actual_result: props.testcase.actual_result || '',
           execution_logs: props.testcase.execution_logs?.length
             ? [...props.testcase.execution_logs]
-            : ['Test execution started at ' + new Date().toLocaleString()],
+            : ['Test execution started at ' + new Date().toLocaleString('vi-VN')],
           environment: {
             os: props.testcase.environment?.os || '',
             browser: props.testcase.environment?.browser || '',
@@ -668,12 +668,12 @@ export default {
     const handleExecute = async () => {
       // Validate required fields
       if (!formData.value.status) {
-        toast.error('Please select an execution status')
+        toast.error('Vui lòng chọn trạng thái thực thi')
         return
       }
 
       if (!formData.value.actual_result.trim()) {
-        toast.error('Please provide an overall actual result')
+        toast.error('Vui lòng nhập kết quả thực tế tổng thể')
         return
       }
 
@@ -683,7 +683,7 @@ export default {
       // Check for JSON errors
       const hasErrors = formData.value.test_data_results.some((data) => data.json_error)
       if (hasErrors) {
-        toast.error('Please fix JSON format errors in test data results')
+        toast.error('Vui lòng sửa lỗi định dạng JSON trong kết quả dữ liệu kiểm thử')
         return
       }
 
@@ -721,10 +721,10 @@ export default {
         }
 
         emit('execute', executionData)
-        toast.success('Test case execution saved successfully')
+        toast.success('Đã lưu kết quả chạy test case')
       } catch (error) {
         console.error('Error executing test case:', error)
-        toast.error('Failed to save test case execution')
+        toast.error('Lưu kết quả chạy test case thất bại')
       } finally {
         executing.value = false
       }

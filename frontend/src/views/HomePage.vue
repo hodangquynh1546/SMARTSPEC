@@ -28,14 +28,14 @@
 
           <!-- Bulk Actions khi có project được chọn -->
           <div v-if="selectedProjects.length > 0" class="bulk-actions">
-            <span class="selected-count">{{ selectedProjects.length }} selected</span>
+            <span class="selected-count">{{ selectedProjects.length }} đã chọn</span>
             <button
               v-if="currentView !== 'trash'"
               @click="bulkMoveToTrash"
               class="btn-bulk btn-bulk-delete"
             >
               <span class="material-symbols-outlined">delete</span>
-              Move to Trash
+              Chuyển vào thùng rác
             </button>
             <button
               v-if="currentView === 'trash'"
@@ -43,7 +43,7 @@
               class="btn-bulk btn-bulk-restore"
             >
               <span class="material-symbols-outlined">restore</span>
-              Restore
+              Khôi phục
             </button>
             <button
               v-if="currentView === 'trash'"
@@ -51,11 +51,11 @@
               class="btn-bulk btn-bulk-delete"
             >
               <span class="material-symbols-outlined">delete_forever</span>
-              Delete Permanently
+              Xoá vĩnh viễn
             </button>
             <button @click="clearSelection" class="btn-bulk btn-bulk-cancel">
               <span class="material-symbols-outlined">close</span>
-              Cancel
+              Huỷ
             </button>
           </div>
 
@@ -83,20 +83,20 @@
                   <li v-for="inv in myInvitations" :key="inv.id" class="invitation-item">
                     <div class="invitation-details">
                       <p>
-                        <strong>{{ inv.invitedBy }}</strong> has invited you to join a project as a
+                        <strong>{{ inv.invitedBy }}</strong> đã mời bạn tham gia dự án với vai trò
                         <strong>{{ inv.role }}</strong
                         >.
                       </p>
                       <small
-                        >Project: <strong>{{ inv.projectName }}</strong></small
+                        >Dự án: <strong>{{ inv.projectName }}</strong></small
                       >
                     </div>
                     <div class="invitation-actions">
                       <button @click="handleAcceptInvitation(inv)" class="btn btn-sm btn-primary">
-                        Accept
+                        Chấp nhận
                       </button>
                       <button @click="handleRejectInvitation(inv)" class="btn btn-sm btn-secondary">
-                        Decline
+                        Từ chối
                       </button>
                     </div>
                   </li>
@@ -141,7 +141,7 @@
                     @click="setLanguageFilter('')"
                   >
                     <span class="material-symbols-outlined">public</span>
-                    All Languages
+                    Tất cả ngôn ngữ
                   </button>
                   <button 
                     class="filter-option" 
@@ -149,7 +149,7 @@
                     @click="setLanguageFilter('vi-VN')"
                   >
                     <span class="material-symbols-outlined">flag</span>
-                    Vietnamese
+                    Tiếng Việt
                   </button>
                   <button 
                     class="filter-option" 
@@ -157,7 +157,7 @@
                     @click="setLanguageFilter('en-US')"
                   >
                     <span class="material-symbols-outlined">flag</span>
-                    English
+                    Tiếng Anh
                   </button>
                 </div>
               </div>
@@ -180,7 +180,7 @@
                     @click="setSortBy('updatedAt')"
                   >
                     <span class="material-symbols-outlined">schedule</span>
-                    Last Updated
+                    Cập nhật gần nhất
                   </button>
                   <button 
                     class="filter-option" 
@@ -188,7 +188,7 @@
                     @click="setSortBy('createdAt')"
                   >
                     <span class="material-symbols-outlined">calendar_today</span>
-                    Date Created
+                    Ngày tạo
                   </button>
                   <button 
                     class="filter-option" 
@@ -196,7 +196,7 @@
                     @click="setSortBy('name')"
                   >
                     <span class="material-symbols-outlined">text_fields</span>
-                    Name
+                    Tên
                   </button>
                 </div>
               </div>
@@ -240,7 +240,7 @@
               <p>Các dự án bạn làm việc gần đây sẽ hiện ở đây</p>
               <button class="btn-primary" @click="openNewProjectModal">
                 <span class="material-symbols-outlined">add</span>
-                Create New Project
+                Tạo dự án mới
               </button>
             </div>
           </div>
@@ -276,7 +276,7 @@
               <p>Tạo dự án đầu tiên để bắt đầu</p>
               <button class="btn-primary" @click="openNewProjectModal">
                 <span class="material-symbols-outlined">add</span>
-                Create New Project
+                Tạo dự án mới
               </button>
             </div>
           </div>
@@ -521,8 +521,8 @@ export default {
     },
     languageLabel() {
       const labels = {
-        'vi-VN': 'Vietnamese',
-        'en-US': 'English',
+        'vi-VN': 'Tiếng Việt',
+        'en-US': 'Tiếng Anh',
       }
       return labels[this.languageFilter] || this.languageFilter
     },
@@ -598,16 +598,16 @@ export default {
       this.showSortFilter = false
     },
     getLanguageFilterLabel() {
-      if (this.languageFilter === '') return 'All Languages'
+      if (this.languageFilter === '') return 'Tất cả ngôn ngữ'
       return this.languageLabel
     },
     getSortFilterLabel() {
       const labels = {
-        updatedAt: 'Last Updated',
-        createdAt: 'Date Created',
+        updatedAt: 'Cập nhật gần nhất',
+        createdAt: 'Ngày tạo',
         name: 'Name',
       }
-      return labels[this.sortBy] || 'Sort'
+      return labels[this.sortBy] || 'Sắp xếp'
     },
     handleClickOutside(event) {
       if (!event.target.closest('.filter-icon-wrapper')) {
@@ -648,13 +648,13 @@ export default {
             const promises = this.selectedProjects.map((projectId) => deleteProject(projectId))
             await Promise.all(promises)
             this.toast.success(
-              `Moved ${this.selectedProjects.length} project(s) to trash successfully!`
+              `Đã chuyển ${this.selectedProjects.length} dự án vào thùng rác!`
             )
             this.clearSelection()
             this.fetchInitialData()
           } catch (err) {
             console.error('Bulk move to trash error', err)
-            this.toast.error('Failed to move some projects to trash!')
+            this.toast.error('Chuyển một số dự án vào thùng rác thất bại!')
           }
         }
       )
@@ -670,12 +670,12 @@ export default {
           try {
             const promises = this.selectedProjects.map((projectId) => apiRestoreProject(projectId))
             await Promise.all(promises)
-            this.toast.success(`Restored ${this.selectedProjects.length} project(s) successfully!`)
+            this.toast.success(`Đã khôi phục ${this.selectedProjects.length} dự án!`)
             this.clearSelection()
             this.fetchInitialData()
           } catch (err) {
             console.error('Bulk restore error', err)
-            this.toast.error('Failed to restore some projects!')
+            this.toast.error('Khôi phục một số dự án thất bại!')
           }
         }
       )
@@ -692,13 +692,13 @@ export default {
             const promises = this.selectedProjects.map((projectId) => deleteProject(projectId))
             await Promise.all(promises)
             this.toast.success(
-              `Permanently deleted ${this.selectedProjects.length} project(s) successfully!`
+              `Đã xoá vĩnh viễn ${this.selectedProjects.length} dự án!`
             )
             this.clearSelection()
             this.fetchInitialData()
           } catch (err) {
             console.error('Bulk permanent delete error', err)
-            this.toast.error('Failed to permanently delete some projects!')
+            this.toast.error('Xoá vĩnh viễn một số dự án thất bại!')
           }
         }
       )
@@ -773,7 +773,7 @@ export default {
           console.error(`❌ Attempt ${attempt} failed:`, error)
           
           if (attempt === maxRetries) {
-            this.toast.error('Failed to refresh project data')
+            this.toast.error('Làm mới dữ liệu dự án thất bại')
           } else {
             // Chờ trước khi retry
             await new Promise(resolve => setTimeout(resolve, 300 * attempt))
@@ -801,7 +801,7 @@ export default {
      */
     async handlePreviewApproved(result) {
       console.log('✅ Changes approved:', result)
-      this.toast.success(`Version ${result.newVersion} created successfully!`)
+      this.toast.success(`Đã tạo phiên bản ${result.newVersion}!`)
       
       // Refresh project data để cập nhật version mới và changes count
       await this.refreshProjectDataImmediately()
@@ -846,9 +846,9 @@ export default {
         this.myInvitations = (invRes.data?.data || []).map((inv) => ({
           id: inv._id,
           project_id: inv.project_id,
-          projectName: inv.project_name || 'Unnamed Project',
+          projectName: inv.project_name || 'Dự án chưa đặt tên',
           role: inv.role,
-          invitedBy: inv.inviter?.name || 'Unknown',
+          invitedBy: inv.inviter?.name || 'Không rõ',
           date: inv.created_at,
           invitee: inv.invitee,
           invite_token: inv.invite_token,
@@ -904,17 +904,17 @@ export default {
       try {
         console.log('Leaving project:', projectId)
         await leaveProject(projectId)
-        this.toast.success('You have left the project successfully.')
+        this.toast.success('Bạn đã rời dự án.')
         this.fetchInitialData()
       } catch (err) {
         console.error('Leave project error:', err)
         if (err.response?.status === 403) {
-          this.toast.error('You cannot leave a project you own. Please transfer ownership first.')
+          this.toast.error('Bạn không thể rời dự án do mình sở hữu. Hãy chuyển quyền sở hữu trước.')
         } else if (err.response?.status === 404) {
-          this.toast.error('Project not found or you are not a member.')
+          this.toast.error('Không tìm thấy dự án hoặc bạn không phải thành viên.')
           this.fetchInitialData()
         } else {
-          this.toast.error('Failed to leave project. Please try again.')
+          this.toast.error('Rời dự án thất bại. Vui lòng thử lại.')
         }
       }
     },
@@ -934,14 +934,14 @@ export default {
 
         if (!inv.project_id || !inv.invitee?._id) {
           console.error('❌ Missing required data for acceptance:', inv)
-          this.toast.error('Invalid invitation data - missing project or member ID')
+          this.toast.error('Dữ liệu lời mời không hợp lệ - thiếu mã dự án hoặc thành viên')
           return
         }
 
         await acceptInvite(inv.project_id, inv.invitee._id, inv.invite_token)
 
         this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
-        this.toast.success(`You have joined the project: ${inv.projectName}`)
+        this.toast.success(`Bạn đã tham gia dự án: ${inv.projectName}`)
 
         this.fetchInitialData()
       } catch (err) {
@@ -952,16 +952,16 @@ export default {
         })
 
         if (err.response?.status === 400) {
-          const errorMsg = err.response?.data?.message || 'Invalid request'
-          this.toast.error(`Failed to accept: ${errorMsg}`)
+          const errorMsg = err.response?.data?.message || 'Yêu cầu không hợp lệ'
+          this.toast.error(`Chấp nhận thất bại: ${errorMsg}`)
         } else if (err.response?.status === 404) {
-          this.toast.error('Invitation not found or already processed.')
+          this.toast.error('Không tìm thấy lời mời hoặc đã được xử lý.')
           this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
         } else if (err.response?.status === 403) {
-          this.toast.error('Invalid or expired token.')
+          this.toast.error('Mã không hợp lệ hoặc đã hết hạn.')
           this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
         } else {
-          this.toast.error('Failed to accept the invitation. Please try again.')
+          this.toast.error('Chấp nhận lời mời thất bại. Vui lòng thử lại.')
         }
       }
     },
@@ -977,14 +977,14 @@ export default {
 
         if (!inv.project_id || !inv.invitee?._id) {
           console.error('❌ Missing required data for rejection:', inv)
-          this.toast.error('Invalid invitation data - missing project or member ID')
+          this.toast.error('Dữ liệu lời mời không hợp lệ - thiếu mã dự án hoặc thành viên')
           return
         }
 
         await rejectInvite(inv.project_id, inv.invitee._id, inv.invite_token)
 
         this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
-        this.toast.info('You have declined the invitation.')
+        this.toast.info('Bạn đã từ chối lời mời.')
       } catch (err) {
         console.error('❌ Reject invitation error:', {
           status: err.response?.status,
@@ -993,16 +993,16 @@ export default {
         })
 
         if (err.response?.status === 400) {
-          const errorMsg = err.response?.data?.message || 'Invalid request'
-          this.toast.error(`Failed to decline: ${errorMsg}`)
+          const errorMsg = err.response?.data?.message || 'Yêu cầu không hợp lệ'
+          this.toast.error(`Từ chối thất bại: ${errorMsg}`)
         } else if (err.response?.status === 404) {
-          this.toast.error('Invitation not found or already processed.')
+          this.toast.error('Không tìm thấy lời mời hoặc đã được xử lý.')
           this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
         } else if (err.response?.status === 403) {
-          this.toast.error('Invalid or expired token.')
+          this.toast.error('Mã không hợp lệ hoặc đã hết hạn.')
           this.myInvitations = this.myInvitations.filter((i) => i.id !== inv.id)
         } else {
-          this.toast.error('Failed to decline the invitation. Please try again.')
+          this.toast.error('Từ chối lời mời thất bại. Vui lòng thử lại.')
         }
       }
     },
@@ -1068,11 +1068,11 @@ export default {
     async handleEditProject({ projectId, data }) {
       try {
         await updateProject(projectId, data)
-        this.toast.success(`Project updated successfully!`)
+        this.toast.success(`Đã cập nhật dự án!`)
         this.updateProjectInLists(projectId, data)
       } catch (err) {
         console.error('Update project error', err)
-        this.toast.error(`Failed to update project!`)
+        this.toast.error(`Cập nhật dự án thất bại!`)
       }
     },
 
@@ -1107,22 +1107,22 @@ export default {
     async moveToTrash(projectId) {
       try {
         await deleteProject(projectId)
-        this.toast.success(`Project trashed successfully!`)
+        this.toast.success(`Đã chuyển dự án vào thùng rác!`)
         this.fetchInitialData()
       } catch (err) {
         console.error('Move to trash error', err)
-        this.toast.error(`Failed to trash project!`)
+        this.toast.error(`Chuyển dự án vào thùng rác thất bại!`)
       }
     },
 
     async restoreProject(projectId) {
       try {
         await apiRestoreProject(projectId)
-        this.toast.success(`Project restored successfully!`)
+        this.toast.success(`Đã khôi phục dự án!`)
         this.fetchInitialData()
       } catch (err) {
         console.error('Restore error', err)
-        this.toast.error(`Failed to restore project!`)
+        this.toast.error(`Khôi phục dự án thất bại!`)
       }
     },
 
@@ -1137,11 +1137,11 @@ export default {
     async deleteProjectPermanently(projectId) {
       try {
         await deleteProject(projectId)
-        this.toast.success(`Project deleted successfully!`)
+        this.toast.success(`Đã xoá dự án!`)
         this.fetchInitialData()
       } catch (err) {
         console.error('Permanent delete error', err)
-        this.toast.error(`Failed to permanently delete project!`)
+        this.toast.error(`Xoá vĩnh viễn dự án thất bại!`)
       }
     },
 
@@ -1213,13 +1213,13 @@ export default {
               created_at: member.invited_at,
               invitee: {
                 _id: member.user_id?._id || member.user_id,
-                name: member.user_id?.name || 'Unknown',
-                email: member.user_id?.email || 'No email',
+                name: member.user_id?.name || 'Không rõ',
+                email: member.user_id?.email || 'Không có email',
               },
               inviter: {
                 _id: member.invited_by?._id || member.invited_by,
-                name: member.invited_by?.name || 'Unknown',
-                email: member.invited_by?.email || 'No email',
+                name: member.invited_by?.name || 'Không rõ',
+                email: member.invited_by?.email || 'Không có email',
               },
             }))
             allSentInvites = [...allSentInvites, ...projectInvites]
@@ -1229,14 +1229,14 @@ export default {
         this.sentInvitations = allSentInvites
       } catch (error) {
         console.error('Error loading sent invitations:', error)
-        this.toast.error('Failed to load sent invitations')
+        this.toast.error('Không tải được các lời mời đã gửi')
       }
     },
 
     async handleCancelInvite(invitation) {
       try {
         await cancelInvite(invitation.project_id, invitation.invitee._id)
-        this.toast.success('Invitation canceled successfully')
+        this.toast.success('Đã huỷ lời mời')
 
         this.sentInvitations = this.sentInvitations.filter(
           (inv) => inv.invite_id !== invitation.invite_id
@@ -1245,7 +1245,7 @@ export default {
         this.fetchInitialData()
       } catch (error) {
         console.error('Error canceling invitation:', error)
-        this.toast.error('Failed to cancel invitation')
+        this.toast.error('Huỷ lời mời thất bại')
       }
     },
   },

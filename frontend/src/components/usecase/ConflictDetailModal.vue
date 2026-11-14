@@ -3,7 +3,7 @@
     <div class="modal-content">
       <!-- Header -->
       <div class="modal-header">
-        <h2>Use Case Details</h2>
+        <h2>Chi tiết use case</h2>
         <div class="header-actions">
           <button
             v-if="showSelectButton"
@@ -16,7 +16,7 @@
             <span v-else class="material-symbols-outlined">
               {{ isSelected ? 'check_circle' : 'radio_button_unchecked' }}
             </span>
-            {{ isSelecting ? 'Selecting...' : isSelected ? 'Selected' : 'Select This Use Case' }}
+            {{ isSelecting ? 'Selecting...' : isSelected ? 'Đã chọn' : 'Chọn use case này' }}
           </button>
           <button
             v-if="showSkipButton"
@@ -26,7 +26,7 @@
           >
             <span v-if="isSkipping" class="button-spinner-small"></span>
             <span v-else class="material-symbols-outlined">close</span>
-            {{ isSkipping ? 'Skipping...' : 'Skip Conflict' }}
+            {{ isSkipping ? 'Skipping...' : 'Bỏ qua xung đột' }}
           </button>
           <button class="close-btn" @click="$emit('close')">
             <span class="material-symbols-outlined">close</span>
@@ -43,13 +43,13 @@
             <span v-if="useCase.type" class="meta-badge type-badge">{{ useCase.type }}</span>
             <span v-if="useCase.level" class="meta-badge level-badge">{{ useCase.level }}</span>
             <span v-if="useCase.status" class="meta-badge status-badge" :class="`status-${useCase.status}`">{{ useCase.status }}</span>
-            <span v-if="useCase.frequency" class="meta-badge frequency-badge">freq: {{ useCase.frequency }}</span>
+            <span v-if="useCase.frequency" class="meta-badge frequency-badge">tần suất: {{ useCase.frequency }}</span>
           </div>
         </div>
         
         <!-- Actor Details -->
         <div v-if="useCase.actor && typeof useCase.actor === 'object'" class="actor-details">
-          <span class="actor-label">Actor:</span>
+          <span class="actor-label">Tác nhân:</span>
           <span class="actor-name">{{ useCase.actor.name }}</span>
           <span v-if="useCase.actor.description" class="actor-desc">- {{ useCase.actor.description }}</span>
         </div>
@@ -58,19 +58,19 @@
           <!-- Row 1: Goal, Description, Business Reason, Context -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Goal</h5>
-              <p>{{ useCase.goal || 'No goal specified' }}</p>
+              <h5>Mục tiêu</h5>
+              <p>{{ useCase.goal || 'Chưa có mục tiêu' }}</p>
             </div>
             <div class="detail-section">
-              <h5>Description</h5>
-              <p>{{ (useCase.description || useCase.business_reason || useCase.reason) || 'No description available' }}</p>
+              <h5>Mô tả</h5>
+              <p>{{ (useCase.description || useCase.business_reason || useCase.reason) || 'Chưa có mô tả' }}</p>
             </div>
             <div class="detail-section">
-              <h5>Business Reason</h5>
-              <p>{{ (useCase.business_reason || useCase.reason) || 'No business reason specified' }}</p>
+              <h5>Lý do nghiệp vụ</h5>
+              <p>{{ (useCase.business_reason || useCase.reason) || 'Chưa có lý do nghiệp vụ' }}</p>
             </div>
             <div class="detail-section">
-              <h5>Context</h5>
+              <h5>Ngữ cảnh</h5>
               <p>{{ contextDisplayText }}</p>
             </div>
           </div>
@@ -78,7 +78,7 @@
           <!-- Row 2: Main Flow (Full Width) - Enhanced -->
           <div class="detail-row">
             <div class="detail-section full-width">
-              <h5>Main Flow</h5>
+              <h5>Luồng chính</h5>
               <div class="main-flow-container">
                 <template v-if="useCase.main_flow && Array.isArray(useCase.main_flow) && useCase.main_flow.length > 0">
                   <div v-for="(step, i) in useCase.main_flow" :key="i" class="flow-step" :class="{ 'system-step': step.actor === 'System' }">
@@ -91,11 +91,11 @@
                     <div class="step-content">
                       <div class="step-action">{{ step.action || step }}</div>
                       <div v-if="step.inputs && step.inputs.length > 0" class="step-inputs">
-                        <span class="step-label">Inputs:</span>
+                        <span class="step-label">Đầu vào:</span>
                         <span v-for="(inp, idx) in step.inputs" :key="idx" class="step-input-tag">{{ inp }}</span>
                       </div>
                       <div v-if="step.rules_applied && step.rules_applied.length > 0" class="step-rules">
-                        <span class="step-label">Rules:</span>
+                        <span class="step-label">Quy tắc:</span>
                         <span v-for="(rule, idx) in step.rules_applied" :key="idx" class="step-rule-tag">{{ rule }}</span>
                       </div>
                       <div v-if="step.expected_result" class="step-result">
@@ -109,7 +109,7 @@
                 <li v-for="(task, i) in useCase.tasks" :key="i">{{ task }}</li>
               </ol>
                 </template>
-                <div v-else class="no-data">No main flow defined</div>
+                <div v-else class="no-data">Chưa có luồng chính</div>
               </div>
             </div>
           </div>
@@ -117,17 +117,17 @@
           <!-- Row 2b: Alternative Flows -->
           <div v-if="useCase.alternative_flows && useCase.alternative_flows.length > 0" class="detail-row">
             <div class="detail-section full-width">
-              <h5>Alternative Flows</h5>
+              <h5>Luồng thay thế</h5>
               <div class="alt-flows-container">
                 <div v-for="(af, i) in useCase.alternative_flows" :key="i" class="alt-flow-item">
                   <div class="alt-flow-header">
                     <span class="alt-flow-id">{{ af.id || `AF${i + 1}` }}</span>
-                    <span class="alt-flow-step">at Step {{ af.at_step }}</span>
+                    <span class="alt-flow-step">tại bước {{ af.at_step }}</span>
                   </div>
                   <div class="alt-flow-content">
                     <div class="alt-flow-condition"><strong>If:</strong> {{ af.condition }}</div>
-                    <div class="alt-flow-response"><strong>Then:</strong> {{ af.system_response }}</div>
-                    <div class="alt-flow-end"><strong>End State:</strong> {{ af.end_state }}</div>
+                    <div class="alt-flow-response"><strong>Sau đó:</strong> {{ af.system_response }}</div>
+                    <div class="alt-flow-end"><strong>Trạng thái kết thúc:</strong> {{ af.end_state }}</div>
                   </div>
                 </div>
               </div>
@@ -137,17 +137,17 @@
           <!-- Row 3: Preconditions & Postconditions -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Preconditions</h5>
+              <h5>Điều kiện tiên quyết</h5>
               <ul class="condition-list">
                 <li v-for="(item, i) in useCase.preconditions" :key="i">{{ item }}</li>
-                <li v-if="!useCase.preconditions || useCase.preconditions.length === 0">None</li>
+                <li v-if="!useCase.preconditions || useCase.preconditions.length === 0">Không có</li>
               </ul>
             </div>
             <div class="detail-section">
-              <h5>Postconditions</h5>
+              <h5>Điều kiện sau</h5>
               <ul class="condition-list">
                 <li v-for="(item, i) in useCase.postconditions" :key="i">{{ item }}</li>
-                <li v-if="!useCase.postconditions || useCase.postconditions.length === 0">None</li>
+                <li v-if="!useCase.postconditions || useCase.postconditions.length === 0">Không có</li>
               </ul>
             </div>
           </div>
@@ -155,7 +155,7 @@
           <!-- Row 4: Inputs & Outputs -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Inputs</h5>
+              <h5>Đầu vào</h5>
               <div class="tag-list">
                 <template v-if="useCase.inputs && Array.isArray(useCase.inputs) && useCase.inputs.length > 0">
                   <span 
@@ -166,11 +166,11 @@
                     {{ typeof item === 'object' ? item.name : item }}
                   </span>
                 </template>
-                <span v-else class="tag tag-meta">None</span>
+                <span v-else class="tag tag-meta">Không có</span>
               </div>
             </div>
             <div class="detail-section">
-              <h5>Outputs</h5>
+              <h5>Đầu ra</h5>
               <div class="tag-list">
                 <template v-if="useCase.outputs && Array.isArray(useCase.outputs) && useCase.outputs.length > 0">
                   <span 
@@ -181,7 +181,7 @@
                     {{ typeof item === 'object' ? item.name : item }}
                   </span>
                 </template>
-                <span v-else class="tag tag-meta">None</span>
+                <span v-else class="tag tag-meta">Không có</span>
               </div>
             </div>
           </div>
@@ -189,20 +189,20 @@
           <!-- Row 5: Trigger, Business Rules & Non-functional Constraints -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Trigger</h5>
+              <h5>Kích hoạt</h5>
               <ul class="condition-list">
                 <template v-if="useCase.trigger && typeof useCase.trigger === 'object'">
-                  <li><strong>Event:</strong> {{ useCase.trigger.event || 'N/A' }}</li>
-                  <li v-if="useCase.trigger.source"><strong>Source:</strong> {{ useCase.trigger.source }}</li>
+                  <li><strong>Sự kiện:</strong> {{ useCase.trigger.event || 'N/A' }}</li>
+                  <li v-if="useCase.trigger.source"><strong>Nguồn:</strong> {{ useCase.trigger.source }}</li>
                 </template>
                 <template v-else-if="useCase.triggers && Array.isArray(useCase.triggers) && useCase.triggers.length > 0">
                 <li v-for="(item, i) in useCase.triggers" :key="i">{{ item }}</li>
                 </template>
-                <li v-else>None</li>
+                <li v-else>Không có</li>
               </ul>
             </div>
             <div class="detail-section">
-              <h5>Business Rules</h5>
+              <h5>Quy tắc nghiệp vụ</h5>
               <ul class="condition-list">
                 <template v-if="useCase.rules && Array.isArray(useCase.rules) && useCase.rules.length > 0">
                   <li v-for="(item, i) in useCase.rules" :key="i">
@@ -210,11 +210,11 @@
                     {{ typeof item === 'object' ? item.description : item }}
                   </li>
                 </template>
-                <li v-else>None</li>
+                <li v-else>Không có</li>
               </ul>
             </div>
             <div class="detail-section">
-              <h5>Non-functional Constraints</h5>
+              <h5>Ràng buộc phi chức năng</h5>
               <ul class="condition-list">
                 <template v-if="useCase.non_functional_constraints && Array.isArray(useCase.non_functional_constraints) && useCase.non_functional_constraints.length > 0">
                   <li v-for="(item, i) in useCase.non_functional_constraints" :key="i">{{ item }}</li>
@@ -222,7 +222,7 @@
                 <template v-else-if="useCase.constraints && Array.isArray(useCase.constraints) && useCase.constraints.length > 0">
                 <li v-for="(item, i) in useCase.constraints" :key="i">{{ item }}</li>
                 </template>
-                <li v-else>None</li>
+                <li v-else>Không có</li>
               </ul>
             </div>
           </div>
@@ -230,19 +230,19 @@
           <!-- Row 6: Exceptions (Full Width) -->
           <div class="detail-row">
             <div class="detail-section full-width">
-              <h5>Exceptions</h5>
+              <h5>Ngoại lệ</h5>
               <ul class="exception-list">
                 <template v-if="useCase.exceptions && Array.isArray(useCase.exceptions) && useCase.exceptions.length > 0">
                 <li v-for="(item, i) in useCase.exceptions" :key="i">
                   <span class="material-symbols-outlined">warning</span>
                     <template v-if="typeof item === 'object'">
-                      <strong>Step {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
+                      <strong>Bước {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
                       <span v-if="item.system_response"> → {{ item.system_response }}</span>
                     </template>
                     <template v-else>{{ item }}</template>
                 </li>
                 </template>
-                <li v-else>No exceptions defined</li>
+                <li v-else>Chưa có ngoại lệ</li>
               </ul>
             </div>
           </div>
@@ -250,7 +250,7 @@
           <!-- Row 7: Stakeholders & Related Use Cases -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Stakeholders</h5>
+              <h5>Các bên liên quan</h5>
               <div class="tag-list">
                 <span v-for="item in useCase.stakeholders" :key="item" class="tag tag-meta">{{
                   item
@@ -258,12 +258,12 @@
                 <span
                   v-if="!useCase.stakeholders || useCase.stakeholders.length === 0"
                   class="tag tag-meta"
-                  >None</span
+                  >Không có</span
                 >
               </div>
             </div>
             <div class="detail-section">
-              <h5>Related Use Cases</h5>
+              <h5>Use case liên quan</h5>
               <div class="tag-list">
                 <span
                   v-for="relatedId in useCase.related_usecases"
@@ -275,7 +275,7 @@
                 <span
                   v-if="!useCase.related_usecases || useCase.related_usecases.length === 0"
                   class="tag tag-meta"
-                  >None</span
+                  >Không có</span
                 >
               </div>
             </div>
@@ -284,7 +284,7 @@
           <!-- Row 8: Priority & Context Details -->
           <div class="detail-row">
             <div class="detail-section">
-              <h5>Priority</h5>
+              <h5>Độ ưu tiên</h5>
               <p>
                 <span class="priority-badge" :class="`priority-${useCase.priority || 'medium'}`">
                   {{ useCase.priority || 'Medium' }}
@@ -292,15 +292,15 @@
               </p>
             </div>
             <div v-if="useCase.context && typeof useCase.context === 'object'" class="detail-section">
-              <h5>Module</h5>
+              <h5>Phân hệ</h5>
               <p>{{ useCase.context.module || 'N/A' }}</p>
             </div>
             <div v-if="useCase.context && typeof useCase.context === 'object'" class="detail-section">
-              <h5>Scope</h5>
+              <h5>Phạm vi</h5>
               <p>{{ useCase.context.scope || 'N/A' }}</p>
           </div>
             <div v-if="useCase.context && typeof useCase.context === 'object'" class="detail-section">
-              <h5>System</h5>
+              <h5>Hệ thống</h5>
               <p>{{ useCase.context.system || 'N/A' }}</p>
             </div>
           </div>
@@ -309,7 +309,7 @@
 
       <!-- Footer -->
       <div class="modal-footer">
-        <button class="close-button" @click="$emit('close')">Close</button>
+        <button class="close-button" @click="$emit('close')">Đóng</button>
       </div>
     </div>
   </div>
@@ -348,16 +348,16 @@ export default {
   emits: ['close', 'skip-conflict', 'select-usecase'],
   computed: {
     contextDisplayText() {
-      if (!this.useCase.context) return 'No context specified'
+      if (!this.useCase.context) return 'Chưa có ngữ cảnh'
       if (typeof this.useCase.context === 'object') {
         const parts = [
           this.useCase.context.module,
           this.useCase.context.scope,
           this.useCase.context.system
         ].filter(Boolean)
-        return parts.length > 0 ? parts.join(' / ') : 'No context specified'
+        return parts.length > 0 ? parts.join(' / ') : 'Chưa có ngữ cảnh'
       }
-      return this.useCase.context || 'No context specified'
+      return this.useCase.context || 'Chưa có ngữ cảnh'
     }
   }
 }

@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click="$emit('close')">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
-        <h3>Manage Relationships</h3>
+        <h3>Quản lý quan hệ</h3>
         <button class="btn-icon" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,16 +11,16 @@
       <div class="modal-body">
         <!-- Add New Relationship Form -->
         <div class="relationship-form">
-          <h4>{{ editingRelationship ? 'Edit Relationship' : 'Add New Relationship' }}</h4>
+          <h4>{{ editingRelationship ? 'Sửa quan hệ' : 'Thêm quan hệ mới' }}</h4>
 
           <div class="form-row">
             <div class="form-group">
-              <label>From Table</label>
+              <label>Từ bảng</label>
               <select
                 :value="newRelationship.from_table"
                 @change="$emit('update-from-table', $event.target.value)"
               >
-                <option value="">Select Table</option>
+                <option value="">Chọn bảng</option>
                 <option v-for="table in localTables" :key="table.name" :value="table.name">
                   {{ table.name }}
                 </option>
@@ -28,13 +28,13 @@
             </div>
 
             <div class="form-group">
-              <label>From Column</label>
+              <label>Từ cột</label>
               <select
                 :value="newRelationship.from_column"
                 @change="$emit('update-from-column', $event.target.value)"
                 :disabled="!newRelationship.from_table"
               >
-                <option value="">Select Column</option>
+                <option value="">Chọn cột</option>
                 <option v-for="column in fromTableColumns" :key="column.name" :value="column.name">
                   {{ column.name }} ({{ column.type }})
                 </option>
@@ -44,12 +44,12 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>To Table</label>
+              <label>Đến bảng</label>
               <select
                 :value="newRelationship.to_table"
                 @change="$emit('update-to-table', $event.target.value)"
               >
-                <option value="">Select Table</option>
+                <option value="">Chọn bảng</option>
                 <option v-for="table in localTables" :key="table.name" :value="table.name">
                   {{ table.name }}
                 </option>
@@ -57,13 +57,13 @@
             </div>
 
             <div class="form-group">
-              <label>To Column</label>
+              <label>Đến cột</label>
               <select
                 :value="newRelationship.to_column"
                 @change="$emit('update-to-column', $event.target.value)"
                 :disabled="!newRelationship.to_table"
               >
-                <option value="">Select Column</option>
+                <option value="">Chọn cột</option>
                 <option v-for="column in toTableColumns" :key="column.name" :value="column.name">
                   {{ column.name }} ({{ column.type }})
                 </option>
@@ -73,26 +73,26 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Relationship Type</label>
+              <label>Loại quan hệ</label>
               <select
                 :value="newRelationship.type"
                 @change="$emit('update-type', $event.target.value)"
               >
-                <option value="one-to-one">One to One</option>
-                <option value="one-to-many">One to Many</option>
-                <option value="many-to-one">Many to One</option>
-                <option value="many-to-many">Many to Many</option>
+                <option value="one-to-one">Một-Một</option>
+                <option value="one-to-many">Một-Nhiều</option>
+                <option value="many-to-one">Nhiều-Một</option>
+                <option value="many-to-many">Nhiều-Nhiều</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Display Layer</label>
+              <label>Lớp hiển thị</label>
               <select
                 :value="newRelationship.layer"
                 @change="$emit('update-layer', $event.target.value)"
               >
-                <option value="over">On Top of Tables</option>
-                <option value="under">Under Tables</option>
+                <option value="over">Phía trên bảng</option>
+                <option value="under">Phía dưới bảng</option>
               </select>
             </div>
           </div>
@@ -103,19 +103,19 @@
               @click="$emit('cancel-edit')"
               v-if="editingRelationship"
             >
-              Cancel
+              Huỷ
             </button>
             <button class="btn btn-primary" @click="$emit('save')" :disabled="!isRelationshipValid">
-              {{ editingRelationship ? 'Update' : 'Add' }} Relationship
+              {{ editingRelationship ? 'Update' : 'Add' }} Quan hệ
             </button>
           </div>
         </div>
 
         <!-- Existing Relationships List -->
         <div class="relationships-list">
-          <h4>Existing Relationships</h4>
+          <h4>Quan hệ hiện có</h4>
           <div v-if="manualRelationships.length === 0" class="empty-state">
-            No manual relationships defined
+            Chưa có quan hệ thủ công
           </div>
           <div v-else class="relationship-items">
             <div
@@ -136,17 +136,17 @@
                   >.{{ relationship.to_column }}
                 </div>
                 <div class="relationship-layer">
-                  {{ relationship.layer === 'over' ? 'On Top' : 'Under' }}
+                  {{ relationship.layer === 'over' ? 'Phía trên' : 'Under' }}
                 </div>
               </div>
               <div class="relationship-actions">
-                <button class="btn-icon" @click="$emit('edit', relationship)" title="Edit">
+                <button class="btn-icon" @click="$emit('edit', relationship)" title="Sửa">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
                 <button
                   class="btn-icon danger"
                   @click="$emit('delete', relationship)"
-                  title="Delete"
+                  title="Xoá"
                 >
                   <span class="material-symbols-outlined">delete</span>
                 </button>

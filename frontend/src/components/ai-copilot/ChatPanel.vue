@@ -4,13 +4,13 @@
     <div class="chat-header">
       <h3>
         <span class="material-symbols-outlined">smart_toy</span>
-        AI Copilot
+        Trợ lý AI
       </h3>
       <div class="header-actions">
-        <button @click="createNewChat" class="new-chat-btn" title="New Chat">
+        <button @click="createNewChat" class="new-chat-btn" title="Cuộc trò chuyện mới">
           <span class="material-symbols-outlined">add</span>
         </button>
-        <button @click="clearCurrentChat" class="clear-btn" title="Clear Chat">
+        <button @click="clearCurrentChat" class="clear-btn" title="Xoá cuộc trò chuyện">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
@@ -39,7 +39,7 @@
     <!-- Context Items -->
     <div v-if="contextItems.length > 0" class="context-section">
       <div class="context-header">
-        <span>Context ({{ contextItems.length }})</span>
+        <span>Ngữ cảnh ({{ contextItems.length }})</span>
       </div>
       <div class="context-items">
         <div
@@ -77,14 +77,14 @@
                 class="action-btn apply"
               >
                 <span class="material-symbols-outlined">check</span>
-                Apply
+                Áp dụng
               </button>
               <button
                 @click="rejectAction(message.actions[0])"
                 class="action-btn reject"
               >
                 <span class="material-symbols-outlined">close</span>
-                Reject
+                Từ chối
               </button>
             </div>
           </div>
@@ -100,22 +100,22 @@
     <!-- Action Review Panel -->
     <div v-if="pendingAction" class="action-review-panel">
       <div class="review-header">
-        <h4>Review Action</h4>
+        <h4>Xem lại hành động</h4>
       </div>
       <div class="review-content">
         <div class="action-preview">
-          <strong>Type:</strong> {{ pendingAction.type }}<br>
-          <strong>Target:</strong> {{ pendingAction.target }}<br>
+          <strong>Loại:</strong> {{ pendingAction.type }}<br>
+          <strong>Đối tượng:</strong> {{ pendingAction.target }}<br>
           <pre>{{ JSON.stringify(pendingAction.data, null, 2) }}</pre>
         </div>
         <div class="review-actions">
           <button @click="confirmAction" class="confirm-btn">
             <span class="material-symbols-outlined">check</span>
-            Apply
+            Áp dụng
           </button>
           <button @click="cancelAction" class="cancel-btn">
             <span class="material-symbols-outlined">close</span>
-            Cancel
+            Huỷ
           </button>
         </div>
       </div>
@@ -127,7 +127,7 @@
         v-model="inputMessage"
         @keydown.enter.exact.prevent="sendMessage"
         @keydown.shift.enter.exact="newline"
-        placeholder="Ask AI to create, update, or analyze..."
+        placeholder="Nhờ AI tạo, cập nhật hoặc phân tích..."
         class="chat-input"
         rows="1"
         ref="inputRef"
@@ -186,7 +186,7 @@ const loadChatSessions = () => {
   return [
     {
       id: `chat-${Date.now()}`,
-      title: 'New Chat',
+      title: 'Cuộc trò chuyện mới',
       messages: [],
       contextItems: [],
       createdAt: new Date().toISOString()
@@ -240,7 +240,7 @@ const contextSummary = computed(() => {
   return props.contextItems.map(ctx => ({
     type: ctx.type,
     id: ctx.item._id || ctx.item.id,
-    name: ctx.item.name || ctx.item.title || 'Unknown'
+    name: ctx.item.name || ctx.item.title || 'Không rõ'
   }))
 })
 
@@ -249,7 +249,7 @@ const createNewChat = () => {
   const newChatId = `chat-${Date.now()}`
   chatSessions.value.push({
     id: newChatId,
-    title: 'New Chat',
+    title: 'Cuộc trò chuyện mới',
     messages: [],
     contextItems: [],
     createdAt: new Date().toISOString()
@@ -280,7 +280,7 @@ const closeChat = (chatId) => {
 }
 
 const clearCurrentChat = () => {
-  if (confirm('Clear all messages in this chat?')) {
+  if (confirm('Xoá toàn bộ tin nhắn trong cuộc trò chuyện này?')) {
     activeChat.value.messages = []
     activeChat.value.contextItems = []
     saveChatSessions()

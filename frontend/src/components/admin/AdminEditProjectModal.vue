@@ -24,7 +24,7 @@
             <label for="language">Ngôn ngữ</label>
             <select v-model="form.language" id="language">
               <option value="vi-VN">Tiếng Việt</option>
-              <option value="en-US">English</option>
+              <option value="en-US">Tiếng Anh</option>
             </select>
           </div>
         </form>

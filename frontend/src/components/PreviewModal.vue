@@ -4,10 +4,10 @@
       <!-- Header -->
       <div class="modal-header">
         <div class="header-left">
-          <h2>Review Changes</h2>
+          <h2>Xem lại thay đổi</h2>
           <div class="project-info">
             <span class="project-name">{{ projectData?.name }}</span>
-            <span class="version-info">Current Version: {{ currentVersion?.version_number }}</span>
+            <span class="version-info">Phiên bản hiện tại: {{ currentVersion?.version_number }}</span>
           </div>
         </div>
         <div class="header-right">
@@ -30,7 +30,7 @@
                 <input
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Tìm kiếm..."
                   class="search-input"
                   @input="handleSearch"
                 />
@@ -55,7 +55,7 @@
                     @click="setEntityTypeFilter('all')"
                   >
                     <span class="material-symbols-outlined">apps</span>
-                    All Types
+                    Tất cả loại
                   </button>
                   <button 
                     class="filter-option" 
@@ -63,7 +63,7 @@
                     @click="setEntityTypeFilter('requirement')"
                   >
                     <span class="material-symbols-outlined">description</span>
-                    Requirements
+                    Yêu cầu
                   </button>
                   <button 
                     class="filter-option" 
@@ -71,7 +71,7 @@
                     @click="setEntityTypeFilter('testcase')"
                   >
                     <span class="material-symbols-outlined">checklist</span>
-                    Test Cases
+                    Test case
                   </button>
                   <button 
                     class="filter-option" 
@@ -79,7 +79,7 @@
                     @click="setEntityTypeFilter('database')"
                   >
                     <span class="material-symbols-outlined">storage</span>
-                    Database
+                    Cơ sở dữ liệu
                   </button>
                   <button 
                     class="filter-option" 
@@ -87,7 +87,7 @@
                     @click="setEntityTypeFilter('activity_diagram')"
                   >
                     <span class="material-symbols-outlined">account_tree</span>
-                    Activity Diagrams
+                    Sơ đồ hoạt động
                   </button>
                   <button 
                     class="filter-option" 
@@ -95,7 +95,7 @@
                     @click="setEntityTypeFilter('sequence_diagram')"
                   >
                     <span class="material-symbols-outlined">timeline</span>
-                    Sequence Diagrams
+                    Sơ đồ tuần tự
                   </button>
                   <button 
                     class="filter-option" 
@@ -103,7 +103,7 @@
                     @click="setEntityTypeFilter('usecase_diagram')"
                   >
                     <span class="material-symbols-outlined">hub</span>
-                    Use Case Diagrams
+                    Sơ đồ use case
                   </button>
                 </div>
               </div>
@@ -126,7 +126,7 @@
                     @click="setChangeTypeFilter('all')"
                   >
                     <span class="material-symbols-outlined">apps</span>
-                    All Changes
+                    Tất cả thay đổi
                   </button>
                   <button 
                     class="filter-option" 
@@ -134,7 +134,7 @@
                     @click="setChangeTypeFilter('added')"
                   >
                     <span class="material-symbols-outlined">add_circle</span>
-                    Added
+                    Đã thêm
                   </button>
                   <button 
                     class="filter-option" 
@@ -142,7 +142,7 @@
                     @click="setChangeTypeFilter('updated')"
                   >
                     <span class="material-symbols-outlined">edit</span>
-                    Updated
+                    Đã cập nhật
                   </button>
                   <button 
                     class="filter-option" 
@@ -150,11 +150,11 @@
                     @click="setChangeTypeFilter('deleted')"
                   >
                     <span class="material-symbols-outlined">delete</span>
-                    Deleted
+                    Đã xoá
                   </button>
                 </div>
               </div>
-              <button class="btn-refresh" @click="refreshPreview" :disabled="isLoading" title="Refresh">
+              <button class="btn-refresh" @click="refreshPreview" :disabled="isLoading" title="Làm mới">
                 <span class="material-symbols-outlined">refresh</span>
               </button>
             </div>
@@ -162,30 +162,30 @@
 
           <div v-if="isLoading" class="loading-state">
             <span class="material-symbols-outlined spin">sync</span>
-            Loading changes...
+            Đang tải thay đổi...
           </div>
 
           <div v-else-if="changes.length === 0" class="empty-state">
             <span class="material-symbols-outlined">check_circle</span>
-            <p>No pending changes</p>
+            <p>Không có thay đổi chờ duyệt</p>
           </div>
 
           <div v-else-if="filteredChanges.length === 0" class="empty-state">
             <span class="material-symbols-outlined">search_off</span>
-            <p>No changes match your filters</p>
+            <p>Không có thay đổi nào khớp bộ lọc</p>
           </div>
 
           <div v-else class="changes-list">
             <!-- Bulk Actions Bar -->
             <div v-if="selectedChanges.length > 0" class="bulk-actions-bar">
-              <span class="bulk-info">{{ selectedChanges.length }} selected</span>
+              <span class="bulk-info">{{ selectedChanges.length }} đã chọn</span>
               <button class="btn-bulk-revert" @click="bulkRevertChanges">
                 <span class="material-symbols-outlined">undo</span>
-                Undo Selected
+                Hoàn tác mục đã chọn
               </button>
               <button class="btn-bulk-clear" @click="clearSelection">
                 <span class="material-symbols-outlined">close</span>
-                Clear Selection
+                Bỏ chọn
               </button>
             </div>
 
@@ -221,7 +221,7 @@
                   <button
                     class="btn-revert"
                     @click.stop="revertChange(change.change_id)"
-                    title="Undo this change"
+                    title="Hoàn tác thay đổi này"
                   >
                     <span class="material-symbols-outlined">undo</span>
                   </button>
@@ -234,18 +234,18 @@
         <!-- Change Comparison -->
         <div class="comparison-section" v-if="selectedChange" :class="{ 'fullscreen-mode': isFullscreen }">
           <div class="section-header">
-            <h3>Change Details</h3>
+            <h3>Chi tiết thay đổi</h3>
             <div class="header-actions">
               <div class="change-navigation">
                 <button class="btn-nav" @click="selectPreviousChange" :disabled="!hasPreviousChange">
                   <span class="material-symbols-outlined">chevron_left</span>
                 </button>
-                <span class="nav-info"> {{ currentChangeIndex + 1 }} of {{ filteredChanges.length }} </span>
+                <span class="nav-info"> {{ currentChangeIndex + 1 }} / {{ filteredChanges.length }} </span>
                 <button class="btn-nav" @click="selectNextChange" :disabled="!hasNextChange">
                   <span class="material-symbols-outlined">chevron_right</span>
                 </button>
               </div>
-              <button class="btn-fullscreen" @click="toggleFullscreen" :title="isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'">
+              <button class="btn-fullscreen" @click="toggleFullscreen" :title="isFullscreen ? 'Thoát toàn màn hình' : 'Vào toàn màn hình'">
                 <span class="material-symbols-outlined">{{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}</span>
               </button>
             </div>
@@ -265,8 +265,8 @@
         <div v-else class="no-selection">
           <div class="no-selection-content">
             <span class="material-symbols-outlined">compare_arrows</span>
-            <h3>Select a change to view details</h3>
-            <p>Click on any change from the list to see the before and after comparison</p>
+            <h3>Chọn một thay đổi để xem chi tiết</h3>
+            <p>Bấm vào một thay đổi trong danh sách để xem so sánh trước và sau</p>
           </div>
         </div>
       </div>
@@ -274,13 +274,13 @@
       <!-- Footer Actions -->
       <div class="modal-footer">
         <div class="footer-left">
-          <button class="btn-secondary" @click="closeModal" :disabled="isApproving">Cancel</button>
+          <button class="btn-secondary" @click="closeModal" :disabled="isApproving">Huỷ</button>
         </div>
 
         <div class="footer-right" v-if="changes.length > 0">
           <!-- Release Version Selection -->
           <div class="version-selection">
-            <label>Release as version:</label>
+            <label>Phát hành thành phiên bản:</label>
             <div class="version-options">
               <label class="version-option">
                 <input
@@ -289,7 +289,7 @@
                   value="minor"
                   :disabled="isApproving"
                 />
-                <span class="radio-label">Minor ({{ nextMinorVersion }})</span>
+                <span class="radio-label">Nhỏ ({{ nextMinorVersion }})</span>
               </label>
               <label class="version-option">
                 <input
@@ -298,7 +298,7 @@
                   value="major"
                   :disabled="isApproving"
                 />
-                <span class="radio-label">Major ({{ nextMajorVersion }})</span>
+                <span class="radio-label">Lớn ({{ nextMajorVersion }})</span>
               </label>
             </div>
           </div>
@@ -628,7 +628,7 @@ export default {
       try {
         const userId = localStorage.getItem('userId')
         if (!userId) {
-          this.toast.error('Unable to identify user. Please log in again.')
+          this.toast.error('Không xác định được người dùng. Vui lòng đăng nhập lại.')
           this.isApproving = false
           return
         }
@@ -674,7 +674,7 @@ export default {
 
           // Thông báo thành công
           this.toast.success(
-            `Successfully released ${changesCount} change(s) as version ${newVersion}`
+            `Đã phát hành ${changesCount} thay đổi thành phiên bản ${newVersion}`
           )
 
           // Clear changes list because preview is deleted after release
@@ -699,7 +699,7 @@ export default {
           this.closeModal()
         } else {
           // Handle failed response
-          const errorMessage = approveResponse.data?.message || 'Release failed'
+          const errorMessage = approveResponse.data?.message || 'Phát hành thất bại'
           throw new Error(errorMessage)
         }
       } catch (error) {
@@ -714,15 +714,15 @@ export default {
 
     formatEntityType(entityType) {
       const types = {
-        requirement: 'Requirement',
+        requirement: 'Yêu cầu',
         input: 'Input',
         output: 'Output',
-        database: 'Database',
+        database: 'Cơ sở dữ liệu',
         table: 'Table',
-        column: 'Column',
-        relationship: 'Relationship',
-        testcase: 'Test Case',
-        uml: 'UML Diagram',
+        column: 'Cột',
+        relationship: 'Quan hệ',
+        testcase: 'Test case',
+        uml: 'Sơ đồ UML',
         activity_diagram: 'Activity Diagram',
         sequence_diagram: 'Sequence Diagram',
         usecase_diagram: 'Use Case Diagram',
@@ -749,9 +749,9 @@ export default {
 
     formatChangeType(changeType) {
       const types = {
-        added: 'Added',
-        updated: 'Updated',
-        deleted: 'Deleted',
+        added: 'Đã thêm',
+        updated: 'Đã cập nhật',
+        deleted: 'Đã xoá',
       }
       return types[changeType] || changeType
     },
@@ -851,23 +851,23 @@ export default {
       this.handleFilter()
     },
     getEntityTypeFilterLabel() {
-      if (this.filterType === 'all') return 'All Types'
+      if (this.filterType === 'all') return 'Tất cả loại'
       const labels = {
-        requirement: 'Requirements',
-        testcase: 'Test Cases',
-        database: 'Database',
-        activity_diagram: 'Activity Diagrams',
-        sequence_diagram: 'Sequence Diagrams',
-        usecase_diagram: 'Use Case Diagrams',
+        requirement: 'Yêu cầu',
+        testcase: 'Test case',
+        database: 'Cơ sở dữ liệu',
+        activity_diagram: 'Sơ đồ hoạt động',
+        sequence_diagram: 'Sơ đồ tuần tự',
+        usecase_diagram: 'Sơ đồ use case',
       }
       return labels[this.filterType] || this.filterType
     },
     getChangeTypeFilterLabel() {
-      if (this.filterChangeType === 'all') return 'All Changes'
+      if (this.filterChangeType === 'all') return 'Tất cả thay đổi'
       const labels = {
-        added: 'Added',
-        updated: 'Updated',
-        deleted: 'Deleted',
+        added: 'Đã thêm',
+        updated: 'Đã cập nhật',
+        deleted: 'Đã xoá',
       }
       return labels[this.filterChangeType] || this.filterChangeType
     },
@@ -922,7 +922,7 @@ export default {
         // Clear selection
         this.selectedChanges = []
 
-        this.toast.success(`Successfully undone ${count} change(s)`)
+        this.toast.success(`Đã hoàn tác ${count} thay đổi`)
       } catch (error) {
         console.error('Error undoing changes:', error)
         this.toast.error(formatErrorForDisplay(error, 'Failed to undo some changes. Please try again.'))

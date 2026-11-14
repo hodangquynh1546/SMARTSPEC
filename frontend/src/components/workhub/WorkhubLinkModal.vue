@@ -70,7 +70,7 @@ function later() {
         </label>
         <label class="wh-field">
           <span>Email WorkHub</span>
-          <input v-model="email" type="email" autocomplete="email" placeholder="you@example.com" />
+          <input v-model="email" type="email" autocomplete="email" placeholder="ban@example.com" />
         </label>
         <label class="wh-field">
           <span>Mật khẩu WorkHub</span>

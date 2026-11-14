@@ -44,7 +44,7 @@
               </div>
 
               <div class="form-group">
-                <label>API Key</label>
+                <label>API key</label>
                 <div class="key-preview">
                   <code class="key-value">{{ maskApiKey(formData.key_value) }}</code>
                   <button class="btn-copy" @click="copyApiKey" title="Sao chép">

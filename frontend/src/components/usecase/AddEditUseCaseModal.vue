@@ -4,16 +4,16 @@
       <!-- Header -->
       <div class="modal-header">
         <div class="header-content">
-          <h2>{{ isEditing ? 'Edit Use Case' : 'Create New Use Case' }}</h2>
+          <h2>{{ isEditing ? 'Sửa use case' : 'Tạo use case mới' }}</h2>
           <p class="subtitle">
             {{
               isEditing
-                ? 'Update the details of this use case'
-                : 'Define a new use case for your system'
+                ? 'Cập nhật chi tiết của use case này'
+                : 'Định nghĩa use case mới cho hệ thống'
             }}
           </p>
         </div>
-        <button class="close-btn" @click="close" aria-label="Close modal">
+        <button class="close-btn" @click="close" aria-label="Đóng hộp thoại">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -22,11 +22,11 @@
       <div class="progress-indicator" v-if="useSteps">
         <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
           <span class="step-number">1</span>
-          <span class="step-label">Basic Info</span>
+          <span class="step-label">Thông tin cơ bản</span>
         </div>
         <div class="step" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
           <span class="step-number">2</span>
-          <span class="step-label">Details</span>
+          <span class="step-label">Chi tiết</span>
         </div>
         <div class="step" :class="{ active: currentStep === 3 }">
           <span class="step-number">3</span>
@@ -39,18 +39,18 @@
         <!-- Step 1: Basic Information -->
         <div v-if="!useSteps || currentStep === 1" class="form-step">
           <div class="step-header">
-            <h3>Basic Information</h3>
-            <p>Define the core elements of your use case</p>
+            <h3>Thông tin cơ bản</h3>
+            <p>Xác định các thành phần cốt lõi của use case</p>
           </div>
           <div class="form-grid">
             <div class="form-group">
-              <label for="name" class="required">Use Case Name</label>
+              <label for="name" class="required">Tên use case</label>
               <input
                 id="name"
                 v-model="localForm.name"
                 type="text"
                 required
-                placeholder="e.g., User Login"
+                placeholder="VD: Đăng nhập"
                 :class="{ error: fieldErrors.name }"
                 @blur="validateField('name')"
               />
@@ -58,7 +58,7 @@
             </div>
 
             <div class="form-group">
-              <label for="role" class="required">Role</label>
+              <label for="role" class="required">Vai trò</label>
               <input
                 id="role"
                 :value="roleName"
@@ -66,7 +66,7 @@
                 @blur="validateRoleName(roleName)"
                 type="text"
                 required
-                placeholder="e.g., User, Admin, System"
+                placeholder="VD: Người dùng, Quản trị, Hệ thống"
                 autocomplete="off"
                 :class="{ error: fieldErrors.role, 'has-suggestion': showSuggestion }"
               />
@@ -84,12 +84,12 @@
             </div>
 
             <div class="form-group span-2">
-              <label for="goal" class="required">Goal</label>
+              <label for="goal" class="required">Mục tiêu</label>
               <textarea
                 id="goal"
                 v-model="localForm.goal"
                 required
-                placeholder="What is the main objective this use case accomplishes?"
+                placeholder="Use case này đạt mục tiêu chính nào?"
                 rows="3"
                 :class="{ error: fieldErrors.goal }"
                 @blur="validateField('goal')"
@@ -98,12 +98,12 @@
             </div>
 
             <div class="form-group span-2">
-              <label for="reason" class="required">Reason</label>
+              <label for="reason" class="required">Lý do</label>
               <textarea
                 id="reason"
                 v-model="localForm.reason"
                 required
-                placeholder="Why is this use case needed? What problem does it solve?"
+                placeholder="Vì sao cần use case này? Nó giải quyết vấn đề gì?"
                 rows="3"
                 :class="{ error: fieldErrors.reason }"
                 @blur="validateField('reason')"
@@ -112,7 +112,7 @@
             </div>
 
             <div class="form-group">
-              <label for="priority" class="required">Priority</label>
+              <label for="priority" class="required">Độ ưu tiên</label>
               <div class="priority-selector">
                 <button
                   type="button"
@@ -121,7 +121,7 @@
                   @click="localForm.priority = 'high'"
                 >
                   <span class="priority-indicator high"></span>
-                  High
+                  Cao
                 </button>
                 <button
                   type="button"
@@ -130,7 +130,7 @@
                   @click="localForm.priority = 'medium'"
                 >
                   <span class="priority-indicator medium"></span>
-                  Medium
+                  Trung bình
                 </button>
                 <button
                   type="button"
@@ -139,20 +139,20 @@
                   @click="localForm.priority = 'low'"
                 >
                   <span class="priority-indicator low"></span>
-                  Low
+                  Thấp
                 </button>
               </div>
             </div>
 
             <div class="form-group span-2">
-              <label for="context">Context</label>
+              <label for="context">Ngữ cảnh</label>
               <textarea
                 id="context"
                 v-model="localForm.context"
-                placeholder="Describe the situation or environment where this use case occurs"
+                placeholder="Mô tả tình huống hoặc môi trường diễn ra use case"
                 rows="2"
               ></textarea>
-              <div class="field-help">Optional: Helps understand the circumstances</div>
+              <div class="field-help">Không bắt buộc: giúp hiểu rõ bối cảnh</div>
             </div>
           </div>
         </div>
@@ -160,14 +160,14 @@
         <!-- Step 2: Detailed Information -->
         <div v-if="!useSteps || currentStep === 2" class="form-step">
           <div class="step-header">
-            <h3>Process & Requirements</h3>
-            <p>Define the flow, inputs, outputs, and constraints</p>
+            <h3>Quy trình & yêu cầu</h3>
+            <p>Xác định luồng, đầu vào, đầu ra và ràng buộc</p>
           </div>
 
           <div class="form-grid">
             <!-- Row 1: Main Flow (Tasks) -->
             <div class="form-group span-3">
-              <label class="required">Main Flow (Tasks)</label>
+              <label class="required">Luồng chính (các bước)</label>
               <div class="array-input">
                 <div v-for="(task, index) in localForm.tasks" :key="index" class="task-item">
                   <div class="task-header">
@@ -183,22 +183,22 @@
                   </div>
                   <div class="task-inputs">
                     <div class="task-input-group">
-                      <label class="task-label">Action</label>
+                      <label class="task-label">Hành động</label>
                       <input
                         v-model="localForm.tasks[index].action"
                         type="text"
-                        placeholder="Describe the action"
+                        placeholder="Mô tả hành động"
                         required
                         :class="{ error: fieldErrors.tasks && fieldErrors.tasks[index] }"
                         @blur="validateTasks()"
                       />
                     </div>
                     <div class="task-input-group">
-                      <label class="task-label">Expected Result</label>
+                      <label class="task-label">Kết quả mong đợi</label>
                       <input
                         v-model="localForm.tasks[index].expected_result"
                         type="text"
-                        placeholder="Expected result"
+                        placeholder="Kết quả mong đợi"
                         :class="{ error: fieldErrors.tasks && fieldErrors.tasks[index] }"
                         @blur="validateTasks()"
                       />
@@ -207,24 +207,24 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('tasks')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Step
+                  Thêm bước
                 </button>
               </div>
               <div v-if="fieldErrors.tasks" class="error-message">
-                At least one task step is required
+                Cần ít nhất một bước
               </div>
             </div>
 
             <!-- Row 2: Inputs & Outputs -->
             <div class="conditions-row">
             <div class="form-group">
-              <label>Inputs</label>
+              <label>Đầu vào</label>
               <div class="array-input">
                 <div v-for="(input, index) in localForm.inputs" :key="index" class="array-item">
                   <input
                     v-model="localForm.inputs[index]"
                     type="text"
-                    placeholder="Data or trigger required"
+                    placeholder="Dữ liệu hoặc sự kiện cần có"
                   />
                   <button
                     type="button"
@@ -236,19 +236,19 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('inputs')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Input
+                  Thêm đầu vào
                 </button>
               </div>
             </div>
 
             <div class="form-group">
-              <label>Outputs</label>
+              <label>Đầu ra</label>
               <div class="array-input">
                 <div v-for="(output, index) in localForm.outputs" :key="index" class="array-item">
                   <input
                     v-model="localForm.outputs[index]"
                     type="text"
-                    placeholder="Result or data produced"
+                    placeholder="Kết quả hoặc dữ liệu tạo ra"
                   />
                   <button
                     type="button"
@@ -260,7 +260,7 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('outputs')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Output
+                  Thêm đầu ra
                 </button>
                 </div>
               </div>
@@ -269,7 +269,7 @@
             <!-- Row 3: Preconditions & Postconditions -->
             <div class="conditions-row">
             <div class="form-group">
-              <label>Preconditions</label>
+              <label>Điều kiện tiên quyết</label>
               <div class="array-input">
                 <div
                   v-for="(precondition, index) in localForm.preconditions"
@@ -279,7 +279,7 @@
                   <input
                     v-model="localForm.preconditions[index]"
                     type="text"
-                    placeholder="Condition that must be true before"
+                    placeholder="Điều kiện phải đúng trước khi bắt đầu"
                   />
                   <button
                     type="button"
@@ -291,13 +291,13 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('preconditions')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Precondition
+                  Thêm điều kiện tiên quyết
                 </button>
               </div>
             </div>
 
             <div class="form-group">
-              <label>Postconditions</label>
+              <label>Điều kiện sau</label>
               <div class="array-input">
                 <div
                   v-for="(postcondition, index) in localForm.postconditions"
@@ -307,7 +307,7 @@
                   <input
                     v-model="localForm.postconditions[index]"
                     type="text"
-                    placeholder="State after completion"
+                    placeholder="Trạng thái sau khi hoàn thành"
                   />
                   <button
                     type="button"
@@ -319,7 +319,7 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('postconditions')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Postcondition
+                  Thêm điều kiện sau
                 </button>
                 </div>
               </div>
@@ -327,11 +327,11 @@
 
             <!-- Row 4: Alternate Flows -->
             <div class="form-group span-3">
-              <label>Alternate Flows</label>
+              <label>Luồng thay thế</label>
               <div class="array-input">
                 <div v-for="(flow, index) in localForm.alternative_flows" :key="index" class="alternative-flow-item">
                   <div class="flow-header">
-                    <span class="flow-label">Flow {{ index + 1 }}</span>
+                    <span class="flow-label">Luồng {{ index + 1 }}</span>
                     <button
                       type="button"
                       class="remove-item-btn"
@@ -342,43 +342,43 @@
                   </div>
                   <div class="flow-inputs">
                     <div class="flow-input-group">
-                      <label class="task-label">At Step</label>
+                      <label class="task-label">Tại bước</label>
                       <input
                         v-model.number="localForm.alternative_flows[index].at_step"
                         type="number"
-                        placeholder="Step number"
+                        placeholder="Số bước"
                         min="1"
                       />
                     </div>
                     <div class="flow-input-group">
-                      <label class="task-label">Condition</label>
+                      <label class="task-label">Điều kiện</label>
                       <input
                         v-model="localForm.alternative_flows[index].condition"
                         type="text"
-                        placeholder="Condition that triggers this flow"
+                        placeholder="Điều kiện kích hoạt luồng này"
                       />
                     </div>
                     <div class="flow-input-group">
-                      <label class="task-label">System Response</label>
+                      <label class="task-label">Phản hồi hệ thống</label>
                       <input
                         v-model="localForm.alternative_flows[index].system_response"
                         type="text"
-                        placeholder="How the system responds"
+                        placeholder="Hệ thống phản hồi ra sao"
                       />
                     </div>
                     <div class="flow-input-group">
-                      <label class="task-label">End State</label>
+                      <label class="task-label">Trạng thái kết thúc</label>
                       <input
                         v-model="localForm.alternative_flows[index].end_state"
                         type="text"
-                        placeholder="Final state after this flow"
+                        placeholder="Trạng thái cuối sau luồng này"
                       />
                     </div>
                   </div>
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('alternative_flows')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Alternate Flow
+                  Thêm luồng thay thế
                 </button>
               </div>
             </div>
@@ -386,13 +386,13 @@
             <!-- Row 5: Triggers & Exceptions -->
             <div class="conditions-row">
             <div class="form-group">
-              <label>Triggers</label>
+              <label>Sự kiện kích hoạt</label>
               <div class="array-input">
                 <div v-for="(trigger, index) in localForm.triggers" :key="index" class="array-item">
                   <input
                     v-model="localForm.triggers[index]"
                     type="text"
-                    placeholder="Event that starts the use case"
+                    placeholder="Sự kiện bắt đầu use case"
                   />
                   <button
                     type="button"
@@ -404,13 +404,13 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('triggers')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Trigger
+                  Thêm sự kiện kích hoạt
                 </button>
               </div>
             </div>
 
               <div class="form-group">
-                <label>Exceptions</label>
+                <label>Ngoại lệ</label>
               <div class="array-input">
                 <div
                   v-for="(exception, index) in localForm.exceptions"
@@ -420,7 +420,7 @@
                   <input
                     v-model="localForm.exceptions[index]"
                     type="text"
-                    placeholder="What happens when things go wrong"
+                    placeholder="Chuyện gì xảy ra khi có sự cố"
                   />
                   <button
                     type="button"
@@ -432,7 +432,7 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('exceptions')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Exception
+                  Thêm ngoại lệ
                 </button>
                 </div>
               </div>
@@ -441,11 +441,11 @@
             <!-- Row 6: Business Rules & Constraints -->
             <div class="conditions-row">
               <div class="form-group span-3">
-              <label>Business Rules</label>
+              <label>Quy tắc nghiệp vụ</label>
               <div class="array-input">
                 <div v-for="(rule, index) in localForm.rules" :key="index" class="alternative-flow-item">
                   <div class="flow-header">
-                    <span class="flow-label">Rule {{ index + 1 }}</span>
+                    <span class="flow-label">Quy tắc {{ index + 1 }}</span>
                     <button
                       type="button"
                       class="remove-item-btn"
@@ -460,28 +460,28 @@
                       <input
                         v-model="localForm.rules[index].id"
                         type="text"
-                        placeholder="Rule ID"
+                        placeholder="Mã quy tắc"
                       />
                     </div>
                     <div class="flow-input-group" style="grid-column: span 3;">
-                      <label class="task-label">Description</label>
+                      <label class="task-label">Mô tả</label>
                       <input
                         v-model="localForm.rules[index].description"
                         type="text"
-                        placeholder="Rule description"
+                        placeholder="Mô tả quy tắc"
                       />
                     </div>
                   </div>
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('rules')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Business Rule
+                  Thêm quy tắc nghiệp vụ
                 </button>
               </div>
             </div>
 
             <div class="form-group">
-              <label>Constraints</label>
+              <label>Ràng buộc</label>
               <div class="array-input">
                 <div
                   v-for="(constraint, index) in localForm.constraints"
@@ -491,7 +491,7 @@
                   <input
                     v-model="localForm.constraints[index]"
                     type="text"
-                    placeholder="Limitation or restriction"
+                    placeholder="Giới hạn hoặc hạn chế"
                   />
                   <button
                     type="button"
@@ -503,7 +503,7 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('constraints')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Constraint
+                  Thêm ràng buộc
                 </button>
                 </div>
               </div>
@@ -514,13 +514,13 @@
         <!-- Step 3: Relationships & Review -->
         <div v-if="!useSteps || currentStep === 3" class="form-step">
           <div class="step-header">
-            <h3>Relationships & Review</h3>
-            <p>Connect to stakeholders and related use cases</p>
+            <h3>Quan hệ & xem lại</h3>
+            <p>Liên kết với các bên liên quan và use case liên quan</p>
           </div>
 
           <div class="form-grid">
             <div class="form-group">
-              <label>Stakeholders</label>
+              <label>Các bên liên quan</label>
               <div class="array-input">
                 <div
                   v-for="(stakeholder, index) in localForm.stakeholders"
@@ -530,7 +530,7 @@
                   <input
                     v-model="localForm.stakeholders[index]"
                     type="text"
-                    placeholder="Person or role with interest"
+                    placeholder="Người hoặc vai trò quan tâm"
                   />
                   <button
                     type="button"
@@ -542,13 +542,13 @@
                 </div>
                 <button type="button" class="add-item-btn" @click="addArrayItem('stakeholders')">
                   <span class="material-symbols-outlined">add</span>
-                  Add Stakeholder
+                  Thêm bên liên quan
                 </button>
               </div>
             </div>
 
             <div class="form-group">
-              <label>Related Use Cases</label>
+              <label>Use case liên quan</label>
               <div class="array-input">
                 <div
                   v-for="(relatedId, index) in localForm.related_usecases"
@@ -559,7 +559,7 @@
                     v-model="localForm.related_usecases[index]"
                     class="related-usecase-select"
                   >
-                    <option value="">Select a use case</option>
+                    <option value="">Chọn một use case</option>
                     <option
                       v-for="usecase in availableUseCases"
                       :key="getUsecaseId(usecase)"
@@ -586,20 +586,20 @@
                   :disabled="!hasAvailableUseCases"
                 >
                   <span class="material-symbols-outlined">add</span>
-                  Add Related Use Case
+                  Thêm use case liên quan
                 </button>
                 <div v-if="!hasAvailableUseCases" class="field-help">
-                  No more use cases available to add
+                  Không còn use case nào để thêm
                 </div>
               </div>
             </div>
 
             <div class="form-group span-2">
-              <label for="feedback">Feedback & Notes</label>
+              <label for="feedback">Phản hồi & ghi chú</label>
               <textarea
                 id="feedback"
                 v-model="localForm.feedback"
-                placeholder="Any additional notes, feedback, or comments about this use case"
+                placeholder="Ghi chú, phản hồi hoặc bình luận thêm về use case này"
                 rows="3"
               ></textarea>
             </div>
@@ -607,28 +607,28 @@
             <!-- Review Section (only in step 3) -->
             <div v-if="useSteps && currentStep === 3" class="form-group span-3">
               <div class="review-section">
-                <h4>Review Your Use Case</h4>
+                <h4>Xem lại use case của bạn</h4>
                 <div class="review-grid">
                   <div class="review-item">
-                    <span class="review-label">Name:</span>
-                    <span class="review-value">{{ localForm.name || 'Not provided' }}</span>
+                    <span class="review-label">Tên:</span>
+                    <span class="review-value">{{ localForm.name || 'Chưa cung cấp' }}</span>
                   </div>
                   <div class="review-item">
-                    <span class="review-label">Role:</span>
-                    <span class="review-value">{{ localForm.role.name || 'Not provided' }}</span>
+                    <span class="review-label">Vai trò:</span>
+                    <span class="review-value">{{ localForm.role.name || 'Chưa cung cấp' }}</span>
                   </div>
                   <div class="review-item">
-                    <span class="review-label">Priority:</span>
+                    <span class="review-label">Độ ưu tiên:</span>
                     <span class="review-value priority-tag" :class="localForm.priority">
-                      {{ localForm.priority || 'Not set' }}
+                      {{ localForm.priority || 'Chưa đặt' }}
                     </span>
                   </div>
                   <div class="review-item span-2">
-                    <span class="review-label">Goal:</span>
-                    <span class="review-value">{{ localForm.goal || 'Not provided' }}</span>
+                    <span class="review-label">Mục tiêu:</span>
+                    <span class="review-value">{{ localForm.goal || 'Chưa cung cấp' }}</span>
                   </div>
                   <div class="review-item">
-                    <span class="review-label">Tasks:</span>
+                    <span class="review-label">Các bước:</span>
                     <span class="review-value"
                       >{{ localForm.tasks.filter((t) => t && (t.action || '').trim()).length }} steps</span
                     >
@@ -650,13 +650,13 @@
               :disabled="submitting"
             >
               <span class="material-symbols-outlined">arrow_back</span>
-              Previous
+              Trước
             </button>
           </div>
 
           <div class="action-right">
             <button type="button" class="secondary-btn" @click="close" :disabled="submitting">
-              Cancel
+              Huỷ
             </button>
 
             <button
@@ -666,13 +666,13 @@
               @click="nextStep"
               :disabled="!canProceedToNextStep"
             >
-              Next
+              Tiếp
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
 
             <button v-else type="submit" class="primary-btn" :disabled="submitting || !isFormValid">
               <span v-if="submitting" class="loading-spinner"></span>
-              {{ submitting ? 'Saving...' : isEditing ? 'Update Use Case' : 'Create Use Case' }}
+              {{ submitting ? 'Đang lưu...' : isEditing ? 'Cập nhật use case' : 'Tạo use case' }}
             </button>
           </div>
         </div>
@@ -913,10 +913,10 @@ export default {
 
       // Required fields
       const requiredFields = [
-        { key: 'name', label: 'Use Case Name' },
-        { key: 'role', label: 'Role' },
-        { key: 'goal', label: 'Goal' },
-        { key: 'reason', label: 'Reason' },
+        { key: 'name', label: 'Tên use case' },
+        { key: 'role', label: 'Vai trò' },
+        { key: 'goal', label: 'Mục tiêu' },
+        { key: 'reason', label: 'Lý do' },
       ]
 
       for (const field of requiredFields) {

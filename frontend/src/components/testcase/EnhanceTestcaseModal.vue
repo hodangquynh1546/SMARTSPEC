@@ -6,8 +6,8 @@
         <div class="header-content">
           <span class="material-symbols-outlined">auto_awesome</span>
           <div class="header-text">
-            <h2>Enhance Test Cases</h2>
-            <p>Generate enhanced test cases to replace existing ones</p>
+            <h2>Nâng cấp test case</h2>
+            <p>Sinh test case nâng cấp để thay thế test case hiện có</p>
           </div>
         </div>
         <button class="close-button" @click="$emit('close')">
@@ -19,25 +19,25 @@
       <div class="progress-steps">
         <div class="step" :class="{ active: currentStep === 1, completed: currentStep > 1 }">
           <div class="step-number">1</div>
-          <span class="step-label">Select Requirements</span>
+          <span class="step-label">Chọn yêu cầu</span>
         </div>
         <div class="step-connector" :class="{ completed: currentStep > 1 }"></div>
         <div class="step" :class="{ active: currentStep === 2, completed: currentStep > 2 }">
           <div class="step-number">2</div>
-          <span class="step-label">Generate & Compare</span>
+          <span class="step-label">Sinh & so sánh</span>
         </div>
         <div class="step-connector" :class="{ completed: currentStep > 2 }"></div>
         <div class="step" :class="{ active: currentStep === 3 }">
           <div class="step-number">3</div>
-          <span class="step-label">Save Results</span>
+          <span class="step-label">Lưu kết quả</span>
         </div>
       </div>
 
       <!-- Step 1: Select Requirements -->
       <div v-if="currentStep === 1" class="step-content">
         <div class="section-header">
-          <h3>Select Requirements to Enhance</h3>
-          <p>Choose requirements to replace existing test cases with enhanced versions</p>
+          <h3>Chọn yêu cầu cần nâng cấp</h3>
+          <p>Chọn yêu cầu để thay test case hiện có bằng bản nâng cấp</p>
         </div>
 
         <!-- Requirements Selection -->
@@ -48,15 +48,15 @@
               <input
                 v-model="requirementSearch"
                 type="text"
-                placeholder="Search requirements..."
+                placeholder="Tìm yêu cầu..."
                 class="search-input"
               />
             </div>
             <div class="selection-actions">
               <button class="btn-text" @click="selectAllRequirements">
-                {{ allRequirementsSelected ? 'Deselect All' : 'Select All' }}
+                {{ allRequirementsSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả' }}
               </button>
-              <span class="selection-count">{{ selectedRequirementIds.length }} selected</span>
+              <span class="selection-count">{{ selectedRequirementIds.length }} đã chọn</span>
             </div>
           </div>
 
@@ -81,7 +81,7 @@
                 </span>
               </div>
               <div class="requirement-content">
-                <div class="requirement-name">{{ requirement.name || 'Unnamed Requirement' }}</div>
+                <div class="requirement-name">{{ requirement.name || 'Yêu cầu chưa đặt tên' }}</div>
                 <div class="requirement-desc" v-if="requirement.description">
                   {{ requirement.description }}
                 </div>
@@ -96,13 +96,13 @@
                 <span class="testcase-count" v-if="getExistingTestCasesCount(requirement.id) > 0">
                   {{ getExistingTestCasesCount(requirement.id) }} existing
                 </span>
-                <span class="testcase-count none" v-else>No test cases</span>
+                <span class="testcase-count none" v-else>Không có test case</span>
               </div>
             </div>
 
             <div v-if="filteredRequirements.length === 0" class="empty-requirements">
               <span class="material-symbols-outlined">search_off</span>
-              <p>No requirements found matching your search</p>
+              <p>Không có yêu cầu nào khớp tìm kiếm</p>
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@
             </div>
             <div class="summary-info">
               <div class="summary-value">{{ selectedRequirementIds.length }}</div>
-              <div class="summary-label">Requirements Selected</div>
+              <div class="summary-label">Yêu cầu đã chọn</div>
             </div>
           </div>
           <div class="summary-card">
@@ -124,7 +124,7 @@
             </div>
             <div class="summary-info">
               <div class="summary-value">{{ estimatedNewTestCases }}</div>
-              <div class="summary-label">Estimated Test Cases</div>
+              <div class="summary-label">Test case ước tính</div>
             </div>
           </div>
           <div class="summary-card">
@@ -133,29 +133,29 @@
             </div>
             <div class="summary-info">
               <div class="summary-value">{{ totalExistingTestCasesForSelected }}</div>
-              <div class="summary-label">To Be Replaced</div>
+              <div class="summary-label">Sẽ bị thay thế</div>
             </div>
           </div>
         </div>
 
         <!-- Generation Options -->
         <div class="generation-options">
-          <h4>Generation Options</h4>
+          <h4>Tuỳ chọn sinh</h4>
           <div class="options-grid">
             <label class="option-checkbox">
               <input type="checkbox" v-model="generationOptions.includeEdgeCases" />
               <span class="checkmark"></span>
-              <span class="option-label">Include edge cases</span>
+              <span class="option-label">Gồm trường hợp biên</span>
             </label>
             <label class="option-checkbox">
               <input type="checkbox" v-model="generationOptions.includeNegativeTests" />
               <span class="checkmark"></span>
-              <span class="option-label">Include negative test cases</span>
+              <span class="option-label">Gồm test case tiêu cực</span>
             </label>
             <label class="option-checkbox">
               <input type="checkbox" v-model="generationOptions.enhanceExisting" />
               <span class="checkmark"></span>
-              <span class="option-label">Enhance existing test cases</span>
+              <span class="option-label">Nâng cấp test case hiện có</span>
             </label>
           </div>
         </div>
@@ -164,8 +164,8 @@
       <!-- Step 2: Generate & Compare -->
       <div v-if="currentStep === 2" class="step-content">
         <div class="section-header">
-          <h3>Review Enhanced Test Cases</h3>
-          <p>Compare the enhanced test cases with existing ones</p>
+          <h3>Xem lại test case đã nâng cấp</h3>
+          <p>So sánh test case nâng cấp với bản hiện có</p>
         </div>
 
         <!-- Generation Status -->
@@ -175,15 +175,15 @@
               <span class="material-symbols-outlined">auto_awesome</span>
             </div>
             <div class="prompt-content">
-              <h4>Ready to Generate</h4>
-              <p>Generate enterprise-standard test cases to replace existing ones</p>
+              <h4>Sẵn sàng sinh</h4>
+              <p>Sinh test case chuẩn doanh nghiệp để thay thế bản hiện có</p>
               <button
                 class="btn-primary generate-btn"
                 @click="generateTestCases"
                 :disabled="generating"
               >
                 <span v-if="generating" class="spinner small"></span>
-                {{ generating ? 'Generating...' : 'Generate Enhanced Test Cases' }}
+                {{ generating ? 'Generating...' : 'Sinh test case nâng cấp' }}
               </button>
             </div>
           </div>
@@ -196,14 +196,14 @@
               <span class="material-symbols-outlined">auto_awesome</span>
             </div>
             <div class="progress-content">
-              <h4>Generating Enhanced Test Cases...</h4>
-              <p>AI is creating enterprise-standard test cases to replace existing ones</p>
+              <h4>Đang sinh test case nâng cấp...</h4>
+              <p>AI đang tạo test case chuẩn doanh nghiệp để thay thế bản hiện có</p>
               <div class="progress-bar">
                 <div class="progress-fill" :style="{ width: `${generationProgress}%` }"></div>
               </div>
               <div class="progress-stats">
-                <span>Estimated time: 30-60 seconds</span>
-                <span>{{ Math.round(generationProgress) }}% complete</span>
+                <span>Thời gian ước tính: 30-60 giây</span>
+                <span>{{ Math.round(generationProgress) }}% hoàn thành</span>
               </div>
             </div>
           </div>
@@ -220,7 +220,7 @@
                 @click="activeTab = 'preview'"
               >
                 <span class="material-symbols-outlined">visibility</span>
-                Preview Enhanced
+                Xem trước bản nâng cấp
               </button>
               <button
                 class="tab-button"
@@ -228,7 +228,7 @@
                 @click="activeTab = 'comparison'"
               >
                 <span class="material-symbols-outlined">compare</span>
-                Side by Side
+                Song song
               </button>
               <button
                 class="tab-button"
@@ -236,17 +236,17 @@
                 @click="activeTab = 'coverage'"
               >
                 <span class="material-symbols-outlined">analytics</span>
-                Coverage Analysis
+                Phân tích độ phủ
               </button>
             </div>
 
             <!-- Preview Tab -->
             <div v-if="activeTab === 'preview'" class="tab-content preview-tab">
               <div class="preview-header">
-                <h4>Enhanced Test Cases ({{ generatedTestCases.length }})</h4>
+                <h4>Test case nâng cấp ({{ generatedTestCases.length }})</h4>
                 <button class="btn-secondary" @click="regenerateTestCases" :disabled="generating">
                   <span class="material-symbols-outlined">refresh</span>
-                  Regenerate
+                  Sinh lại
                 </button>
               </div>
 
@@ -259,7 +259,7 @@
                   <div class="testcase-header">
                     <div class="testcase-title-section">
                       <span class="testcase-title">{{ testcase.title }}</span>
-                      <span class="testcase-badge enhanced">ENHANCED</span>
+                      <span class="testcase-badge enhanced">NÂNG CẤP</span>
                     </div>
                     <div class="testcase-meta">
                       <span class="testcase-type" :class="testcase.test_type || 'integration'">
@@ -278,17 +278,17 @@
 
                     <div class="testcase-details">
                       <div class="detail-item">
-                        <span class="detail-label">Steps:</span>
+                        <span class="detail-label">Số bước:</span>
                         <span class="detail-value">{{ testcase.steps?.length || 0 }}</span>
                       </div>
                       <div class="detail-item">
-                        <span class="detail-label">Database Tables:</span>
+                        <span class="detail-label">Bảng dữ liệu:</span>
                         <span class="detail-value">{{
                           testcase.database_tables?.join(', ') || 'None'
                         }}</span>
                       </div>
                       <div class="detail-item">
-                        <span class="detail-label">Requirements:</span>
+                        <span class="detail-label">Yêu cầu:</span>
                         <span class="detail-value">{{
                           testcase.source_requirement_ids?.join(', ') || 'None'
                         }}</span>
@@ -297,7 +297,7 @@
 
                     <!-- Steps Preview -->
                     <div class="steps-preview" v-if="testcase.steps && testcase.steps.length > 0">
-                      <div class="steps-header">Test Steps:</div>
+                      <div class="steps-header">Các bước kiểm thử:</div>
                       <div class="steps-list">
                         <div
                           v-for="step in testcase.steps"
@@ -317,18 +317,18 @@
             <!-- Side by Side Comparison Tab -->
             <div v-if="activeTab === 'comparison'" class="tab-content comparison-tab">
               <div class="comparison-header">
-                <h4>Before vs After Enhancement</h4>
+                <h4>Trước và sau khi nâng cấp</h4>
                 <div class="comparison-stats-quick">
                   <div class="quick-stat">
-                    <span class="stat-label">Current:</span>
+                    <span class="stat-label">Hiện tại:</span>
                     <span class="stat-value">{{ existingTestCasesForSelected.length }}</span>
                   </div>
                   <div class="quick-stat">
-                    <span class="stat-label">Enhanced:</span>
+                    <span class="stat-label">Nâng cấp:</span>
                     <span class="stat-value enhanced">{{ generatedTestCases.length }}</span>
                   </div>
                   <div class="quick-stat">
-                    <span class="stat-label">Change:</span>
+                    <span class="stat-label">Thay đổi:</span>
                     <span class="stat-value" :class="testCaseChangeClass">{{
                       testCaseChangeText
                     }}</span>
@@ -340,9 +340,9 @@
                 <!-- Before Column -->
                 <div class="column before-column">
                   <div class="column-header">
-                    <h5>Before Enhancement</h5>
+                    <h5>Trước khi nâng cấp</h5>
                     <span class="column-badge"
-                      >{{ existingTestCasesForSelected.length }} test cases</span
+                      >{{ existingTestCasesForSelected.length }} test case</span
                     >
                   </div>
 
@@ -358,30 +358,30 @@
                         <span class="testcase-steps">{{ testcase.steps?.length || 0 }} steps</span>
                       </div>
                       <div class="testcase-requirements">
-                        {{ testcase.source_requirement_ids?.join(', ') || 'No requirements' }}
+                        {{ testcase.source_requirement_ids?.join(', ') || 'Không có yêu cầu' }}
                       </div>
                     </div>
                     <div v-if="existingTestCasesForSelected.length === 0" class="no-testcases">
-                      No existing test cases for selected requirements
+                      Yêu cầu đã chọn chưa có test case
                     </div>
                   </div>
 
                   <div class="coverage-summary-compact">
-                    <h6>Current Coverage</h6>
+                    <h6>Độ phủ hiện tại</h6>
                     <div class="coverage-stats">
                       <div class="coverage-stat">
                         <span class="coverage-value">{{
                           existingTestCasesForSelected.length
                         }}</span>
-                        <span class="coverage-label">Test Cases</span>
+                        <span class="coverage-label">Test case</span>
                       </div>
                       <div class="coverage-stat">
                         <span class="coverage-value">{{ currentDatabaseTables.length }}</span>
-                        <span class="coverage-label">Database Tables</span>
+                        <span class="coverage-label">Bảng dữ liệu</span>
                       </div>
                       <div class="coverage-stat">
                         <span class="coverage-value">{{ currentTestTypesCovered.length }}</span>
-                        <span class="coverage-label">Test Types</span>
+                        <span class="coverage-label">Loại kiểm thử</span>
                       </div>
                     </div>
                   </div>
@@ -390,9 +390,9 @@
                 <!-- After Column -->
                 <div class="column after-column">
                   <div class="column-header">
-                    <h5>After Enhancement</h5>
+                    <h5>Sau khi nâng cấp</h5>
                     <span class="column-badge enhanced"
-                      >{{ generatedTestCases.length }} test cases</span
+                      >{{ generatedTestCases.length }} test case</span
                     >
                   </div>
 
@@ -408,35 +408,35 @@
                         <span class="testcase-steps">{{ testcase.steps?.length || 0 }} steps</span>
                       </div>
                       <div class="testcase-requirements enhanced">
-                        {{ testcase.source_requirement_ids?.join(', ') || 'No requirements' }}
+                        {{ testcase.source_requirement_ids?.join(', ') || 'Không có yêu cầu' }}
                       </div>
-                      <div class="enhanced-indicator">ENHANCED</div>
+                      <div class="enhanced-indicator">NÂNG CẤP</div>
                     </div>
                     <div v-if="generatedTestCases.length === 0" class="no-testcases">
-                      No enhanced test cases generated
+                      Chưa sinh được test case nâng cấp
                     </div>
                   </div>
 
                   <div class="coverage-summary-compact enhanced">
-                    <h6>Enhanced Coverage</h6>
+                    <h6>Độ phủ sau nâng cấp</h6>
                     <div class="coverage-stats">
                       <div class="coverage-stat">
                         <span class="coverage-value">{{ generatedTestCases.length }}</span>
-                        <span class="coverage-label">Test Cases</span>
+                        <span class="coverage-label">Test case</span>
                         <span class="coverage-diff" :class="testCaseChangeClass">{{
                           testCaseChangeText
                         }}</span>
                       </div>
                       <div class="coverage-stat">
                         <span class="coverage-value">{{ enhancedDatabaseTables.length }}</span>
-                        <span class="coverage-label">Database Tables</span>
+                        <span class="coverage-label">Bảng dữ liệu</span>
                         <span class="coverage-diff" :class="databaseChangeClass">{{
                           databaseChangeText
                         }}</span>
                       </div>
                       <div class="coverage-stat">
                         <span class="coverage-value">{{ enhancedTestTypesCovered.length }}</span>
-                        <span class="coverage-label">Test Types</span>
+                        <span class="coverage-label">Loại kiểm thử</span>
                         <span class="coverage-diff" :class="testTypeChangeClass">{{
                           testTypeChangeText
                         }}</span>
@@ -450,11 +450,11 @@
             <!-- Coverage Analysis Tab -->
             <div v-if="activeTab === 'coverage'" class="tab-content coverage-tab">
               <div class="coverage-header">
-                <h4>Coverage Improvement Analysis</h4>
+                <h4>Phân tích cải thiện độ phủ</h4>
                 <div class="coverage-overview">
                   <div class="overview-card">
                     <div class="overview-value">{{ testCaseChangePercentage }}%</div>
-                    <div class="overview-label">Test Case Change</div>
+                    <div class="overview-label">Thay đổi test case</div>
                   </div>
                 </div>
               </div>
@@ -462,11 +462,11 @@
               <div class="coverage-grid">
                 <!-- Test Cases Coverage -->
                 <div class="coverage-card">
-                  <h5>Test Cases Coverage</h5>
+                  <h5>Độ phủ test case</h5>
                   <div class="coverage-progress">
                     <div class="progress-labels">
-                      <span>Before: {{ existingTestCasesForSelected.length }}</span>
-                      <span>After: {{ generatedTestCases.length }}</span>
+                      <span>Trước: {{ existingTestCasesForSelected.length }}</span>
+                      <span>Sau: {{ generatedTestCases.length }}</span>
                     </div>
                     <div class="progress-bar">
                       <div
@@ -479,7 +479,7 @@
                       ></div>
                     </div>
                     <div class="progress-improvement">
-                      <span class="improvement-value">{{ testCaseChangeText }} test cases</span>
+                      <span class="improvement-value">{{ testCaseChangeText }} test case</span>
                       <span class="improvement-percent" :class="testCaseChangeClass">
                         {{ testCaseChangePercentage }}%
                       </span>
@@ -489,10 +489,10 @@
 
                 <!-- Database Coverage -->
                 <div class="coverage-card">
-                  <h5>Database Coverage</h5>
+                  <h5>Độ phủ cơ sở dữ liệu</h5>
                   <div class="coverage-metrics">
                     <div class="metric-row">
-                      <span class="metric-label">Tables Covered:</span>
+                      <span class="metric-label">Bảng được phủ:</span>
                       <div class="metric-values">
                         <span class="metric-before">{{ currentDatabaseTables.length }}</span>
                         <span class="metric-arrow">→</span>
@@ -503,7 +503,7 @@
                       </div>
                     </div>
                     <div class="metric-row">
-                      <span class="metric-label">New Tables:</span>
+                      <span class="metric-label">Bảng mới:</span>
                       <span class="metric-new-tables">{{
                         newDatabaseTables.join(', ') || 'None'
                       }}</span>
@@ -513,10 +513,10 @@
 
                 <!-- Test Types Coverage -->
                 <div class="coverage-card">
-                  <h5>Test Types Coverage</h5>
+                  <h5>Độ phủ theo loại kiểm thử</h5>
                   <div class="types-comparison">
                     <div class="types-before">
-                      <div class="types-label">Before:</div>
+                      <div class="types-label">Trước:</div>
                       <div class="types-list">
                         <span
                           v-for="type in currentTestTypesCovered"
@@ -526,12 +526,12 @@
                           {{ type }}
                         </span>
                         <span v-if="currentTestTypesCovered.length === 0" class="type-tag none">
-                          None
+                          Không có
                         </span>
                       </div>
                     </div>
                     <div class="types-after">
-                      <div class="types-label">After:</div>
+                      <div class="types-label">Sau:</div>
                       <div class="types-list">
                         <span
                           v-for="type in enhancedTestTypesCovered"
@@ -541,7 +541,7 @@
                           {{ type }}
                         </span>
                         <span v-if="enhancedTestTypesCovered.length === 0" class="type-tag none">
-                          None
+                          Không có
                         </span>
                       </div>
                     </div>
@@ -550,10 +550,10 @@
 
                 <!-- Enterprise Metrics -->
                 <div class="coverage-card">
-                  <h5>Quality Metrics</h5>
+                  <h5>Chỉ số chất lượng</h5>
                   <div class="enterprise-metrics">
                     <div class="enterprise-metric">
-                      <span class="metric-name">Steps per Test Case:</span>
+                      <span class="metric-name">Số bước mỗi test case:</span>
                       <div class="metric-value">
                         <span class="value-before">{{ currentAvgSteps.toFixed(1) }}</span>
                         <span class="value-arrow">→</span>
@@ -561,7 +561,7 @@
                       </div>
                     </div>
                     <div class="enterprise-metric">
-                      <span class="metric-name">Test Data Coverage:</span>
+                      <span class="metric-name">Độ phủ dữ liệu kiểm thử:</span>
                       <div class="metric-value">
                         <span class="value-before">{{ currentTestDataCoverage }}%</span>
                         <span class="value-arrow">→</span>
@@ -569,7 +569,7 @@
                       </div>
                     </div>
                     <div class="enterprise-metric">
-                      <span class="metric-name">Total Steps:</span>
+                      <span class="metric-name">Tổng số bước:</span>
                       <div class="metric-value">
                         <span class="value-before">{{ currentTotalSteps }}</span>
                         <span class="value-arrow">→</span>
@@ -593,8 +593,8 @@
           <div class="success-icon">
             <span class="material-symbols-outlined">check_circle</span>
           </div>
-          <h3>Enhancement Complete!</h3>
-          <p>Your test cases have been successfully enhanced and saved</p>
+          <h3>Nâng cấp hoàn tất!</h3>
+          <p>Test case của bạn đã được nâng cấp và lưu</p>
 
           <div class="enhancement-results">
             <div class="result-card success">
@@ -603,7 +603,7 @@
               </div>
               <div class="result-info">
                 <div class="result-value">{{ savedResults.replaced || 0 }}</div>
-                <div class="result-label">Test Cases Replaced</div>
+                <div class="result-label">Test case đã thay thế</div>
               </div>
             </div>
             <div class="result-card info">
@@ -612,7 +612,7 @@
               </div>
               <div class="result-info">
                 <div class="result-value">{{ savedResults.databaseTables || 0 }}</div>
-                <div class="result-label">Database Tables Covered</div>
+                <div class="result-label">Bảng dữ liệu được phủ</div>
               </div>
             </div>
             <div class="result-card warning">
@@ -621,7 +621,7 @@
               </div>
               <div class="result-info">
                 <div class="result-value">{{ savedResults.requirementsCovered || 0 }}</div>
-                <div class="result-label">Requirements Covered</div>
+                <div class="result-label">Yêu cầu được phủ</div>
               </div>
             </div>
           </div>
@@ -629,11 +629,11 @@
           <div class="action-buttons">
             <button class="btn-secondary" @click="viewTestCases">
               <span class="material-symbols-outlined">visibility</span>
-              View Test Cases
+              Xem test case
             </button>
             <button class="btn-primary" @click="generateMore">
               <span class="material-symbols-outlined">add</span>
-              Enhance More
+              Nâng cấp thêm
             </button>
           </div>
         </div>
@@ -644,10 +644,10 @@
         <div class="footer-actions">
           <button class="btn-secondary" @click="handleBack" v-if="currentStep > 1">
             <span class="material-symbols-outlined">arrow_back</span>
-            Back
+            Quay lại
           </button>
           <button class="btn-secondary" @click="$emit('close')" v-if="currentStep === 1">
-            Cancel
+            Huỷ
           </button>
         </div>
         <div class="footer-primary">
@@ -666,7 +666,7 @@
             </span>
           </button>
           <button class="btn-primary" @click="handleFinish" v-else>
-            Finish
+            Hoàn tất
             <span class="material-symbols-outlined">check</span>
           </button>
         </div>
@@ -676,8 +676,8 @@
       <div v-if="saving" class="loading-overlay">
         <div class="loading-content">
           <div class="spinner large"></div>
-          <h3>Replacing Test Cases...</h3>
-          <p>Please wait while we replace your test cases with enhanced versions</p>
+          <h3>Đang thay test case...</h3>
+          <p>Vui lòng chờ trong khi thay test case bằng bản nâng cấp</p>
         </div>
       </div>
     </div>
@@ -925,9 +925,9 @@ export default {
     const getNextButtonText = computed(() => {
       switch (currentStep.value) {
         case 1:
-          return 'Generate Enhanced Test Cases'
+          return 'Sinh test case nâng cấp'
         case 2:
-          return 'Replace Test Cases'
+          return 'Thay thế test case'
         default:
           return 'Continue'
       }
@@ -987,11 +987,11 @@ export default {
         clearInterval(progressInterval)
         generationProgress.value = 100
         generatedTestCases.value = response.data.data || []
-        toast.success(`Generated ${generatedTestCases.value.length} enhanced test cases!`)
+        toast.success(`Đã sinh ${generatedTestCases.value.length} test case nâng cấp!`)
       } catch (error) {
         console.error('Error generating enhanced test cases:', error)
         const errorMessage =
-          error.response?.data?.message || 'Failed to generate enhanced test cases'
+          error.response?.data?.message || 'Sinh test case nâng cấp thất bại'
         toast.error(errorMessage)
       } finally {
         generating.value = false
@@ -1031,7 +1031,7 @@ export default {
         }
 
         toast.success(
-          `Successfully replaced ${existingTestCasesForSelected.value.length} test cases with ${generatedTestCases.value.length} enhanced versions!`
+          `Đã thay ${existingTestCasesForSelected.value.length} test case bằng ${generatedTestCases.value.length} bản nâng cấp!`
         )
         emit('enhanced', {
           replacedTestCases: existingTestCasesForSelected.value,
@@ -1040,7 +1040,7 @@ export default {
         })
       } catch (error) {
         console.error('Error replacing test cases:', error)
-        const errorMessage = error.response?.data?.message || 'Failed to replace test cases'
+        const errorMessage = error.response?.data?.message || 'Thay thế test case thất bại'
         toast.error(errorMessage)
       } finally {
         saving.value = false

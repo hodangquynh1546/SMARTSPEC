@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="export-modal">
       <div class="modal-header">
-        <h3>Export Test Cases</h3>
+        <h3>Xuất test case</h3>
         <button class="btn-icon close-btn" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -10,13 +10,13 @@
 
       <div class="modal-content">
         <div class="export-description">
-          <p>Configure export: create sheets, assign test cases, and select fields</p>
+          <p>Cấu hình xuất: tạo trang tính, gán test case và chọn trường</p>
         </div>
 
         <!-- Field Selection -->
         <div class="export-options">
           <div class="option-group">
-            <label class="option-label">Select Fields to Export</label>
+            <label class="option-label">Chọn trường để xuất</label>
             <div class="fields-grid">
               <label
                 v-for="field in availableFields"
@@ -33,23 +33,23 @@
               </label>
             </div>
             <div class="field-actions">
-              <button class="btn-text-small" @click="selectAllFields">Select All</button>
-              <button class="btn-text-small" @click="deselectAllFields">Deselect All</button>
+              <button class="btn-text-small" @click="selectAllFields">Chọn tất cả</button>
+              <button class="btn-text-small" @click="deselectAllFields">Bỏ chọn tất cả</button>
             </div>
           </div>
 
           <!-- Sheets Management -->
           <div class="option-group">
             <div class="sheets-header">
-              <label class="option-label">Sheets Configuration</label>
+              <label class="option-label">Cấu hình trang tính</label>
               <button class="btn-add-sheet" @click="addSheet">
                 <span class="material-symbols-outlined">add</span>
-                Add Sheet
+                Thêm trang tính
               </button>
             </div>
             <div v-if="sheets.length === 0" class="empty-sheets">
               <span class="material-symbols-outlined">info</span>
-              <p>No sheets configured. Add a sheet to start organizing your export.</p>
+              <p>Chưa có trang tính. Hãy thêm trang tính để sắp xếp dữ liệu xuất.</p>
             </div>
             <div v-else class="sheets-list">
               <div
@@ -63,25 +63,25 @@
                       v-model="sheet.name"
                       type="text"
                       class="sheet-name-input"
-                      placeholder="Sheet name..."
+                      placeholder="Tên trang tính..."
                       @blur="validateSheetName(index)"
                     />
                     <span class="sheet-testcase-count">
-                      {{ sheet.testCaseIds.length }} test case(s)
+                      {{ sheet.testCaseIds.length }} test case
                     </span>
                   </div>
                   <div class="sheet-actions">
                     <button
                       class="btn-icon-small"
                       @click="openSheetTestcaseSelector(index)"
-                      title="Select Test Cases"
+                      title="Chọn test case"
                     >
                       <span class="material-symbols-outlined">playlist_add</span>
                     </button>
                     <button
                       class="btn-icon-small danger"
                       @click="removeSheet(index)"
-                      title="Remove Sheet"
+                      title="Xoá trang tính"
                       :disabled="sheets.length === 1"
                     >
                       <span class="material-symbols-outlined">delete</span>
@@ -105,28 +105,28 @@
           </div>
 
           <div class="option-group">
-            <label class="option-label">Export Format</label>
+            <label class="option-label">Định dạng xuất</label>
             <div class="option-cards">
               <div class="option-card active">
                 <div class="option-icon">
                   <span class="material-symbols-outlined">description</span>
                 </div>
                 <div class="option-info">
-                  <h4>Detailed Excel Report</h4>
-                  <p>Complete test case information with all details</p>
+                  <h4>Báo cáo Excel chi tiết</h4>
+                  <p>Đầy đủ thông tin chi tiết của test case</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div v-if="selectionMode === 'all'" class="option-group">
-            <label class="option-label">Apply Current Filters</label>
+            <label class="option-label">Áp dụng bộ lọc hiện tại</label>
             <div class="filter-info">
               <span class="filter-status">
-                {{ hasActiveFilters ? 'Current filters will be applied' : 'No active filters' }}
+                {{ hasActiveFilters ? 'Sẽ áp dụng bộ lọc hiện tại' : 'Không có bộ lọc nào' }}
               </span>
               <button v-if="hasActiveFilters" class="btn-text" @click="$emit('clearFilters')">
-                Clear Filters
+                Xoá bộ lọc
               </button>
             </div>
           </div>
@@ -134,11 +134,11 @@
 
         <!-- Action Buttons -->
         <div class="modal-actions">
-          <button class="btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="btn-secondary" @click="$emit('close')">Huỷ</button>
           <button class="btn-primary export-action" @click="handleExport" :disabled="loading">
             <span class="material-symbols-outlined" v-if="!loading">download</span>
             <span class="spinner-small" v-else></span>
-            {{ loading ? 'Exporting...' : 'Export Test Cases' }}
+            {{ loading ? 'Exporting...' : 'Xuất test case' }}
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@
     <div v-if="showTestcaseSelector" class="modal-overlay" @click.self="closeTestcaseSelector">
       <div class="testcase-selector-modal">
         <div class="modal-header">
-          <h3>Select Test Cases for {{ sheets[currentSheetIndex]?.name }}</h3>
+          <h3>Chọn test case cho {{ sheets[currentSheetIndex]?.name }}</h3>
           <button class="btn-icon close-btn" @click="closeTestcaseSelector">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -162,7 +162,7 @@
               @click="selectorTab = 'testcases'"
             >
               <span class="material-symbols-outlined">playlist_add</span>
-              Test Cases
+              Test case
             </button>
             <button
               class="tab-button"
@@ -170,7 +170,7 @@
               @click="selectorTab = 'usecases'"
             >
               <span class="material-symbols-outlined">list_alt</span>
-              Use Cases
+              Use case
             </button>
           </div>
 
@@ -181,7 +181,7 @@
               <input
                 v-model="testcaseSearchQuery"
                 type="text"
-                placeholder="Search test cases..."
+                placeholder="Tìm test case..."
                 class="search-input"
               />
             </div>
@@ -201,12 +201,12 @@
                   
                   <div class="testcase-info">
                     <span class="testcase-title">{{ testcase.title || testcase.name }}</span>
-                    <span class="testcase-desc">{{ testcase.description || 'No description' }}</span>
+                    <span class="testcase-desc">{{ testcase.description || 'Chưa có mô tả' }}</span>
                   </div>
                 </label>
                 <div v-if="filteredTestCasesForSheet.length === 0" class="empty-testcases">
                   <span class="material-symbols-outlined">search_off</span>
-                  <p>No test cases found</p>
+                  <p>Không tìm thấy test case</p>
                 </div>
               </div>
             </div>
@@ -219,7 +219,7 @@
               <input
                 v-model="usecaseSearchQueryInSelector"
                 type="text"
-                placeholder="Search use cases..."
+                placeholder="Tìm use case..."
                 class="search-input"
               />
             </div>
@@ -248,10 +248,10 @@
                         <div class="usecase-header">
                           <span class="usecase-name">{{ usecase.name }}</span>
                           <span class="usecase-badge" :class="{ 'badge-zero': getUsecaseTestCasesCount(usecase) === 0 }">
-                            {{ getUsecaseTestCasesCount(usecase) }} test case(s)
+                            {{ getUsecaseTestCasesCount(usecase) }} test case
                           </span>
                         </div>
-                        <span class="usecase-goal">{{ usecase.goal || 'No goal' }}</span>
+                        <span class="usecase-goal">{{ usecase.goal || 'Chưa có mục tiêu' }}</span>
                       </div>
                       <span class="material-symbols-outlined expand-icon" :class="{ expanded: isUsecaseExpanded(usecase) }">
                         expand_more
@@ -275,30 +275,30 @@
                       
                       <div class="testcase-info">
                         <span class="testcase-title">{{ testcase.title || testcase.name }}</span>
-                        <span class="testcase-desc">{{ testcase.description || 'No description' }}</span>
+                        <span class="testcase-desc">{{ testcase.description || 'Chưa có mô tả' }}</span>
                       </div>
                     </label>
                     <div v-if="getUsecaseTestCases(usecase).length === 0" class="empty-testcases-nested">
                       <span class="material-symbols-outlined">info</span>
-                      <p>No test cases for this use case</p>
+                      <p>Use case này chưa có test case</p>
                     </div>
                   </div>
                 </div>
                 <div v-if="filteredUseCasesInSelector.length === 0" class="empty-usecases">
                   <span class="material-symbols-outlined">search_off</span>
-                  <p>No use cases found</p>
+                  <p>Không tìm thấy use case</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="selected-count">
-            {{ getSelectedCountForSheet(currentSheetIndex) }} test case(s) selected
+            {{ getSelectedCountForSheet(currentSheetIndex) }} test case đã chọn
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" @click="closeTestcaseSelector">Cancel</button>
-          <button class="btn-primary" @click="closeTestcaseSelector">Done</button>
+          <button class="btn-secondary" @click="closeTestcaseSelector">Huỷ</button>
+          <button class="btn-primary" @click="closeTestcaseSelector">Xong</button>
         </div>
       </div>
     </div>
@@ -351,17 +351,17 @@ export default {
 
     // Available fields for export
     const availableFields = [
-      { key: 'test_case_id', label: 'Test Case ID', required: true },
+      { key: 'test_case_id', label: 'Mã test case', required: true },
       { key: 'test_case_name', label: 'Test Case Name/Title', required: true },
-      { key: 'description', label: 'Description' },
-      { key: 'module_feature', label: 'Module/Feature' },
-      { key: 'test_priority', label: 'Test Priority' },
-      { key: 'preconditions', label: 'Preconditions' },
-      { key: 'test_data', label: 'Test Data' },
-      { key: 'test_steps', label: 'Test Steps' },
-      { key: 'expected_result', label: 'Expected Result' },
-      { key: 'actual_result', label: 'Actual Result' },
-      { key: 'status', label: 'Status' },
+      { key: 'description', label: 'Mô tả' },
+      { key: 'module_feature', label: 'Phân hệ/Tính năng' },
+      { key: 'test_priority', label: 'Độ ưu tiên kiểm thử' },
+      { key: 'preconditions', label: 'Điều kiện tiên quyết' },
+      { key: 'test_data', label: 'Dữ liệu kiểm thử' },
+      { key: 'test_steps', label: 'Các bước kiểm thử' },
+      { key: 'expected_result', label: 'Kết quả mong đợi' },
+      { key: 'actual_result', label: 'Kết quả thực tế' },
+      { key: 'status', label: 'Trạng thái' },
     ]
 
     const selectedFields = ref(
@@ -372,7 +372,7 @@ export default {
     const sheets = ref([
       {
         id: Date.now(),
-        name: 'Sheet 1',
+        name: 'Trang tính 1',
         testCaseIds: [],
       },
     ])
@@ -452,12 +452,12 @@ export default {
       const sheet = sheets.value[sheetIndex]
       
       if (!sheet) {
-        toast.error('Sheet not found')
+        toast.error('Không tìm thấy trang tính')
         return
       }
       
       if (!usecaseId) {
-        toast.error(`Invalid use case ID for: ${usecase.name}`)
+        toast.error(`Mã use case không hợp lệ: ${usecase.name}`)
         return
       }
       
@@ -488,7 +488,7 @@ export default {
       })
 
       if (usecaseTestCases.length === 0) {
-        toast.warning(`No test cases found for use case: ${usecase.name} (ID: ${usecaseId})`)
+        toast.warning(`Không có test case cho use case: ${usecase.name} (ID: ${usecaseId})`)
         return
       }
 
@@ -507,9 +507,9 @@ export default {
       })
 
       if (addedCount > 0) {
-        toast.success(`Added ${addedCount} test case(s) from ${usecase.name}`)
+        toast.success(`Đã thêm ${addedCount} test case từ ${usecase.name}`)
       } else {
-        toast.info('All test cases from this use case are already in the sheet')
+        toast.info('Mọi test case của use case này đã có trong trang tính')
       }
     }
 
@@ -626,7 +626,7 @@ export default {
       if (sheets.value.length > 1) {
         sheets.value.splice(index, 1)
       } else {
-        toast.warning('At least one sheet is required')
+        toast.warning('Cần ít nhất một trang tính')
       }
     }
 
@@ -634,7 +634,7 @@ export default {
       const sheet = sheets.value[index]
       if (!sheet.name || sheet.name.trim() === '') {
         sheet.name = `Sheet ${index + 1}`
-        toast.warning('Sheet name cannot be empty')
+        toast.warning('Tên trang tính không được để trống')
       }
     }
 
@@ -689,20 +689,20 @@ export default {
 
     const handleExport = () => {
       if (!props.projectId) {
-        toast.error('Project ID is required for export')
+        toast.error('Cần mã dự án để xuất')
         return
       }
 
       // Validate fields
       if (selectedFields.value.length === 0) {
-        toast.warning('Please select at least one field to export')
+        toast.warning('Vui lòng chọn ít nhất một trường để xuất')
         return
       }
 
       // Validate sheets
       const hasTestCases = sheets.value.some((sheet) => sheet.testCaseIds.length > 0)
       if (!hasTestCases) {
-        toast.warning('Please add test cases to at least one sheet')
+        toast.warning('Vui lòng thêm test case vào ít nhất một trang tính')
         return
       }
 
@@ -711,13 +711,13 @@ export default {
         (sheet) => !sheet.name || sheet.name.trim() === ''
       )
       if (invalidSheets.length > 0) {
-        toast.warning('Please provide names for all sheets')
+        toast.warning('Vui lòng đặt tên cho tất cả trang tính')
         return
       }
 
       const exportConfig = {
         type: 'testcases',
-        title: 'Test Cases Export',
+        title: 'Xuất test case',
         sheets: sheets.value.map((sheet) => ({
           name: sheet.name,
           testCaseIds: sheet.testCaseIds,

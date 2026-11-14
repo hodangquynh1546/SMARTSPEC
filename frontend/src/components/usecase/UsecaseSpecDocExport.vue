@@ -2,7 +2,7 @@
   <div class="export-modal-overlay" v-if="showExportModal" @click="closeExportModal">
     <div class="export-modal-content" @click.stop>
       <div class="export-modal-header">
-        <h3>Export Use Case Specification</h3>
+        <h3>Xuất đặc tả use case</h3>
         <button class="btn-close" @click="closeExportModal">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,7 +11,7 @@
       <div class="export-modal-body">
         <!-- Format Selection -->
         <div class="export-section">
-          <h4>Export Format</h4>
+          <h4>Định dạng xuất</h4>
           <div class="format-options">
             <label class="format-option" :class="{ active: selectedFormat === 'docx' }">
               <input type="radio" v-model="selectedFormat" value="docx" class="format-radio" />
@@ -20,7 +20,7 @@
               </div>
               <div class="format-info">
                 <strong>Microsoft Word (.docx)</strong>
-                <span>Editable document format</span>
+                <span>Định dạng tài liệu chỉnh sửa được</span>
               </div>
             </label>
 
@@ -30,8 +30,8 @@
                 <span class="material-symbols-outlined">picture_as_pdf</span>
               </div>
               <div class="format-info">
-                <strong>PDF Document (.pdf)</strong>
-                <span>Portable document format</span>
+                <strong>Tài liệu PDF (.pdf)</strong>
+                <span>Định dạng tài liệu di động</span>
               </div>
             </label>
           </div>
@@ -39,11 +39,11 @@
 
         <!-- Scope Selection -->
         <div class="export-section">
-          <h4>Export Scope</h4>
+          <h4>Phạm vi xuất</h4>
           <div class="scope-options">
             <label class="scope-option">
               <input type="radio" v-model="exportScope" value="all" class="scope-radio" />
-              <span>All Use Cases</span>
+              <span>Tất cả use case</span>
             </label>
 
             <label class="scope-option">
@@ -55,25 +55,25 @@
                 :disabled="selectedUseCases.length === 0"
               />
               <span>
-                Selected Use Cases ({{ selectedUseCases.length }})
+                Use case đã chọn ({{ selectedUseCases.length }})
                 <span v-if="selectedUseCases.length === 0" class="hint"
-                  >- No use cases selected</span
+                  >- Chưa chọn use case</span
                 >
               </span>
             </label>
 
             <label class="scope-option">
               <input type="radio" v-model="exportScope" value="role" class="scope-radio" />
-              <span>By Role</span>
+              <span>Theo vai trò</span>
             </label>
           </div>
 
           <!-- Role Selection (when scope is by role) -->
           <div v-if="exportScope === 'role'" class="role-selection">
             <select v-model="selectedRole" class="role-select">
-              <option value="">Select a role</option>
+              <option value="">Chọn vai trò</option>
               <option v-for="role in availableRoles" :key="role" :value="role">
-                {{ role }} ({{ roleUseCaseCounts[role] || 0 }} use cases)
+                {{ role }} ({{ roleUseCaseCounts[role] || 0 }} use case)
               </option>
             </select>
           </div>
@@ -81,44 +81,44 @@
 
         <!-- Document Options -->
         <div class="export-section">
-          <h4>Document Options</h4>
+          <h4>Tuỳ chọn tài liệu</h4>
           <div class="document-options-grid">
             <label class="option-checkbox">
               <input type="checkbox" v-model="includeTableOfContents" />
-              <span>Include Table of Contents</span>
+              <span>Gồm mục lục</span>
             </label>
 
             <label class="option-checkbox">
               <input type="checkbox" v-model="includePageNumbers" />
-              <span>Include Page Numbers</span>
+              <span>Gồm số trang</span>
             </label>
 
             <label class="option-checkbox">
               <input type="checkbox" v-model="includeTimestamp" />
-              <span>Include Generation Timestamp</span>
+              <span>Gồm thời điểm tạo</span>
             </label>
 
             <label class="option-checkbox">
               <input type="checkbox" v-model="includeProjectInfo" />
-              <span>Include Project Information</span>
+              <span>Gồm thông tin dự án</span>
             </label>
           </div>
         </div>
 
         <!-- Preview Section -->
         <div class="export-section">
-          <h4>Preview</h4>
+          <h4>Xem trước</h4>
           <div class="preview-info">
-            <p><strong>Total use cases to export:</strong> {{ useCasesToExport.length }}</p>
-            <p><strong>Format:</strong> {{ selectedFormat.toUpperCase() }}</p>
-            <p><strong>Estimated pages:</strong> {{ estimatedPages }}</p>
+            <p><strong>Số use case sẽ xuất:</strong> {{ useCasesToExport.length }}</p>
+            <p><strong>Định dạng:</strong> {{ selectedFormat.toUpperCase() }}</p>
+            <p><strong>Số trang ước tính:</strong> {{ estimatedPages }}</p>
           </div>
         </div>
       </div>
 
       <div class="export-modal-actions">
         <button class="btn-secondary" @click="closeExportModal" :disabled="exporting">
-          Cancel
+          Huỷ
         </button>
         <button
           class="btn-primary"
@@ -232,7 +232,7 @@ export default {
 
     async startExport() {
       if (this.useCasesToExport.length === 0) {
-        this.toast.error('No use cases selected for export')
+        this.toast.error('Chưa chọn use case để xuất')
         return
       }
 
@@ -246,12 +246,12 @@ export default {
         }
 
         this.toast.success(
-          `Use case specification exported successfully as ${this.selectedFormat.toUpperCase()}`
+          `Đã xuất đặc tả use case dưới dạng ${this.selectedFormat.toUpperCase()}`
         )
         this.closeExportModal()
       } catch (error) {
         console.error('Export error:', error)
-        this.toast.error(`Failed to export document: ${error.message}`)
+        this.toast.error(`Xuất tài liệu thất bại: ${error.message}`)
       } finally {
         this.exporting = false
       }
@@ -592,7 +592,7 @@ export default {
 
       // Timestamp
       if (this.includeTimestamp) {
-        content += `Generated: ${new Date().toLocaleString()}\n\n`
+        content += `Generated: ${new Date().toLocaleString('vi-VN')}\n\n`
       }
 
       // Table of Contents
@@ -610,12 +610,12 @@ export default {
         content += `\n${index + 1}. USE CASE: ${uc.name}\n`
         content += `${'='.repeat(50)}\n`
         content += `ID: UC-${this.getUsecaseId(uc)}\n`
-        const actorName = uc.actor?.name || uc.role?.name || 'Not specified'
+        const actorName = uc.actor?.name || uc.role?.name || 'Chưa chỉ định'
         content += `Actor: ${actorName}\n`
-        content += `Priority: ${uc.priority || 'Not specified'}\n\n`
+        content += `Priority: ${uc.priority || 'Chưa chỉ định'}\n\n`
 
-        content += `Goal: ${uc.goal || 'Not specified'}\n\n`
-        content += `Description: ${(uc.description || uc.business_reason || uc.reason) || 'Not specified'}\n\n`
+        content += `Goal: ${uc.goal || 'Chưa chỉ định'}\n\n`
+        content += `Description: ${(uc.description || uc.business_reason || uc.reason) || 'Chưa chỉ định'}\n\n`
         
         // Business Reason (separate from description)
         if (uc.business_reason || uc.reason) {
@@ -626,11 +626,11 @@ export default {
         const contextStr = typeof uc.context === 'object' 
           ? (uc.context.module || uc.context.scope || uc.context.system || '') 
           : (uc.context || '')
-        content += `Context: ${contextStr || 'Not specified'}\n\n`
+        content += `Context: ${contextStr || 'Chưa chỉ định'}\n\n`
 
         // Actor Details - nếu actor là object
         if (uc.actor && typeof uc.actor === 'object') {
-          content += `Actor: ${uc.actor.name || 'Not specified'}`
+          content += `Actor: ${uc.actor.name || 'Chưa chỉ định'}`
           if (uc.actor.description) {
             content += ` - ${uc.actor.description}`
           }
@@ -854,7 +854,7 @@ export default {
         this.includeTimestamp
           ? `
         <div class="timestamp">
-          Generated on: ${new Date().toLocaleString()}
+          Generated on: ${new Date().toLocaleString('vi-VN')}
         </div>
       `
           : ''
@@ -877,8 +877,8 @@ export default {
       <div class="usecase-section page-break-avoid">
         <div class="usecase-header keep-with-next">
           <h2>${index + 1}. ${uc.name}</h2>
-          <p>UC-${this.getUsecaseId(uc)} | Actor: ${(uc.actor?.name || uc.role?.name) || 'Not specified'}${uc.actor?.description ? ` - ${this.escapeHtml(uc.actor.description)}` : ''} | Priority: ${
-          uc.priority || 'Not specified'
+          <p>UC-${this.getUsecaseId(uc)} | Actor: ${(uc.actor?.name || uc.role?.name) || 'Chưa chỉ định'}${uc.actor?.description ? ` - ${this.escapeHtml(uc.actor.description)}` : ''} | Priority: ${
+          uc.priority || 'Chưa chỉ định'
         }</p>
         </div>
         
@@ -886,20 +886,20 @@ export default {
         <div class="detail-grid three-columns page-break-avoid">
           <div class="detail-item">
             <h4 class="keep-with-next">Goal</h4>
-            <p>${this.escapeHtml(uc.goal || 'Not specified')}</p>
+            <p>${this.escapeHtml(uc.goal || 'Chưa chỉ định')}</p>
           </div>
           <div class="detail-item">
             <h4 class="keep-with-next">Description</h4>
-            <p>${this.escapeHtml((uc.description || uc.business_reason || uc.reason) || 'Not specified')}</p>
+            <p>${this.escapeHtml((uc.description || uc.business_reason || uc.reason) || 'Chưa chỉ định')}</p>
           </div>
           <div class="detail-item">
             <h4 class="keep-with-next">Context</h4>
-            <p>${this.escapeHtml((typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'Not specified')}</p>
+            <p>${this.escapeHtml((typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'Chưa chỉ định')}</p>
           </div>
           ${uc.business_reason || uc.reason ? `
           <div class="detail-item">
             <h4 class="keep-with-next">Business Reason</h4>
-            <p>${this.escapeHtml((uc.business_reason || uc.reason) || 'Not specified')}</p>
+            <p>${this.escapeHtml((uc.business_reason || uc.reason) || 'Chưa chỉ định')}</p>
           </div>
           ` : ''}
         </div>

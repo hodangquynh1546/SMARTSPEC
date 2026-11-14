@@ -2,7 +2,7 @@
   <div v-if="modelValue" class="modal-overlay" @click.self="close">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Select LLM Model</h3>
+        <h3>Chọn mô hình LLM</h3>
         <button class="btn-close" @click="close">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -12,14 +12,14 @@
         <!-- Loading State -->
         <div v-if="loading" class="loading-container">
           <div class="spinner"></div>
-          <p>Loading available models...</p>
+          <p>Đang tải các mô hình khả dụng...</p>
         </div>
 
         <!-- Error State -->
         <div v-else-if="error" class="error-container">
           <span class="material-symbols-outlined error-icon">error</span>
           <p>{{ error }}</p>
-          <button class="btn-retry" @click="fetchModels">Retry</button>
+          <button class="btn-retry" @click="fetchModels">Thử lại</button>
         </div>
 
         <!-- Models List -->
@@ -33,7 +33,7 @@
               :class="{ active: selectedCategory === cat }"
               @click="selectedCategory = cat"
             >
-              {{ cat.charAt(0).toUpperCase() + cat.slice(1) }}
+              {{ { all: 'Tất cả', agent: 'Điều phối', worker: 'Thực thi', specialized: 'Chuyên biệt' }[cat] || cat }}
             </button>
           </div>
 
@@ -49,8 +49,8 @@
               <div class="model-info">
                 <div class="model-header">
                   <span class="model-name">{{ model.displayName }}</span>
-                  <span v-if="model.isFree" class="badge free">FREE</span>
-                  <span v-if="!model.hasKey" class="badge warning">No Key</span>
+                  <span v-if="model.isFree" class="badge free">MIỄN PHÍ</span>
+                  <span v-if="!model.hasKey" class="badge warning">Chưa có khoá</span>
                 </div>
                 <div class="model-details">
                   <span class="model-provider">{{ model.provider }}</span>
@@ -72,20 +72,20 @@
 
             <div v-if="filteredModels.length === 0" class="empty-state">
               <span class="material-symbols-outlined">info</span>
-              <p>No models available for this category</p>
+              <p>Không có mô hình nào cho nhóm này</p>
             </div>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-secondary" @click="close">Cancel</button>
+        <button class="btn-secondary" @click="close">Huỷ</button>
         <button
           class="btn-primary"
           @click="saveSelection"
           :disabled="!selectedModel || loading"
         >
-          Save Selection
+          Lưu lựa chọn
         </button>
       </div>
     </div>
@@ -175,7 +175,7 @@ export default {
     selectModel(model) {
       if (!model.hasKey) {
         this.toast.warning(
-          `No API key found for ${model.provider}. Please add an API key first.`
+          `Chưa có API key cho ${model.provider}. Hãy thêm API key trước.`
         )
         return
       }
@@ -202,7 +202,7 @@ export default {
         console.error('❌ [ModelSelectionModal] Failed to save model preference:', error)
         // Vẫn lưu vào localStorage nếu API fail
         localStorage.setItem('selectedLLMModel', this.selectedModel)
-        this.toast.warning('Model saved locally. Please check your connection.')
+        this.toast.warning('Mô hình chỉ được lưu cục bộ. Vui lòng kiểm tra kết nối.')
         this.close()
       }
     },
@@ -240,11 +240,11 @@ export default {
     },
     formatContextWindow(tokens) {
       if (tokens >= 1000000) {
-        return `${(tokens / 1000000).toFixed(1)}M tokens`
+        return `${(tokens / 1000000).toFixed(1)}M token`
       } else if (tokens >= 1000) {
-        return `${(tokens / 1000).toFixed(0)}K tokens`
+        return `${(tokens / 1000).toFixed(0)}K token`
       }
-      return `${tokens} tokens`
+      return `${tokens} token`
     },
     getModelPricing(modelName) {
       return this.modelPricing[modelName] || null

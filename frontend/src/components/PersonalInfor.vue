@@ -16,7 +16,7 @@
       </transition>
 
       <header class="modal-header">
-        <h2>Personal Information</h2>
+        <h2>Thông tin cá nhân</h2>
         <button class="close-btn" @click="$emit('close')">&times;</button>
       </header>
 
@@ -28,7 +28,7 @@
               v-if="localUser.avatar_url"
               :src="getFullAvatarUrl(localUser.avatar_url)"
               class="avatar-img"
-              alt="User Avatar"
+              alt="Ảnh đại diện"
             />
             <span
               v-else
@@ -43,7 +43,7 @@
               <span class="material-symbols-outlined">
                 {{ isUploadingAvatar ? 'progress_activity' : 'photo_camera' }}
               </span>
-              {{ isUploadingAvatar ? 'Uploading...' : 'Change' }}
+              {{ isUploadingAvatar ? 'Đang tải lên...' : 'Đổi' }}
             </div>
             <input
               type="file"
@@ -56,7 +56,7 @@
 
           <div class="user-basic-info grid-layout">
             <div class="form-group">
-              <label for="fullName">Full Name</label>
+              <label for="fullName">Họ và tên</label>
               <input id="fullName" type="text" class="form-control" v-model="localUser.name" />
             </div>
             <div class="form-group">
@@ -64,7 +64,7 @@
               <input id="email" type="email" class="form-control" v-model="localUser.email" />
             </div>
             <div class="form-group">
-              <label for="dob">Date of Birth</label>
+              <label for="dob">Ngày sinh</label>
               <input
                 id="dob"
                 type="date"
@@ -74,15 +74,15 @@
               />
             </div>
             <div class="form-group">
-              <label for="gender">Gender</label>
+              <label for="gender">Giới tính</label>
               <select id="gender" class="form-control" v-model="localUser.gender">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="male">Nam</option>
+                <option value="female">Nữ</option>
+                <option value="other">Khác</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="status">Status</label>
+              <label for="status">Trạng thái</label>
               <input
                 id="status"
                 type="text"
@@ -95,14 +95,14 @@
         </div>
 
         <div class="security-section">
-          <h3>Security</h3>
+          <h3>Bảo mật</h3>
           <div class="security-item">
             <div class="security-info">
-              <h4>Change Password</h4>
-              <p>Update your password for enhanced security.</p>
+              <h4>Đổi mật khẩu</h4>
+              <p>Cập nhật mật khẩu để tăng bảo mật.</p>
             </div>
             <button class="btn btn-secondary" @click="showPasswordForm = !showPasswordForm">
-              {{ showPasswordForm ? 'Cancel' : 'Change' }}
+              {{ showPasswordForm ? 'Huỷ' : 'Đổi' }}
             </button>
           </div>
 
@@ -111,13 +111,13 @@
               <input
                 type="password"
                 v-model="passwordForm.current"
-                placeholder="Current Password"
+                placeholder="Mật khẩu hiện tại"
                 class="form-control"
               />
               <input
                 type="password"
                 v-model="passwordForm.newPass"
-                placeholder="New Password"
+                placeholder="Mật khẩu mới"
                 class="form-control"
               />
               <button
@@ -125,19 +125,19 @@
                 @click="savePassword"
                 :disabled="isChangingPassword"
               >
-                {{ isChangingPassword ? 'Saving...' : 'Save Password' }}
+                {{ isChangingPassword ? 'Đang lưu...' : 'Lưu mật khẩu' }}
               </button>
             </div>
           </transition>
 
           <div class="security-item">
             <div class="security-info">
-              <h4>Two-Factor Authentication (2FA)</h4>
-              <p>Add an extra layer of security to your account.</p>
+              <h4>Xác thực hai lớp (2FA)</h4>
+              <p>Thêm một lớp bảo mật cho tài khoản.</p>
             </div>
             <div class="security-action">
               <span class="status-tag" :class="twoFAEnabled ? 'enabled' : 'disabled'">
-                {{ twoFAEnabled ? 'Enabled' : 'Disabled' }}
+                {{ twoFAEnabled ? 'Đang bật' : 'Đang tắt' }}
               </span>
               <button
                 class="btn"
@@ -145,17 +145,17 @@
                 @click="toggle2FA"
                 :disabled="isToggling2FA"
               >
-                {{ isToggling2FA ? 'Processing...' : twoFAEnabled ? 'Disable' : 'Enable' }}
+                {{ isToggling2FA ? 'Đang xử lý...' : twoFAEnabled ? 'Tắt' : 'Bật' }}
               </button>
             </div>
           </div>
         </div>
 
         <footer class="form-actions">
-          <button class="btn btn-secondary" @click="$emit('close')">Close</button>
+          <button class="btn btn-secondary" @click="$emit('close')">Đóng</button>
           <button class="btn btn-primary" @click="saveAllChanges" :disabled="isSavingProfile">
             <span class="material-symbols-outlined">save</span>
-            {{ isSavingProfile ? 'Saving...' : 'Save Changes' }}
+            {{ isSavingProfile ? 'Đang lưu...' : 'Lưu thay đổi' }}
           </button>
         </footer>
       </div>
@@ -365,7 +365,7 @@ export default {
         console.error('❌ Error fetching user:', err.response?.data || err.message)
         this.showNotification({
           type: 'error',
-          title: 'Error',
+          title: 'Lỗi',
           message: 'Could not load user information.',
         })
       }
@@ -391,7 +391,7 @@ export default {
       if (!allowedTypes.includes(file.type)) {
         this.showNotification({
           type: 'error',
-          title: 'Invalid File',
+          title: 'Tệp không hợp lệ',
           message: 'Only JPEG, PNG, GIF, and WebP images are allowed.',
         })
         return
@@ -402,7 +402,7 @@ export default {
       if (file.size > maxSize) {
         this.showNotification({
           type: 'error',
-          title: 'File Too Large',
+          title: 'Tệp quá lớn',
           message: 'File size must be less than 5MB.',
         })
         return
@@ -434,14 +434,14 @@ export default {
 
         this.showNotification({
           type: 'success',
-          title: 'Success',
-          message: 'Avatar uploaded successfully!',
+          title: 'Thành công',
+          message: 'Đã tải ảnh đại diện lên!',
         })
       } catch (err) {
         console.error('Error uploading avatar:', err.response?.data || err.message)
         this.showNotification({
           type: 'error',
-          title: 'Upload Failed',
+          title: 'Tải lên thất bại',
           message: err.response?.data?.message || 'Failed to upload avatar.',
         })
       } finally {
@@ -459,14 +459,14 @@ export default {
         this.twoFAEnabled = enable
         this.showNotification({
           type: 'success',
-          title: 'Success',
+          title: 'Thành công',
           message: `2FA ${enable ? 'enabled' : 'disabled'} successfully!`,
         })
       } catch (err) {
         console.error(err)
         this.showNotification({
           type: 'error',
-          title: 'Error',
+          title: 'Lỗi',
           message: 'Failed to toggle 2FA.',
         })
       } finally {
@@ -489,8 +489,8 @@ export default {
         await axiosClient.patch('/api/users/update-profile', payload)
         this.showNotification({
           type: 'success',
-          title: 'Success',
-          message: 'Profile updated successfully!',
+          title: 'Thành công',
+          message: 'Đã cập nhật hồ sơ!',
         })
 
         setTimeout(() => this.$emit('close'), 1000)
@@ -498,7 +498,7 @@ export default {
         console.error('Error updating profile:', err.response?.data || err.message)
         this.showNotification({
           type: 'error',
-          title: 'Error',
+          title: 'Lỗi',
           message: err.response?.data?.message || 'Update failed.',
         })
       } finally {
@@ -513,7 +513,7 @@ export default {
         if (!current || !newPass) {
           this.showNotification({
             type: 'warning',
-            title: 'Warning',
+            title: 'Cảnh báo',
             message: 'Please fill in all password fields.',
           })
           return
@@ -528,14 +528,14 @@ export default {
         this.passwordForm = { current: '', newPass: '' }
         this.showNotification({
           type: 'success',
-          title: 'Success',
-          message: 'Password changed successfully!',
+          title: 'Thành công',
+          message: 'Đã đổi mật khẩu!',
         })
       } catch (err) {
         console.error(err)
         this.showNotification({
           type: 'error',
-          title: 'Error',
+          title: 'Lỗi',
           message: err.response?.data?.message || 'Failed to change password.',
         })
       } finally {

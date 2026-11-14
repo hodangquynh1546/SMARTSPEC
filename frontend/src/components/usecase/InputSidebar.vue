@@ -7,12 +7,12 @@
             <button
               class="collapse-toggle"
               @click="toggleCollapse"
-              :title="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+              :title="isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'"
             >
               <span class="material-symbols-outlined toggle-icon">menu</span>
             </button>
             <h3>
-              Inputs
+              Đầu vào
               <span class="counter-badge">{{ inputs.length }}</span>
             </h3>
           </div>
@@ -21,17 +21,17 @@
             @click="toggleAddForm"
             :class="{ active: showAddForm }"
             :disabled="isVersionProcessing"
-            :title="isVersionProcessing ? 'Cannot add inputs while version is being processed' : ''"
+            :title="isVersionProcessing ? 'Không thể thêm đầu vào khi phiên bản đang được xử lý' : ''"
           >
             <span class="material-symbols-outlined">{{ showAddForm ? 'close' : 'add' }}</span>
-            {{ showAddForm ? 'Cancel' : 'Add Input' }}
+            {{ showAddForm ? 'Huỷ' : 'Thêm đầu vào' }}
           </button>
         </div>
 
         <!-- Add Input Form (Inline) -->
         <div v-if="showAddForm && !isCollapsed" class="add-input-form">
           <div class="form-section">
-            <h4>Upload Files</h4>
+            <h4>Tải tệp lên</h4>
             <div class="file-upload-area" @click="triggerFileInput">
               <input
                 type="file"
@@ -43,12 +43,12 @@
               />
               <div class="upload-placeholder">
                 <span class="material-symbols-outlined upload-icon">cloud_upload</span>
-                <p>Click to upload files</p>
-                <p class="file-types">Supported: DOCX, PDF, Images, Audio files</p>
+                <p>Bấm để tải tệp lên</p>
+                <p class="file-types">Hỗ trợ: DOCX, PDF, ảnh, âm thanh</p>
               </div>
             </div>
             <div v-if="selectedFiles.length > 0" class="selected-files">
-              <h5>Selected Files ({{ selectedFiles.length }})</h5>
+              <h5>Tệp đã chọn ({{ selectedFiles.length }})</h5>
               <ul class="file-list">
                 <li v-for="(file, index) in selectedFiles" :key="index" class="file-item">
                   <span class="material-symbols-outlined file-icon">description</span>
@@ -63,17 +63,17 @@
           </div>
 
           <div class="form-section">
-            <h4>Or Enter Text</h4>
+            <h4>Hoặc nhập văn bản</h4>
             <textarea
               v-model="rawText"
-              placeholder="Describe your requirements, use cases, or system specifications here..."
+              placeholder="Mô tả yêu cầu, use case hoặc đặc tả hệ thống tại đây..."
               class="text-input"
               rows="4"
             ></textarea>
           </div>
 
           <div v-if="!canSubmit" class="validation-message">
-            Please add at least one file or enter some text to proceed!
+            Vui lòng thêm ít nhất một tệp hoặc nhập nội dung để tiếp tục!
           </div>
 
           <div class="form-actions">
@@ -81,15 +81,15 @@
               class="submit-btn" 
               @click="handleSubmit" 
               :disabled="!canSubmit || isAddingInput || isVersionProcessing"
-              :title="isVersionProcessing ? 'Cannot add inputs while version is being processed' : ''"
+              :title="isVersionProcessing ? 'Không thể thêm đầu vào khi phiên bản đang được xử lý' : ''"
             >
               <span v-if="isAddingInput" class="button-spinner-small"></span>
               <span v-else class="material-symbols-outlined">check</span>
-              {{ isAddingInput ? 'Adding...' : isVersionProcessing ? 'Processing...' : 'Add Input' }}
+              {{ isAddingInput ? 'Adding...' : isVersionProcessing ? 'Đang xử lý...' : 'Thêm đầu vào' }}
             </button>
             <div v-if="isVersionProcessing" class="processing-warning">
               <span class="material-symbols-outlined">info</span>
-              Cannot add inputs while version is being processed. Please wait for processing to complete.
+              Không thể thêm đầu vào khi phiên bản đang được xử lý. Vui lòng chờ xử lý xong.
             </div>
           </div>
         </div>
@@ -118,12 +118,12 @@
             <div class="error-content">
               <span class="material-symbols-outlined error-icon">error</span>
               <div class="error-text">
-                <h4>Analysis Failed</h4>
-                <p>Please check and retry.</p>
+                <h4>Phân tích thất bại</h4>
+                <p>Vui lòng kiểm tra và thử lại.</p>
               </div>
               <button class="retry-btn-small" @click="$emit('retry-incremental')">
                 <span class="material-symbols-outlined">refresh</span>
-                Retry
+                Thử lại
               </button>
             </div>
           </div>
@@ -136,9 +136,9 @@
             <div class="banner-content">
               <span class="material-symbols-outlined banner-icon">update</span>
               <div class="banner-text">
-                <h4>New Inputs Available</h4>
+                <h4>Có đầu vào mới</h4>
                 <p>
-                  {{ unprocessedInputsCount }} unprocessed input(s) ready for analysis.
+                  {{ unprocessedInputsCount }} đầu vào chưa xử lý, sẵn sàng phân tích.
                 </p>
               </div>
             </div>
@@ -186,11 +186,11 @@
                 <div class="input-meta">
                   <span v-if="input._isLoading" class="status-badge loading-badge">
                     <span class="button-spinner-small"></span>
-                    Uploading...
+                    Đang tải lên...
                   </span>
                   <span v-else-if="input._isError" class="status-badge error-badge">
                     <span class="material-symbols-outlined">error</span>
-                    Failed
+                    Thất bại
                   </span>
                   <span v-else class="quality-badge" :class="getQualityClass(input)">
                     {{ Math.round(getQualityScore(input) * 100) }}%
@@ -211,7 +211,7 @@
                   class="btn-icon danger"
                   @click.stop="$emit('delete-input', input._id)"
                   :disabled="isDeletingInput === input._id"
-                  title="Delete input"
+                  title="Xoá đầu vào"
                 >
                   <span v-if="isDeletingInput === input._id" class="button-spinner"></span>
                   <span v-else class="material-symbols-outlined">delete</span>
@@ -223,26 +223,26 @@
             <div v-if="expandedInputId === input._id && !isCollapsed" class="input-details">
               <div class="details-grid">
                 <div class="detail-item">
-                  <span class="detail-label">Status</span>
+                  <span class="detail-label">Trạng thái</span>
                   <span class="detail-value">
                     <span class="status-badge" :class="{ processed: input.is_processed }">
-                      {{ input.is_processed ? 'Processed' : 'Not Processed' }}
+                      {{ input.is_processed ? 'Processed' : 'Chưa xử lý' }}
                     </span>
                   </span>
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-label">Type</span>
+                  <span class="detail-label">Loại</span>
                   <span class="detail-value">{{ input.type }}</span>
                 </div>
 
                 <div class="detail-item">
-                  <span class="detail-label">Language</span>
+                  <span class="detail-label">Ngôn ngữ</span>
                   <span class="detail-value">{{ getLanguage(input) }}</span>
                 </div>
 
                 <div class="detail-item full-width">
-                  <span class="detail-label">Content</span>
+                  <span class="detail-label">Nội dung</span>
                   <div class="content-preview">
                     {{ getCleanText(input, 2000000) }}
                   </div>
@@ -255,14 +255,14 @@
           <div v-if="filteredInputs.length === 0 && !isCollapsed" class="empty-state">
             <span class="material-symbols-outlined empty-icon">description</span>
             <p v-if="activeFilter === 'all'">
-              No inputs added yet. Add your first input to get started.
+              Chưa có đầu vào. Hãy thêm đầu vào đầu tiên để bắt đầu.
             </p>
             <p v-else>
-              No {{ activeFilter }} inputs found. Try a different filter or add new inputs.
+              No {{ activeFilter }} đầu vào. Hãy thử bộ lọc khác hoặc thêm đầu vào mới.
             </p>
             <button class="btn-secondary" @click="toggleAddForm">
               <span class="material-symbols-outlined">add</span>
-              Add Input
+              Thêm đầu vào
             </button>
           </div>
 
@@ -280,20 +280,20 @@
       <div 
         v-if="isProcessingIncremental" 
         class="stat-item processing" 
-        title="Analyzing... Click to expand"
+        title="Đang phân tích... Bấm để mở rộng"
         @click="toggleCollapse"
       >
         <div class="loading-spinner-small"></div>
-        <span class="stat-label">Analyzing</span>
+        <span class="stat-label">Đang phân tích</span>
       </div>
       <div 
         v-else-if="isProcessingFailed" 
         class="stat-item error" 
-        title="Analysis Failed. Click to expand"
+        title="Phân tích thất bại. Bấm để mở rộng"
         @click="toggleCollapse"
       >
         <span class="material-symbols-outlined error-icon">error</span>
-        <span class="stat-label">Failed</span>
+        <span class="stat-label">Thất bại</span>
       </div>
       <div 
         v-else-if="showIncrementalButton" 
@@ -411,12 +411,12 @@ export default {
       selectedFiles: [], // Files đã chọn
       rawText: '', // Raw text input
       inputFilters: [
-        { type: 'all', label: 'All', icon: 'apps' },
+        { type: 'all', label: 'Tất cả', icon: 'apps' },
         { type: 'pdf', label: 'PDF', icon: 'picture_as_pdf' },
         { type: 'docx', label: 'DOCX', icon: 'description' },
-        { type: 'image', label: 'Images', icon: 'image' },
-        { type: 'audio', label: 'Audio', icon: 'audiotrack' },
-        { type: 'text', label: 'Text', icon: 'text_snippet' },
+        { type: 'image', label: 'Ảnh', icon: 'image' },
+        { type: 'audio', label: 'Âm thanh', icon: 'audiotrack' },
+        { type: 'text', label: 'Văn bản', icon: 'text_snippet' },
       ],
     }
   },
@@ -570,7 +570,7 @@ export default {
 
     getCleanText(input, maxLength = 60) {
       const text =
-        input.cleaned_text || input.clean_text || input.raw_text || 'No content available'
+        input.cleaned_text || input.clean_text || input.raw_text || 'Không có nội dung'
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
     },
 
@@ -588,7 +588,7 @@ export default {
     },
 
     getLanguage(input) {
-      return input.metadata?.language || input.language || 'Unknown'
+      return input.metadata?.language || input.language || 'Không rõ'
     },
 
     getQualityScore(input) {
@@ -603,13 +603,13 @@ export default {
     },
 
     formatDate(dateString) {
-      if (!dateString) return 'Not available'
-      return new Date(dateString).toLocaleDateString('en-US')
+      if (!dateString) return 'Không có'
+      return new Date(dateString).toLocaleDateString('vi-VN')
     },
 
     formatDateTime(dateString) {
-      if (!dateString) return 'Not available'
-      return new Date(dateString).toLocaleString('en-US')
+      if (!dateString) return 'Không có'
+      return new Date(dateString).toLocaleString('vi-VN')
     },
     // Add Input Form Methods
     toggleAddForm() {

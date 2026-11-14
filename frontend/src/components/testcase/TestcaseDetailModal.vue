@@ -2,15 +2,15 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content xlarge">
       <div class="modal-header">
-        <h2>Test Case Details</h2>
+        <h2>Chi tiết test case</h2>
         <div class="header-actions">
           <button class="btn btn-primary" @click="executeTestcase">
             <span class="material-symbols-outlined">play_arrow</span>
-            Execute
+            Chạy
           </button>
           <button class="btn btn-secondary" @click="editTestcase">
             <span class="material-symbols-outlined">edit</span>
-            Edit
+            Sửa
           </button>
           <button class="btn-close" @click="$emit('close')">
             <span class="material-symbols-outlined">close</span>
@@ -22,7 +22,7 @@
         <!-- Header Section -->
         <div class="detail-header">
           <div class="title-section">
-            <h1>{{ testcase.title || 'Untitled Test Case' }}<WorkhubBugBadge :testcase="testcase" editable /></h1>
+            <h1>{{ testcase.title || 'Test case chưa đặt tên' }}<WorkhubBugBadge :testcase="testcase" editable /></h1>
             <div class="meta-tags">
               <span class="badge type" :class="testcase.test_type">
                 {{ testcase.test_type }}
@@ -46,7 +46,7 @@
               class="condition-section"
               v-if="testcase.preconditions && testcase.preconditions.length > 0"
             >
-              <h4>Preconditions</h4>
+              <h4>Điều kiện tiên quyết</h4>
               <ul class="condition-list">
                 <li v-for="(condition, index) in testcase.preconditions" :key="index">
                   {{ condition }}
@@ -58,7 +58,7 @@
               class="condition-section"
               v-if="testcase.postconditions && testcase.postconditions.length > 0"
             >
-              <h4>Postconditions</h4>
+              <h4>Điều kiện sau</h4>
               <ul class="condition-list">
                 <li v-for="(condition, index) in testcase.postconditions" :key="index">
                   {{ condition }}
@@ -87,7 +87,7 @@
           <!-- Test Steps Tab -->
           <div v-if="activeTab === 'steps'" class="tab-panel">
             <div class="panel-section">
-              <h3 class="panel-title">Test Steps</h3>
+              <h3 class="panel-title">Các bước kiểm thử</h3>
               <div class="steps-list">
                 <div
                   v-for="(step, index) in formattedSteps"
@@ -104,7 +104,7 @@
                         v-if="step.input_data && Object.keys(step.input_data).length > 0"
                         class="step-data-section"
                       >
-                        <h5 class="data-title">Input Data:</h5>
+                        <h5 class="data-title">Dữ liệu đầu vào:</h5>
                         <div class="data-content">
                           <div v-for="(value, key) in step.input_data" :key="key" class="data-item">
                             <span class="data-key">{{ formatKey(key) }}:</span>
@@ -117,7 +117,7 @@
 
                       <!-- Expected Immediate Result -->
                       <div v-if="step.expected_immediate_result" class="step-result-section">
-                        <h5 class="result-title">Expected Immediate Result:</h5>
+                        <h5 class="result-title">Kết quả tức thời mong đợi:</h5>
                         <p class="result-text">{{ step.expected_immediate_result }}</p>
                       </div>
                     </div>
@@ -126,13 +126,13 @@
 
                 <div v-if="!formattedSteps || formattedSteps.length === 0" class="empty-state">
                   <span class="material-symbols-outlined">list_alt</span>
-                  <p>No test steps defined</p>
+                  <p>Chưa có bước kiểm thử</p>
                 </div>
               </div>
             </div>
 
             <div class="panel-section">
-              <h3 class="panel-title">Expected Results</h3>
+              <h3 class="panel-title">Kết quả mong đợi</h3>
               <div class="expected-results-container">
                 <!-- UI Level Results -->
                 <div
@@ -144,7 +144,7 @@
                 >
                   <h4 class="result-level-title">
                     <span class="material-symbols-outlined">desktop_windows</span>
-                    UI Level
+                    Mức giao diện
                   </h4>
                   <ul class="result-list">
                     <li v-for="(result, index) in testcase.expected_results.ui_level" :key="index">
@@ -157,18 +157,18 @@
                 <div v-if="testcase.expected_results?.api_level" class="result-level">
                   <h4 class="result-level-title">
                     <span class="material-symbols-outlined">api</span>
-                    API Level
+                    Mức API
                   </h4>
                   <div class="api-results">
                     <div class="api-item" v-if="testcase.expected_results.api_level.status_code">
-                      <strong>Status Code:</strong>
+                      <strong>Mã trạng thái:</strong>
                       {{ testcase.expected_results.api_level.status_code }}
                     </div>
                     <div
                       class="api-item"
                       v-if="testcase.expected_results.api_level.response_schema"
                     >
-                      <strong>Response Schema:</strong>
+                      <strong>Lược đồ phản hồi:</strong>
                       <pre class="json-data small">{{
                         formatJson(testcase.expected_results.api_level.response_schema)
                       }}</pre>
@@ -186,7 +186,7 @@
                 >
                   <h4 class="result-level-title">
                     <span class="material-symbols-outlined">storage</span>
-                    Database Level
+                    Mức cơ sở dữ liệu
                   </h4>
                   <ul class="result-list">
                     <li
@@ -202,14 +202,14 @@
                 <div v-if="testcase.expected_results?.business_level" class="result-level">
                   <h4 class="result-level-title">
                     <span class="material-symbols-outlined">business_center</span>
-                    Business Level
+                    Mức nghiệp vụ
                   </h4>
                   <p class="business-result">{{ testcase.expected_results.business_level }}</p>
                 </div>
 
                 <div v-if="!testcase.expected_results" class="empty-state">
                   <span class="material-symbols-outlined">check_circle</span>
-                  <p>No expected results defined</p>
+                  <p>Chưa có kết quả mong đợi</p>
                 </div>
               </div>
             </div>
@@ -227,12 +227,12 @@
 
                 <div class="data-columns">
                   <div class="data-column">
-                    <h5>Input Payload</h5>
+                    <h5>Dữ liệu đầu vào</h5>
                     <pre class="json-data small">{{ formatJson(data.input_payload) }}</pre>
                   </div>
 
                   <div class="data-column">
-                    <h5>Expected Output</h5>
+                    <h5>Kết quả mong đợi</h5>
                     <pre class="json-data small">{{ formatJson(data.expected_output) }}</pre>
                   </div>
 
@@ -240,7 +240,7 @@
                     class="data-column"
                     v-if="data.validation_rules && data.validation_rules.length > 0"
                   >
-                    <h5>Validation Rules</h5>
+                    <h5>Quy tắc kiểm tra hợp lệ</h5>
                     <ul class="validation-rules">
                       <li v-for="(rule, ruleIndex) in data.validation_rules" :key="ruleIndex">
                         {{ rule }}
@@ -255,7 +255,7 @@
                 class="empty-state"
               >
                 <span class="material-symbols-outlined">data_table</span>
-                <p>No test data defined</p>
+                <p>Chưa có dữ liệu kiểm thử</p>
               </div>
             </div>
           </div>
@@ -265,7 +265,7 @@
             <div class="database-info">
               <div class="info-grid">
                 <div class="info-item">
-                  <h4>Database Tables</h4>
+                  <h4>Bảng dữ liệu</h4>
                   <div class="tables-list">
                     <span v-for="table in testcase.database_tables" :key="table" class="table-tag">
                       {{ table }}
@@ -275,13 +275,13 @@
                       class="empty-state"
                     >
                       <span class="material-symbols-outlined">table</span>
-                      <p>No database tables specified</p>
+                      <p>Chưa chỉ định bảng dữ liệu</p>
                     </div>
                   </div>
                 </div>
 
                 <div class="info-item">
-                  <h4>Database Operations</h4>
+                  <h4>Thao tác cơ sở dữ liệu</h4>
                   <div class="operations-list">
                     <span
                       v-for="op in testcase.database_operations"
@@ -297,7 +297,7 @@
                       class="empty-state"
                     >
                       <span class="material-symbols-outlined">settings</span>
-                      <p>No database operations specified</p>
+                      <p>Chưa chỉ định thao tác cơ sở dữ liệu</p>
                     </div>
                   </div>
                 </div>
@@ -307,7 +307,7 @@
                 v-if="testcase.source_requirement_ids && testcase.source_requirement_ids.length > 0"
                 class="requirements-section"
               >
-                <h4>Related Requirements</h4>
+                <h4>Yêu cầu liên quan</h4>
                 <div class="requirements-list">
                   <div
                     v-for="reqId in testcase.source_requirement_ids"
@@ -327,27 +327,27 @@
             <div class="execution-history">
               <!-- Current Execution -->
               <div v-if="testcase.executed_at" class="execution-current">
-                <h3>Last Execution</h3>
+                <h3>Lần chạy gần nhất</h3>
                 <div class="execution-details">
                   <div class="execution-meta">
                     <div class="meta-item">
-                      <strong>Date:</strong> {{ formatDate(testcase.executed_at) }}
+                      <strong>Ngày:</strong> {{ formatDate(testcase.executed_at) }}
                     </div>
                     <div class="meta-item" v-if="testcase.executed_by">
-                      <strong>Executed By:</strong> {{ getExecutedByName(testcase.executed_by) }}
+                      <strong>Người chạy:</strong> {{ getExecutedByName(testcase.executed_by) }}
                     </div>
                     <div class="meta-item">
-                      <strong>Duration:</strong>
+                      <strong>Thời lượng:</strong>
                       {{
                         testcase.automation?.last_run_duration
                           ? `${testcase.automation.last_run_duration}s`
-                          : 'Not available'
+                          : 'Không có'
                       }}
                     </div>
                   </div>
 
                   <div v-if="testcase.actual_result" class="execution-result">
-                    <h4>Actual Result</h4>
+                    <h4>Kết quả thực tế</h4>
                     <p>{{ testcase.actual_result }}</p>
                   </div>
 
@@ -355,7 +355,7 @@
                     v-if="testcase.execution_logs && testcase.execution_logs.length > 0"
                     class="execution-logs"
                   >
-                    <h4>Execution Logs</h4>
+                    <h4>Nhật ký thực thi</h4>
                     <div class="logs-list">
                       <div
                         v-for="(log, index) in testcase.execution_logs"
@@ -374,7 +374,7 @@
                 v-if="testcase.exceptions && testcase.exceptions.length > 0"
                 class="exceptions-section"
               >
-                <h3>Exceptions & Issues</h3>
+                <h3>Ngoại lệ & vấn đề</h3>
                 <div class="exceptions-list">
                   <div
                     v-for="(exception, index) in testcase.exceptions"
@@ -388,10 +388,10 @@
                       </span>
                     </div>
                     <div class="exception-message">
-                      {{ exception.message || 'No message provided' }}
+                      {{ exception.message || 'Không có thông báo' }}
                     </div>
                     <div v-if="exception.occurred_at_step" class="exception-meta">
-                      Occurred at step: {{ exception.occurred_at_step }}
+                      Xảy ra ở bước: {{ exception.occurred_at_step }}
                     </div>
                   </div>
                 </div>
@@ -399,9 +399,9 @@
 
               <div v-if="!testcase.executed_at" class="empty-state large">
                 <span class="material-symbols-outlined">play_arrow</span>
-                <h4>No Execution History</h4>
-                <p>This test case has not been executed yet.</p>
-                <button class="btn btn-primary" @click="executeTestcase">Execute Test Case</button>
+                <h4>Chưa có lịch sử chạy</h4>
+                <p>Test case này chưa được chạy.</p>
+                <button class="btn btn-primary" @click="executeTestcase">Chạy test case</button>
               </div>
             </div>
           </div>
@@ -412,10 +412,10 @@
               <div class="info-grid">
                 <!-- Automation Information -->
                 <div class="info-section">
-                  <h3>Automation Details</h3>
+                  <h3>Chi tiết tự động hoá</h3>
                   <div class="info-list">
                     <div class="info-item">
-                      <label>Automation Status:</label>
+                      <label>Trạng thái tự động hoá:</label>
                       <span
                         :class="
                           testcase.automation?.is_automated ? 'status-automated' : 'status-manual'
@@ -425,18 +425,18 @@
                       </span>
                     </div>
                     <div class="info-item" v-if="testcase.automation?.script_path">
-                      <label>Script Path:</label>
+                      <label>Đường dẫn script:</label>
                       <span>{{ testcase.automation.script_path }}</span>
                     </div>
                     <div class="info-item" v-if="testcase.automation?.test_command">
-                      <label>Test Command:</label>
+                      <label>Lệnh chạy:</label>
                       <code class="command-text">{{ testcase.automation.test_command }}</code>
                     </div>
                     <div
                       class="info-item"
                       v-if="testcase.automation?.tags && testcase.automation.tags.length > 0"
                     >
-                      <label>Tags:</label>
+                      <label>Thẻ:</label>
                       <div class="tags-list">
                         <span v-for="tag in testcase.automation.tags" :key="tag" class="tag">
                           {{ tag }}
@@ -448,21 +448,21 @@
                       class="empty-state"
                     >
                       <span class="material-symbols-outlined">smart_toy</span>
-                      <p>This test case is not automated</p>
+                      <p>Test case này chưa tự động hoá</p>
                     </div>
                   </div>
                 </div>
 
                 <!-- Execution Logs Format -->
                 <div class="info-section" v-if="testcase.execution_logs_format">
-                  <h3>Execution Logs Format</h3>
+                  <h3>Định dạng nhật ký thực thi</h3>
                   <div class="info-list">
                     <div class="info-item" v-if="testcase.execution_logs_format.timestamp">
-                      <label>Timestamp Format:</label>
+                      <label>Định dạng thời gian:</label>
                       <span>{{ testcase.execution_logs_format.timestamp }}</span>
                     </div>
                     <div class="info-item" v-if="testcase.execution_logs_format.screenshot_path">
-                      <label>Screenshot Path:</label>
+                      <label>Đường dẫn ảnh chụp:</label>
                       <span>{{ testcase.execution_logs_format.screenshot_path }}</span>
                     </div>
                   </div>
@@ -471,26 +471,26 @@
 
               <!-- Additional Metadata -->
               <div class="metadata-section">
-                <h3>Additional Information</h3>
+                <h3>Thông tin bổ sung</h3>
                 <div class="metadata-grid">
                   <div class="metadata-item">
-                    <label>Created At:</label>
-                    <span>{{ formatDate(testcase.createdAt) || 'Unknown' }}</span>
+                    <label>Tạo lúc:</label>
+                    <span>{{ formatDate(testcase.createdAt) || 'Không rõ' }}</span>
                   </div>
                   <div class="metadata-item">
-                    <label>Last Updated:</label>
-                    <span>{{ formatDate(testcase.updatedAt) || 'Unknown' }}</span>
+                    <label>Cập nhật lần cuối:</label>
+                    <span>{{ formatDate(testcase.updatedAt) || 'Không rõ' }}</span>
                   </div>
                   <div class="metadata-item" v-if="testcase.created_by">
-                    <label>Created By:</label>
+                    <label>Người tạo:</label>
                     <span>{{ formatUserId(testcase.created_by.email) }}</span>
                   </div>
                   <!-- <div class="metadata-item" v-if="testcase.project_id">
-                    <label>Project ID:</label>
+                    <label>Mã dự án:</label>
                     <span>{{ formatObjectId(testcase.project_id) }}</span>
                   </div> -->
                   <!-- <div class="metadata-item" v-if="testcase.version_id">
-                    <label>Version ID:</label>
+                    <label>Mã phiên bản:</label>
                     <span>{{ formatObjectId(testcase.version_id) }}</span>
                   </div> -->
                 </div>
@@ -521,9 +521,9 @@ export default {
     const activeTab = ref('steps')
 
     const tabs = [
-      { id: 'steps', label: 'Test Steps', icon: 'list' },
-      { id: 'data', label: 'Test Data', icon: 'data_table' },
-      { id: 'database', label: 'Database', icon: 'database' },
+      { id: 'steps', label: 'Các bước kiểm thử', icon: 'list' },
+      { id: 'data', label: 'Dữ liệu kiểm thử', icon: 'data_table' },
+      { id: 'database', label: 'Cơ sở dữ liệu', icon: 'database' },
       { id: 'execution', label: 'Execution', icon: 'history' },
       { id: 'environment', label: 'Environment', icon: 'settings' },
     ]
@@ -573,7 +573,7 @@ export default {
         typeof dateString === 'object' && dateString.$date
           ? new Date(dateString.$date)
           : new Date(dateString)
-      return date.toLocaleString('en-US', {
+      return date.toLocaleString('vi-VN', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -599,7 +599,7 @@ export default {
     const getRequirementName = (reqId) => {
       // For now, return a shortened ID format
       // In a full implementation, this would fetch from usecases API
-      if (!reqId) return 'Unknown Requirement'
+      if (!reqId) return 'Yêu cầu không rõ'
       const idStr = String(reqId)
       if (idStr.length > 12) {
         return `Use Case ${idStr.substring(0, 8)}...`
@@ -610,7 +610,7 @@ export default {
     const getExecutedByName = (executedBy) => {
       if (typeof executedBy === 'string') return executedBy
       if (executedBy?.name) return executedBy.name
-      return 'Unknown User'
+      return 'Người dùng không rõ'
     }
 
     const executeTestcase = () => {

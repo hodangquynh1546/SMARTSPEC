@@ -2,37 +2,37 @@
   <div class="diagram-controls">
     <!-- Thêm Control Group cho Sorting -->
     <div class="control-group">
-      <button class="btn-icon" @click="$emit('toggle-sort')" title="Sort Tables">
+      <button class="btn-icon" @click="$emit('toggle-sort')" title="Sắp xếp bảng">
         <span class="material-symbols-outlined">sort</span>
       </button>
       <div class="sort-dropdown" v-if="showSortOptions">
         <div class="sort-option" @click="$emit('sort', 'name-asc')">
           <span class="material-symbols-outlined">sort_by_alpha</span>
-          Name A-Z
+          Tên A-Z
         </div>
         <div class="sort-option" @click="$emit('sort', 'name-desc')">
           <span class="material-symbols-outlined">sort_by_alpha</span>
-          Name Z-A
+          Tên Z-A
         </div>
         <div class="sort-option" @click="$emit('sort', 'columns-asc')">
           <span class="material-symbols-outlined">expand_more</span>
-          Columns ↑
+          Số cột ↑
         </div>
         <div class="sort-option" @click="$emit('sort', 'columns-desc')">
           <span class="material-symbols-outlined">expand_less</span>
-          Columns ↓
+          Số cột ↓
         </div>
         <div class="sort-option" @click="$emit('sort', 'fk-asc')">
           <span class="material-symbols-outlined">expand_more</span>
-          FK Count ↑
+          Số khoá ngoại ↑
         </div>
         <div class="sort-option" @click="$emit('sort', 'fk-desc')">
           <span class="material-symbols-outlined">expand_less</span>
-          FK Count ↓
+          Số khoá ngoại ↓
         </div>
         <div class="sort-option" @click="$emit('sort', 'original')">
           <span class="material-symbols-outlined">restart_alt</span>
-          Original Order
+          Thứ tự gốc
         </div>
       </div>
       <div class="current-sort" v-if="currentSort">
@@ -41,13 +41,13 @@
     </div>
 
     <div class="control-group">
-      <button class="btn-icon" @click="$emit('auto-layout')" title="Auto Layout">
+      <button class="btn-icon" @click="$emit('auto-layout')" title="Tự động bố trí">
         <span class="material-symbols-outlined">auto_awesome</span>
       </button>
       <button
         class="btn-icon"
         @click="$emit('toggle-relationships')"
-        :title="showRelationships ? 'Hide Relationships' : 'Show Relationships'"
+        :title="showRelationships ? 'Ẩn quan hệ' : 'Hiện quan hệ'"
       >
         <span class="material-symbols-outlined">
           {{ showRelationships ? 'link_off' : 'link' }}
@@ -56,7 +56,7 @@
       <button
         class="btn-icon"
         @click="$emit('toggle-relationship-colors')"
-        :title="showRelationshipColors ? 'Hide Relationship Colors' : 'Show Relationship Colors'"
+        :title="showRelationshipColors ? 'Ẩn màu quan hệ' : 'Hiện màu quan hệ'"
       >
         <span class="material-symbols-outlined">
           {{ showRelationshipColors ? 'palette' : 'format_color_reset' }}
@@ -66,7 +66,7 @@
         class="btn-icon"
         :class="{ active: enableTableDimming }"
         @click="$emit('toggle-table-dimming')"
-        :title="enableTableDimming ? 'Disable Table Dimming on Hover' : 'Enable Table Dimming on Hover'"
+        :title="enableTableDimming ? 'Tắt làm mờ bảng khi rê chuột' : 'Bật làm mờ bảng khi rê chuột'"
       >
         <span class="material-symbols-outlined">
           {{ enableTableDimming ? 'visibility' : 'visibility_off' }}
@@ -75,7 +75,7 @@
       <!-- <button
         class="btn-icon"
         @click="$emit('toggle-grid')"
-        :title="showGrid ? 'Hide Grid' : 'Show Grid'"
+        :title="showGrid ? 'Ẩn lưới' : 'Hiện lưới'"
       >
         <span class="material-symbols-outlined">
           {{ showGrid ? 'grid_off' : 'grid_on' }}
@@ -84,20 +84,20 @@
     </div>
 
     <div class="control-group">
-      <button class="btn-icon" @click="$emit('zoom-out')" title="Zoom Out">
+      <button class="btn-icon" @click="$emit('zoom-out')" title="Thu nhỏ">
         <span class="material-symbols-outlined">zoom_out</span>
       </button>
       <div class="zoom-level">{{ Math.round(zoomLevel * 100) }}%</div>
-      <button class="btn-icon" @click="$emit('zoom-in')" title="Zoom In">
+      <button class="btn-icon" @click="$emit('zoom-in')" title="Phóng to">
         <span class="material-symbols-outlined">zoom_in</span>
       </button>
-      <button class="btn-icon" @click="$emit('reset-zoom')" title="Reset Zoom">
+      <button class="btn-icon" @click="$emit('reset-zoom')" title="Đặt lại thu phóng">
         <span class="material-symbols-outlined">refresh</span>
       </button>
       <button
         class="btn-icon"
         @click="$emit('toggle-fullscreen')"
-        :title="isFullscreen ? 'Exit Fullscreen (F11)' : 'Enter Fullscreen (F11)'"
+        :title="isFullscreen ? 'Thoát toàn màn hình (F11)' : 'Vào toàn màn hình (F11)'"
       >
         <span class="material-symbols-outlined">
           {{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}
@@ -106,14 +106,14 @@
     </div>
 
     <!-- <div class="control-group">
-      <button class="btn-icon" @click="$emit('fit-to-screen')" title="Fit to Screen">
+      <button class="btn-icon" @click="$emit('fit-to-screen')" title="Vừa màn hình">
         <span class="material-symbols-outlined">fit_screen</span>
       </button>
       
       <button
         class="btn-icon"
         @click="$emit('toggle-mini-map')"
-        :title="showMiniMap ? 'Hide Mini Map' : 'Show Mini Map'"
+        :title="showMiniMap ? 'Ẩn bản đồ nhỏ' : 'Hiện bản đồ nhỏ'"
       >
         <span class="material-symbols-outlined">
           {{ showMiniMap ? 'map' : 'map' }}
@@ -123,13 +123,13 @@
 
     <!-- Relationship Controls -->
     <div class="control-group">
-      <button class="btn-icon" @click="$emit('export-as-image')" title="Export as Image">
+      <button class="btn-icon" @click="$emit('export-as-image')" title="Xuất thành ảnh">
         <span class="material-symbols-outlined">image</span>
       </button>
       <!-- <button
         class="btn-icon"
         @click="$emit('toggle-relationship-layer')"
-        :title="relationshipOnTop ? 'Relationships on Top' : 'Relationships Under Tables'"
+        :title="relationshipOnTop ? 'Quan hệ ở trên' : 'Quan hệ ở dưới bảng'"
       >
         <span class="material-symbols-outlined">
           {{ relationshipOnTop ? 'layers' : 'layers_clear' }}
@@ -138,7 +138,7 @@
       <button
         class="btn-icon"
         @click="$emit('show-relationship-manager')"
-        title="Manage Relationships"
+        title="Quản lý quan hệ"
       >
         <span class="material-symbols-outlined">settings</span>
       </button>
@@ -146,10 +146,10 @@
 
     <!-- Undo/Redo Controls -->
     <div class="control-group" v-if="historyEnabled">
-      <button class="btn-icon" @click="$emit('undo')" :disabled="!canUndo" title="Undo (Ctrl+Z)">
+      <button class="btn-icon" @click="$emit('undo')" :disabled="!canUndo" title="Hoàn tác (Ctrl+Z)">
         <span class="material-symbols-outlined">undo</span>
       </button>
-      <button class="btn-icon" @click="$emit('redo')" :disabled="!canRedo" title="Redo (Ctrl+Y)">
+      <button class="btn-icon" @click="$emit('redo')" :disabled="!canRedo" title="Làm lại (Ctrl+Y)">
         <span class="material-symbols-outlined">redo</span>
       </button>
       <div class="history-info">{{ historyIndex + 1 }}/{{ history.length }}</div>
@@ -160,7 +160,7 @@
       <div class="auto-save-status" :class="{ saving: isSaving }">
         <span class="material-symbols-outlined" v-if="isSaving">sync</span>
         <span class="material-symbols-outlined" v-else>check_circle</span>
-        {{ isSaving ? 'Saving...' : 'Saved' }}
+        {{ isSaving ? 'Đang lưu...' : 'Đã lưu' }}
       </div>
     </div>
 
@@ -170,7 +170,7 @@
         :value="searchQuery"
         @input="$emit('search-change', $event.target.value)"
         type="text"
-        placeholder="Search tables..."
+        placeholder="Tìm bảng..."
         class="search-input"
       />
       <span class="material-symbols-outlined search-icon">search</span>
@@ -230,8 +230,8 @@ export default {
       const sortNames = {
         'name-asc': 'A-Z',
         'name-desc': 'Z-A',
-        'columns-asc': 'Columns ↑',
-        'columns-desc': 'Columns ↓',
+        'columns-asc': 'Số cột ↑',
+        'columns-desc': 'Số cột ↓',
         'fk-asc': 'FK ↑',
         'fk-desc': 'FK ↓',
         original: 'Original',

@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h3>Manage Relationships</h3>
+        <h3>Quản lý quan hệ</h3>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,21 +11,21 @@
       <div class="modal-body">
         <!-- Add Relationship Form -->
         <div class="relationship-form">
-          <h4>Add New Relationship</h4>
+          <h4>Thêm quan hệ mới</h4>
           <div class="form-row">
             <div class="form-group">
-              <label>From Table <span class="required">*</span></label>
+              <label>Từ bảng <span class="required">*</span></label>
               <select v-model="newRelationship.from_table" required @change="validateRelationship">
-                <option value="">Select source table</option>
+                <option value="">Chọn bảng nguồn</option>
                 <option v-for="table in tables" :key="table._id || table.name" :value="table.name">
                   {{ table.name }}
                 </option>
               </select>
             </div>
             <div class="form-group">
-              <label>To Table <span class="required">*</span></label>
+              <label>Đến bảng <span class="required">*</span></label>
               <select v-model="newRelationship.to_table" required @change="validateRelationship">
-                <option value="">Select target table</option>
+                <option value="">Chọn bảng đích</option>
                 <option
                   v-for="table in availableTargetTables"
                   :key="table._id || table.name"
@@ -36,12 +36,12 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Relationship Type <span class="required">*</span></label>
+              <label>Loại quan hệ <span class="required">*</span></label>
               <select v-model="newRelationship.type" required @change="validateRelationship">
-                <option value="one-to-one">One-to-One</option>
-                <option value="one-to-many">One-to-Many</option>
-                <option value="many-to-one">Many-to-One</option>
-                <option value="many-to-many">Many-to-Many</option>
+                <option value="one-to-one">Một-Một</option>
+                <option value="one-to-many">Một-Nhiều</option>
+                <option value="many-to-one">Nhiều-Một</option>
+                <option value="many-to-many">Nhiều-Nhiều</option>
               </select>
             </div>
           </div>
@@ -49,7 +49,7 @@
           <div v-if="relationshipPreview" class="relationship-preview">
             <div class="preview-header">
               <span class="material-symbols-outlined">info</span>
-              <strong>Relationship Preview:</strong>
+              <strong>Xem trước quan hệ:</strong>
             </div>
             <div class="preview-content">
               {{ relationshipPreview }}
@@ -66,38 +66,38 @@
 
           <button class="btn-primary" @click="addRelationship" :disabled="!canAddRelationship">
             <span class="material-symbols-outlined">add</span>
-            Add Relationship
+            Thêm quan hệ
           </button>
         </div>
 
         <!-- Existing Relationships -->
         <div class="relationships-list">
           <div class="section-header">
-            <h4>Current Relationships ({{ relationships.length }})</h4>
+            <h4>Quan hệ hiện tại ({{ relationships.length }})</h4>
             <div class="relationship-stats">
               <span class="stat-item">
                 <span class="stat-dot one-to-one"></span>
-                One-to-One: {{ getRelationshipCount('one-to-one') }}
+                Một-Một: {{ getRelationshipCount('one-to-one') }}
               </span>
               <span class="stat-item">
                 <span class="stat-dot one-to-many"></span>
-                One-to-Many: {{ getRelationshipCount('one-to-many') }}
+                Một-Nhiều: {{ getRelationshipCount('one-to-many') }}
               </span>
               <span class="stat-item">
                 <span class="stat-dot many-to-one"></span>
-                Many-to-One: {{ getRelationshipCount('many-to-one') }}
+                Nhiều-Một: {{ getRelationshipCount('many-to-one') }}
               </span>
               <span class="stat-item">
                 <span class="stat-dot many-to-many"></span>
-                Many-to-Many: {{ getRelationshipCount('many-to-many') }}
+                Nhiều-Nhiều: {{ getRelationshipCount('many-to-many') }}
               </span>
             </div>
           </div>
 
           <div v-if="relationships.length === 0" class="empty-relationships">
             <span class="material-symbols-outlined">link_off</span>
-            <p>No relationships defined yet</p>
-            <p class="hint">Add relationships to establish connections between your tables</p>
+            <p>Chưa có quan hệ nào</p>
+            <p class="hint">Thêm quan hệ để liên kết các bảng với nhau</p>
           </div>
 
           <div v-else class="relationships-grid">
@@ -123,7 +123,7 @@
                 <div class="relationship-meta">
                   <span class="meta-item">
                     <span class="material-symbols-outlined">schema</span>
-                    Requires foreign key in {{ relationship.from_table }}
+                    Cần khoá ngoại trong {{ relationship.from_table }}
                   </span>
                 </div>
               </div>
@@ -131,7 +131,7 @@
                 <button
                   class="btn-icon danger"
                   @click="removeRelationship(index)"
-                  title="Delete relationship"
+                  title="Xoá quan hệ"
                 >
                   <span class="material-symbols-outlined">delete</span>
                 </button>
@@ -142,7 +142,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn-secondary" @click="$emit('close')">Close</button>
+        <button class="btn-secondary" @click="$emit('close')">Đóng</button>
       </div>
     </div>
   </div>
@@ -262,7 +262,7 @@ export default {
     },
 
     removeRelationship(index) {
-      if (confirm('Are you sure you want to delete this relationship?')) {
+      if (confirm('Bạn có chắc muốn xoá quan hệ này?')) {
         this.$emit('remove-relationship', index)
       }
     },

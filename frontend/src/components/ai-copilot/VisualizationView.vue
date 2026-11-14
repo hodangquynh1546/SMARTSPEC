@@ -2,7 +2,7 @@
   <div class="visualization-view">
     <div v-if="!item" class="empty-state">
       <span class="material-symbols-outlined empty-icon">dashboard</span>
-      <p>Select an item to visualize</p>
+      <p>Chọn một mục để hiển thị</p>
     </div>
 
     <div v-else class="visualization-content">
@@ -22,7 +22,7 @@
           <div class="viz-section">
             <h4>
               <span class="material-symbols-outlined">flag</span>
-              Goal
+              Mục tiêu
               <button v-if="editingField !== 'goal'" @click.stop="startEditField('goal')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -30,8 +30,8 @@
             <div v-if="editingField === 'goal'" class="inline-edit">
               <textarea v-model="editedItem.goal" class="form-textarea" rows="3" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <p v-else>{{ item.goal }}</p>
@@ -39,7 +39,7 @@
           <div class="viz-section" v-if="item.role">
             <h4>
               <span class="material-symbols-outlined">person</span>
-              Role
+              Vai trò
               <button v-if="editingField !== 'role'" @click.stop="startEditField('role')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -47,8 +47,8 @@
             <div v-if="editingField === 'role'" class="inline-edit">
               <input v-model="editedItem.role.name" type="text" class="form-input" @blur="saveField" />
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <p v-else>{{ item.role.name || item.role }}</p>
@@ -56,7 +56,7 @@
           <div class="viz-section" v-if="item.tasks && item.tasks.length > 0">
             <h4>
               <span class="material-symbols-outlined">list</span>
-              Tasks
+              Công việc
               <button v-if="editingField !== 'tasks'" @click.stop="startEditField('tasks')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -64,22 +64,22 @@
             <div v-if="editingField === 'tasks'" class="inline-edit">
               <textarea v-model="tasksText" class="form-textarea" rows="5" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <ul v-else class="task-list">
               <li v-for="(task, idx) in item.tasks" :key="idx" class="task-item">
                 <span>{{ task }}</span>
-                <button @click.stop="removeListItem('tasks', idx)" class="task-remove" title="Remove task">
+                <button @click.stop="removeListItem('tasks', idx)" class="task-remove" title="Xoá bước">
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </li>
-              <li v-if="!item.tasks || item.tasks.length === 0" class="empty-list">No tasks</li>
+              <li v-if="!item.tasks || item.tasks.length === 0" class="empty-list">Không có bước</li>
               <li>
                 <button @click.stop="addListItem('tasks')" class="task-add">
                   <span class="material-symbols-outlined">add</span>
-                  Add Task
+                  Thêm bước
                 </button>
               </li>
             </ul>
@@ -87,7 +87,7 @@
           <div class="viz-section">
             <h4>
               <span class="material-symbols-outlined">input</span>
-              Inputs
+              Đầu vào
               <button v-if="editingField !== 'inputs'" @click.stop="startEditField('inputs')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -95,12 +95,12 @@
             <div v-if="editingField === 'inputs'" class="inline-edit">
               <input v-model="inputsText" type="text" class="form-input" placeholder="input1, input2, input3" @blur="saveField" />
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <div v-else class="tag-list">
-              <span v-if="!item.inputs || item.inputs.length === 0" class="empty-list">No inputs</span>
+              <span v-if="!item.inputs || item.inputs.length === 0" class="empty-list">Không có đầu vào</span>
               <span v-for="(input, idx) in (item.inputs || [])" :key="idx" class="tag">
                 <span v-if="editingListItem !== `inputs-${idx}`">{{ input }}</span>
                 <input 
@@ -116,19 +116,19 @@
                   v-if="editingListItem !== `inputs-${idx}`"
                   @click.stop="editListItem('inputs', idx, input)" 
                   class="tag-edit"
-                  title="Edit"
+                  title="Sửa"
                 >
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button @click.stop="removeListItem('inputs', idx)" class="tag-remove" title="Remove">×</button>
+                <button @click.stop="removeListItem('inputs', idx)" class="tag-remove" title="Gỡ">×</button>
               </span>
-              <button @click.stop="addListItem('inputs')" class="tag-add">+ Add</button>
+              <button @click.stop="addListItem('inputs')" class="tag-add">+ Thêm</button>
             </div>
           </div>
           <div class="viz-section">
             <h4>
               <span class="material-symbols-outlined">output</span>
-              Outputs
+              Đầu ra
               <button v-if="editingField !== 'outputs'" @click.stop="startEditField('outputs')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -136,12 +136,12 @@
             <div v-if="editingField === 'outputs'" class="inline-edit">
               <input v-model="outputsText" type="text" class="form-input" placeholder="output1, output2, output3" @blur="saveField" />
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <div v-else class="tag-list">
-              <span v-if="!item.outputs || item.outputs.length === 0" class="empty-list">No outputs</span>
+              <span v-if="!item.outputs || item.outputs.length === 0" class="empty-list">Không có đầu ra</span>
               <span v-for="(output, idx) in (item.outputs || [])" :key="idx" class="tag">
                 <span v-if="editingListItem !== `outputs-${idx}`">{{ output }}</span>
                 <input 
@@ -157,58 +157,58 @@
                   v-if="editingListItem !== `outputs-${idx}`"
                   @click.stop="editListItem('outputs', idx, output)" 
                   class="tag-edit"
-                  title="Edit"
+                  title="Sửa"
                 >
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button @click.stop="removeListItem('outputs', idx)" class="tag-remove" title="Remove">×</button>
+                <button @click.stop="removeListItem('outputs', idx)" class="tag-remove" title="Gỡ">×</button>
               </span>
-              <button @click.stop="addListItem('outputs')" class="tag-add">+ Add</button>
+              <button @click.stop="addListItem('outputs')" class="tag-add">+ Thêm</button>
             </div>
           </div>
         </div>
         
         <div v-else class="edit-section">
           <div class="form-group">
-            <label>Name</label>
+            <label>Tên</label>
             <input v-model="editedItem.name" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label>Goal</label>
+            <label>Mục tiêu</label>
             <textarea v-model="editedItem.goal" class="form-textarea" rows="3"></textarea>
           </div>
           <div class="form-group">
-            <label>Priority</label>
+            <label>Độ ưu tiên</label>
             <select v-model="editedItem.priority" class="form-input">
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">Thấp</option>
+              <option value="medium">Trung bình</option>
+              <option value="high">Cao</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Role</label>
-            <input v-model="editedItem.role.name" type="text" class="form-input" placeholder="Role name" />
+            <label>Vai trò</label>
+            <input v-model="editedItem.role.name" type="text" class="form-input" placeholder="Tên vai trò" />
           </div>
           <div class="form-group">
-            <label>Tasks (one per line)</label>
-            <textarea v-model="tasksText" class="form-textarea" rows="5" placeholder="Task 1&#10;Task 2&#10;Task 3"></textarea>
+            <label>Các bước (mỗi dòng một bước)</label>
+            <textarea v-model="tasksText" class="form-textarea" rows="5" placeholder="Bước 1&#10;Bước 2&#10;Bước 3"></textarea>
           </div>
           <div class="form-group">
-            <label>Inputs (comma separated)</label>
+            <label>Đầu vào (cách nhau bằng dấu phẩy)</label>
             <input v-model="inputsText" type="text" class="form-input" placeholder="input1, input2, input3" />
           </div>
           <div class="form-group">
-            <label>Outputs (comma separated)</label>
+            <label>Đầu ra (cách nhau bằng dấu phẩy)</label>
             <input v-model="outputsText" type="text" class="form-input" placeholder="output1, output2, output3" />
           </div>
           <div class="action-buttons">
             <button @click="saveChanges" class="save-btn">
               <span class="material-symbols-outlined">save</span>
-              Save Changes
+              Lưu thay đổi
             </button>
             <button @click="cancelEdit" class="cancel-btn">
               <span class="material-symbols-outlined">close</span>
-              Cancel
+              Huỷ
             </button>
           </div>
         </div>
@@ -230,7 +230,7 @@
           <div class="viz-section" v-if="item.description">
             <h4>
               <span class="material-symbols-outlined">description</span>
-              Description
+              Mô tả
               <button v-if="editingField !== 'description'" @click.stop="startEditField('description')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -238,8 +238,8 @@
             <div v-if="editingField === 'description'" class="inline-edit">
               <textarea v-model="editedItem.description" class="form-textarea" rows="3" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <p v-else>{{ item.description }}</p>
@@ -247,7 +247,7 @@
           <div class="viz-section">
             <h4>
               <span class="material-symbols-outlined">play_arrow</span>
-              Steps
+              Các bước
               <button v-if="editingField !== 'steps'" @click.stop="startEditField('steps')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -255,12 +255,12 @@
             <div v-if="editingField === 'steps'" class="inline-edit">
               <textarea v-model="stepsText" class="form-textarea" rows="5" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <ol v-else class="step-list">
-              <li v-if="!item.steps || item.steps.length === 0" class="empty-list">No steps</li>
+              <li v-if="!item.steps || item.steps.length === 0" class="empty-list">Không có bước</li>
               <li v-for="(step, idx) in (item.steps || [])" :key="idx" class="step-item">
                 <strong>{{ step.step_number || idx + 1 }}.</strong> 
                 <span v-if="editingListItem !== `steps-${idx}`">{{ step.action || step }}</span>
@@ -277,18 +277,18 @@
                   v-if="editingListItem !== `steps-${idx}`"
                   @click.stop="editStepItem(idx, step)" 
                   class="step-edit"
-                  title="Edit step"
+                  title="Sửa bước"
                 >
                   <span class="material-symbols-outlined">edit</span>
                 </button>
-                <button @click.stop="removeStepItem(idx)" class="step-remove" title="Remove step">
+                <button @click.stop="removeStepItem(idx)" class="step-remove" title="Xoá bước">
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </li>
               <li>
                 <button @click.stop="addStepItem" class="step-add">
                   <span class="material-symbols-outlined">add</span>
-                  Add Step
+                  Thêm bước
                 </button>
               </li>
             </ol>
@@ -296,7 +296,7 @@
           <div class="viz-section" v-if="item.expected_result">
             <h4>
               <span class="material-symbols-outlined">check_circle</span>
-              Expected Result
+              Kết quả mong đợi
               <button v-if="editingField !== 'expected_result'" @click.stop="startEditField('expected_result')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -304,8 +304,8 @@
             <div v-if="editingField === 'expected_result'" class="inline-edit">
               <textarea v-model="editedItem.expected_result" class="form-textarea" rows="3" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
             <p v-else>{{ item.expected_result }}</p>
@@ -314,38 +314,38 @@
         
         <div v-else class="edit-section">
           <div class="form-group">
-            <label>Title</label>
+            <label>Tiêu đề</label>
             <input v-model="editedItem.title" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label>Description</label>
+            <label>Mô tả</label>
             <textarea v-model="editedItem.description" class="form-textarea" rows="3"></textarea>
           </div>
           <div class="form-group">
-            <label>Test Type</label>
+            <label>Loại kiểm thử</label>
             <select v-model="editedItem.test_type" class="form-input">
-              <option value="functional">Functional</option>
-              <option value="integration">Integration</option>
-              <option value="unit">Unit</option>
+              <option value="functional">Chức năng</option>
+              <option value="integration">Tích hợp</option>
+              <option value="unit">Đơn vị</option>
               <option value="e2e">E2E</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Steps (JSON format or one per line)</label>
+            <label>Các bước (định dạng JSON hoặc mỗi dòng một bước)</label>
             <textarea v-model="stepsText" class="form-textarea" rows="5" placeholder='[{"step_number": 1, "action": "Step 1"}, ...]'></textarea>
           </div>
           <div class="form-group">
-            <label>Expected Result</label>
+            <label>Kết quả mong đợi</label>
             <textarea v-model="editedItem.expected_result" class="form-textarea" rows="3"></textarea>
           </div>
           <div class="action-buttons">
             <button @click="saveChanges" class="save-btn">
               <span class="material-symbols-outlined">save</span>
-              Save Changes
+              Lưu thay đổi
             </button>
             <button @click="cancelEdit" class="cancel-btn">
               <span class="material-symbols-outlined">close</span>
-              Cancel
+              Huỷ
             </button>
           </div>
         </div>
@@ -361,7 +361,7 @@
             </button>
             <button @click="addColumn" class="add-btn">
               <span class="material-symbols-outlined">add</span>
-              Add Column
+              Thêm cột
             </button>
           </div>
         </div>
@@ -370,7 +370,7 @@
           <div class="viz-section" v-if="item.description">
             <h4>
               <span class="material-symbols-outlined">description</span>
-              Description
+              Mô tả
               <button v-if="editingField !== 'description'" @click.stop="startEditField('description')" class="inline-edit-btn">
                 <span class="material-symbols-outlined">edit</span>
               </button>
@@ -378,30 +378,30 @@
             <div v-if="editingField === 'description'" class="inline-edit">
               <textarea v-model="editedItem.description" class="form-textarea" rows="2" @blur="saveField" @keydown.ctrl.enter="saveField"></textarea>
               <div class="inline-edit-actions">
-                <button @click="saveField" class="save-btn small">Save</button>
-                <button @click="editingField = null" class="cancel-btn small">Cancel</button>
+                <button @click="saveField" class="save-btn small">Lưu</button>
+                <button @click="editingField = null" class="cancel-btn small">Huỷ</button>
               </div>
             </div>
-            <p v-else>{{ item.description || 'No description' }}</p>
+            <p v-else>{{ item.description || 'Chưa có mô tả' }}</p>
           </div>
           
           <div class="viz-section">
             <div class="section-header">
               <h4>
                 <span class="material-symbols-outlined">view_column</span>
-                Columns ({{ item.columns?.length || 0 }})
+                Cột ({{ item.columns?.length || 0 }})
               </h4>
             </div>
-            <div v-if="!item.columns || item.columns.length === 0" class="empty-list">No columns</div>
+            <div v-if="!item.columns || item.columns.length === 0" class="empty-list">Không có cột</div>
             <table v-else class="columns-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Nullable</th>
-                  <th>Primary Key</th>
-                  <th>Foreign Key</th>
-                  <th>References</th>
+                  <th>Tên</th>
+                  <th>Loại</th>
+                  <th>Cho phép rỗng</th>
+                  <th>Khoá chính</th>
+                  <th>Khoá ngoại</th>
+                  <th>Tham chiếu</th>
                 </tr>
               </thead>
               <tbody>
@@ -433,11 +433,11 @@
         
         <div v-if="editMode" class="edit-section">
           <div class="form-group">
-            <label>Table Name</label>
+            <label>Tên bảng</label>
             <input v-model="editedItem.name" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label>Description</label>
+            <label>Mô tả</label>
             <textarea v-model="editedItem.description" class="form-textarea" rows="2"></textarea>
           </div>
         </div>
@@ -446,7 +446,7 @@
           <div class="section-header">
             <h4>
               <span class="material-symbols-outlined">view_column</span>
-              Columns
+              Cột
             </h4>
             <button v-if="editMode" @click="addColumn" class="icon-btn">
               <span class="material-symbols-outlined">add</span>
@@ -455,11 +455,11 @@
           <table class="columns-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Nullable</th>
-                <th>Key</th>
-                <th v-if="editMode">Actions</th>
+                <th>Tên</th>
+                <th>Loại</th>
+                <th>Cho phép rỗng</th>
+                <th>Khoá</th>
+                <th v-if="editMode">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -509,11 +509,11 @@
         <div v-if="editMode" class="action-buttons">
           <button @click="saveChanges" class="save-btn">
             <span class="material-symbols-outlined">save</span>
-            Save Changes
+            Lưu thay đổi
           </button>
           <button @click="cancelEdit" class="cancel-btn">
             <span class="material-symbols-outlined">close</span>
-            Cancel
+            Huỷ
           </button>
         </div>
       </div>
@@ -529,28 +529,28 @@
         <div v-if="!editMode" class="viz-section">
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Type:</span>
+              <span class="label">Loại:</span>
               <code>{{ item.type }}</code>
             </div>
             <div class="info-item">
-              <span class="label">Nullable:</span>
+              <span class="label">Cho phép rỗng:</span>
               <span class="material-symbols-outlined">{{ item.nullable ? 'check' : 'close' }}</span>
             </div>
             <div class="info-item" v-if="item.is_primary_key">
-              <span class="badge primary">Primary Key</span>
+              <span class="badge primary">Khoá chính</span>
             </div>
             <div class="info-item" v-if="item.is_foreign_key">
-              <span class="badge foreign">Foreign Key</span>
+              <span class="badge foreign">Khoá ngoại</span>
             </div>
           </div>
         </div>
         <div v-else class="edit-section">
           <div class="form-group">
-            <label>Column Name</label>
+            <label>Tên cột</label>
             <input v-model="editedItem.name" type="text" class="form-input" />
           </div>
           <div class="form-group">
-            <label>Type</label>
+            <label>Loại</label>
             <select v-model="editedItem.type" class="form-input">
               <option>VARCHAR</option>
               <option>INT</option>
@@ -564,29 +564,29 @@
           <div class="form-group">
             <label>
               <input type="checkbox" v-model="editedItem.nullable" />
-              Nullable
+              Cho phép rỗng
             </label>
           </div>
           <div class="form-group">
             <label>
               <input type="checkbox" v-model="editedItem.is_primary_key" />
-              Primary Key
+              Khoá chính
             </label>
           </div>
           <div class="form-group">
             <label>
               <input type="checkbox" v-model="editedItem.is_foreign_key" />
-              Foreign Key
+              Khoá ngoại
             </label>
           </div>
           <div class="action-buttons">
             <button @click="saveChanges" class="save-btn">
               <span class="material-symbols-outlined">save</span>
-              Save
+              Lưu
             </button>
             <button @click="cancelEdit" class="cancel-btn">
               <span class="material-symbols-outlined">close</span>
-              Cancel
+              Huỷ
             </button>
           </div>
         </div>
@@ -595,7 +595,7 @@
       <!-- Default JSON View -->
       <div v-else class="json-viz">
         <div class="viz-header">
-          <h3>{{ item.name || item.title || 'Item Details' }}</h3>
+          <h3>{{ item.name || item.title || 'Chi tiết mục' }}</h3>
         </div>
         <pre class="json-preview">{{ JSON.stringify(item, null, 2) }}</pre>
       </div>
@@ -723,7 +723,7 @@ const saveColumn = (idx) => {
 }
 
 const deleteColumn = (idx) => {
-  if (confirm('Delete this column?')) {
+  if (confirm('Xoá cột này?')) {
     editedItem.value.columns.splice(idx, 1)
     editingColumnIdx.value = -1
   }
@@ -810,7 +810,7 @@ const saveChanges = async () => {
         }
       } catch (error) {
         console.error('Error saving column:', error)
-        alert('Failed to save column: ' + (error.response?.data?.message || error.message))
+        alert('Lưu cột thất bại:' + (error.response?.data?.message || error.message))
       }
     } else {
       // For other types, just emit
@@ -820,7 +820,7 @@ const saveChanges = async () => {
     editingColumnIdx.value = -1
   } catch (error) {
     console.error('Error saving changes:', error)
-    alert('Failed to save changes: ' + (error.response?.data?.message || error.message))
+    alert('Lưu thay đổi thất bại:' + (error.response?.data?.message || error.message))
   }
 }
 
@@ -874,7 +874,7 @@ const saveField = async () => {
   } catch (error) {
     console.error('Error saving field:', error)
     const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message
-    alert('Failed to save changes: ' + errorMsg)
+    alert('Lưu thay đổi thất bại:' + errorMsg)
   }
 }
 

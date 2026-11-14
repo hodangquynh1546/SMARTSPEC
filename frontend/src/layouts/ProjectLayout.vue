@@ -116,7 +116,7 @@
                   v-if="process.status === 'success' || process.status === 'failed'"
                   class="close-process-btn"
                   @click="removeProcess(process)"
-                  title="Close"
+                  title="Đóng"
                 >
                   <span class="material-symbols-outlined">close</span>
                 </button>
@@ -130,7 +130,7 @@
                   <span class="material-symbols-outlined stage-icon success-icon"
                     >check_circle</span
                   >
-                  <span class="stage-text">Completed successfully!</span>
+                  <span class="stage-text">Hoàn tất thành công!</span>
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@
               <div class="progress-stage failed-stage">
                 <div class="stage-content">
                   <span class="material-symbols-outlined stage-icon failed-icon">error</span>
-                  <span class="stage-text">{{ process.errorMessage || 'Generation failed' }}</span>
+                  <span class="stage-text">{{ process.errorMessage || 'Sinh thất bại' }}</span>
                 </div>
               </div>
             </div>
@@ -170,7 +170,7 @@
               <div v-else-if="process.stage === 'estimating'" class="progress-stage">
                 <div class="stage-content">
                   <span class="material-symbols-outlined stage-icon spinning">calculate</span>
-                  <span class="stage-text">Estimating...</span>
+                  <span class="stage-text">Đang ước tính...</span>
                 </div>
               </div>
 
@@ -189,7 +189,7 @@
                   >
                   <div class="stage-text-container">
                     <span class="stage-text stage-title"
-                      >Estimated {{ process.estimateInfo.estimated_count }} items</span
+                      >Ước tính {{ process.estimateInfo.estimated_count }} items</span
                     >
                   </div>
                 </div>
@@ -201,7 +201,7 @@
                   <span class="material-symbols-outlined stage-icon pulsing">auto_awesome</span>
                   <div class="stage-text-container">
                     <span class="stage-text stage-title">
-                      Generating Batch {{ process.batchProgress.currentBatch }}/{{
+                      Đang sinh lô {{ process.batchProgress.currentBatch }}/{{
                         process.batchProgress.totalBatches
                       }}
                     </span>
@@ -221,7 +221,7 @@
                 <div class="stage-content">
                   <span class="material-symbols-outlined stage-icon spinning">save</span>
                   <div class="stage-text-container">
-                    <span class="stage-text stage-title">Saving...</span>
+                    <span class="stage-text stage-title">Đang lưu...</span>
                   </div>
                 </div>
               </div>
@@ -230,7 +230,7 @@
               <div v-else class="progress-stage">
                 <div class="stage-content">
                   <span class="material-symbols-outlined stage-icon spinning">sync</span>
-                  <span class="stage-text">{{ process.stage || 'Processing...' }}</span>
+                  <span class="stage-text">{{ process.stage || 'Đang xử lý...' }}</span>
                 </div>
               </div>
             </div>
@@ -659,7 +659,7 @@ export default {
         }
       } catch (error) {
         console.error('Error fetching project:', error)
-        toast.error('Failed to load project data')
+        toast.error('Không tải được dữ liệu dự án')
       }
     }
 
@@ -1031,10 +1031,10 @@ export default {
 
     const getProcessName = (type) => {
       const names = {
-        usecase: 'Use Cases',
-        database: 'Database',
-        testcase: 'Test Cases',
-        uml: 'UML Diagrams',
+        usecase: 'Use case',
+        database: 'Cơ sở dữ liệu',
+        testcase: 'Test case',
+        uml: 'Sơ đồ UML',
       }
       return names[type] || 'Processing'
     }
@@ -1244,7 +1244,7 @@ export default {
           // Format error message thân thiện với người dùng
           const rawErrorMsg = hasErrors
             ? event.errors.join('; ')
-            : event.error || event.errorMessage || event.message || 'Generation failed'
+            : event.error || event.errorMessage || event.message || 'Sinh thất bại'
 
           // Format error message để thân thiện hơn
           const friendlyErrorMsg = translateErrorMessage(rawErrorMsg)

@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content medium">
       <div class="modal-header">
-        <h2>Step Templates</h2>
+        <h2>Mẫu bước</h2>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -43,7 +43,7 @@
                   <span class="step-action">{{ step.action.substring(0, 50) }}...</span>
                 </div>
                 <div v-if="template.steps.length > 2" class="more-steps">
-                  +{{ template.steps.length - 2 }} more steps
+                  +{{ template.steps.length - 2 }} bước khác
                 </div>
               </div>
             </div>
@@ -51,9 +51,9 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="btn btn-secondary" @click="$emit('close')">Huỷ</button>
           <button class="btn btn-primary" @click="createCustomTemplate" v-if="customSteps.length">
-            Create Custom ({{ customSteps.length }})
+            Tạo tuỳ chỉnh ({{ customSteps.length }})
           </button>
         </div>
       </div>
@@ -74,76 +74,76 @@ export default {
     const customSteps = ref([])
 
     const categories = [
-      { id: 'common', name: 'Common Flows' },
-      { id: 'auth', name: 'Authentication' },
-      { id: 'crud', name: 'CRUD Operations' },
-      { id: 'api', name: 'API Testing' },
-      { id: 'ui', name: 'UI Testing' },
-      { id: 'custom', name: 'My Templates' },
+      { id: 'common', name: 'Luồng thường gặp' },
+      { id: 'auth', name: 'Xác thực' },
+      { id: 'crud', name: 'Thao tác CRUD' },
+      { id: 'api', name: 'Kiểm thử API' },
+      { id: 'ui', name: 'Kiểm thử giao diện' },
+      { id: 'custom', name: 'Mẫu của tôi' },
     ]
 
     const templates = ref([
       {
         id: 'login-flow',
-        title: 'User Login Flow',
-        description: 'Standard user authentication process',
+        title: 'Luồng đăng nhập',
+        description: 'Quy trình xác thực người dùng chuẩn',
         category: 'auth',
         steps: [
           {
             step_number: 1,
-            action: 'Navigate to login page',
+            action: 'Mở trang đăng nhập',
             input_data: { url: '/login' },
-            expected_immediate_result: 'Login page loads successfully',
+            expected_immediate_result: 'Trang đăng nhập tải thành công',
           },
           {
             step_number: 2,
-            action: 'Enter username and password',
+            action: 'Nhập tên đăng nhập và mật khẩu',
             input_data: { username: 'testuser', password: 'testpass123' },
-            expected_immediate_result: 'Credentials entered into form fields',
+            expected_immediate_result: 'Thông tin đã được nhập vào biểu mẫu',
           },
           {
             step_number: 3,
-            action: 'Click login button',
+            action: 'Bấm nút đăng nhập',
             input_data: { element: 'login-btn' },
-            expected_immediate_result: 'Login request sent to server',
+            expected_immediate_result: 'Yêu cầu đăng nhập đã gửi tới máy chủ',
           },
           {
             step_number: 4,
-            action: 'Verify successful login',
+            action: 'Xác nhận đăng nhập thành công',
             input_data: { expected_url: '/dashboard' },
-            expected_immediate_result: 'User redirected to dashboard',
+            expected_immediate_result: 'Người dùng được chuyển tới trang chủ',
           },
         ],
       },
       {
         id: 'create-record',
-        title: 'Create New Record',
-        description: 'Create a new record in the system',
+        title: 'Tạo bản ghi mới',
+        description: 'Tạo một bản ghi mới trong hệ thống',
         category: 'crud',
         steps: [
           {
             step_number: 1,
-            action: 'Navigate to create form',
+            action: 'Mở biểu mẫu tạo mới',
             input_data: { url: '/create' },
-            expected_immediate_result: 'Create form loads successfully',
+            expected_immediate_result: 'Biểu mẫu tạo mới tải thành công',
           },
           {
             step_number: 2,
-            action: 'Fill in required fields',
+            action: 'Điền các trường bắt buộc',
             input_data: { field1: 'value1', field2: 'value2' },
-            expected_immediate_result: 'All required fields populated',
+            expected_immediate_result: 'Đã điền đủ trường bắt buộc',
           },
           {
             step_number: 3,
-            action: 'Submit the form',
+            action: 'Gửi biểu mẫu',
             input_data: { element: 'submit-btn' },
-            expected_immediate_result: 'Form data sent to server',
+            expected_immediate_result: 'Dữ liệu biểu mẫu đã gửi tới máy chủ',
           },
           {
             step_number: 4,
-            action: 'Verify record creation',
-            input_data: { expected_message: 'Record created successfully' },
-            expected_immediate_result: 'Success message displayed',
+            action: 'Xác nhận bản ghi đã tạo',
+            input_data: { expected_message: 'Tạo bản ghi thành công' },
+            expected_immediate_result: 'Hiển thị thông báo thành công',
           },
         ],
       },
@@ -162,7 +162,7 @@ export default {
     }
 
     const createCustomTemplate = () => {
-      toast.info('Custom template creation feature coming soon')
+      toast.info('Tính năng tạo mẫu tuỳ chỉnh sắp ra mắt')
     }
 
     return {

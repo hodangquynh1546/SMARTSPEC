@@ -11,7 +11,7 @@
       <div class="header-left">
         <div class="logo">
           <span class="material-symbols-outlined">admin_panel_settings</span>
-          <h1>SmartSpec Admin</h1>
+          <h1>Quản trị SmartSpec</h1>
         </div>
       </div>
       <div class="header-right">
@@ -151,7 +151,7 @@
                         @click="setRangeDays(7)"
                       >
                         <span class="material-symbols-outlined">today</span>
-                        7 days
+                        7 ngày
                       </button>
                       <button 
                         class="filter-option" 
@@ -159,7 +159,7 @@
                         @click="setRangeDays(30)"
                       >
                         <span class="material-symbols-outlined">date_range</span>
-                        30 days
+                        30 ngày
                       </button>
                       <button 
                         class="filter-option" 
@@ -167,7 +167,7 @@
                         @click="setRangeDays(90)"
                       >
                         <span class="material-symbols-outlined">event</span>
-                        90 days
+                        90 ngày
                       </button>
                     </div>
                   </div>
@@ -190,7 +190,7 @@
                         @click="setViewMode('day')"
                       >
                         <span class="material-symbols-outlined">today</span>
-                        By Day
+                        Theo ngày
                       </button>
                       <button 
                         class="filter-option" 
@@ -198,7 +198,7 @@
                         @click="setViewMode('month')"
                       >
                         <span class="material-symbols-outlined">calendar_month</span>
-                        By Month
+                        Theo tháng
                       </button>
                       <button 
                         class="filter-option" 
@@ -206,7 +206,7 @@
                         @click="setViewMode('year')"
                       >
                         <span class="material-symbols-outlined">event</span>
-                        By Year
+                        Theo năm
                       </button>
                     </div>
                   </div>
@@ -378,7 +378,7 @@
                 <div class="filter-item-modern">
                   <label class="filter-label">
                     <span class="material-symbols-outlined">cloud</span>
-                    Provider
+                    Nhà cung cấp
                   </label>
                   <div class="filter-icon-wrapper">
                     <button 
@@ -399,7 +399,7 @@
                         @click="setProviderFilter('')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Providers
+                        Tất cả nhà cung cấp
                       </button>
                       <button 
                         class="filter-option" 
@@ -431,7 +431,7 @@
                 <div class="filter-item-modern">
                   <label class="filter-label">
                     <span class="material-symbols-outlined">check_circle</span>
-                    Status
+                    Trạng thái
                   </label>
                   <div class="filter-icon-wrapper">
                     <button 
@@ -452,7 +452,7 @@
                         @click="setStatusFilter('')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Status
+                        Tất cả trạng thái
                       </button>
                       <button 
                         class="filter-option" 
@@ -460,7 +460,7 @@
                         @click="setStatusFilter('success')"
                       >
                         <span class="material-symbols-outlined">check_circle</span>
-                        Success
+                        Thành công
                       </button>
                       <button 
                         class="filter-option" 
@@ -468,7 +468,7 @@
                         @click="setStatusFilter('failed')"
                       >
                         <span class="material-symbols-outlined">cancel</span>
-                        Failed
+                        Thất bại
                       </button>
                       <button 
                         class="filter-option" 
@@ -476,7 +476,7 @@
                         @click="setStatusFilter('timeout')"
                       >
                         <span class="material-symbols-outlined">schedule</span>
-                        Timeout
+                        Quá hạn
                       </button>
                     </div>
                   </div>
@@ -553,7 +553,7 @@
                   ></div>
                 </div>
                 <div class="provider-details-modern">
-                  <span class="provider-count">{{ provider.usage }} requests</span>
+                  <span class="provider-count">{{ provider.usage }} yêu cầu</span>
                 </div>
               </div>
             </div>
@@ -716,7 +716,7 @@
                 </button>
                 <button class="btn-action secondary" @click="showProjectTemplatesModal = true">
                   <span class="material-symbols-outlined">description</span>
-                  Template
+                  Mẫu
                 </button>
               </div>
             </div>
@@ -739,7 +739,7 @@
                   <span class="stat-value">{{ systemStats.totalConfigs }}</span>
                 </div>
                 <div class="quick-stat">
-                  <span class="stat-label">Backup</span>
+                  <span class="stat-label">Sao lưu</span>
                   <span class="stat-value">{{ systemStats.lastBackup }}</span>
                 </div>
               </div>
@@ -788,7 +788,7 @@
                         @click="setLogLevelFilter('all')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Levels
+                        Tất cả mức
                       </button>
                       <button 
                         class="filter-option" 
@@ -796,7 +796,7 @@
                         @click="setLogLevelFilter('info')"
                       >
                         <span class="material-symbols-outlined">info</span>
-                        Info
+                        Thông tin
                       </button>
                       <button 
                         class="filter-option" 
@@ -804,7 +804,7 @@
                         @click="setLogLevelFilter('warning')"
                       >
                         <span class="material-symbols-outlined">warning</span>
-                        Warning
+                        Cảnh báo
                       </button>
                       <button 
                         class="filter-option" 
@@ -812,7 +812,7 @@
                         @click="setLogLevelFilter('error')"
                       >
                         <span class="material-symbols-outlined">error</span>
-                        Error
+                        Lỗi
                       </button>
                     </div>
                   </div>
@@ -835,7 +835,7 @@
                         @click="setLogTypeFilter('all')"
                       >
                         <span class="material-symbols-outlined">filter_alt_off</span>
-                        All Types
+                        Tất cả loại
                       </button>
                       <button 
                         class="filter-option" 
@@ -843,7 +843,7 @@
                         @click="setLogTypeFilter('system')"
                       >
                         <span class="material-symbols-outlined">settings</span>
-                        System
+                        Hệ thống
                       </button>
                       <button 
                         class="filter-option" 
@@ -851,7 +851,7 @@
                         @click="setLogTypeFilter('user')"
                       >
                         <span class="material-symbols-outlined">person</span>
-                        User
+                        Người dùng
                       </button>
                       <button 
                         class="filter-option" 
@@ -859,7 +859,7 @@
                         @click="setLogTypeFilter('project')"
                       >
                         <span class="material-symbols-outlined">folder</span>
-                        Project
+                        Dự án
                       </button>
                       <button 
                         class="filter-option" 
@@ -867,7 +867,7 @@
                         @click="setLogTypeFilter('member')"
                       >
                         <span class="material-symbols-outlined">group</span>
-                        Member
+                        Thành viên
                       </button>
                     </div>
                   </div>
@@ -985,14 +985,14 @@
                 <span class="metric-value">{{ systemMetrics.cpu }}%</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">Memory</span>
+                <span class="metric-label">Bộ nhớ</span>
                 <div class="metric-bar">
                   <div class="metric-fill" :style="{ width: systemMetrics.memory + '%' }"></div>
                 </div>
                 <span class="metric-value">{{ systemMetrics.memory }}%</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">Disk</span>
+                <span class="metric-label">Ổ đĩa</span>
                 <div class="metric-bar">
                   <div class="metric-fill" :style="{ width: systemMetrics.disk + '%' }"></div>
                 </div>
@@ -1082,6 +1082,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { actionLabel } from '@/utils/logLabels'
 import axiosClient from '@/utils/axiosClient'
 import { socket, initSocketConnection } from '@/utils/socket'
 import { useToast } from 'vue-toastification'
@@ -1298,10 +1299,7 @@ const formatLogType = (type) => {
 
 const formatLogAction = (action) => {
   if (!action) return ''
-  return action
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+  return actionLabel(action)
 }
 
 const getLogIcon = (log) => {
@@ -1522,9 +1520,9 @@ const refreshUserStats = async () => {
       const distribution = Object.entries(roleCounts).map(([role, count]) => ({
         label:
           role === 'ADMIN'
-            ? 'Admin'
+            ? 'Quản trị viên'
             : role === 'PARTICIPANT'
-            ? 'Participant'
+            ? 'Người dùng'
             : role,
         value: count,
         percentage: Math.round((count / total) * 100),
@@ -1714,7 +1712,7 @@ const loadChartData = async () => {
                 pointBorderWidth: 2,
               },
               {
-                label: 'Success',
+                label: 'Thành công',
                 data: timelineRes.data.data.map(d => d.success),
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -1728,7 +1726,7 @@ const loadChartData = async () => {
                 pointBorderWidth: 2,
               },
               {
-                label: 'Failed',
+                label: 'Thất bại',
                 data: timelineRes.data.data.map(d => d.failed),
                 borderColor: '#ef4444',
                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -2321,9 +2319,9 @@ const setViewMode = (value) => {
 }
 const getViewModeLabel = () => {
   const labels = {
-    day: 'By Day',
-    month: 'By Month',
-    year: 'By Year',
+    day: 'Theo ngày',
+    month: 'Theo tháng',
+    year: 'Theo năm',
   }
   return labels[userAnalyticsFilters.value.viewMode] || 'View'
 }
@@ -2347,11 +2345,11 @@ const setStatusFilter = (value) => {
   applyApiFilters()
 }
 const getProviderFilterLabel = () => {
-  if (apiFilters.value.provider === '') return 'All Providers'
+  if (apiFilters.value.provider === '') return 'Tất cả nhà cung cấp'
   return apiFilters.value.provider.charAt(0).toUpperCase() + apiFilters.value.provider.slice(1)
 }
 const getStatusFilterLabel = () => {
-  if (apiFilters.value.status === '') return 'All Status'
+  if (apiFilters.value.status === '') return 'Tất cả trạng thái'
   const labels = {
     success: 'Success',
     failed: 'Failed',
@@ -2379,11 +2377,11 @@ const setLogTypeFilter = (value) => {
   refreshLogs()
 }
 const getLogLevelFilterLabel = () => {
-  if (logFilter.value.level === 'all') return 'All Levels'
+  if (logFilter.value.level === 'all') return 'Tất cả mức'
   return logFilter.value.level.charAt(0).toUpperCase() + logFilter.value.level.slice(1)
 }
 const getLogTypeFilterLabel = () => {
-  if (logFilter.value.type === 'all') return 'All Types'
+  if (logFilter.value.type === 'all') return 'Tất cả loại'
   return logFilter.value.type.charAt(0).toUpperCase() + logFilter.value.type.slice(1)
 }
 

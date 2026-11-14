@@ -13,26 +13,26 @@
       <div class="toolbar-left">
         <!-- View Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="zoomOut" title="Zoom Out (Ctrl + -)">
+          <button class="toolbar-btn" @click="zoomOut" title="Thu nhỏ (Ctrl + -)">
             <span class="material-symbols-outlined">zoom_out</span>
           </button>
           <div class="zoom-display">{{ Math.round(internalZoom * 100) }}%</div>
-          <button class="toolbar-btn" @click="zoomIn" title="Zoom In (Ctrl + +)">
+          <button class="toolbar-btn" @click="zoomIn" title="Phóng to (Ctrl + +)">
             <span class="material-symbols-outlined">zoom_in</span>
           </button>
           <button
             class="toolbar-btn"
             @click="toggleFullscreen"
-            :title="isFullscreen ? 'Exit Fullscreen (F11)' : 'Enter Fullscreen (F11)'"
+            :title="isFullscreen ? 'Thoát toàn màn hình (F11)' : 'Vào toàn màn hình (F11)'"
           >
             <span class="material-symbols-outlined">{{
               isFullscreen ? 'fullscreen_exit' : 'fullscreen'
             }}</span>
           </button>
-          <button class="toolbar-btn" @click="resetZoom" title="Reset Zoom">
+          <button class="toolbar-btn" @click="resetZoom" title="Đặt lại thu phóng">
             <span class="material-symbols-outlined">refresh</span>
           </button>
-          <button class="toolbar-btn" @click="fitToViewport" title="Fit to Viewport">
+          <button class="toolbar-btn" @click="fitToViewport" title="Vừa khung nhìn">
             <span class="material-symbols-outlined">fit_screen</span>
           </button>
         </div>
@@ -43,28 +43,28 @@
             class="toolbar-btn" 
             :class="{ active: snapToGrid }"
             @click="snapToGrid = !snapToGrid" 
-            title="Snap to Grid (Ctrl+G)"
+            title="Căn theo lưới (Ctrl+G)"
           >
             <span class="material-symbols-outlined">grid_on</span>
-            Snap
+            Căn lưới
           </button>
         </div>
 
         <!-- CRUD Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Manage Diagram">
+          <button class="toolbar-btn btn-manage" @click="showManagementModal" title="Quản lý sơ đồ">
             <span class="material-symbols-outlined">settings</span>
-            Manage
+            Quản lý
           </button>
         </div>
 
         <!-- Export Controls -->
         <div class="toolbar-group">
-          <button class="toolbar-btn" @click="exportAsSVG" title="Export as SVG">
+          <button class="toolbar-btn" @click="exportAsSVG" title="Xuất SVG">
             <span class="material-symbols-outlined">download</span>
             SVG
           </button>
-          <button class="toolbar-btn" @click="exportAsPNG" title="Export as PNG">
+          <button class="toolbar-btn" @click="exportAsPNG" title="Xuất PNG">
             <span class="material-symbols-outlined">image</span>
             PNG
           </button>
@@ -430,31 +430,31 @@
     <div v-if="!previewMode && !optimizeForPreview" class="status-bar">
       <div class="status-item">
         <span class="material-symbols-outlined">circle</span>
-        {{ positionedNodes.length }} Nodes
+        {{ positionedNodes.length }} Nút
       </div>
       <div class="status-item">
         <span class="material-symbols-outlined">arrow_right_alt</span>
-        {{ computedEdges.length }} Edges
+        {{ computedEdges.length }} Cạnh
       </div>
 
-      <div class="status-item" v-if="selectedElement">Selected: {{ selectedElement.label }}</div>
+      <div class="status-item" v-if="selectedElement">Đã chọn: {{ selectedElement.label }}</div>
 
       <div class="status-item spacer"></div>
 
       <div class="status-item">
-        View: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
+        Chế độ xem: ({{ Math.round(viewport.x) }}, {{ Math.round(viewport.y) }})
       </div>
       <div class="status-item">
-        Canvas: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
+        Khung vẽ: {{ Math.round(virtualSpace.width) }} × {{ Math.round(virtualSpace.height) }}
       </div>
-      <div class="status-item">Zoom: {{ Math.round(internalZoom * 100) }}%</div>
+      <div class="status-item">Thu phóng: {{ Math.round(internalZoom * 100) }}%</div>
     </div>
 
     <!-- Management Modal -->
     <div v-if="managementModal.visible" class="management-modal-overlay" @click="closeManagementModal">
       <div class="management-modal-content" @click.stop>
         <div class="management-modal-header">
-          <h2>Manage Activity Diagram</h2>
+          <h2>Quản lý sơ đồ hoạt động</h2>
           <button class="modal-close-btn" @click="closeManagementModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -480,10 +480,10 @@
           <!-- Nodes Tab -->
           <div v-if="managementModal.activeTab === 'nodes'" class="tab-panel">
             <div class="panel-header">
-              <h3>Nodes</h3>
+              <h3>Nút</h3>
               <button class="btn-add-item" @click="openCreateForm('node')">
                 <span class="material-symbols-outlined">add</span>
-                Add Node
+                Thêm nút
               </button>
             </div>
             <div class="items-list">
@@ -493,11 +493,11 @@
                 class="item-card"
               >
                 <div class="item-info">
-                  <div class="item-name">{{ node.label || 'Unnamed Node' }}</div>
+                  <div class="item-name">{{ node.label || 'Nút chưa đặt tên' }}</div>
                   <div class="item-meta">
                     <span class="node-type-badge">{{ node.type }}</span>
                     <span v-if="node.lane_id" class="lane-badge">
-                      Lane: {{ getLaneName(node.lane_id) }}
+                      Làn: {{ getLaneName(node.lane_id) }}
                     </span>
                   </div>
                 </div>
@@ -505,7 +505,7 @@
                   <button 
                     class="btn-edit" 
                     @click="openEditForm('node', node)" 
-                    title="Edit"
+                    title="Sửa"
                     :disabled="isCrudLoading"
                   >
                     <span class="material-symbols-outlined">edit</span>
@@ -513,7 +513,7 @@
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('node', node)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === node.id"
                   >
                     <span 
@@ -527,7 +527,7 @@
               </div>
               <div v-if="positionedNodes.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">circle</span>
-                <p>No nodes yet</p>
+                <p>Chưa có nút</p>
               </div>
             </div>
           </div>
@@ -535,14 +535,14 @@
           <!-- Edges Tab -->
           <div v-if="managementModal.activeTab === 'edges'" class="tab-panel">
             <div class="panel-header">
-              <h3>Edges</h3>
+              <h3>Cạnh</h3>
               <button 
                 class="btn-add-item" 
                 @click="openCreateForm('edge')"
                 :disabled="isCrudLoading"
               >
                 <span class="material-symbols-outlined">add</span>
-                Add Edge
+                Thêm cạnh
               </button>
             </div>
             <div class="items-list">
@@ -553,19 +553,19 @@
               >
                 <div class="item-info">
                   <div class="item-name">
-                    {{ edge.source?.label || 'Unknown' }} → {{ edge.target?.label || 'Unknown' }}
+                    {{ edge.source?.label || 'Không rõ' }} → {{ edge.target?.label || 'Không rõ' }}
                   </div>
                   <div v-if="edge.condition || edge.guard || edge.trigger" class="item-description">
-                    <span v-if="edge.condition">Condition: {{ edge.condition }}</span>
-                    <span v-if="edge.guard">Guard: {{ edge.guard }}</span>
-                    <span v-if="edge.trigger">Trigger: {{ edge.trigger }}</span>
+                    <span v-if="edge.condition">Điều kiện: {{ edge.condition }}</span>
+                    <span v-if="edge.guard">Điều kiện chặn: {{ edge.guard }}</span>
+                    <span v-if="edge.trigger">Kích hoạt: {{ edge.trigger }}</span>
                   </div>
                 </div>
                 <div class="item-actions">
                   <button 
                     class="btn-edit" 
                     @click="openEditForm('edge', edge)" 
-                    title="Edit"
+                    title="Sửa"
                     :disabled="isCrudLoading"
                   >
                     <span class="material-symbols-outlined">edit</span>
@@ -573,7 +573,7 @@
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('edge', edge)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === edge.id"
                   >
                     <span 
@@ -587,7 +587,7 @@
               </div>
               <div v-if="computedEdges.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">arrow_right_alt</span>
-                <p>No edges yet</p>
+                <p>Chưa có cạnh</p>
               </div>
             </div>
           </div>
@@ -595,7 +595,7 @@
           <!-- Lanes Tab -->
           <div v-if="managementModal.activeTab === 'lanes'" class="tab-panel">
             <div class="panel-header">
-              <h3>Lanes</h3>
+              <h3>Làn</h3>
             </div>
             <div class="items-list">
               <div
@@ -604,7 +604,7 @@
                 class="item-card"
               >
                 <div class="item-info">
-                  <div class="item-name">{{ lane.name || 'Unnamed Lane' }}</div>
+                  <div class="item-name">{{ lane.name || 'Làn chưa đặt tên' }}</div>
                   <div class="item-meta">
                     <span>{{ getNodesInLane(lane.id).length }} nodes</span>
                   </div>
@@ -613,7 +613,7 @@
                   <button 
                     class="btn-edit" 
                     @click="openEditForm('lane', lane)" 
-                    title="Edit"
+                    title="Sửa"
                     :disabled="isCrudLoading"
                   >
                     <span class="material-symbols-outlined">edit</span>
@@ -621,7 +621,7 @@
                   <button 
                     class="btn-delete" 
                     @click="confirmDelete('lane', lane)" 
-                    title="Delete"
+                    title="Xoá"
                     :disabled="isCrudLoading || deletingElementId === lane.id"
                   >
                     <span 
@@ -635,7 +635,7 @@
               </div>
               <div v-if="computedLanes.length === 0" class="empty-state">
                 <span class="material-symbols-outlined">view_column</span>
-                <p>No lanes yet</p>
+                <p>Chưa có làn</p>
               </div>
             </div>
           </div>
@@ -647,7 +647,7 @@
     <div v-if="formModal.visible" class="form-modal-overlay" @click="closeFormModal">
       <div class="form-modal-content" @click.stop>
         <div class="form-modal-header">
-          <h3>{{ formModal.isEdit ? 'Edit' : 'Create' }} {{ formModal.type }}</h3>
+          <h3>{{ formModal.isEdit ? 'Sửa' : 'Create' }} {{ formModal.type }}</h3>
           <button class="modal-close-btn" @click="closeFormModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -656,31 +656,31 @@
           <!-- Node Form -->
           <div v-if="formModal.type === 'node'">
             <div class="form-group">
-              <label>Node Label *</label>
+              <label>Nhãn nút *</label>
               <input
                 v-model="formModal.data.label"
                 type="text"
-                placeholder="Enter node label"
+                placeholder="Nhập nhãn nút"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Node Type *</label>
+              <label>Loại nút *</label>
               <select v-model="formModal.data.type" class="form-input">
-                <option value="start">Start</option>
-                <option value="end">End</option>
-                <option value="action">Action</option>
-                <option value="decision">Decision</option>
-                <option value="merge">Merge</option>
-                <option value="fork">Fork</option>
-                <option value="join">Join</option>
-                <option value="object">Object</option>
+                <option value="start">Bắt đầu</option>
+                <option value="end">Kết thúc</option>
+                <option value="action">Hành động</option>
+                <option value="decision">Rẽ nhánh</option>
+                <option value="merge">Gộp</option>
+                <option value="fork">Tách luồng</option>
+                <option value="join">Nối luồng</option>
+                <option value="object">Đối tượng</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Lane (Optional)</label>
+              <label>Làn (không bắt buộc)</label>
               <select v-model="formModal.data.lane_id" class="form-input">
-                <option :value="null">No Lane</option>
+                <option :value="null">Không có làn</option>
                 <option
                   v-for="lane in computedLanes"
                   :key="lane.id"
@@ -695,9 +695,9 @@
           <!-- Edge Form -->
           <div v-if="formModal.type === 'edge'">
             <div class="form-group">
-              <label>From Node *</label>
+              <label>Nút nguồn *</label>
               <select v-model="formModal.data.from" class="form-input">
-                <option value="">Select From Node</option>
+                <option value="">Chọn nút nguồn</option>
                 <option
                   v-for="node in positionedNodes"
                   :key="node.id"
@@ -708,9 +708,9 @@
               </select>
             </div>
             <div class="form-group">
-              <label>To Node *</label>
+              <label>Nút đích *</label>
               <select v-model="formModal.data.to" class="form-input">
-                <option value="">Select To Node</option>
+                <option value="">Chọn nút đích</option>
                 <option
                   v-for="node in positionedNodes"
                   :key="node.id"
@@ -721,29 +721,29 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Condition</label>
+              <label>Điều kiện</label>
               <input
                 v-model="formModal.data.condition"
                 type="text"
-                placeholder="Enter condition (optional)"
+                placeholder="Nhập điều kiện (không bắt buộc)"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Guard</label>
+              <label>Điều kiện chặn</label>
               <input
                 v-model="formModal.data.guard"
                 type="text"
-                placeholder="Enter guard (optional)"
+                placeholder="Nhập điều kiện chặn (không bắt buộc)"
                 class="form-input"
               />
             </div>
             <div class="form-group">
-              <label>Trigger</label>
+              <label>Kích hoạt</label>
               <input
                 v-model="formModal.data.trigger"
                 type="text"
-                placeholder="Enter trigger (optional)"
+                placeholder="Nhập sự kiện kích hoạt (không bắt buộc)"
                 class="form-input"
               />
             </div>
@@ -752,11 +752,11 @@
           <!-- Lane Form -->
           <div v-if="formModal.type === 'lane'">
             <div class="form-group">
-              <label>Lane Name *</label>
+              <label>Tên làn *</label>
               <input
                 v-model="formModal.data.name"
                 type="text"
-                placeholder="Enter lane name"
+                placeholder="Nhập tên làn"
                 class="form-input"
               />
             </div>
@@ -768,7 +768,7 @@
             @click="closeFormModal"
             :disabled="isCrudLoading"
           >
-            Cancel
+            Huỷ
           </button>
           <button 
             class="btn-primary" 
@@ -782,7 +782,7 @@
             >
               sync
             </span>
-            {{ isCrudLoading ? 'Saving...' : (formModal.isEdit ? 'Update' : 'Create') }}
+            {{ isCrudLoading ? 'Đang lưu...' : (formModal.isEdit ? 'Update' : 'Create') }}
           </button>
         </div>
       </div>
@@ -908,9 +908,9 @@ export default {
         hasChanges: false,
       },
       managementTabs: [
-        { id: 'nodes', label: 'Nodes', icon: 'circle' },
-        { id: 'edges', label: 'Edges', icon: 'arrow_right_alt' },
-        { id: 'lanes', label: 'Lanes', icon: 'view_column' },
+        { id: 'nodes', label: 'Nút', icon: 'circle' },
+        { id: 'edges', label: 'Cạnh', icon: 'arrow_right_alt' },
+        { id: 'lanes', label: 'Làn', icon: 'view_column' },
       ],
       formModal: {
         visible: false,
@@ -1092,7 +1092,7 @@ export default {
               defaultLabel = 'Join'
               break
             case 'action':
-              defaultLabel = 'Action'
+              defaultLabel = 'Hành động'
               break
             case 'object':
               defaultLabel = 'Object'
@@ -1837,11 +1837,11 @@ export default {
 
     getSaveStatusText() {
       if (this.isSaving) {
-        return 'Saving...'
+        return 'Đang lưu...'
       } else if (this.lastSaved) {
-        return 'Saved'
+        return 'Đã lưu'
       } else {
-        return 'No changes'
+        return 'Không có thay đổi'
       }
     },
 
@@ -2239,7 +2239,7 @@ export default {
 
         const allElements = [...this.positionedNodes]
         if (allElements.length === 0) {
-          alert('No content to export!')
+          alert('Không có nội dung để xuất!')
           return
         }
 
@@ -2306,7 +2306,7 @@ export default {
         })
       } catch (err) {
         console.error('Error exporting PNG:', err)
-        alert('Error exporting PNG: ' + err.message)
+        alert('Lỗi khi xuất PNG:' + err.message)
       } finally {
         this.isExporting = false
       }
@@ -2315,7 +2315,7 @@ export default {
     exportAsSVG() {
       const allElements = [...this.positionedNodes]
       if (allElements.length === 0) {
-        alert('No content to export!')
+        alert('Không có nội dung để xuất!')
         return
       }
 
@@ -2569,9 +2569,9 @@ export default {
       }
     },
     getLaneName(laneId) {
-      if (!laneId) return 'No Lane'
+      if (!laneId) return 'Không có làn'
       const lane = this.computedLanes.find((l) => l.id === laneId)
-      return lane ? lane.name : 'Unknown Lane'
+      return lane ? lane.name : 'Làn không rõ'
     },
     getNodesInLane(laneId) {
       if (!laneId) return []
@@ -2640,7 +2640,7 @@ export default {
     async saveForm() {
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
       if (!diagramId) {
-        alert('Diagram ID not found')
+        alert('Không tìm thấy mã sơ đồ')
         return
       }
 
@@ -2652,7 +2652,7 @@ export default {
 
         if (this.formModal.type === 'node') {
           if (!this.formModal.data.label || !this.formModal.data.type) {
-            alert('Label and Type are required')
+            alert('Cần nhập nhãn và loại')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2664,14 +2664,14 @@ export default {
               lane_id: this.formModal.data.lane_id || null,
             })
           } else {
-            alert('Creating new nodes is not yet supported via API')
+            alert('Chưa hỗ trợ tạo nút mới qua API')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
           }
         } else if (this.formModal.type === 'edge') {
           if (!this.formModal.data.from || !this.formModal.data.to) {
-            alert('From and To nodes are required')
+            alert('Cần có nút nguồn và nút đích')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2695,7 +2695,7 @@ export default {
           }
         } else if (this.formModal.type === 'lane') {
           if (!this.formModal.data.name) {
-            alert('Lane name is required')
+            alert('Cần nhập tên làn')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2705,7 +2705,7 @@ export default {
               name: this.formModal.data.name,
             })
           } else {
-            alert('Creating new lanes is not yet supported via API')
+            alert('Chưa hỗ trợ tạo làn mới qua API')
             this.isCrudLoading = false
             this.hideSavingIndicator()
             return
@@ -2730,19 +2730,19 @@ export default {
         this.isCrudLoading = false
       } catch (error) {
         console.error('Error saving:', error)
-        alert('Failed to save: ' + (error.response?.data?.message || error.message))
+        alert('Lưu thất bại:' + (error.response?.data?.message || error.message))
         this.hideSavingIndicator()
         this.isCrudLoading = false
       }
     },
     async confirmDelete(type, element) {
-      if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+      if (!confirm(`Bạn có chắc muốn xoá ${type} này?`)) {
         return
       }
 
       const diagramId = this.diagramId || this.diagramData?.id || this.diagramData?._id
       if (!diagramId) {
-        alert('Diagram ID not found')
+        alert('Không tìm thấy mã sơ đồ')
         return
       }
 
@@ -2778,7 +2778,7 @@ export default {
         this.deletingElementId = null
       } catch (error) {
         console.error('Error deleting:', error)
-        alert('Failed to delete: ' + (error.response?.data?.message || error.message))
+        alert('Xoá thất bại:' + (error.response?.data?.message || error.message))
         this.hideSavingIndicator()
         this.isCrudLoading = false
         this.deletingElementId = null

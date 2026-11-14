@@ -141,7 +141,7 @@ const handleDrop = (e) => {
 }
 
 const handleDelete = () => {
-  if (confirm('Are you sure you want to delete this item?')) {
+  if (confirm('Bạn có chắc muốn xoá mục này?')) {
     emit('item-deleted', props.node, props.node.type)
   }
 }

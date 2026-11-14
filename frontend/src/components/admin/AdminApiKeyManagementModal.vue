@@ -140,7 +140,7 @@
                   <span class="limit-value">{{ apiKey.daily_limit || 'Không giới hạn' }}</span>
                 </div>
                 <div class="limit-item">
-                  <span class="limit-label">Rate limit:</span>
+                  <span class="limit-label">Giới hạn tốc độ:</span>
                   <span class="limit-value">{{ apiKey.rate_limit || 60 }}/phút</span>
                 </div>
               </div>
@@ -184,7 +184,7 @@
 
         <!-- Pagination -->
         <div v-if="filteredApiKeys.length > 0" class="pagination-section">
-          <div class="pagination-info">Hiển thị {{ filteredApiKeys.length }} API Key</div>
+          <div class="pagination-info">Hiển thị {{ filteredApiKeys.length }} API key</div>
         </div>
       </div>
     </div>
@@ -385,7 +385,7 @@ const handleAddApiKey = (apiKeyData) => {
     usage_count: 0,
     last_used: null,
     created_at: new Date(),
-    created_by_name: 'Current User',
+    created_by_name: 'Người dùng hiện tại',
   }
   apiKeys.value.unshift(newApiKey)
   showAddApiKeyModal.value = false

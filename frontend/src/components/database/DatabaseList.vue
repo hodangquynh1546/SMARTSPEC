@@ -6,7 +6,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Search tables, columns..."
+          placeholder="Tìm bảng, cột..."
           class="search-input"
         />
         <span class="material-symbols-outlined search-icon">search</span>
@@ -14,27 +14,27 @@
 
       <div class="filter-controls">
         <select v-model="sortBy" class="filter-select">
-          <option value="name">Sort by Name</option>
-          <option value="columns">Sort by Columns</option>
-          <option value="relationships">Sort by Relationships</option>
+          <option value="name">Sắp xếp theo tên</option>
+          <option value="columns">Sắp xếp theo số cột</option>
+          <option value="relationships">Sắp xếp theo quan hệ</option>
         </select>
 
         <select v-model="filterBy" class="filter-select">
-          <option value="all">All Tables</option>
-          <option value="withRelationships">With Relationships</option>
-          <option value="withForeignKeys">With Foreign Keys</option>
-          <option value="noRelationships">No Relationships</option>
+          <option value="all">Tất cả bảng</option>
+          <option value="withRelationships">Có quan hệ</option>
+          <option value="withForeignKeys">Có khoá ngoại</option>
+          <option value="noRelationships">Không có quan hệ</option>
         </select>
       </div>
 
       <div class="view-actions">
         <button class="btn-secondary" @click="exportToCSV">
           <span class="material-symbols-outlined">download</span>
-          Export CSV
+          Xuất CSV
         </button>
         <button class="btn-secondary" @click="printList">
           <span class="material-symbols-outlined">print</span>
-          Print
+          In
         </button>
       </div>
     </div>
@@ -43,19 +43,19 @@
     <div class="list-statistics">
       <div class="stat-card">
         <div class="stat-value">{{ filteredTables.length }}</div>
-        <div class="stat-label">Tables</div>
+        <div class="stat-label">Bảng</div>
       </div>
       <div class="stat-card">
         <div class="stat-value">{{ totalColumns }}</div>
-        <div class="stat-label">Columns</div>
+        <div class="stat-label">Cột</div>
       </div>
       <div class="stat-card">
         <div class="stat-value">{{ totalRelationships }}</div>
-        <div class="stat-label">Relationships</div>
+        <div class="stat-label">Quan hệ</div>
       </div>
       <div class="stat-card">
         <div class="stat-value">{{ tablesWithForeignKeys }}</div>
-        <div class="stat-label">Tables with FKs</div>
+        <div class="stat-label">Bảng có khoá ngoại</div>
       </div>
     </div>
 
@@ -76,25 +76,25 @@
           </div>
           <div class="table-meta">
             <span class="table-stats">
-              {{ table.columns?.length || 0 }} columns
+              {{ table.columns?.length || 0 }} cột
               <span class="stat-separator">•</span>
-              {{ getTableRelationshipCount(table) }} relationships
+              {{ getTableRelationshipCount(table) }} quan hệ
             </span>
             <div class="table-actions">
               <button
                 class="btn-icon"
                 @click.stop="$emit('table-view', table)"
-                title="View Details"
+                title="Xem chi tiết"
               >
                 <span class="material-symbols-outlined">visibility</span>
               </button>
-              <button class="btn-icon" @click.stop="$emit('table-edit', table)" title="Edit">
+              <button class="btn-icon" @click.stop="$emit('table-edit', table)" title="Sửa">
                 <span class="material-symbols-outlined">edit</span>
               </button>
               <button
                 class="btn-icon danger"
                 @click.stop="$emit('table-delete', table._id || table.name)"
-                title="Delete"
+                title="Xoá"
               >
                 <span class="material-symbols-outlined">delete</span>
               </button>
@@ -123,13 +123,13 @@
             </div>
           </div>
           <div v-if="hasMoreColumns(table)" class="more-columns">
-            +{{ getRemainingColumnsCount(table) }} more columns
+            +{{ getRemainingColumnsCount(table) }} cột khác
           </div>
         </div>
 
         <!-- Relationships Preview -->
         <div v-if="getTableRelationships(table).length > 0" class="relationships-preview">
-          <div class="relationships-label">Relationships:</div>
+          <div class="relationships-label">Quan hệ:</div>
           <div class="relationship-tags">
             <span
               v-for="rel in getTableRelationships(table)"
@@ -148,9 +148,9 @@
     <!-- Empty State -->
     <div v-if="filteredTables.length === 0" class="empty-state">
       <span class="material-symbols-outlined">table</span>
-      <h3>No tables found</h3>
-      <p v-if="searchQuery">Try adjusting your search criteria</p>
-      <p v-else>No tables available in this database</p>
+      <h3>Không tìm thấy bảng</h3>
+      <p v-if="searchQuery">Hãy thử đổi điều kiện tìm kiếm</p>
+      <p v-else>Cơ sở dữ liệu này chưa có bảng</p>
     </div>
   </div>
 </template>
@@ -280,11 +280,11 @@ export default {
     generateCSV() {
       const headers = [
         'Table',
-        'Description',
-        'Columns',
-        'Primary Keys',
-        'Foreign Keys',
-        'Relationships',
+        'Mô tả',
+        'Cột',
+        'Khoá chính',
+        'Khoá ngoại',
+        'Quan hệ',
       ]
       const rows = this.tables.map((table) => [
         table.name,

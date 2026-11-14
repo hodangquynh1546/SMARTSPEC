@@ -4,7 +4,7 @@
     <div class="comparison-panel before-panel">
       <div class="panel-header">
         <span class="material-symbols-outlined">history</span>
-        Before
+        Trước
       </div>
       <div class="panel-content">
         <div v-if="beforeData" class="visualized-content">
@@ -12,7 +12,7 @@
         </div>
         <div v-else class="no-data">
           <span class="material-symbols-outlined">add</span>
-          No previous data
+          Không có dữ liệu trước đó
         </div>
       </div>
     </div>
@@ -21,7 +21,7 @@
     <div class="comparison-panel after-panel">
       <div class="panel-header">
         <span class="material-symbols-outlined">edit</span>
-        After
+        Sau
       </div>
       <div class="panel-content">
         <div v-if="afterData" class="visualized-content">
@@ -29,7 +29,7 @@
         </div>
         <div v-else class="no-data">
           <span class="material-symbols-outlined">remove</span>
-          Data will be removed
+          Dữ liệu sẽ bị xoá
         </div>
       </div>
     </div>

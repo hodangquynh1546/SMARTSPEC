@@ -81,7 +81,7 @@
             v-if="user && user.avatar_url"
             :src="getFullAvatarUrl(user.avatar_url)"
             @error="handleAvatarError"
-            alt="User Avatar"
+            alt="Ảnh đại diện"
           />
           <div v-else class="avatar-placeholder">
             {{ userInitials }}
@@ -93,7 +93,7 @@
           <div class="user-email">{{ user.email || 'user@example.com' }}</div>
         </div>
         <div v-else class="user-info">
-          <div class="user-name">Loading...</div>
+          <div class="user-name">Đang tải...</div>
           <div class="user-email">...</div>
         </div>
 

@@ -27,7 +27,7 @@
               }}</span>
             </button>
             <div v-if="showDescription" class="project-description">
-              <p>{{ project.description || 'No description available' }}</p>
+              <p>{{ project.description || 'Chưa có mô tả' }}</p>
             </div>
           </div>
         </div>
@@ -54,8 +54,8 @@
 
             <div v-if="isOpen" class="dropdown-menu">
               <div class="dropdown-header">
-                <span>Select Version</span>
-                <span v-if="!isOwner" class="owner-only-hint">(Owner only)</span>
+                <span>Chọn phiên bản</span>
+                <span v-if="!isOwner" class="owner-only-hint">(Chỉ chủ dự án)</span>
               </div>
               <div class="version-list">
                 <div
@@ -72,7 +72,7 @@
                       <span class="material-symbols-outlined">history</span>
                     </div>
                     <div class="version-details">
-                      <span class="version-number">Version {{ version.version_number }}</span>
+                      <span class="version-number">Phiên bản {{ version.version_number }}</span>
                       <span class="version-date">{{ formatDate(version.created_at) }}</span>
                     </div>
                   </div>
@@ -82,7 +82,7 @@
                     v-if="isOwner && version.parent_version_id && version._id === selectedVersionId"
                     class="rollback-btn"
                     @click.stop="handleRollback(version)"
-                    title="Rollback to parent version"
+                    title="Quay về phiên bản cha"
                   >
                     <span class="material-symbols-outlined">undo</span>
                   </button>
@@ -98,7 +98,7 @@
             :disabled="isPolling"
           >
             <span class="material-symbols-outlined">refresh</span>
-            <span class="btn-text">Retry Failed</span>
+            <span class="btn-text">Thử lại mục lỗi</span>
           </button> -->
         </div>
 
@@ -119,7 +119,7 @@
 
           <div v-if="showActiveUsers" class="active-users-dropdown">
             <div class="dropdown-header">
-              <span>Active Users</span>
+              <span>Người đang online</span>
             </div>
             <div class="active-users-list">
               <div
@@ -133,7 +133,7 @@
                     v-if="user.avatar"
                     :src="getFullAvatarUrl(user.avatar)"
                     @error="handleAvatarError"
-                    alt="User Avatar"
+                    alt="Ảnh đại diện"
                   />
                   <div v-else class="avatar-placeholder">
                     {{ getUserInitials(user.name) }}
@@ -149,11 +149,11 @@
               </div>
               <div v-if="activeUsers.length === 0" class="no-active-users">
                 <span class="material-symbols-outlined">group_off</span>
-                <p>No active users</p>
+                <p>Không có ai online</p>
               </div>
             </div>
             <div class="active-users-footer">
-              {{ activeUsers.length }} member{{ activeUsers.length !== 1 ? 's' : '' }} online
+              {{ activeUsers.length }} thành viên đang online
             </div>
           </div>
         </div>
@@ -342,13 +342,13 @@ export default {
 
       // ✅ Chỉ cho phép rollback current version
       if (version._id !== this.selectedVersionId) {
-        this.toast.error('Can only rollback the current version')
+        this.toast.error('Chỉ quay lui được phiên bản hiện tại')
         return
       }
 
       // ✅ Kiểm tra có parent version không
       if (!version.parent_version_id) {
-        this.toast.error('This version does not have a parent version to rollback to')
+        this.toast.error('Phiên bản này không có phiên bản cha để quay về')
         return
       }
 
@@ -367,7 +367,7 @@ export default {
           const parentVersion = this.versions.find(v => v._id === version.parent_version_id)
           const parentVersionNumber = parentVersion?.version_number || version.parent_version_id
 
-          this.toast.success(`Successfully rolled back to parent version ${parentVersionNumber}`)
+          this.toast.success(`Đã quay về phiên bản cha ${parentVersionNumber}`)
 
           // Đóng dropdown
           this.isOpen = false
@@ -381,11 +381,11 @@ export default {
           // Refresh toàn bộ dữ liệu project
           this.$emit('version-rollback-completed')
         } else {
-          throw new Error(response.data?.message || 'Rollback failed')
+          throw new Error(response.data?.message || 'Quay lui thất bại')
         }
       } catch (error) {
         console.error('Error rolling back version:', error)
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to rollback version'
+        const errorMessage = error.response?.data?.message || error.message || 'Quay lui phiên bản thất bại'
         this.toast.error(errorMessage)
       }
     },
@@ -400,7 +400,7 @@ export default {
         'Analyzing Requirements': 'Extracting use cases and requirements...',
         'Normalizing Data': 'Organizing and structuring the data...',
         Finalizing: 'Generating final documentation...',
-        Completed: 'Analysis completed successfully!',
+        Completed: 'Phân tích hoàn tất!',
       }
       return descriptions[stage] || 'Processing your request...'
     },
@@ -440,7 +440,7 @@ export default {
     formatDate(dateString) {
       if (!dateString) return ''
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('vi-VN', {
         month: 'short',
         day: 'numeric',
         year: 'numeric',

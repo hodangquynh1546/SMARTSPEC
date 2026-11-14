@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content large">
       <div class="modal-header">
-        <h3>Manage Composite Keys</h3>
+        <h3>Quản lý khoá phức hợp</h3>
         <button class="btn-close" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -12,14 +12,14 @@
         <!-- Create Composite Key Section -->
         <div class="form-section">
           <div class="section-header">
-            <h4>Create Composite Key</h4>
+            <h4>Tạo khoá phức hợp</h4>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Select Table</label>
+              <label>Chọn bảng</label>
               <select v-model="selectedTable" class="form-select">
-                <option value="">Choose a table...</option>
+                <option value="">Chọn một bảng...</option>
                 <option
                   v-for="table in availableTables"
                   :key="table.name"
@@ -28,23 +28,23 @@
                 >
                   {{ table.name }}
                   <template v-if="table.primaryKeyCount > 1">
-                    (Already has composite key)
+                    (Đã có khoá phức hợp)
                   </template>
-                  <template v-else-if="table.primaryKeyCount === 1"> (Single key) </template>
-                  <template v-else> (No primary key) </template>
+                  <template v-else-if="table.primaryKeyCount === 1"> (Khoá đơn) </template>
+                  <template v-else> (Chưa có khoá chính) </template>
                 </option>
               </select>
             </div>
           </div>
 
           <div v-if="selectedTable" class="columns-section">
-            <h4>Select Columns for Composite Key</h4>
+            <h4>Chọn cột cho khoá phức hợp</h4>
             <div class="columns-table">
               <div class="table-header">
-                <div class="col-select">Select</div>
-                <div class="col-name">Column Name</div>
-                <div class="col-type">Data Type</div>
-                <div class="col-attributes">Attributes</div>
+                <div class="col-select">Chọn</div>
+                <div class="col-name">Tên cột</div>
+                <div class="col-type">Kiểu dữ liệu</div>
+                <div class="col-attributes">Thuộc tính</div>
               </div>
 
               <div class="table-body">
@@ -75,14 +75,14 @@
                   </div>
                   <div class="col-attributes">
                     <div class="attribute-list">
-                      <span v-if="!column.nullable" class="attribute not-null" title="Not Null"
+                      <span v-if="!column.nullable" class="attribute not-null" title="Bắt buộc"
                         >NN</span
                       >
-                      <span v-if="column.unique" class="attribute unique" title="Unique">UQ</span>
+                      <span v-if="column.unique" class="attribute unique" title="Duy nhất">UQ</span>
                       <span
                         v-if="column.is_foreign_key"
                         class="attribute foreign"
-                        title="Foreign Key"
+                        title="Khoá ngoại"
                         >FK</span
                       >
                     </div>
@@ -92,7 +92,7 @@
             </div>
 
             <div v-if="selectedColumns.length > 0" class="selected-columns-section">
-              <h4>Selected Columns Order</h4>
+              <h4>Thứ tự cột đã chọn</h4>
               <div class="selected-columns-list">
                 <div
                   v-for="(columnName, index) in selectedColumns"
@@ -111,7 +111,7 @@
                       class="btn-icon"
                       @click.stop="moveColumn(index, -1)"
                       :disabled="index === 0"
-                      title="Move up"
+                      title="Chuyển lên"
                     >
                       <span class="material-symbols-outlined">arrow_upward</span>
                     </button>
@@ -119,14 +119,14 @@
                       class="btn-icon"
                       @click.stop="moveColumn(index, 1)"
                       :disabled="index === selectedColumns.length - 1"
-                      title="Move down"
+                      title="Chuyển xuống"
                     >
                       <span class="material-symbols-outlined">arrow_downward</span>
                     </button>
                     <button
                       class="btn-icon danger"
                       @click.stop="removeColumn(columnName)"
-                      title="Remove"
+                      title="Gỡ"
                     >
                       <span class="material-symbols-outlined">delete</span>
                     </button>
@@ -138,7 +138,7 @@
             <div v-if="validationError" class="validation-summary error">
               <span class="material-symbols-outlined">error</span>
               <div>
-                <strong>Validation Error:</strong>
+                <strong>Lỗi kiểm tra hợp lệ:</strong>
                 <p>{{ validationError }}</p>
               </div>
             </div>
@@ -150,7 +150,7 @@
                 :disabled="!canCreateCompositeKey"
               >
                 <span class="material-symbols-outlined">key</span>
-                Create Composite Key
+                Tạo khoá phức hợp
               </button>
             </div>
           </div>
@@ -159,12 +159,12 @@
         <!-- Existing Composite Keys Section -->
         <div class="form-section">
           <div class="section-header">
-            <h4>Existing Composite Keys</h4>
+            <h4>Khoá phức hợp hiện có</h4>
           </div>
 
           <div v-if="compositeKeyTables.length === 0" class="no-data">
             <span class="material-symbols-outlined">key_off</span>
-            <p>No composite keys found</p>
+            <p>Chưa có khoá phức hợp</p>
           </div>
 
           <div v-else class="composite-keys-list">
@@ -173,10 +173,10 @@
                 <div class="table-info">
                   <span class="table-name">{{ table.name }}</span>
                   <span class="key-stats">
-                    {{ table.compositeKey.columns.length }} column composite key
+                    {{ table.compositeKey.columns.length }} cột khoá phức hợp
                   </span>
                 </div>
-                <div class="key-badge">Composite Key</div>
+                <div class="key-badge">Khoá phức hợp</div>
               </div>
 
               <div class="key-columns">
@@ -196,11 +196,11 @@
                   </div>
                   <div class="column-attributes">
                     <div class="attribute-list">
-                      <span v-if="!col.nullable" class="attribute not-null" title="Not Null"
+                      <span v-if="!col.nullable" class="attribute not-null" title="Bắt buộc"
                         >NN</span
                       >
-                      <span v-if="col.unique" class="attribute unique" title="Unique">UQ</span>
-                      <span v-if="col.is_foreign_key" class="attribute foreign" title="Foreign Key"
+                      <span v-if="col.unique" class="attribute unique" title="Duy nhất">UQ</span>
+                      <span v-if="col.is_foreign_key" class="attribute foreign" title="Khoá ngoại"
                         >FK</span
                       >
                     </div>
@@ -211,7 +211,7 @@
               <div class="key-actions">
                 <button class="btn-secondary" @click="convertToSingle(table)">
                   <span class="material-symbols-outlined">merge</span>
-                  Convert to Single Key
+                  Chuyển về khoá đơn
                 </button>
               </div>
             </div>
@@ -220,7 +220,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn-primary" @click="$emit('close')">Close</button>
+        <button class="btn-primary" @click="$emit('close')">Đóng</button>
       </div>
     </div>
   </div>

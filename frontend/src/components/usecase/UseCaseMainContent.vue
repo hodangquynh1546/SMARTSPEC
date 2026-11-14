@@ -9,7 +9,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ useCases.length }}</h3>
-            <p>Total Use Cases</p>
+            <p>Tổng số use case</p>
           </div>
         </div>
         <div class="stat-card roles">
@@ -18,7 +18,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ Object.keys(groupedUseCases).length }}</h3>
-            <p>Roles</p>
+            <p>Vai trò</p>
           </div>
         </div>
         <div class="stat-card high-priority">
@@ -27,7 +27,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ highPriorityCount }}</h3>
-            <p>High Priority</p>
+            <p>Ưu tiên cao</p>
           </div>
         </div>
         <!-- <div class="stat-card completed">
@@ -36,7 +36,7 @@
           </div>
           <div class="stat-info">
             <h3>{{ completedCount }}</h3>
-            <p>Completed</p>
+            <p>Hoàn thành</p>
           </div>
         </div> -->
       </div>
@@ -45,7 +45,7 @@
       <div class="header-actions">
         <button class="btn-primary" @click="showAddUsecaseModal">
           <span class="material-symbols-outlined">add</span>
-          Add Use Case
+          Thêm use case
         </button>
         <button
           class="btn-secondary"
@@ -54,18 +54,18 @@
         >
           <span v-if="isFindingConflicts" class="button-spinner-small"></span>
           <span v-else class="material-symbols-outlined">rule</span>
-          {{ isFindingConflicts ? 'Scanning...' : 'Scan for Duplicates' }}
+          {{ isFindingConflicts ? 'Scanning...' : 'Quét trùng lặp' }}
         </button>
         <button class="btn-secondary" @click="showExportModal">
           <span class="material-symbols-outlined">download</span>
-          Export
+          Xuất
         </button>
       </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="loading-state">
         <div class="spinner"></div>
-        <p>Loading use cases...</p>
+        <p>Đang tải use case...</p>
       </div>
 
       <!-- Empty State -->
@@ -73,11 +73,11 @@
         <div class="empty-icon">
           <span class="material-symbols-outlined">list_alt</span>
         </div>
-        <h3>No Use Cases Yet</h3>
-        <p>Start by creating your first use case to define system requirements.</p>
+        <h3>Chưa có use case</h3>
+        <p>Hãy tạo use case đầu tiên để xác định yêu cầu hệ thống.</p>
         <button class="btn-primary" @click="showAddUsecaseModal">
           <span class="material-symbols-outlined">add</span>
-          Create First Use Case
+          Tạo use case đầu tiên
         </button>
       </div>
 
@@ -90,7 +90,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search use cases by name, goal or ID..."
+              placeholder="Tìm use case theo tên, mục tiêu hoặc ID..."
               class="search-input"
             />
           </div>
@@ -115,7 +115,7 @@
                     @click="setRoleFilter('')"
                   >
                     <span class="material-symbols-outlined">filter_alt_off</span>
-                    All Roles
+                    Tất cả vai trò
                   </button>
                   <button 
                     v-for="role in availableRoles" 
@@ -148,7 +148,7 @@
                     @click="setPriorityFilter('')"
                   >
                     <span class="material-symbols-outlined">filter_alt_off</span>
-                    All Priorities
+                    Tất cả mức ưu tiên
                   </button>
                   <button 
                     class="filter-option" 
@@ -156,7 +156,7 @@
                     @click="setPriorityFilter('high')"
                   >
                     <span class="material-symbols-outlined">error</span>
-                    High
+                    Cao
                   </button>
                   <button 
                     class="filter-option" 
@@ -164,7 +164,7 @@
                     @click="setPriorityFilter('medium')"
                   >
                     <span class="material-symbols-outlined">remove</span>
-                    Medium
+                    Trung bình
                   </button>
                   <button 
                     class="filter-option" 
@@ -172,7 +172,7 @@
                     @click="setPriorityFilter('low')"
                   >
                     <span class="material-symbols-outlined">arrow_downward</span>
-                    Low
+                    Thấp
                   </button>
                 </div>
               </div>
@@ -183,7 +183,7 @@
                 class="view-mode-btn"
                 :class="{ active: viewMode === 'table' }"
                 @click="viewMode = 'table'"
-                title="Table View"
+                title="Dạng bảng"
               >
                 <span class="material-symbols-outlined">table_rows</span>
               </button>
@@ -191,7 +191,7 @@
                 class="view-mode-btn"
                 :class="{ active: viewMode === 'grouped' }"
                 @click="viewMode = 'grouped'"
-                title="Grouped by Role"
+                title="Nhóm theo vai trò"
               >
                 <span class="material-symbols-outlined">view_list</span>
               </button>
@@ -199,7 +199,7 @@
                 class="view-mode-btn"
                 :class="{ active: viewMode === 'grid' }"
                 @click="viewMode = 'grid'"
-                title="Grid View"
+                title="Dạng lưới"
               >
                 <span class="material-symbols-outlined">grid_view</span>
               </button>
@@ -207,7 +207,7 @@
                 class="view-mode-btn"
                 :class="{ active: viewMode === 'list' }"
                 @click="viewMode = 'list'"
-                title="List View"
+                title="Dạng danh sách"
               >
                 <span class="material-symbols-outlined">view_agenda</span>
               </button>
@@ -215,7 +215,7 @@
                 class="view-mode-btn"
                 :class="{ active: viewMode === 'compact' }"
                 @click="viewMode = 'compact'"
-                title="Compact View"
+                title="Dạng gọn"
               >
                 <span class="material-symbols-outlined">view_compact</span>
               </button>
@@ -225,13 +225,13 @@
               <button
                 class="btn-icon"
                 @click="showColumnMenu = !showColumnMenu"
-                title="Column Options"
+                title="Tuỳ chọn cột"
               >
                 <span class="material-symbols-outlined">view_column</span>
               </button>
               <div v-if="showColumnMenu" class="column-menu-dropdown" @click.stop>
                 <div class="column-menu-header">
-                  <h4>Show/Hide Columns</h4>
+                  <h4>Hiện/ẩn cột</h4>
                   <button class="btn-close-menu" @click="showColumnMenu = false">
                     <span class="material-symbols-outlined">close</span>
                   </button>
@@ -250,11 +250,11 @@
                       @change="toggleColumn(column.key)"
                     />
                     <span class="column-label">{{ column.label }}</span>
-                    <span v-if="column.required" class="required-badge">Required</span>
+                    <span v-if="column.required" class="required-badge">Bắt buộc</span>
                   </label>
                 </div>
                 <div class="column-menu-footer">
-                  <button class="btn-reset-columns" @click="resetColumns">Reset to Default</button>
+                  <button class="btn-reset-columns" @click="resetColumns">Đặt lại mặc định</button>
                 </div>
               </div>
             </div>
@@ -265,14 +265,14 @@
         <div v-if="viewMode === 'table'" class="usecase-table-view">
           <!-- Sorting Options -->
           <div class="sorting-section">
-            <span class="sort-label">Sort by:</span>
+            <span class="sort-label">Sắp xếp theo:</span>
             <div class="sort-options">
               <button
                 class="sort-option"
                 :class="{ active: sortBy === 'name' }"
                 @click="setSort('name')"
               >
-                Name
+                Tên
                 <span
                   class="material-symbols-outlined sort-icon"
                   :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -285,7 +285,7 @@
                 :class="{ active: sortBy === 'priority' }"
                 @click="setSort('priority')"
               >
-                Priority
+                Độ ưu tiên
                 <span
                   class="material-symbols-outlined sort-icon"
                   :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -298,7 +298,7 @@
                 :class="{ active: sortBy === 'role' }"
                 @click="setSort('role')"
               >
-                Role
+                Vai trò
                 <span
                   class="material-symbols-outlined sort-icon"
                   :class="{ 'sort-desc': sortOrder === 'desc' }"
@@ -336,12 +336,12 @@
                     />
                   </th>
                   <th class="id-column">ID</th>
-                  <th class="name-column">Name</th>
-                  <th v-if="visibleColumns.goal" class="goal-column">Goal</th>
-                  <th v-if="visibleColumns.role" class="role-column">Role</th>
-                  <th v-if="visibleColumns.priority" class="priority-column">Priority</th>
-                  <th v-if="visibleColumns.tasks" class="tasks-column">Tasks</th>
-                  <th class="actions-column">Actions</th>
+                  <th class="name-column">Tên</th>
+                  <th v-if="visibleColumns.goal" class="goal-column">Mục tiêu</th>
+                  <th v-if="visibleColumns.role" class="role-column">Vai trò</th>
+                  <th v-if="visibleColumns.priority" class="priority-column">Độ ưu tiên</th>
+                  <th v-if="visibleColumns.tasks" class="tasks-column">Công việc</th>
+                  <th class="actions-column">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -372,7 +372,7 @@
                     </div>
                   </td>
                   <td v-if="visibleColumns.goal" class="goal-column">
-                    <span class="goal-text">{{ uc.goal || 'No goal specified' }}</span>
+                    <span class="goal-text">{{ uc.goal || 'Chưa có mục tiêu' }}</span>
                   </td>
                   <td v-if="visibleColumns.role" class="role-column">
                     <span class="role-badge">{{ (uc.actor?.name || uc.role?.name) || 'Undefined' }}</span>
@@ -383,17 +383,17 @@
                     </span>
                   </td>
                   <td v-if="visibleColumns.tasks" class="tasks-column">
-                    <span class="tasks-count">{{ (uc.main_flow || uc.tasks || []).length }} tasks</span>
+                    <span class="tasks-count">{{ (uc.main_flow || uc.tasks || []).length }} bước</span>
                   </td>
                   <td class="actions-column">
                     <div class="action-buttons">
-                      <button class="btn-icon" @click="showUsecaseDetail(uc)" title="View Details">
+                      <button class="btn-icon" @click="showUsecaseDetail(uc)" title="Xem chi tiết">
                         <span class="material-symbols-outlined">visibility</span>
                       </button>
-                      <button class="btn-icon" @click="showEditUsecaseModal(uc)" title="Edit">
+                      <button class="btn-icon" @click="showEditUsecaseModal(uc)" title="Sửa">
                         <span class="material-symbols-outlined">edit</span>
                       </button>
-                      <button class="btn-icon danger" @click="showDeleteConfirm(uc)" title="Delete">
+                      <button class="btn-icon danger" @click="showDeleteConfirm(uc)" title="Xoá">
                         <span class="material-symbols-outlined">delete</span>
                       </button>
                     </div>
@@ -405,17 +405,17 @@
             <!-- Empty State -->
             <div v-if="filteredUseCases.length === 0" class="empty-state">
               <span class="material-symbols-outlined">list_alt</span>
-              <h3>No use cases found</h3>
-              <p v-if="hasActiveFilters">Try adjusting your filters or search terms.</p>
-              <p v-else>Create your first use case to define system requirements.</p>
+              <h3>Không tìm thấy use case</h3>
+              <p v-if="hasActiveFilters">Hãy thử đổi bộ lọc hoặc từ khoá tìm kiếm.</p>
+              <p v-else>Tạo use case đầu tiên để xác định yêu cầu hệ thống.</p>
             </div>
           </div>
 
           <!-- Pagination -->
           <div v-if="filteredUseCases.length > 0" class="pagination">
             <div class="pagination-info">
-              Showing {{ pagination.startIndex + 1 }} to {{ pagination.endIndex }} of
-              {{ filteredUseCases.length }} use cases
+              Hiển thị {{ pagination.startIndex + 1 }} to {{ pagination.endIndex }} /
+              {{ filteredUseCases.length }} use case
             </div>
             <div class="pagination-controls">
               <button
@@ -445,7 +445,7 @@
               </button>
             </div>
             <div class="page-size-selector">
-              <label for="pageSize">Show:</label>
+              <label for="pageSize">Hiển thị:</label>
               <select
                 id="pageSize"
                 v-model="pagination.pageSize"
@@ -464,12 +464,12 @@
           <div v-if="selectedUseCases.length > 0" class="bulk-actions">
             <div class="bulk-info">
               <span class="material-symbols-outlined">check_circle</span>
-              {{ selectedUseCases.length }} use case(s) selected
+              {{ selectedUseCases.length }} use case đã chọn
             </div>
             <div class="bulk-buttons">
               <button class="btn-secondary" @click="showBulkRoleModal = true" :disabled="loading">
                 <span class="material-symbols-outlined">group</span>
-                Change Role
+                Đổi vai trò
               </button>
               <button
                 class="btn-secondary"
@@ -477,11 +477,11 @@
                 :disabled="loading"
               >
                 <span class="material-symbols-outlined">priority_high</span>
-                Change Priority
+                Đổi độ ưu tiên
               </button>
               <button class="btn-secondary danger" @click="bulkDelete" :disabled="loading">
                 <span class="material-symbols-outlined">delete</span>
-                Delete Selected
+                Xoá mục đã chọn
               </button>
             </div>
           </div>
@@ -497,7 +497,7 @@
             <div class="group-header" @click="toggleGroup(role)">
               <div class="group-info">
                 <h3 class="group-title">{{ role }}</h3>
-                <span class="group-count">{{ group.length }} use cases</span>
+                <span class="group-count">{{ group.length }} use case</span>
               </div>
               <div class="group-actions">
                 <span class="expand-icon">{{ expandedGroups[role] ? '−' : '+' }}</span>
@@ -529,13 +529,13 @@
                       {{ formatLastModified(uc.updated_at) }}
                     </span> -->
                     <div class="action-buttons">
-                      <button class="btn-icon" @click.stop="showEditUsecaseModal(uc)" title="Edit">
+                      <button class="btn-icon" @click.stop="showEditUsecaseModal(uc)" title="Sửa">
                         <span class="material-symbols-outlined">edit</span>
                       </button>
                       <button
                         class="btn-icon danger"
                         @click.stop="showDeleteConfirm(uc)"
-                        title="Delete"
+                        title="Xoá"
                       >
                         <span class="material-symbols-outlined">delete</span>
                       </button>
@@ -552,31 +552,31 @@
                     <!-- Row 1: Goal, Description, Context -->
                     <div class="detail-row">
                       <div class="detail-section">
-                        <h5>Goal</h5>
-                        <p>{{ uc.goal || 'No goal specified' }}</p>
+                        <h5>Mục tiêu</h5>
+                        <p>{{ uc.goal || 'Chưa có mục tiêu' }}</p>
                       </div>
                       <div class="detail-section">
-                        <h5>Description</h5>
-                        <p>{{ (uc.description || uc.business_reason || uc.reason) || 'No description available' }}</p>
+                        <h5>Mô tả</h5>
+                        <p>{{ (uc.description || uc.business_reason || uc.reason) || 'Chưa có mô tả' }}</p>
                       </div>
                       <div class="detail-section">
-                        <h5>Business Reason</h5>
-                        <p>{{ (uc.business_reason || uc.reason) || 'No business reason specified' }}</p>
+                        <h5>Lý do nghiệp vụ</h5>
+                        <p>{{ (uc.business_reason || uc.reason) || 'Chưa có lý do nghiệp vụ' }}</p>
                       </div>
                       <div class="detail-section">
-                        <h5>Context</h5>
-                        <p>{{ (typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'No context specified' }}</p>
+                        <h5>Ngữ cảnh</h5>
+                        <p>{{ (typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'Chưa có ngữ cảnh' }}</p>
                       </div>
                     </div>
 
                     <!-- Row 2: Main Flow (Full Width) -->
                     <div class="detail-row">
                       <div class="detail-section full-width">
-                        <h5>Main Flow</h5>
+                        <h5>Luồng chính</h5>
                         <ol class="task-list">
                           <template v-if="uc.main_flow && Array.isArray(uc.main_flow) && uc.main_flow.length > 0">
                             <li v-for="(step, i) in uc.main_flow" :key="i">
-                              <strong>Step {{ step.step || (i + 1) }}:</strong> 
+                              <strong>Bước {{ step.step || (i + 1) }}:</strong> 
                               {{ step.action || step }}
                               <span v-if="step.expected_result" class="step-result"> → {{ step.expected_result }}</span>
                             </li>
@@ -584,7 +584,7 @@
                           <template v-else-if="uc.tasks && Array.isArray(uc.tasks) && uc.tasks.length > 0">
                           <li v-for="(task, i) in uc.tasks" :key="i">{{ task }}</li>
                           </template>
-                          <li v-else>No tasks defined</li>
+                          <li v-else>Chưa có công việc</li>
                         </ol>
                       </div>
                     </div>
@@ -592,17 +592,17 @@
                     <!-- Row 3: Preconditions & Postconditions -->
                     <div class="detail-row">
                       <div class="detail-section">
-                        <h5>Preconditions</h5>
+                        <h5>Điều kiện tiên quyết</h5>
                         <ul class="condition-list">
                           <li v-for="(item, i) in uc.preconditions" :key="i">{{ item }}</li>
-                          <li v-if="!uc.preconditions || uc.preconditions.length === 0">None</li>
+                          <li v-if="!uc.preconditions || uc.preconditions.length === 0">Không có</li>
                         </ul>
                       </div>
                       <div class="detail-section">
-                        <h5>Postconditions</h5>
+                        <h5>Điều kiện sau</h5>
                         <ul class="condition-list">
                           <li v-for="(item, i) in uc.postconditions" :key="i">{{ item }}</li>
-                          <li v-if="!uc.postconditions || uc.postconditions.length === 0">None</li>
+                          <li v-if="!uc.postconditions || uc.postconditions.length === 0">Không có</li>
                         </ul>
                       </div>
                     </div>
@@ -610,7 +610,7 @@
                     <!-- Row 4: Inputs & Outputs -->
                     <div class="detail-row">
                       <div class="detail-section">
-                        <h5>Inputs</h5>
+                        <h5>Đầu vào</h5>
                         <div class="tag-list">
                         <template v-if="uc.inputs && Array.isArray(uc.inputs) && uc.inputs.length > 0">
                           <span 
@@ -621,11 +621,11 @@
                             {{ typeof item === 'object' ? item.name : item }}
                           </span>
                         </template>
-                        <span v-else class="tag tag-meta">None</span>
+                        <span v-else class="tag tag-meta">Không có</span>
                         </div>
                       </div>
                       <div class="detail-section">
-                        <h5>Outputs</h5>
+                        <h5>Đầu ra</h5>
                         <div class="tag-list">
                         <template v-if="uc.outputs && Array.isArray(uc.outputs) && uc.outputs.length > 0">
                           <span 
@@ -636,7 +636,7 @@
                             {{ typeof item === 'object' ? item.name : item }}
                           </span>
                         </template>
-                        <span v-else class="tag tag-meta">None</span>
+                        <span v-else class="tag tag-meta">Không có</span>
                         </div>
                       </div>
                     </div>
@@ -644,20 +644,20 @@
                     <!-- Row 5: Triggers, Business Rules & Constraints -->
                     <div class="detail-row">
                       <div class="detail-section">
-                        <h5>Trigger</h5>
+                        <h5>Kích hoạt</h5>
                         <ul class="condition-list">
                           <template v-if="uc.trigger && typeof uc.trigger === 'object'">
-                            <li><strong>Event:</strong> {{ uc.trigger.event || 'N/A' }}</li>
-                            <li v-if="uc.trigger.source"><strong>Source:</strong> {{ uc.trigger.source }}</li>
+                            <li><strong>Sự kiện:</strong> {{ uc.trigger.event || 'N/A' }}</li>
+                            <li v-if="uc.trigger.source"><strong>Nguồn:</strong> {{ uc.trigger.source }}</li>
                           </template>
                           <template v-else-if="uc.triggers && Array.isArray(uc.triggers) && uc.triggers.length > 0">
                           <li v-for="(item, i) in uc.triggers" :key="i">{{ item }}</li>
                           </template>
-                          <li v-else>None</li>
+                          <li v-else>Không có</li>
                         </ul>
                       </div>
                       <div class="detail-section">
-                        <h5>Business Rules</h5>
+                        <h5>Quy tắc nghiệp vụ</h5>
                         <ul class="condition-list">
                           <template v-if="uc.rules && Array.isArray(uc.rules) && uc.rules.length > 0">
                             <li v-for="(item, i) in uc.rules" :key="i">
@@ -665,11 +665,11 @@
                               {{ typeof item === 'object' ? item.description : item }}
                             </li>
                           </template>
-                          <li v-else>None</li>
+                          <li v-else>Không có</li>
                         </ul>
                       </div>
                       <div class="detail-section">
-                        <h5>Non-functional Constraints</h5>
+                        <h5>Ràng buộc phi chức năng</h5>
                         <ul class="condition-list">
                           <template v-if="uc.non_functional_constraints && Array.isArray(uc.non_functional_constraints) && uc.non_functional_constraints.length > 0">
                             <li v-for="(item, i) in uc.non_functional_constraints" :key="i">{{ item }}</li>
@@ -677,7 +677,7 @@
                           <template v-else-if="uc.constraints && Array.isArray(uc.constraints) && uc.constraints.length > 0">
                           <li v-for="(item, i) in uc.constraints" :key="i">{{ item }}</li>
                           </template>
-                          <li v-else>None</li>
+                          <li v-else>Không có</li>
                         </ul>
                       </div>
                     </div>
@@ -685,19 +685,19 @@
                     <!-- Row 6: Exceptions (Full Width) -->
                     <div class="detail-row">
                       <div class="detail-section full-width">
-                        <h5>Exceptions</h5>
+                        <h5>Ngoại lệ</h5>
                         <ul class="exception-list">
                           <template v-if="uc.exceptions && Array.isArray(uc.exceptions) && uc.exceptions.length > 0">
                           <li v-for="(item, i) in uc.exceptions" :key="i">
                             <span class="material-symbols-outlined">warning</span>
                               <template v-if="typeof item === 'object'">
-                                <strong>Step {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
+                                <strong>Bước {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
                                 <span v-if="item.system_response"> → {{ item.system_response }}</span>
                               </template>
                               <template v-else>{{ item }}</template>
                           </li>
                           </template>
-                          <li v-else>No exceptions defined</li>
+                          <li v-else>Chưa có ngoại lệ</li>
                         </ul>
                       </div>
                     </div>
@@ -705,7 +705,7 @@
                     <!-- Row 7: Stakeholders & Related Use Cases -->
                     <div class="detail-row">
                       <div class="detail-section">
-                        <h5>Stakeholders</h5>
+                        <h5>Các bên liên quan</h5>
                         <div class="tag-list">
                           <span v-for="item in uc.stakeholders" :key="item" class="tag tag-meta">{{
                             item
@@ -713,12 +713,12 @@
                           <span
                             v-if="!uc.stakeholders || uc.stakeholders.length === 0"
                             class="tag tag-meta"
-                            >None</span
+                            >Không có</span
                           >
                         </div>
                       </div>
                       <div class="detail-section">
-                        <h5>Related Use Cases</h5>
+                        <h5>Use case liên quan</h5>
                         <div class="tag-list">
                           <span
                             v-for="relatedId in uc.related_usecases"
@@ -729,13 +729,13 @@
                               {{ getUsecaseName(useCaseMap[relatedId]) }}
                             </template>
                             <template v-else>
-                              Use Case {{ String(relatedId).substring(0, 8) }}...
+                              Use case {{ String(relatedId).substring(0, 8) }}...
                             </template>
                           </span>
                           <span
                             v-if="!uc.related_usecases || uc.related_usecases.length === 0"
                             class="tag tag-meta"
-                            >None</span
+                            >Không có</span
                           >
                         </div>
                       </div>
@@ -747,11 +747,11 @@
                   <div class="detail-actions">
                     <button class="btn-secondary" @click="showEditUsecaseModal(uc)">
                       <span class="material-symbols-outlined">edit</span>
-                      Edit Use Case
+                      Sửa use case
                     </button>
                     <button class="btn-danger" @click="showDeleteConfirm(uc)">
                       <span class="material-symbols-outlined">delete</span>
-                      Delete Use Case
+                      Xoá use case
                     </button>
                   </div>
                 </div>
@@ -786,36 +786,36 @@
             <div v-if="expandedUseCaseId === getUsecaseId(uc)" class="grid-card-details">
               <div class="grid-details-content">
                 <div class="detail-section">
-                  <h5>Goal</h5>
-                  <p>{{ uc.goal || 'No goal specified' }}</p>
+                  <h5>Mục tiêu</h5>
+                  <p>{{ uc.goal || 'Chưa có mục tiêu' }}</p>
                 </div>
                 <div class="detail-section">
-                  <h5>Description</h5>
-                  <p>{{ (uc.description || uc.business_reason || uc.reason) || 'No description available' }}</p>
+                  <h5>Mô tả</h5>
+                  <p>{{ (uc.description || uc.business_reason || uc.reason) || 'Chưa có mô tả' }}</p>
                 </div>
                 <div class="detail-section">
-                  <h5>Main Flow</h5>
+                  <h5>Luồng chính</h5>
                   <ol class="task-list">
                     <template v-if="uc.main_flow && Array.isArray(uc.main_flow) && uc.main_flow.length > 0">
                       <li v-for="(step, i) in uc.main_flow" :key="i">
-                        <strong>Step {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
+                        <strong>Bước {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
                       </li>
                     </template>
                     <template v-else-if="uc.tasks && Array.isArray(uc.tasks) && uc.tasks.length > 0">
                     <li v-for="(task, i) in uc.tasks" :key="i">{{ task }}</li>
                     </template>
-                    <li v-else>No tasks defined</li>
+                    <li v-else>Chưa có công việc</li>
                   </ol>
                 </div>
               </div>
               <div class="grid-card-actions" @click.stop>
                 <button class="btn-secondary" @click="showEditUsecaseModal(uc)">
                   <span class="material-symbols-outlined">edit</span>
-                  Edit
+                  Sửa
                 </button>
                 <button class="btn-danger" @click="showDeleteConfirm(uc)">
                   <span class="material-symbols-outlined">delete</span>
-                  Delete
+                  Xoá
                 </button>
               </div>
             </div>
@@ -839,7 +839,7 @@
                 <div class="list-item-id">{{ formatUsecaseId(uc, getUseCaseIndex(uc)) }}</div>
                 <div class="list-item-info">
                   <h4>{{ uc.name }}</h4>
-                  <p class="list-item-goal">{{ uc.goal || 'No goal specified' }}</p>
+                  <p class="list-item-goal">{{ uc.goal || 'Chưa có mục tiêu' }}</p>
                 </div>
               </div>
               <div class="list-item-meta">
@@ -848,10 +848,10 @@
                 </span>
                 <span class="role-badge">{{ (uc.actor?.name || uc.role?.name) || 'Undefined' }}</span>
                 <div class="list-item-actions" @click.stop>
-                  <button class="btn-icon" @click="showEditUsecaseModal(uc)" title="Edit">
+                  <button class="btn-icon" @click="showEditUsecaseModal(uc)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
-                  <button class="btn-icon danger" @click="showDeleteConfirm(uc)" title="Delete">
+                  <button class="btn-icon danger" @click="showDeleteConfirm(uc)" title="Xoá">
                     <span class="material-symbols-outlined">delete</span>
                   </button>
                 </div>
@@ -860,25 +860,25 @@
             <div v-if="expandedUseCaseId === getUsecaseId(uc)" class="list-item-details">
               <div class="list-details-grid">
                 <div class="detail-section">
-                  <h5>Description</h5>
-                  <p>{{ (uc.description || uc.business_reason || uc.reason) || 'No description available' }}</p>
+                  <h5>Mô tả</h5>
+                  <p>{{ (uc.description || uc.business_reason || uc.reason) || 'Chưa có mô tả' }}</p>
                 </div>
                 <div class="detail-section">
-                  <h5>Context</h5>
-                  <p>{{ (typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'No context specified' }}</p>
+                  <h5>Ngữ cảnh</h5>
+                  <p>{{ (typeof uc.context === 'object' ? (uc.context.module || uc.context.scope || uc.context.system || '') : uc.context) || 'Chưa có ngữ cảnh' }}</p>
                 </div>
                 <div class="detail-section full-width">
-                  <h5>Main Flow</h5>
+                  <h5>Luồng chính</h5>
                   <ol class="task-list">
                     <template v-if="uc.main_flow && Array.isArray(uc.main_flow) && uc.main_flow.length > 0">
                       <li v-for="(step, i) in uc.main_flow" :key="i">
-                        <strong>Step {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
+                        <strong>Bước {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
                       </li>
                     </template>
                     <template v-else-if="uc.tasks && Array.isArray(uc.tasks) && uc.tasks.length > 0">
                     <li v-for="(task, i) in uc.tasks" :key="i">{{ task }}</li>
                     </template>
-                    <li v-else>No tasks defined</li>
+                    <li v-else>Chưa có công việc</li>
                   </ol>
                 </div>
               </div>
@@ -903,7 +903,7 @@
               <div class="compact-id">{{ formatUsecaseId(uc, getUseCaseIndex(uc)) }}</div>
               <div class="compact-info">
                 <h4>{{ uc.name }}</h4>
-                <p>{{ uc.goal || 'No goal' }}</p>
+                <p>{{ uc.goal || 'Chưa có mục tiêu' }}</p>
               </div>
               <div class="compact-badges">
                 <span class="priority-badge" :class="`priority-${uc.priority}`">
@@ -913,18 +913,18 @@
             </div>
             <div v-if="expandedUseCaseId === getUsecaseId(uc)" class="compact-item-details">
               <div class="compact-details-content">
-                <p><strong>Description:</strong> {{ (uc.description || uc.business_reason || uc.reason) || 'N/A' }}</p>
-                <p><strong>Main Flow:</strong></p>
+                <p><strong>Mô tả:</strong> {{ (uc.description || uc.business_reason || uc.reason) || 'N/A' }}</p>
+                <p><strong>Luồng chính:</strong></p>
                 <ol class="task-list">
                   <template v-if="uc.main_flow && Array.isArray(uc.main_flow) && uc.main_flow.length > 0">
                     <li v-for="(step, i) in uc.main_flow" :key="i">
-                      <strong>Step {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
+                      <strong>Bước {{ step.step || (i + 1) }}:</strong> {{ step.action || step }}
                     </li>
                   </template>
                   <template v-else-if="uc.tasks && Array.isArray(uc.tasks) && uc.tasks.length > 0">
                   <li v-for="(task, i) in uc.tasks" :key="i">{{ task }}</li>
                   </template>
-                  <li v-else>No tasks defined</li>
+                  <li v-else>Chưa có công việc</li>
                 </ol>
               </div>
               <div class="compact-item-actions" @click.stop>
@@ -957,25 +957,25 @@
     <div v-if="showDeleteModal" class="modal-overlay" @click="closeDeleteModal">
       <div class="modal-content delete-modal" @click.stop>
         <div class="modal-header">
-          <h3>Delete Use Case</h3>
+          <h3>Xoá use case</h3>
           <button class="btn-close" @click="closeDeleteModal">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
         <div class="modal-body">
           <p>
-            Are you sure you want to delete the use case
+            Bạn có chắc muốn xoá use case
             <strong>"{{ usecaseToDelete?.name }}"</strong>?
           </p>
           <p class="warning-text">
-            This action cannot be undone and will remove all associated data.
+            Hành động này không thể hoàn tác và sẽ xoá mọi dữ liệu liên quan.
           </p>
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" @click="closeDeleteModal">Cancel</button>
+          <button class="btn-secondary" @click="closeDeleteModal">Huỷ</button>
           <button class="btn-danger" @click="confirmDelete" :disabled="deleting">
             <span v-if="deleting" class="button-spinner"></span>
-            {{ deleting ? 'Deleting...' : 'Delete Use Case' }}
+            {{ deleting ? 'Deleting...' : 'Xoá use case' }}
           </button>
         </div>
       </div>
@@ -994,16 +994,16 @@
     <div v-if="showBulkRoleModal" class="modal-overlay" @click="showBulkRoleModal = false">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h3>Change Role for {{ selectedUseCases.length }} Use Case(s)</h3>
+          <h3>Đổi vai trò cho {{ selectedUseCases.length }} Use case</h3>
           <button class="btn-close" @click="showBulkRoleModal = false">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="bulkRole">Select Role:</label>
+            <label for="bulkRole">Chọn vai trò:</label>
             <select id="bulkRole" v-model="bulkRoleValue" class="form-select">
-              <option value="">-- Select Role --</option>
+              <option value="">-- Chọn vai trò --</option>
               <option v-for="role in availableRoles" :key="role" :value="role">
                 {{ role }}
               </option>
@@ -1012,22 +1012,22 @@
           <div class="form-group">
             <label>
               <input type="checkbox" v-model="createNewRole" />
-              Create new role if not exists
+              Tạo vai trò mới nếu chưa có
             </label>
           </div>
           <div v-if="createNewRole" class="form-group">
-            <label for="newRoleName">New Role Name:</label>
+            <label for="newRoleName">Tên vai trò mới:</label>
             <input
               id="newRoleName"
               v-model="newRoleName"
               type="text"
               class="form-input"
-              placeholder="Enter role name"
+              placeholder="Nhập tên vai trò"
             />
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" @click="showBulkRoleModal = false">Cancel</button>
+          <button class="btn-secondary" @click="showBulkRoleModal = false">Huỷ</button>
           <button
             class="btn-primary"
             @click="bulkUpdateRole"
@@ -1036,7 +1036,7 @@
             "
           >
             <span v-if="loading" class="button-spinner"></span>
-            {{ loading ? 'Updating...' : 'Update Role' }}
+            {{ loading ? 'Updating...' : 'Cập nhật vai trò' }}
           </button>
         </div>
       </div>
@@ -1046,26 +1046,26 @@
     <div v-if="showBulkPriorityModal" class="modal-overlay" @click="showBulkPriorityModal = false">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
-          <h3>Change Priority for {{ selectedUseCases.length }} Use Case(s)</h3>
+          <h3>Đổi độ ưu tiên cho {{ selectedUseCases.length }} Use case</h3>
           <button class="btn-close" @click="showBulkPriorityModal = false">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="bulkPriority">Select Priority:</label>
+            <label for="bulkPriority">Chọn độ ưu tiên:</label>
             <select id="bulkPriority" v-model="bulkPriorityValue" class="form-select">
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
+              <option value="high">Cao</option>
+              <option value="medium">Trung bình</option>
+              <option value="low">Thấp</option>
             </select>
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" @click="showBulkPriorityModal = false">Cancel</button>
+          <button class="btn-secondary" @click="showBulkPriorityModal = false">Huỷ</button>
           <button class="btn-primary" @click="bulkUpdatePriority" :disabled="loading">
             <span v-if="loading" class="button-spinner"></span>
-            {{ loading ? 'Updating...' : 'Update Priority' }}
+            {{ loading ? 'Updating...' : 'Cập nhật độ ưu tiên' }}
           </button>
         </div>
       </div>
@@ -1075,7 +1075,7 @@
     <div v-if="showDetailModal && viewingUsecase" class="modal-overlay" @click="closeDetailModal">
       <div class="modal-content detail-modal" @click.stop>
         <div class="modal-header">
-          <h3>Use Case Details</h3>
+          <h3>Chi tiết use case</h3>
           <button class="btn-close" @click="closeDetailModal">
             <span class="material-symbols-outlined">close</span>
           </button>
@@ -1099,14 +1099,14 @@
               >
                 {{ viewingUsecase.priority || 'medium' }}
               </span>
-              <span v-if="viewingUsecase.frequency" class="frequency-badge">freq: {{ viewingUsecase.frequency }}</span>
+              <span v-if="viewingUsecase.frequency" class="frequency-badge">tần suất: {{ viewingUsecase.frequency }}</span>
               <span class="role-badge">{{ (viewingUsecase.actor?.name || viewingUsecase.role?.name) || 'Undefined' }}</span>
             </div>
           </div>
           
           <!-- Actor Details -->
           <div v-if="viewingUsecase.actor && typeof viewingUsecase.actor === 'object'" class="actor-details">
-            <span class="actor-label">Actor:</span>
+            <span class="actor-label">Tác nhân:</span>
             <span class="actor-name">{{ viewingUsecase.actor.name }}</span>
             <span v-if="viewingUsecase.actor.description" class="actor-desc">- {{ viewingUsecase.actor.description }}</span>
           </div>
@@ -1115,27 +1115,27 @@
             <!-- Row 1: Goal, Description, Business Reason, Context -->
             <div class="detail-row">
               <div class="detail-section">
-                <h5>Goal</h5>
-                <p>{{ viewingUsecase.goal || 'No goal specified' }}</p>
+                <h5>Mục tiêu</h5>
+                <p>{{ viewingUsecase.goal || 'Chưa có mục tiêu' }}</p>
               </div>
               <div class="detail-section">
-                <h5>Description</h5>
-                <p>{{ (viewingUsecase.description || viewingUsecase.business_reason || viewingUsecase.reason) || 'No description available' }}</p>
+                <h5>Mô tả</h5>
+                <p>{{ (viewingUsecase.description || viewingUsecase.business_reason || viewingUsecase.reason) || 'Chưa có mô tả' }}</p>
               </div>
               <div class="detail-section">
-                <h5>Business Reason</h5>
-                <p>{{ (viewingUsecase.business_reason || viewingUsecase.reason) || 'No business reason specified' }}</p>
+                <h5>Lý do nghiệp vụ</h5>
+                <p>{{ (viewingUsecase.business_reason || viewingUsecase.reason) || 'Chưa có lý do nghiệp vụ' }}</p>
               </div>
               <div class="detail-section">
-                <h5>Context</h5>
-                <p>{{ (typeof viewingUsecase.context === 'object' ? (viewingUsecase.context.module || viewingUsecase.context.scope || viewingUsecase.context.system || '') : viewingUsecase.context) || 'No context specified' }}</p>
+                <h5>Ngữ cảnh</h5>
+                <p>{{ (typeof viewingUsecase.context === 'object' ? (viewingUsecase.context.module || viewingUsecase.context.scope || viewingUsecase.context.system || '') : viewingUsecase.context) || 'Chưa có ngữ cảnh' }}</p>
               </div>
             </div>
 
             <!-- Row 2: Main Flow (Full Width) - Enhanced -->
             <div class="detail-row">
               <div class="detail-section full-width">
-                <h5>Main Flow</h5>
+                <h5>Luồng chính</h5>
                 <div class="main-flow-container">
                   <template v-if="viewingUsecase.main_flow && Array.isArray(viewingUsecase.main_flow) && viewingUsecase.main_flow.length > 0">
                     <div v-for="(step, i) in viewingUsecase.main_flow" :key="i" class="flow-step" :class="{ 'system-step': step.actor === 'System' }">
@@ -1148,11 +1148,11 @@
                       <div class="step-content">
                         <div class="step-action">{{ step.action || step }}</div>
                         <div v-if="step.inputs && step.inputs.length > 0" class="step-inputs">
-                          <span class="step-label">Inputs:</span>
+                          <span class="step-label">Đầu vào:</span>
                           <span v-for="(inp, idx) in step.inputs" :key="idx" class="step-input-tag">{{ inp }}</span>
                         </div>
                         <div v-if="step.rules_applied && step.rules_applied.length > 0" class="step-rules">
-                          <span class="step-label">Rules:</span>
+                          <span class="step-label">Quy tắc:</span>
                           <span v-for="(rule, idx) in step.rules_applied" :key="idx" class="step-rule-tag">{{ rule }}</span>
                         </div>
                         <div v-if="step.expected_result" class="step-result">
@@ -1166,7 +1166,7 @@
                       <li v-for="(task, i) in viewingUsecase.tasks" :key="i">{{ task }}</li>
                     </ol>
                   </template>
-                  <div v-else class="no-data">No main flow defined</div>
+                  <div v-else class="no-data">Chưa có luồng chính</div>
                 </div>
               </div>
             </div>
@@ -1174,17 +1174,17 @@
             <!-- Row 2b: Alternative Flows -->
             <div v-if="viewingUsecase.alternative_flows && viewingUsecase.alternative_flows.length > 0" class="detail-row">
               <div class="detail-section full-width">
-                <h5>Alternative Flows</h5>
+                <h5>Luồng thay thế</h5>
                 <div class="alt-flows-container">
                   <div v-for="(af, i) in viewingUsecase.alternative_flows" :key="i" class="alt-flow-item">
                     <div class="alt-flow-header">
                       <span class="alt-flow-id">{{ af.id || `AF${i + 1}` }}</span>
-                      <span class="alt-flow-step">at Step {{ af.at_step }}</span>
+                      <span class="alt-flow-step">tại bước {{ af.at_step }}</span>
                     </div>
                     <div class="alt-flow-content">
                       <div class="alt-flow-condition"><strong>If:</strong> {{ af.condition }}</div>
-                      <div class="alt-flow-response"><strong>Then:</strong> {{ af.system_response }}</div>
-                      <div class="alt-flow-end"><strong>End State:</strong> {{ af.end_state }}</div>
+                      <div class="alt-flow-response"><strong>Sau đó:</strong> {{ af.system_response }}</div>
+                      <div class="alt-flow-end"><strong>Trạng thái kết thúc:</strong> {{ af.end_state }}</div>
                     </div>
                   </div>
                 </div>
@@ -1194,7 +1194,7 @@
             <!-- Row 3: Preconditions & Postconditions -->
             <div class="detail-row">
               <div class="detail-section">
-                <h5>Preconditions</h5>
+                <h5>Điều kiện tiên quyết</h5>
                 <ul class="condition-list">
                   <li v-for="(item, i) in viewingUsecase.preconditions" :key="i">{{ item }}</li>
                   <li
@@ -1202,12 +1202,12 @@
                       !viewingUsecase.preconditions || viewingUsecase.preconditions.length === 0
                     "
                   >
-                    None
+                    Không có
                   </li>
                 </ul>
               </div>
               <div class="detail-section">
-                <h5>Postconditions</h5>
+                <h5>Điều kiện sau</h5>
                 <ul class="condition-list">
                   <li v-for="(item, i) in viewingUsecase.postconditions" :key="i">{{ item }}</li>
                   <li
@@ -1215,7 +1215,7 @@
                       !viewingUsecase.postconditions || viewingUsecase.postconditions.length === 0
                     "
                   >
-                    None
+                    Không có
                   </li>
                 </ul>
               </div>
@@ -1224,7 +1224,7 @@
             <!-- Row 4: Inputs & Outputs -->
             <div class="detail-row">
               <div class="detail-section">
-                <h5>Inputs</h5>
+                <h5>Đầu vào</h5>
                 <div class="tag-list">
                   <template v-if="viewingUsecase.inputs && Array.isArray(viewingUsecase.inputs) && viewingUsecase.inputs.length > 0">
                   <span
@@ -1235,11 +1235,11 @@
                       {{ typeof item === 'object' ? item.name : item }}
                     </span>
                   </template>
-                  <span v-else class="tag tag-meta">None</span>
+                  <span v-else class="tag tag-meta">Không có</span>
                 </div>
               </div>
               <div class="detail-section">
-                <h5>Outputs</h5>
+                <h5>Đầu ra</h5>
                 <div class="tag-list">
                   <template v-if="viewingUsecase.outputs && Array.isArray(viewingUsecase.outputs) && viewingUsecase.outputs.length > 0">
                   <span
@@ -1250,7 +1250,7 @@
                       {{ typeof item === 'object' ? item.name : item }}
                     </span>
                   </template>
-                  <span v-else class="tag tag-meta">None</span>
+                  <span v-else class="tag tag-meta">Không có</span>
                 </div>
               </div>
             </div>
@@ -1258,20 +1258,20 @@
             <!-- Row 5: Trigger, Business Rules & Non-functional Constraints -->
             <div class="detail-row">
               <div class="detail-section">
-                <h5>Trigger</h5>
+                <h5>Kích hoạt</h5>
                 <ul class="condition-list">
                   <template v-if="viewingUsecase.trigger && typeof viewingUsecase.trigger === 'object'">
-                    <li><strong>Event:</strong> {{ viewingUsecase.trigger.event || 'N/A' }}</li>
-                    <li v-if="viewingUsecase.trigger.source"><strong>Source:</strong> {{ viewingUsecase.trigger.source }}</li>
+                    <li><strong>Sự kiện:</strong> {{ viewingUsecase.trigger.event || 'N/A' }}</li>
+                    <li v-if="viewingUsecase.trigger.source"><strong>Nguồn:</strong> {{ viewingUsecase.trigger.source }}</li>
                   </template>
                   <template v-else-if="viewingUsecase.triggers && Array.isArray(viewingUsecase.triggers) && viewingUsecase.triggers.length > 0">
                   <li v-for="(item, i) in viewingUsecase.triggers" :key="i">{{ item }}</li>
                   </template>
-                  <li v-else>None</li>
+                  <li v-else>Không có</li>
                 </ul>
               </div>
               <div class="detail-section">
-                <h5>Business Rules</h5>
+                <h5>Quy tắc nghiệp vụ</h5>
                 <ul class="condition-list">
                   <template v-if="viewingUsecase.rules && Array.isArray(viewingUsecase.rules) && viewingUsecase.rules.length > 0">
                     <li v-for="(item, i) in viewingUsecase.rules" :key="i">
@@ -1279,11 +1279,11 @@
                       {{ typeof item === 'object' ? item.description : item }}
                     </li>
                   </template>
-                  <li v-else>None</li>
+                  <li v-else>Không có</li>
                 </ul>
               </div>
               <div class="detail-section">
-                <h5>Non-functional Constraints</h5>
+                <h5>Ràng buộc phi chức năng</h5>
                 <ul class="condition-list">
                   <template v-if="viewingUsecase.non_functional_constraints && Array.isArray(viewingUsecase.non_functional_constraints) && viewingUsecase.non_functional_constraints.length > 0">
                     <li v-for="(item, i) in viewingUsecase.non_functional_constraints" :key="i">{{ item }}</li>
@@ -1291,7 +1291,7 @@
                   <template v-else-if="viewingUsecase.constraints && Array.isArray(viewingUsecase.constraints) && viewingUsecase.constraints.length > 0">
                   <li v-for="(item, i) in viewingUsecase.constraints" :key="i">{{ item }}</li>
                   </template>
-                  <li v-else>None</li>
+                  <li v-else>Không có</li>
                 </ul>
               </div>
             </div>
@@ -1299,13 +1299,13 @@
             <!-- Row 6: Exceptions (Full Width) -->
             <div class="detail-row">
               <div class="detail-section full-width">
-                <h5>Exceptions</h5>
+                <h5>Ngoại lệ</h5>
                 <ul class="exception-list">
                   <template v-if="viewingUsecase.exceptions && Array.isArray(viewingUsecase.exceptions) && viewingUsecase.exceptions.length > 0">
                   <li v-for="(item, i) in viewingUsecase.exceptions" :key="i">
                     <span class="material-symbols-outlined">warning</span>
                       <template v-if="typeof item === 'object'">
-                        <strong>Step {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
+                        <strong>Bước {{ item.at_step }}:</strong> {{ item.description || item.type || 'Exception' }}
                         <span v-if="item.system_response"> 
                         <!-- → {{ item.system_response }} -->
                         </span>
@@ -1313,7 +1313,7 @@
                       <template v-else>{{ item }}</template>
                   </li>
                   </template>
-                  <li v-else>No exceptions defined</li>
+                  <li v-else>Chưa có ngoại lệ</li>
                 </ul>
               </div>
             </div>
@@ -1321,7 +1321,7 @@
             <!-- Row 7: Stakeholders & Related Use Cases -->
             <div class="detail-row">
               <div class="detail-section">
-                <h5>Stakeholders</h5>
+                <h5>Các bên liên quan</h5>
                 <div class="tag-list">
                   <span
                     v-for="item in viewingUsecase.stakeholders"
@@ -1332,7 +1332,7 @@
                   <span
                     v-if="!viewingUsecase.stakeholders || viewingUsecase.stakeholders.length === 0"
                     class="tag tag-meta"
-                    >None</span
+                    >Không có</span
                   >
                 </div>
               </div>
@@ -1341,15 +1341,15 @@
             <!-- Row 8: Context Details (if object) -->
             <div v-if="viewingUsecase.context && typeof viewingUsecase.context === 'object'" class="detail-row">
               <div class="detail-section">
-                <h5>Module</h5>
+                <h5>Phân hệ</h5>
                 <p>{{ viewingUsecase.context.module || 'N/A' }}</p>
               </div>
               <div class="detail-section">
-                <h5>Scope</h5>
+                <h5>Phạm vi</h5>
                 <p>{{ viewingUsecase.context.scope || 'N/A' }}</p>
               </div>
               <div class="detail-section">
-                <h5>System</h5>
+                <h5>Hệ thống</h5>
                 <p>{{ viewingUsecase.context.system || 'N/A' }}</p>
               </div>
             </div>
@@ -1357,10 +1357,10 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-secondary" @click="closeDetailModal">Close</button>
+          <button class="btn-secondary" @click="closeDetailModal">Đóng</button>
           <button class="btn-primary" @click="editFromDetail">
             <span class="material-symbols-outlined">edit</span>
-            Edit Use Case
+            Sửa use case
           </button>
         </div>
       </div>
@@ -1453,9 +1453,9 @@ export default {
       // Column visibility
       columnOptions: [
         //{ key: 'goal', label: 'Goal', required: false },
-        { key: 'role', label: 'Role', required: false },
-        { key: 'priority', label: 'Priority', required: false },
-        { key: 'tasks', label: 'Tasks', required: false },
+        { key: 'role', label: 'Vai trò', required: false },
+        { key: 'priority', label: 'Độ ưu tiên', required: false },
+        { key: 'tasks', label: 'Công việc', required: false },
       ],
       defaultVisibleColumns: {
         goal: true,
@@ -1747,8 +1747,8 @@ export default {
     },
     // Helper: Get usecase name for display
     getUsecaseName(uc) {
-      if (!uc) return 'Unknown Use Case'
-      return uc.name || uc.goal || 'Unnamed Use Case'
+      if (!uc) return 'Use case không rõ'
+      return uc.name || uc.goal || 'Use case chưa đặt tên'
     },
     // Helper: Get usecase index in all usecases for consistent ID formatting
     getUseCaseIndex(uc) {
@@ -1789,7 +1789,7 @@ export default {
         this.closeDeleteModal()
       } catch (error) {
         console.error('Deletion failed from parent:', error)
-        this.toast.error('Failed to delete use case')
+        this.toast.error('Xoá use case thất bại')
       } finally {
         this.deleting = false
       }
@@ -1901,8 +1901,8 @@ export default {
     },
 
     formatLastModified(dateString) {
-      if (!dateString) return 'Unknown'
-      return new Date(dateString).toLocaleDateString('en-US')
+      if (!dateString) return 'Không rõ'
+      return new Date(dateString).toLocaleDateString('vi-VN')
     },
 
     saveExpandedGroupsState() {
@@ -1965,7 +1965,7 @@ export default {
     resetColumns() {
       this.visibleColumns = { ...this.defaultVisibleColumns }
       this.saveColumnVisibility()
-      this.toast.info('Column visibility reset to default')
+      this.toast.info('Đã đặt lại hiển thị cột')
     },
     // Sorting methods
     setSort(field) {
@@ -2028,11 +2028,11 @@ export default {
       this.showPriorityFilter = false
     },
     getRoleFilterLabel() {
-      if (this.roleFilter === '') return 'All Roles'
+      if (this.roleFilter === '') return 'Tất cả vai trò'
       return this.roleFilter
     },
     getPriorityFilterLabel() {
-      if (this.priorityFilter === '') return 'All Priorities'
+      if (this.priorityFilter === '') return 'Tất cả mức ưu tiên'
       return this.priorityFilter.charAt(0).toUpperCase() + this.priorityFilter.slice(1)
     },
     handleClickOutsideFilters(event) {
@@ -2044,7 +2044,7 @@ export default {
     // Bulk operations
     async bulkUpdateRole() {
       if (this.selectedUseCases.length === 0) {
-        this.toast.warning('No use cases selected')
+        this.toast.warning('Chưa chọn use case')
         return
       }
 
@@ -2056,7 +2056,7 @@ export default {
       }
 
       if (!roleToUpdate) {
-        this.toast.warning('Please select or enter a role')
+        this.toast.warning('Vui lòng chọn hoặc nhập vai trò')
         return
       }
 
@@ -2100,7 +2100,7 @@ export default {
             }`
           )
         } else {
-          this.toast.error(`Failed to update all ${total} use case(s)`)
+          this.toast.error(`Không cập nhật được ${total} use case`)
         }
 
         this.selectedUseCases = []
@@ -2122,12 +2122,12 @@ export default {
     },
     async bulkUpdatePriority() {
       if (this.selectedUseCases.length === 0) {
-        this.toast.warning('No use cases selected')
+        this.toast.warning('Chưa chọn use case')
         return
       }
 
       if (!this.bulkPriorityValue) {
-        this.toast.warning('Please select a priority')
+        this.toast.warning('Vui lòng chọn độ ưu tiên')
         return
       }
 
@@ -2168,7 +2168,7 @@ export default {
             }`
           )
         } else {
-          this.toast.error(`Failed to update all ${total} use case(s)`)
+          this.toast.error(`Không cập nhật được ${total} use case`)
         }
 
         this.selectedUseCases = []
@@ -2188,13 +2188,13 @@ export default {
     },
     async bulkDelete() {
       if (this.selectedUseCases.length === 0) {
-        this.toast.warning('No use cases selected')
+        this.toast.warning('Chưa chọn use case')
         return
       }
 
       if (
         !confirm(
-          `Are you sure you want to delete ${this.selectedUseCases.length} use case(s)? This action cannot be undone.`
+          `Bạn có chắc muốn xoá ${this.selectedUseCases.length} use case? Hành động này không thể hoàn tác.`
         )
       ) {
         return
@@ -2222,7 +2222,7 @@ export default {
             `Deleted ${successCount} use case(s)${failCount > 0 ? `, ${failCount} failed` : ''}`
           )
         } else {
-          this.toast.error(`Failed to delete all ${total} use case(s)`)
+          this.toast.error(`Không xoá được ${total} use case`)
         }
 
         this.selectedUseCases = []

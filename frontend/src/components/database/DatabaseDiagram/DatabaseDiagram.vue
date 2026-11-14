@@ -173,8 +173,8 @@
 
     <!-- Debug Info -->
     <div v-if="showDebug" class="debug-info">
-      Tables: {{ tables.length }} | Relationships: {{ allRelationships.length }} | Zoom:
-      {{ Math.round(zoomLevel * 100) }}% | History: {{ historyIndex + 1 }}/{{ history.length }}
+      Bảng: {{ tables.length }} | Quan hệ: {{ allRelationships.length }} | Thu phóng:
+      {{ Math.round(zoomLevel * 100) }}% | Lịch sử: {{ historyIndex + 1 }}/{{ history.length }}
     </div>
   </div>
 </template>
@@ -552,7 +552,7 @@ export default {
       }
 
       this.$emit('relationships-updated', this.manualRelationships)
-      this.saveToHistory(this.editingRelationship ? 'Relationship updated' : 'Relationship added')
+      this.saveToHistory(this.editingRelationship ? 'Đã cập nhật quan hệ' : 'Đã thêm quan hệ')
       this.closeRelationshipManager()
     },
     editRelationship(relationship) {
@@ -560,7 +560,7 @@ export default {
       this.newRelationship = { ...relationship }
     },
     deleteRelationship(relationship) {
-      if (confirm('Are you sure you want to delete this relationship?')) {
+      if (confirm('Bạn có chắc muốn xoá quan hệ này?')) {
         this.manualRelationships = this.manualRelationships.filter(
           (rel) => rel._id !== relationship._id
         )
@@ -589,7 +589,7 @@ export default {
     toggleRelationshipLayer() {
       this.relationshipOnTop = !this.relationshipOnTop
     },
-    saveToHistory(description = 'Change') {
+    saveToHistory(description = 'Đổi') {
       if (!this.historyEnabled) return
 
       if (this.historyIndex < this.history.length - 1) {
@@ -672,7 +672,7 @@ export default {
               if (success) {
                 resolve()
               } else {
-                reject(new Error('Failed to save positions'))
+                reject(new Error('Lưu vị trí thất bại'))
               }
             }
           )
@@ -1536,7 +1536,7 @@ export default {
         document.body.removeChild(link)
       } catch (error) {
         console.error('Failed to export image:', error)
-        alert('Failed to export image. Please try again.')
+        alert('Xuất ảnh thất bại. Vui lòng thử lại.')
       } finally {
         // Restore original state
         if (this.showRelationships !== originalShowRelationships) {
@@ -1562,7 +1562,7 @@ export default {
     addNewTable() {
       const newTable = {
         name: `table_${Date.now()}`,
-        description: 'New table description',
+        description: 'Mô tả bảng mới',
         columns: [
           {
             name: 'id',
@@ -1735,8 +1735,8 @@ export default {
       const sortNames = {
         'name-asc': 'A-Z',
         'name-desc': 'Z-A',
-        'columns-asc': 'Columns ↑',
-        'columns-desc': 'Columns ↓',
+        'columns-asc': 'Số cột ↑',
+        'columns-desc': 'Số cột ↓',
         'fk-asc': 'FK ↑',
         'fk-desc': 'FK ↓',
         original: 'Original',

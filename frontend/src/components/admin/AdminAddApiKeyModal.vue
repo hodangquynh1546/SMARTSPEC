@@ -13,7 +13,7 @@
             <h4>Thông tin API Key</h4>
             <div class="form-grid">
               <div class="form-group">
-                <label>API Key *</label>
+                <label>API key *</label>
                 <div class="input-with-actions">
                   <input
                     type="text"
@@ -46,9 +46,9 @@
                     <option value="claude">Anthropic Claude</option>
                   </optgroup>
                   <optgroup label="OpenRouter (Hỗ trợ nhiều model)">
-                    <option value="openrouter">OpenRouter (Universal)</option>
+                    <option value="openrouter">OpenRouter (đa năng)</option>
                   </optgroup>
-                  <optgroup label="Open Source Models">
+                  <optgroup label="Mô hình mã nguồn mở">
                     <option value="nous">Nous</option>
                     <option value="qwen">Qwen</option>
                     <option value="deepseek">DeepSeek</option>

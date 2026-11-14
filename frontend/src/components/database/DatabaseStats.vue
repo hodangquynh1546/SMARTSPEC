@@ -6,7 +6,7 @@
       </div>
       <div class="stat-info">
         <h3>{{ stats.tables }}</h3>
-        <p>Total Tables</p>
+        <p>Tổng số bảng</p>
       </div>
     </div>
     <div class="stat-card relationships">
@@ -15,7 +15,7 @@
       </div>
       <div class="stat-info">
         <h3>{{ stats.relationships }}</h3>
-        <p>Relationships</p>
+        <p>Quan hệ</p>
       </div>
     </div>
     <div class="stat-card columns">
@@ -24,7 +24,7 @@
       </div>
       <div class="stat-info">
         <h3>{{ stats.columns }}</h3>
-        <p>Total Columns</p>
+        <p>Tổng số cột</p>
       </div>
     </div>
     <div class="stat-card usecases">
@@ -33,7 +33,7 @@
       </div>
       <div class="stat-info">
         <h3>{{ stats.relatedUsecases }}</h3>
-        <p>Related Use Cases</p>
+        <p>Use case liên quan</p>
       </div>
     </div>
   </div>

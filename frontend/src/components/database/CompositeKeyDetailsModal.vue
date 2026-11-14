@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="close">
     <div class="modal-content large">
       <div class="modal-header">
-        <h3>Composite Key Details: {{ table.name }}</h3>
+        <h3>Chi tiết khoá phức hợp: {{ table.name }}</h3>
         <button class="btn-close" @click="close">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -11,22 +11,22 @@
       <div class="modal-body">
         <!-- Table Information -->
         <div class="info-section">
-          <h4>Table Information</h4>
+          <h4>Thông tin bảng</h4>
           <div class="info-grid">
             <div class="info-item">
-              <label>Table Name</label>
+              <label>Tên bảng</label>
               <span class="info-value">{{ table.name }}</span>
             </div>
             <div class="info-item">
-              <label>Description</label>
-              <span class="info-value">{{ table.description || 'No description' }}</span>
+              <label>Mô tả</label>
+              <span class="info-value">{{ table.description || 'Chưa có mô tả' }}</span>
             </div>
             <div class="info-item">
-              <label>Composite Key Columns</label>
+              <label>Các cột của khoá phức hợp</label>
               <span class="info-value">{{ compositeKeyColumns.length }}</span>
             </div>
             <div class="info-item">
-              <label>Estimated Key Size</label>
+              <label>Kích thước khoá ước tính</label>
               <span class="info-value">{{ keySize }} bytes</span>
             </div>
           </div>
@@ -35,22 +35,22 @@
         <!-- Composite Key Structure -->
         <div class="columns-section">
           <div class="section-header">
-            <h4>Composite Key Structure</h4>
+            <h4>Cấu trúc khoá phức hợp</h4>
             <div class="column-stats">
               <span class="stat">
                 <span class="stat-dot primary"></span>
-                Primary Key Columns: {{ compositeKeyColumns.length }}
+                Các cột khoá chính: {{ compositeKeyColumns.length }}
               </span>
             </div>
           </div>
 
           <div class="columns-table">
             <div class="table-header">
-              <div class="col-order">Order</div>
-              <div class="col-name">Column Name</div>
-              <div class="col-type">Data Type</div>
-              <div class="col-attributes">Attributes</div>
-              <div class="col-relations">Relations</div>
+              <div class="col-order">Thứ tự</div>
+              <div class="col-name">Tên cột</div>
+              <div class="col-type">Kiểu dữ liệu</div>
+              <div class="col-attributes">Thuộc tính</div>
+              <div class="col-relations">Quan hệ</div>
             </div>
 
             <div class="table-body">
@@ -74,12 +74,12 @@
 
                 <div class="col-attributes">
                   <div class="attribute-list">
-                    <span v-if="!column.nullable" class="attribute not-null" title="Not Null"
+                    <span v-if="!column.nullable" class="attribute not-null" title="Bắt buộc"
                       >NN</span
                     >
-                    <span v-if="column.unique" class="attribute unique" title="Unique">UQ</span>
-                    <span v-if="column.default" class="attribute default" title="Default Value">
-                      DEFAULT: {{ column.default }}
+                    <span v-if="column.unique" class="attribute unique" title="Duy nhất">UQ</span>
+                    <span v-if="column.default" class="attribute default" title="Giá trị mặc định">
+                      MẶC ĐỊNH: {{ column.default }}
                     </span>
                   </div>
                 </div>
@@ -87,7 +87,7 @@
                 <div class="col-relations">
                   <div v-if="column.is_foreign_key && column.references" class="relation-info">
                     <span class="material-symbols-outlined">arrow_right_alt</span>
-                    References {{ column.references }}.id
+                    Tham chiếu {{ column.references }}.id
                   </div>
                   <span v-else class="no-relation">—</span>
                 </div>
@@ -98,16 +98,15 @@
 
         <!-- Performance Considerations -->
         <div class="performance-section">
-          <h4>Performance Considerations</h4>
+          <h4>Lưu ý hiệu năng</h4>
           <div class="considerations-grid">
             <div class="consideration-card" :class="getConsiderationClass('indexing')">
               <div class="consideration-header">
                 <span class="material-symbols-outlined">speed</span>
-                <span class="consideration-title">Indexing</span>
+                <span class="consideration-title">Chỉ mục</span>
               </div>
               <p>
-                Composite keys create a single index covering all key columns, which can improve
-                query performance for searches using the key prefix.
+                Khoá phức hợp tạo một chỉ mục bao phủ mọi cột khoá, giúp truy vấn theo tiền tố khoá nhanh hơn.
               </p>
               <div class="consideration-status">
                 <span class="status-dot" :class="getConsiderationClass('indexing')"></span>
@@ -118,11 +117,10 @@
             <div class="consideration-card" :class="getConsiderationClass('storage')">
               <div class="consideration-header">
                 <span class="material-symbols-outlined">storage</span>
-                <span class="consideration-title">Storage</span>
+                <span class="consideration-title">Lưu trữ</span>
               </div>
               <p>
-                Larger key sizes may increase storage requirements for indexes and foreign key
-                references.
+                Khoá lớn hơn có thể làm tăng dung lượng lưu trữ cho chỉ mục và tham chiếu khoá ngoại.
               </p>
               <div class="consideration-status">
                 <span class="status-dot" :class="getConsiderationClass('storage')"></span>
@@ -133,11 +131,10 @@
             <div class="consideration-card" :class="getConsiderationClass('foreign')">
               <div class="consideration-header">
                 <span class="material-symbols-outlined">account_tree</span>
-                <span class="consideration-title">Foreign Keys</span>
+                <span class="consideration-title">Khoá ngoại</span>
               </div>
               <p>
-                Referencing tables must include all composite key columns in their foreign key
-                constraints.
+                Các bảng tham chiếu phải gồm đủ mọi cột của khoá phức hợp trong ràng buộc khoá ngoại.
               </p>
               <div class="consideration-status">
                 <span class="status-dot" :class="getConsiderationClass('foreign')"></span>
@@ -149,7 +146,7 @@
 
         <!-- Related Foreign Keys -->
         <div v-if="relatedForeignKeys.length > 0" class="relationships-section">
-          <h4>Related Foreign Keys ({{ relatedForeignKeys.length }})</h4>
+          <h4>Khoá ngoại liên quan ({{ relatedForeignKeys.length }})</h4>
           <div class="relationships-list">
             <div
               v-for="fk in relatedForeignKeys"
@@ -157,8 +154,8 @@
               class="relationship-card"
             >
               <div class="relationship-header">
-                <span class="relationship-type">Foreign Key Reference</span>
-                <span class="relationship-direction">Incoming</span>
+                <span class="relationship-type">Tham chiếu khoá ngoại</span>
+                <span class="relationship-direction">Đến</span>
               </div>
 
               <div class="relationship-tables">
@@ -170,8 +167,7 @@
               </div>
 
               <div class="relationship-description">
-                Column <strong>{{ fk.column }}</strong> ({{ fk.columnType }}) references this
-                composite key
+                Cột <strong>{{ fk.column }}</strong> ({{ fk.columnType }}) tham chiếu khoá phức hợp này
               </div>
             </div>
           </div>
@@ -182,18 +178,18 @@
           <div class="sql-actions">
             <button class="btn-secondary" @click="convertToSingleKey">
               <span class="material-symbols-outlined">merge</span>
-              Convert to Single Key
+              Chuyển về khoá đơn
             </button>
             <button class="btn-secondary" @click="exportKeyInfo">
               <span class="material-symbols-outlined">download</span>
-              Export Key Info
+              Xuất thông tin khoá
             </button>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-primary" @click="close">Close</button>
+        <button class="btn-primary" @click="close">Đóng</button>
       </div>
     </div>
   </div>
@@ -261,8 +257,8 @@ export default {
       const classes = this.getConsiderationClass(type)
       const texts = {
         good: 'Optimal',
-        warning: 'Consideration Needed',
-        critical: 'Critical Review',
+        warning: 'Cần cân nhắc',
+        critical: 'Cần xem xét kỹ',
       }
       return texts[classes] || 'Good'
     },

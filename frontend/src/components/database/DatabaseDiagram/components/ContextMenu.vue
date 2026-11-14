@@ -6,10 +6,10 @@
       top: y + 'px',
     }"
   >
-    <div class="context-menu-item" @click="$emit('add-new-table')">Add New Table</div>
-    <div class="context-menu-item" @click="$emit('auto-layout')">Auto Layout</div>
-    <div class="context-menu-item" @click="$emit('clear-selection')">Clear Selection</div>
-    <div class="context-menu-item" @click="$emit('export-as-image')">Export as Image</div>
+    <div class="context-menu-item" @click="$emit('add-new-table')">Thêm bảng mới</div>
+    <div class="context-menu-item" @click="$emit('auto-layout')">Tự động bố trí</div>
+    <div class="context-menu-item" @click="$emit('clear-selection')">Bỏ chọn</div>
+    <div class="context-menu-item" @click="$emit('export-as-image')">Xuất thành ảnh</div>
   </div>
 </template>
 

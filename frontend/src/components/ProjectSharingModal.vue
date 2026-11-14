@@ -65,10 +65,10 @@
           </transition-group>
         </div>
 
-        <h1 class="modal-title">Project Sharing Management: {{ project?.name }}</h1>
+        <h1 class="modal-title">Quản lý chia sẻ dự án: {{ project?.name }}</h1>
         <div class="header-actions">
           <div class="user-role-display">
-            Role: <span class="role-text" style="text-transform: capitalize">{{ userRole }}</span>
+            Vai trò: <span class="role-text" style="text-transform: capitalize">{{ userRole }}</span>
           </div>
           <button @click="$emit('close')" class="btn-icon">
             <span class="material-symbols-outlined">close</span>
@@ -79,13 +79,13 @@
       <div class="modal-content">
         <div class="content-card">
           <div class="card-header">
-            <h2 class="card-title">Project Members & Invitations</h2>
+            <h2 class="card-title">Thành viên & lời mời dự án</h2>
 
             <div class="filter-controls">
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search by name or email..."
+                placeholder="Tìm theo tên hoặc email..."
                 class="form-input search-input"
                 @input="handleSearch"
               />
@@ -94,17 +94,17 @@
                 class="form-select role-filter-select"
                 @change="filterMembers"
               >
-                <option value="all">All Roles</option>
-                <option value="owner">Owner</option>
-                <option value="editor">Editor</option>
-                <option value="viewer">Viewer</option>
+                <option value="all">Tất cả vai trò</option>
+                <option value="owner">Chủ dự án</option>
+                <option value="editor">Người chỉnh sửa</option>
+                <option value="viewer">Người xem</option>
               </select>
             </div>
 
             <div class="card-actions">
-              <button @click="openInviteModal" class="btn btn-primary">Invite</button>
+              <button @click="openInviteModal" class="btn btn-primary">Mời</button>
               <button v-if="!isOwner" @click="handleLeaveProject" class="btn btn-danger">
-                Leave
+                Rời dự án
               </button>
             </div>
           </div>
@@ -112,11 +112,11 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>Người dùng</th>
+                  <th>Vai trò</th>
+                  <th>Ngày</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -128,7 +128,7 @@
                           v-if="member.avatar_url && !member.avatarLoadError"
                           :src="getFullAvatarUrl(member.avatar_url)"
                           @error="(e) => handleAvatarError(e, member)"
-                          alt="User Avatar"
+                          alt="Ảnh đại diện"
                           class="avatar-img"
                         />
                         <div v-else class="avatar-placeholder">
@@ -157,14 +157,14 @@
                         @click="confirmRemoveMember(member)"
                         class="btn-text-danger"
                       >
-                        Remove
+                        Gỡ
                       </button>
                       <button
                         v-else-if="member.status === 'pending'"
                         @click="confirmCancelInvitation(member)"
                         class="btn-text-danger"
                       >
-                        Cancel
+                        Huỷ
                       </button>
                       <span v-else class="text-muted">-</span>
                     </template>
@@ -172,7 +172,7 @@
                   </td>
                 </tr>
                 <tr v-if="filteredMembers.length === 0">
-                  <td colspan="5" class="text-center">No members found matching your criteria.</td>
+                  <td colspan="5" class="text-center">Không có thành viên nào khớp điều kiện.</td>
                 </tr>
               </tbody>
             </table>
@@ -183,10 +183,10 @@
       <!-- Invite Modal -->
       <div v-if="isInviteModalVisible" class="dialog-overlay">
         <div class="dialog-box fade-in">
-          <div class="dialog-header"><h3>Invite Member</h3></div>
+          <div class="dialog-header"><h3>Mời thành viên</h3></div>
           <form @submit.prevent="handleInviteMemberSubmit" class="dialog-content">
             <div class="form-group">
-              <label>Email or Name</label>
+              <label>Email hoặc tên</label>
               <div class="autocomplete-wrapper">
                 <input
                   v-model="inviteForm.email"
@@ -194,7 +194,7 @@
                   required
                   class="form-input"
                   :disabled="isInviteLoading"
-                  placeholder="Enter email or name to search..."
+                  placeholder="Nhập email hoặc tên để tìm..."
                   @input="handleEmailInput"
                   @focus="showSuggestions = true"
                   @blur="onEmailInputBlur"
@@ -219,7 +219,7 @@
                         v-if="user.avatar_url && !user.avatarLoadError"
                         :src="getFullAvatarUrl(user.avatar_url)"
                         @error="(e) => handleSuggestionAvatarError(e, user)"
-                        alt="User Avatar"
+                        alt="Ảnh đại diện"
                         class="avatar-img"
                       />
                       <div v-else class="avatar-placeholder">
@@ -227,7 +227,7 @@
                       </div>
                     </div>
                     <div class="suggestion-info">
-                      <div class="suggestion-name">{{ user.name || 'No name' }}</div>
+                      <div class="suggestion-name">{{ user.name || 'Không có tên' }}</div>
                       <div class="suggestion-email">{{ user.email }}</div>
                     </div>
                   </div>
@@ -241,17 +241,17 @@
                 >
                   <div class="suggestion-item no-results-item">
                     <span class="material-symbols-outlined">search_off</span>
-                    No users found
+                    Không tìm thấy người dùng
                   </div>
                 </div>
               </div>
-              <small class="hint-text">Start typing to search for users by name or email</small>
+              <small class="hint-text">Gõ để tìm người dùng theo tên hoặc email</small>
             </div>
             <div class="form-group">
-              <label>Role</label>
+              <label>Vai trò</label>
               <select v-model="inviteForm.role" class="form-select" :disabled="isInviteLoading">
-                <option value="editor">Editor</option>
-                <option value="viewer">Viewer</option>
+                <option value="editor">Người chỉnh sửa</option>
+                <option value="viewer">Người xem</option>
               </select>
             </div>
             <div class="dialog-actions">
@@ -261,7 +261,7 @@
                 class="btn btn-secondary"
                 :disabled="isInviteLoading"
               >
-                Cancel
+                Huỷ
               </button>
               <button type="submit" class="btn btn-primary" :disabled="isInviteLoading">
                 <span v-if="isInviteLoading" class="loading-spinner"></span>
@@ -283,9 +283,9 @@
           </div>
           <div class="dialog-actions" style="justify-content: flex-end">
             <button type="button" @click="closeConfirmModal" class="btn btn-secondary">
-              Cancel
+              Huỷ
             </button>
-            <button type="button" @click="executeConfirm" class="btn btn-danger">Confirm</button>
+            <button type="button" @click="executeConfirm" class="btn btn-danger">Xác nhận</button>
           </div>
         </div>
       </div>
@@ -406,7 +406,7 @@ function getUserInitials(name) {
 
 const formatDate = (date) => {
   if (!date) return '-'
-  return new Date(date).toLocaleDateString()
+  return new Date(date).toLocaleDateString('vi-VN')
 }
 
 async function loadData() {
@@ -442,7 +442,7 @@ async function loadProjectInvites() {
     // Transform invites data
     const inviteMembers = invites.map((invite) => ({
       id: invite.invitee._id,
-      name: invite.invitee.name || invite.invitee.email?.split('@')[0] || 'Invited User',
+      name: invite.invitee.name || invite.invitee.email?.split('@')[0] || 'Người được mời',
       email: invite.invitee.email,
       avatar_url: invite.invitee.avatar_url,
       role: invite.role,
@@ -578,7 +578,7 @@ async function handleInviteMemberSubmit() {
     closeInviteModal()
     await loadProjectInvites()
   } catch (err) {
-    const errorMessage = err.response?.data?.message || 'Failed to send invitation'
+    const errorMessage = err.response?.data?.message || 'Gửi lời mời thất bại'
     addToast(errorMessage, 'error')
   } finally {
     isInviteLoading.value = false
@@ -617,7 +617,7 @@ function confirmCancelInvitation(member) {
         addToast('Invitation cancelled successfully', 'info')
       } catch (err) {
         console.error('Error cancelling invitation:', err)
-        addToast('Failed to cancel invitation', 'error')
+        addToast('Huỷ lời mời thất bại', 'error')
       }
     }
   )

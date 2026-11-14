@@ -4,15 +4,15 @@
       <div class="error-content">
         <span class="material-symbols-outlined error-icon">error</span>
         <div class="error-text">
-          <h4>Incremental Analysis Failed</h4>
-          <p>Analysis completed with errors. Please check and retry.</p>
+          <h4>Phân tích gia tăng thất bại</h4>
+          <p>Phân tích xong nhưng có lỗi. Vui lòng kiểm tra và thử lại.</p>
           <small v-if="isRemoteProgress" class="remote-indicator">
-            ⚠️ Failed from team member
+            ⚠️ Thành viên nhóm xử lý thất bại
           </small>
         </div>
         <button class="retry-btn-small" @click="$emit('retry-incremental')">
           <span class="material-symbols-outlined">refresh</span>
-          Retry
+          Thử lại
         </button>
       </div>
     </div>
@@ -21,10 +21,10 @@
       <div class="loading-content">
         <div class="loading-spinner"></div>
         <div class="loading-text">
-          <h4>Incremental Analysis in Progress</h4>
-          <p>Please wait while we analyze your inputs...</p>
+          <h4>Đang phân tích gia tăng</h4>
+          <p>Vui lòng chờ trong khi phân tích đầu vào...</p>
           <small v-if="isRemoteProgress" class="remote-indicator">
-            🔄 Updated from team member
+            🔄 Cập nhật từ thành viên nhóm
           </small>
         </div>
       </div>
@@ -39,10 +39,9 @@
         <div class="banner-content">
           <span class="material-symbols-outlined banner-icon">update</span>
           <div class="banner-text">
-            <h4>New Inputs Available</h4>
+            <h4>Có đầu vào mới</h4>
             <p>
-              You have {{ unprocessedInputsCount }} unprocessed input(s). Run incremental analysis
-              to update use cases.
+              Bạn có {{ unprocessedInputsCount }} đầu vào chưa xử lý. Hãy chạy phân tích gia tăng để cập nhật use case.
             </p>
           </div>
         </div>
@@ -52,7 +51,7 @@
           :disabled="isProcessingIncremental"
         >
           <span v-if="isProcessingIncremental" class="button-spinner-small"></span>
-          {{ isProcessingIncremental ? 'Analyzing...' : 'Analyze Incremental' }}
+          {{ isProcessingIncremental ? 'Analyzing...' : 'Phân tích gia tăng' }}
         </button>
       </div>
     </div>

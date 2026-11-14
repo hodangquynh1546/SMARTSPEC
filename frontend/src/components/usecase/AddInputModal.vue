@@ -2,14 +2,14 @@
   <div class="modal-overlay" @click="$emit('close')">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
-        <h3>Add New Input</h3>
+        <h3>Thêm đầu vào mới</h3>
         <button class="close-btn" @click="$emit('close')">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="input-section">
-          <h4>Upload Files</h4>
+          <h4>Tải tệp lên</h4>
           <div class="file-upload-area" @click="triggerFileInput">
             <input
               type="file"
@@ -21,12 +21,12 @@
             />
             <div class="upload-placeholder">
               <span class="material-symbols-outlined upload-icon">cloud_upload</span>
-              <p>Click to upload files</p>
-              <p class="file-types">Supported: DOCX, PDF, Images, Audio files</p>
+              <p>Bấm để tải tệp lên</p>
+              <p class="file-types">Hỗ trợ: DOCX, PDF, ảnh, âm thanh</p>
             </div>
           </div>
           <div v-if="selectedFiles.length > 0" class="selected-files">
-            <h5>Selected Files ({{ selectedFiles.length }})</h5>
+            <h5>Tệp đã chọn ({{ selectedFiles.length }})</h5>
             <ul class="file-list">
               <li v-for="(file, index) in selectedFiles" :key="index" class="file-item">
                 <span class="material-symbols-outlined file-icon">description</span>
@@ -41,24 +41,24 @@
         </div>
 
         <div class="input-section">
-          <h4>Describe your project</h4>
+          <h4>Mô tả dự án của bạn</h4>
           <textarea
             v-model="rawText"
-            placeholder="Describe your requirements, use cases, or system specifications here..."
+            placeholder="Mô tả yêu cầu, use case hoặc đặc tả hệ thống tại đây..."
             class="text-input"
             rows="6"
           ></textarea>
         </div>
 
         <div v-if="!canSubmit" class="validation-message">
-          Please add at least one file or enter some text to proceed!
+          Vui lòng thêm ít nhất một tệp hoặc nhập nội dung để tiếp tục!
         </div>
       </div>
       <div class="modal-footer">
-        <button class="cancel-btn" @click="$emit('close')">Cancel</button>
+        <button class="cancel-btn" @click="$emit('close')">Huỷ</button>
         <button class="submit-btn" @click="handleSubmit" :disabled="!canSubmit || isAddingInput">
           <span v-if="isAddingInput" class="button-spinner-small"></span>
-          {{ isAddingInput ? 'Adding...' : 'Add Input' }}
+          {{ isAddingInput ? 'Adding...' : 'Thêm đầu vào' }}
         </button>
       </div>
     </div>

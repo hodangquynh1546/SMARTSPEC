@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click="close">
     <div class="modal-content" @click.stop>
       <div class="modal-header">
-        <h2>Project Invitations</h2>
+        <h2>Lời mời dự án</h2>
         <button class="close-btn" @click="close">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -16,7 +16,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="Search by project name or inviter..."
+              placeholder="Tìm theo tên dự án hoặc người mời..."
               class="search-input"
               @input="handleSearch"
             />
@@ -33,14 +33,14 @@
             :class="{ active: activeTab === 'received' }"
             @click="activeTab = 'received'"
           >
-            Received ({{ filteredReceivedInvitations.length }})
+            Đã nhận ({{ filteredReceivedInvitations.length }})
           </button>
           <button
             class="tab-button"
             :class="{ active: activeTab === 'sent' }"
             @click="activeTab = 'sent'"
           >
-            Sent ({{ filteredSentInvitations.length }})
+            Đã gửi ({{ filteredSentInvitations.length }})
           </button>
         </div>
 
@@ -57,7 +57,7 @@
                   v-if="inv.inviter?.avatar_url && !inv.avatarLoadError"
                   :src="getFullAvatarUrl(inv.inviter.avatar_url)"
                   @error="(e) => handleAvatarError(e, inv)"
-                  alt="Inviter Avatar"
+                  alt="Ảnh người mời"
                   class="avatar-img"
                 />
                 <div v-else class="avatar-placeholder">
@@ -65,12 +65,12 @@
                 </div>
               </div>
               <div class="invitation-info">
-                <h4>Project: {{ inv.projectName }}</h4>
+                <h4>Dự án: {{ inv.projectName }}</h4>
                 <div class="inviter-info">
-                  <strong>{{ inv.inviter?.name }}</strong> invited you as
+                  <strong>{{ inv.inviter?.name }}</strong> đã mời bạn với vai trò
                   <span class="role-badge">{{ inv.role }}</span>
                 </div>
-                <small>Received: {{ formatDate(inv.created_at) }}</small>
+                <small>Đã nhận: {{ formatDate(inv.created_at) }}</small>
               </div>
               <div class="invitation-actions">
                 <button
@@ -78,14 +78,14 @@
                   @click="$emit('accept-invite', inv)"
                   :disabled="isProcessing"
                 >
-                  Accept
+                  Chấp nhận
                 </button>
                 <button
                   class="btn btn-reject"
                   @click="$emit('reject-invite', inv)"
                   :disabled="isProcessing"
                 >
-                  Reject
+                  Từ chối
                 </button>
               </div>
             </div>
@@ -95,11 +95,11 @@
             <span v-else class="material-symbols-outlined">inbox</span>
             <p>
               {{
-                searchQuery ? 'No invitations found matching your search' : 'No pending invitations'
+                searchQuery ? 'Không có lời mời nào khớp tìm kiếm' : 'Không có lời mời nào đang chờ'
               }}
             </p>
             <button v-if="searchQuery" class="btn btn-secondary" @click="clearSearch">
-              Clear Search
+              Xoá tìm kiếm
             </button>
           </div>
         </div>
@@ -117,7 +117,7 @@
                   v-if="inv.invitee?.avatar_url && !inv.avatarLoadError"
                   :src="getFullAvatarUrl(inv.invitee.avatar_url)"
                   @error="(e) => handleAvatarError(e, inv)"
-                  alt="Invitee Avatar"
+                  alt="Ảnh người được mời"
                   class="avatar-img"
                 />
                 <div v-else class="avatar-placeholder">
@@ -125,13 +125,13 @@
                 </div>
               </div>
               <div class="invitation-info">
-                <h4>Project: {{ inv.projectName }}</h4>
+                <h4>Dự án: {{ inv.projectName }}</h4>
                 <div class="invitee-info">
-                  Invited <strong>{{ inv.invitee?.name || inv.invitee?.email }}</strong> as
+                  Đã mời <strong>{{ inv.invitee?.name || inv.invitee?.email }}</strong> as
                   <span class="role-badge">{{ inv.role }}</span>
                 </div>
-                <small>Sent: {{ formatDate(inv.created_at) }}</small>
-                <small>Status: <span class="status-pending">Pending</span></small>
+                <small>Đã gửi: {{ formatDate(inv.created_at) }}</small>
+                <small>Trạng thái: <span class="status-pending">Đang chờ</span></small>
               </div>
               <div class="invitation-actions">
                 <button
@@ -139,7 +139,7 @@
                   @click="$emit('cancel-invite', inv)"
                   :disabled="isProcessing"
                 >
-                  Cancel
+                  Huỷ
                 </button>
               </div>
             </div>
@@ -155,7 +155,7 @@
               }}
             </p>
             <button v-if="searchQuery" class="btn btn-secondary" @click="clearSearch">
-              Clear Search
+              Xoá tìm kiếm
             </button>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default {
           ...inv,
           projectName: inv.projectName || `Project ${inv.project_id}`,
           inviter: inviterObj || {
-            name: 'Unknown User',
+            name: 'Người dùng không rõ',
             avatar_url: null,
           },
         }
@@ -286,7 +286,7 @@ export default {
     formatDate(dateStr) {
       if (!dateStr) return ''
       const date = new Date(dateStr)
-      return date.toLocaleDateString('en-US', {
+      return date.toLocaleDateString('vi-VN', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
