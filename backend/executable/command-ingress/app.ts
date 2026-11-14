@@ -1,3 +1,5 @@
+import initImportRoute from "./features/import/adapter/route";
+import initAccessTokenRoute from "./features/access_token/adapter/route";
 import initAdminRoute from "./features/admin/adapter/route";
 import initWorkhubRoute, { initWorkhubCallbackRoute } from "./features/workhub/adapter/route";
 import appLogger from "../../lib/logger";
@@ -220,6 +222,8 @@ const createHttpServer = (redisClient: any) => {
   app.use('/api/orchestrate', initOrchestratorRoute(new OrchestratorController(new OrchestratorService())));
   app.use('/api/projects', initProjectRoute(projectController));
   app.use('/api/admin', initAdminRoute());
+  app.use('/api/tokens', initAccessTokenRoute());
+  app.use('/api/import', initImportRoute());
   app.use('/api/workhub', initWorkhubRoute());
   app.use('/api/integrations/workhub', initWorkhubCallbackRoute());
   app.use('/api/input', initInputHandleRoute(inputHandleController));

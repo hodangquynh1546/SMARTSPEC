@@ -16,6 +16,7 @@ import ForgotPassword from '../pages/ForgotPassword.vue'
 import ResetPassword from '../pages/ResetPassword.vue'
 import ProjectLayout from '../layouts/ProjectLayout.vue'
 import adminRoutes from './admin'
+import ConnectClaude from '../views/ConnectClaude.vue'
 import { authGuard } from '../utils/authGuard'
 
 //import ProjectSharing from '@./components/ProjectSharingManagement.vue'
@@ -28,6 +29,7 @@ const routes = [
   { path: '/verify-otp', component: VerifyOtp },
   { path: '/forgot-password', component: ForgotPassword },
   { path: '/reset-password', component: ResetPassword },
+  { path: '/connect-claude', name: 'ConnectClaude', component: ConnectClaude, beforeEnter: authGuard },
   { 
     path: '/dashboard', 
     name: 'Home', 

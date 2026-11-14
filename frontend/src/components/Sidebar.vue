@@ -104,6 +104,9 @@
               <li @click.stop="$emit('open-personal')">
                 <span class="material-symbols-outlined">settings</span> Settings
               </li>
+              <li @click.stop="$router.push('/connect-claude')">
+                <span class="material-symbols-outlined">hub</span> Kết nối Claude
+              </li>
               <li @click.stop="openModelSelection">
                 <span class="material-symbols-outlined">smart_toy</span> Model Selection
               </li>

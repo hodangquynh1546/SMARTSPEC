@@ -255,3 +255,10 @@ npm run test
 - **Thống kê test case** dùng `aggregate()`, vốn **không tự ép kiểu** chuỗi sang ObjectId: luôn truyền `new Types.ObjectId(...)` (lỗi này làm mọi thống kê/độ phủ luôn bằng 0).
 - **Nhật ký**: ghi, đọc toàn bộ, xuất và dọn dẹp log chỉ dành cho ADMIN; log của dự án đọc qua `/api/logs/project` (thành viên). `target_id` không phải ObjectId được giữ trong `details.target_name`.
 - Kiểm thử không cần AI: `backend/scripts/api-smoke*.cjs` (159 kiểm tra). Phần cần AI (phân tích đa nguồn, sinh UML/CSDL/test case) chưa có kiểm thử tự động.
+
+## 12. Claude ghi đặc tả vào SmartSpec (MCP)
+
+- **Token cá nhân** `ssp_…` (`internal/model/access_token.ts`, chỉ lưu SHA-256; `/api/tokens` tạo/liệt kê/thu hồi, chỉ phiên đăng nhập thật, tối đa 20): `requireAuthorizedUser` nhận cả token này; token **không** làm admin (`requireRole` → 403) và không tạo được token khác (`requireInteractiveSession`).
+- **API nhập** `/api/import/versions/:versionId/{usecases,database,usecase-diagram,sequence-diagram,activity-diagram}` (`features/import/`): dữ liệu theo **tên** (không id), trùng tên = thay thế (idempotent), lỗi trả `400 {errors: []}` để Claude tự sửa; ghi vào bản nháp (bản đã chốt tự bump), có preview change + log `performed_by_ai`. Hợp lệ hoá bằng các validator sẵn có (ví dụ `TableValidationService`).
+- MCP server ở ForgeBridge: `src/smartspec-mcp.ts` (công cụ), HTTP `/mcp/smartspec` (token trong header Authorization, không trạng thái), stdio `src/smartspec-mcp-stdio.ts`. Hướng dẫn: `ForgeBridge/docs/claude-mcp.md`. Frontend: `views/ConnectClaude.vue` (`/connect-claude`, `VITE_BRIDGE_URL`).
+- Kiểm thử: `backend/scripts/api-smoke-import.cjs`, `ForgeBridge/scripts/e2e-claude-mcp.cjs`.
