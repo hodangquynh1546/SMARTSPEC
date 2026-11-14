@@ -1204,10 +1204,11 @@ const userAnalytics = ref({
 })
 
 // Computed
-const userTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
-const apiTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
-const projectTrend = ref({ type: 'positive', icon: 'trending_up', value: '+0%' })
-const activityTrend = ref({ type: 'negative', icon: 'trending_down', value: '-0%' })
+const NO_TREND = { type: 'neutral', icon: 'remove', value: '—' }
+const userTrend = ref({ ...NO_TREND })
+const apiTrend = ref({ ...NO_TREND })
+const projectTrend = ref({ ...NO_TREND })
+const activityTrend = ref({ ...NO_TREND })
 
 const filteredLogs = computed(() => {
   return systemLogs.value.filter((log) => {
@@ -1529,10 +1530,10 @@ const refreshUserStats = async () => {
         percentage: Math.round((count / total) * 100),
         color:
           role === 'ADMIN'
-            ? '#13235d'
+            ? '#0a0a0a'
             : role === 'PARTICIPANT'
-            ? '#52abea'
-            : '#8884d8',
+            ? '#6b6b6b'
+            : '#b5b5b2',
       }))
 
       userDistribution.value = distribution
@@ -1660,7 +1661,7 @@ const refreshApiStats = async () => {
         name: p.provider,
         usage: formatNumber(p.requests || 0),
         percentage: totalRequests > 0 ? Math.round((p.requests / totalRequests) * 100) : 0,
-        color: p.provider === 'Gemini' ? '#1a365d' : p.provider === 'OpenAI' ? '#2d3748' : '#4a5568',
+        color: p.provider === 'Gemini' ? '#0a0a0a' : p.provider === 'OpenAI' ? '#3d3d3b' : '#6b6b6b',
         trend: (p.success || 0) > (p.failed || 0) ? 'up' : 'down',
         change: p.failed > 0 ? `-${Math.round((p.failed / p.requests) * 100)}%` : '+0%',
       }))
@@ -1701,14 +1702,14 @@ const loadChartData = async () => {
               {
                 label: 'Requests',
                 data: timelineRes.data.data.map(d => d.requests),
-                borderColor: '#1a365d',
+                borderColor: '#0a0a0a',
                 backgroundColor: 'rgba(26, 54, 93, 0.1)',
                 tension: 0.4,
                 fill: true,
                 borderWidth: 3,
                 pointRadius: 4,
                 pointHoverRadius: 6,
-                pointBackgroundColor: '#1a365d',
+                pointBackgroundColor: '#0a0a0a',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
               },
@@ -1818,7 +1819,7 @@ const loadChartData = async () => {
             labels: providerRes.data.data.map(d => d.provider),
             datasets: [{
               data: providerRes.data.data.map(d => d.requests),
-              backgroundColor: ['#1a365d', '#2d3748', '#4a5568', '#718096'],
+              backgroundColor: ['#0a0a0a', '#3d3d3b', '#6b6b6b', '#9b9b98'],
               borderWidth: 0,
             }],
           },
@@ -2019,14 +2020,14 @@ const loadUserTimelineChart = async () => {
             {
               label: 'Đăng ký mới',
               data,
-              borderColor: '#4299e1',
+              borderColor: '#0a0a0a',
               backgroundColor: 'rgba(66, 153, 225, 0.15)',
               tension: 0.4,
               fill: true,
               borderWidth: 3,
               pointRadius: 4,
               pointHoverRadius: 6,
-              pointBackgroundColor: '#3182ce',
+              pointBackgroundColor: '#0a0a0a',
               pointBorderColor: '#fff',
               pointBorderWidth: 2,
             },
@@ -2617,7 +2618,7 @@ async function loadDashboardStatsFromAPI() {
       name: p.provider,
       usage: formatNumber(p.requests || 0),
       percentage: totalProviderRequests > 0 ? Math.round((p.requests / totalProviderRequests) * 100) : 0,
-      color: p.provider === 'Gemini' ? '#1a365d' : p.provider === 'OpenAI' ? '#2d3748' : '#4a5568',
+      color: p.provider === 'Gemini' ? '#0a0a0a' : p.provider === 'OpenAI' ? '#3d3d3b' : '#6b6b6b',
       trend: (p.success || 0) > (p.failed || 0) ? 'up' : 'down',
       change: p.failed > 0 ? `-${Math.round((p.failed / p.requests) * 100)}%` : '+0%',
     }))
@@ -2674,8 +2675,15 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .logo .material-symbols-outlined {
-  font-size: 32px;
-  color: var(--ink);
+  font-size: 28px;
+  color: var(--ink-text);
+}
+
+.logo h1 {
+  color: var(--ink-text);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
 }
 .pie-chart {
   position: relative;
@@ -2715,9 +2723,7 @@ async function loadDashboardStatsFromAPI() {
   font-size: 20px;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--ink-text);
 }
 
 .header-actions {
@@ -2963,6 +2969,10 @@ async function loadDashboardStatsFromAPI() {
   color: var(--danger);
 }
 
+.stat-trend.neutral {
+  color: var(--muted);
+}
+
 .stat-trend .material-symbols-outlined {
   font-size: 14px;
 }
@@ -3018,7 +3028,7 @@ async function loadDashboardStatsFromAPI() {
 
 .header-icon {
   font-size: 32px;
-  color: var(--ink);
+  color: var(--ink-text);
   background: rgba(255, 255, 255, 0.1);
   width: 56px;
   height: 56px;
@@ -3312,6 +3322,15 @@ async function loadDashboardStatsFromAPI() {
 }
 
 /* Filter Icon Buttons */
+.chart-actions,
+.user-filters-modern {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .filter-icon-wrapper {
   position: relative;
   display: inline-block;
@@ -3634,7 +3653,12 @@ async function loadDashboardStatsFromAPI() {
   margin-bottom: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border);
-  max-width: calc(100% - 20px);
+  min-width: 0;
+}
+
+.user-charts-grid > .chart-container-modern,
+.charts-grid-modern > .chart-container-modern {
+  margin-bottom: 0;
 }
 
 .chart-container-modern.timeline-chart {
@@ -4087,6 +4111,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .card-header h3 {
+  color: var(--ink-text);
   margin: 0;
   font-size: 16px;
   font-weight: 600;

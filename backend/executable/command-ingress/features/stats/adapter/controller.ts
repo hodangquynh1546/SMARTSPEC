@@ -74,16 +74,33 @@ export class StatsController {
         }
     }
 
-    // Trends (user, api, project, activity)
+    // Trends (user, api, project, activity): 7 ngày gần nhất so với 7 ngày trước đó, từ dữ liệu thật
     async trends(req: Request, res: Response, next: NextFunction) {
         try {
-            // TODO: Tính toán trends từ dữ liệu thật (so sánh hôm nay vs hôm qua)
-            res.json({
-                userTrend: { type: 'positive', icon: 'trending_up', value: '+12%' },
-                apiTrend: { type: 'positive', icon: 'trending_up', value: '+8%' },
-                projectTrend: { type: 'positive', icon: 'trending_up', value: '+15%' },
-                activityTrend: { type: 'negative', icon: 'trending_down', value: '-3%' }
-            });
+            const DAY = 24 * 3600 * 1000;
+            const now = Date.now();
+            const cur = new Date(now - 7 * DAY), prev = new Date(now - 14 * DAY);
+            const [User, Project, ApiUsage, Log] = await Promise.all([
+                import('../../../../../internal/model/user'),
+                import('../../../../../internal/model/project'),
+                import('../../../../../internal/model/api_usage'),
+                import('../../../../../internal/model/log'),
+            ]).then((m) => m.map((x: any) => x.default));
+            const count = (M: any, field: string, from: Date, to?: Date) =>
+                M.countDocuments({ [field]: to ? { $gte: from, $lt: to } : { $gte: from } });
+            const trend = (now7: number, before7: number) => {
+                if (now7 === 0 && before7 === 0) return { type: 'neutral', icon: 'remove', value: '—' };
+                if (before7 === 0) return { type: 'positive', icon: 'trending_up', value: `+${now7} mới` };
+                const pct = Math.round(((now7 - before7) / before7) * 100);
+                return { type: pct >= 0 ? 'positive' : 'negative', icon: pct >= 0 ? 'trending_up' : 'trending_down', value: `${pct >= 0 ? '+' : ''}${pct}%` };
+            };
+            const [u1, u0, p1, p0, a1, a0, l1, l0] = await Promise.all([
+                count(User, 'created_at', cur), count(User, 'created_at', prev, cur),
+                count(Project, 'created_at', cur), count(Project, 'created_at', prev, cur),
+                count(ApiUsage, 'created_at', cur), count(ApiUsage, 'created_at', prev, cur),
+                count(Log, 'created_at', cur), count(Log, 'created_at', prev, cur),
+            ]);
+            res.json({ userTrend: trend(u1, u0), apiTrend: trend(a1, a0), projectTrend: trend(p1, p0), activityTrend: trend(l1, l0), period: '7 ngày so với 7 ngày trước' });
         } catch (err) {
             next(err);
         }
