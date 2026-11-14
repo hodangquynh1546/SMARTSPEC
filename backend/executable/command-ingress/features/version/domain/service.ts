@@ -304,6 +304,15 @@ export class VersionService {
         approver.comment = comment ?? "";
       }
 
+      // A version still being analysed, or with unresolved conflicts, is not ready to be finalized
+      if (["processing", "has_conflicts", "paused"].includes(String(baseVersion.status))) {
+        return new ServiceResponse(ResponseStatus.Failed, "Version is still processing or has unresolved conflicts; finish that before approving", null, 409);
+      }
+
+      // numbers before the change (the log below used to record the already-incremented ones as "before")
+      const beforeMajor = baseVersion.version_major;
+      const beforeMinor = baseVersion.version_minor;
+
       // ✅ CHỈNH VERSION DỰA TRÊN changeType
       if (changeType === "major") {
         // tăng major
@@ -315,8 +324,8 @@ export class VersionService {
 
       // ✅ Chuyển version tạm thành version chính thức
       const oldVersionNumber = baseVersion.version_number;
-      const oldVersionMajor = baseVersion.version_major;
-      const oldVersionMinor = baseVersion.version_minor;
+      const oldVersionMajor = beforeMajor;
+      const oldVersionMinor = beforeMinor;
 
       baseVersion.version_temporary = false;
       await baseVersion.save();
@@ -767,6 +776,12 @@ export class VersionService {
         return new ServiceResponse(ResponseStatus.Failed, "Project not found", null, 404);
       }
 
+      // Switching which version the whole team works on is the owner's call (the header already says "Owner only")
+      const isOwner = (project.members ?? []).some((m: any) => m.user_id?.toString() === userId && m.role === "owner" && m.status === "accepted");
+      if (!isOwner) {
+        return new ServiceResponse(ResponseStatus.Failed, "Only project owner can change the current version", null, 403);
+      }
+
       // 🕓 Lưu version cũ (nếu có)
       const oldVersionId = project.current_version?.toString();
 
@@ -840,6 +855,12 @@ export class VersionService {
 
       // ✅ Kiểm tra version có đang là current_version không
       const project = await Project.findById(version.project_id);
+      if (project) {
+        const isOwner = (project.members ?? []).some((m: any) => m.user_id?.toString() === userId && m.role === "owner" && m.status === "accepted");
+        if (!isOwner) {
+          return new ServiceResponse(ResponseStatus.Failed, "Only project owner can delete a version", null, 403);
+        }
+      }
       if (project && project.current_version?.toString() === versionId) {
         return new ServiceResponse(
           ResponseStatus.Failed,
@@ -848,8 +869,18 @@ export class VersionService {
           400
         );
       }
+      // A version another one was made from is part of the history (rollback needs it): refuse
+      if (await Version.exists({ parent_version_id: versionId })) {
+        return new ServiceResponse(
+          ResponseStatus.Failed,
+          "Cannot delete a version that a newer version was created from. Delete or roll back the newer version first.",
+          null,
+          409
+        );
+      }
 
       await Promise.all([
+        Usecase.deleteMany({ version_id: versionId }), // were left behind, orphaned
         Input.deleteMany({ version_id: versionId }),
         Database.deleteMany({ version_id: versionId }),
         Testcase.deleteMany({ version_id: versionId }),
@@ -1202,6 +1233,13 @@ export class VersionService {
         );
       }
 
+      // Rollback is the owner's decision, like approve (it used to wait for EVERY member to agree, which made it
+      // impossible in any shared project).
+      const isOwner = (project.members ?? []).some((m: any) => m.user_id?.toString() === userId && m.role === "owner" && m.status === "accepted");
+      if (!isOwner) {
+        return new ServiceResponse(ResponseStatus.Failed, "Only project owner can roll back this version", null, 403);
+      }
+
       const parentVersionId = version.parent_version_id;
       if (!parentVersionId) {
         return new ServiceResponse(ResponseStatus.Failed, "Version does not have a parent version to rollback to", null, 400);
@@ -1210,26 +1248,7 @@ export class VersionService {
       if (!parentVersion) {
         return new ServiceResponse(ResponseStatus.Failed, "Parent version not found", null, 404);
       }
-      // 🔍 2. Tìm preview gắn với version này
-      const preview = await Preview.findOne({ base_version_id: versionId });
-      if (!preview) {
-        return new ServiceResponse(ResponseStatus.Failed, "Preview not found", null, 404);
-      }
-      // 🔍 3. Tìm approver của user này
-      const approver = preview.approvers.find(a => a.user_id.toString() === userId);
-      if (!approver) {
-        return new ServiceResponse(ResponseStatus.Failed, "You are not an approver of this preview", null, 403);
-      }
-      // 4️⃣ Đánh dấu user này rollback
-      approver.status = "rollback";
-      approver.approved_at = new Date();
-      await preview.save();
-      // 5️⃣ Kiểm tra TẤT CẢ đã rollback chưa?
-      const allRollback = preview.approvers.every(a => a.status === "rollback");
-      if (!allRollback) {
-        // Một số người rollback → chờ người khác
-        return new ServiceResponse(ResponseStatus.Success, "Rollback submitted, waiting for other approvers", { preview_status: "partial_rollback" }, 200);
-      }
+      // A working copy with nothing left to review (every change reverted) can still be discarded: no preview needed.
       // ================================
       // 🎯 6️⃣ TẤT CẢ APPROVERS ĐÃ ROLLBACK → THỰC HIỆN ROLLBACK VERSION
       // ================================

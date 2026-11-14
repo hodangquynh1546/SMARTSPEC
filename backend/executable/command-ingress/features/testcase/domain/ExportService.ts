@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import logger from "../../../../../lib/logger";
 // exportService.ts
 import * as ExcelJS from 'exceljs';
@@ -85,7 +86,7 @@ export class TestcaseExportService {
             project_id: projectId,
             _id: { $in: Array.from(allTestCaseIds) }
         };
-        if (versionId) query.version_id = versionId;
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         const allTestCases = await Testcase.find(query)
             .populate('created_by', 'name email')
@@ -124,9 +125,9 @@ export class TestcaseExportService {
         versionId?: string,
         filters: ExportFilters = {}
     ): Promise<any[]> {
-        const query: any = { project_id: projectId };
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
 
-        if (versionId) query.version_id = versionId;
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
         
         // If specific test case IDs are provided, use them (highest priority)
         if (filters.testCaseIds && filters.testCaseIds.length > 0) {
@@ -503,8 +504,8 @@ export class TestcaseExportService {
 
 
     private async getDatabaseCoverage(projectId: string, versionId?: string): Promise<any> {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         // Get database schema
         const dbQuery: any = { project_id: projectId };
@@ -573,8 +574,8 @@ export class TestcaseExportService {
     }
 
     private async getRequirementCoverage(projectId: string, versionId?: string): Promise<any> {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         // Get requirements from version
         const versionQuery: any = { project_id: projectId };

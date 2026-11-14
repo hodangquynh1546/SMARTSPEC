@@ -13,7 +13,7 @@ export function statusForFailure(message: string, code: number): number {
   const m = String(message ?? "");
   if (/access denied|do not have access|not allowed|forbidden|no permission|viewer .*quyền|không có quyền/i.test(m)) return 403;
   if (/not found|không tìm thấy/i.test(m)) return 404;
-  if (/already exists|does not exist|is required|must be |invalid |cannot be |không hợp lệ/i.test(m)) return 400;
+  if (/already exists|does not exist|is required|must be |invalid |cannot be |không hợp lệ|cast to objectid failed|objectid failed|must be a string of 12 bytes/i.test(m)) return 400;
   return code;
 }
 

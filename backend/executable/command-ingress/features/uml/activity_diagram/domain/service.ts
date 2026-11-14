@@ -286,14 +286,21 @@ export class ActivityDiagramService {
     const version = await VersionModel.findById(versionId).lean();
     if (!version) throw new Error('Không tìm thấy version');
 
+    // Nodes and edges are keyed by ObjectId in the schema. The starter nodes used string ids ("n_start"), so creating a
+    // diagram by hand failed every time with a cast error.
+    const startId = new Types.ObjectId();
+    const endId = new Types.ObjectId();
     const newDiagram = await ActivityDiagramModel.create({
       project_id: projectId,
       version_id: versionId,
       name,
       description: description || '',
       lanes: [],
-      nodes: [{ id: 'n_start', type: 'start', label: 'Start' }, { id: 'n_end', type: 'end', label: 'End' }],
-      edges: [{ from: 'n_start', to: 'n_end' }],
+      nodes: [
+        { _id: startId, type: 'start', label: 'Start', position: { x: 300, y: 80 } },
+        { _id: endId, type: 'end', label: 'End', position: { x: 300, y: 320 } },
+      ],
+      edges: [{ from: startId, to: endId }],
       created_by: userId ? new Types.ObjectId(userId) : undefined,
     } as any);
 

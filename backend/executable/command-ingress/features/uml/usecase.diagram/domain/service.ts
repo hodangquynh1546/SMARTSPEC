@@ -250,6 +250,8 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Actor not found");
     }
     uc.actors.splice(actorIndex, 1);
+    // associations that pointed at the actor would dangle (the diagram could no longer be drawn)
+    (uc as any).associations = (uc.associations ?? []).filter((a: any) => String(a.actor_id) !== String(actorId));
     await uc.save();
   }
   public async editUsecaseById(
@@ -287,6 +289,9 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       throw new Error("Usecase not found");
     }
     uc.usecases.splice(usecaseIndex, 1);
+    // its associations and include/extend/generalization links would dangle
+    (uc as any).associations = (uc.associations ?? []).filter((a: any) => String(a.usecase_id) !== String(usecaseId));
+    (uc as any).relationships = (uc.relationships ?? []).filter((r: any) => String(r.source) !== String(usecaseId) && String(r.target) !== String(usecaseId));
     await uc.save();
   }
   public async createUsecase(

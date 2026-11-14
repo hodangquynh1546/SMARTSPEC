@@ -247,3 +247,11 @@ npm run test
 - Lỗi mã trạng thái: `ServiceResponse` tự đổi 500 thành 403/404/400 theo nội dung ("Access denied", "not found", "already exists"…); web **đăng xuất khi gặp 401**, nên lỗi API key LLM trả 502 (không phải 401/403).
 - Frontend: `components/auth/AuthShell.vue` là khung chung của mọi trang đăng nhập/đăng ký/quên mật khẩu/đặt lại/xác thực email/OTP (giống WorkHub). `axiosClient` không refresh token cho các endpoint `/api/auth/*`; backend nhận cả `refreshToken` lẫn `refresh_token`.
 - Kiểm thử: `backend/scripts/api-smoke.cjs` (nghiệp vụ không cần AI, 74 kiểm tra) và `ForgeBridge/scripts/e2e-accounts.cjs`; chạy backend với `MAIL_ENABLED=false AUTH_RATE_LIMIT=1000` và MONGO_URI riêng.
+
+## 11. Rà soát nghiệp vụ: quy tắc đã chốt (đừng phá vỡ)
+
+- **Phiên bản**: dự án mới có bản nháp 1.0 (`version_temporary`); sửa bản **đã chốt** sẽ bump ra bản nháp mới (id use case/test case bị clone, nên `usecaseId` phải được ánh xạ qua `idMaps` sau khi bump). Chỉ **chủ dự án** được duyệt (`approve`), **rollback**, đổi phiên bản hiện tại và xoá phiên bản. Không duyệt phiên bản đang `processing`/`has_conflicts`; không xoá phiên bản hiện tại hay phiên bản mà bản khác được tạo từ nó; xoá phiên bản phải xoá luôn use case, test case, sơ đồ, CSDL của nó.
+- **Sơ đồ**: xoá actor/use case trong use case diagram phải xoá các association/relationship trỏ tới nó; sơ đồ activity tạo tay dùng ObjectId cho node/edge.
+- **Thống kê test case** dùng `aggregate()`, vốn **không tự ép kiểu** chuỗi sang ObjectId: luôn truyền `new Types.ObjectId(...)` (lỗi này làm mọi thống kê/độ phủ luôn bằng 0).
+- **Nhật ký**: ghi, đọc toàn bộ, xuất và dọn dẹp log chỉ dành cho ADMIN; log của dự án đọc qua `/api/logs/project` (thành viên). `target_id` không phải ObjectId được giữ trong `details.target_name`.
+- Kiểm thử không cần AI: `backend/scripts/api-smoke*.cjs` (159 kiểm tra). Phần cần AI (phân tích đa nguồn, sinh UML/CSDL/test case) chưa có kiểm thử tự động.

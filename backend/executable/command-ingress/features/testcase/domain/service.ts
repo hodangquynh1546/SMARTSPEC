@@ -745,8 +745,8 @@ export class TestcaseService {
      * Lấy test cases theo project và version với Enterprise filters
      */
     async getTestCasesByProject(projectId: string, versionId?: string, filters: any = {}) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         // Apply filters
         if (filters.test_type) query.test_type = filters.test_type;
@@ -784,7 +784,7 @@ export class TestcaseService {
             project_id: projectId,
             database_tables: tableName
         };
-        if (versionId) query.version_id = versionId;
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         return await Testcase.find(query)
             .populate('created_by', 'name email')
@@ -1048,8 +1048,8 @@ export class TestcaseService {
      * Get test statistics
      */
     async getTestStatistics(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         const stats = await Testcase.aggregate([
             { $match: query },
@@ -1154,8 +1154,8 @@ export class TestcaseService {
      * Get database coverage report
      */
     async getDatabaseCoverageReport(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         // Get database schema
         const dbQuery: any = { project_id: projectId };
@@ -1225,8 +1225,8 @@ export class TestcaseService {
      * Get requirement coverage report
      */
     async getRequirementCoverageReport(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         // Get requirements from version
         const versionQuery: any = { project_id: projectId };
@@ -1306,8 +1306,8 @@ export class TestcaseService {
      * Find duplicate test cases
      */
     async findDuplicateTestCases(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         const duplicates = await Testcase.aggregate([
             { $match: query },
@@ -1336,8 +1336,8 @@ export class TestcaseService {
      * Get test case metrics for dashboard
      */
     async getDashboardMetrics(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         const metrics = await Testcase.aggregate([
             { $match: query },
@@ -1441,8 +1441,8 @@ export class TestcaseService {
      * Export test cases to JSON
      */
     async exportTestCases(projectId: string, versionId?: string) {
-        const query: any = { project_id: projectId };
-        if (versionId) query.version_id = versionId;
+        const query: any = { project_id: new Types.ObjectId(String(projectId)) }; // aggregate() does not cast strings: a plain string matched nothing
+        if (versionId) query.version_id = new Types.ObjectId(String(versionId));
 
         const testCases = await Testcase.find(query)
             .populate('created_by', 'name email')

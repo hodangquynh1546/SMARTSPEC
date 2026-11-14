@@ -1,7 +1,5 @@
-// API smoke test of SmartSpec business flows that need no AI (projects, use cases, versions, database design, test cases,
-// sharing, trash, admin, accounts). Run against a backend started with MAIL_ENABLED=false AUTH_RATE_LIMIT=1000 and a
-// throw-away MONGO_URI (database smartspec_e2e): node scripts/api-smoke.cjs
-
+// API smoke test of SmartSpec flows that need no AI. Run against a backend started with MAIL_ENABLED=false
+// AUTH_RATE_LIMIT=1000 WORKHUB_ENABLED=false and a throw-away MONGO_URI (database smartspec_e2e): node scripts/api-smoke.cjs
 const R = "../node_modules/";
 const { MongoClient, ObjectId } = require(R + "mongodb");
 const SS = "http://localhost:8000";
@@ -149,8 +147,8 @@ const short = (r) => `${r.s} ${typeof r.d === "string" ? r.d.slice(0, 100) : JSO
   t("admin: a normal user cannot read API keys", r.s === 403, short(r));
   r = await call(A.tok, "GET", "/api/auth/me");
   t("user: own profile endpoint", r.s === 200 && r.d.data.email === A.email, short(r));
-  r = await call(A.tok, "GET", "/api/logs?projectId=" + pid);
-  t("logs: project logs", r.s === 200, short(r));
+  r = await call(A.tok, "GET", "/api/logs/project?project_id=" + pid);
+  t("logs: project logs for a member", r.s === 200, short(r));
   r = await call(null, "GET", "/api/projects/myproject");
   t("auth: protected endpoints refuse anonymous callers", r.s === 401, short(r));
 
