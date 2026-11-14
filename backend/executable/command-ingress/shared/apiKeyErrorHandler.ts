@@ -150,6 +150,7 @@ export function analyzeApiKeyError(error: any): ApiKeyErrorInfo {
   // Invalid key
   if (
     combinedMessage.includes('invalid api key') ||
+    combinedMessage.includes('invalid x-api-key') ||
     combinedMessage.includes('invalid key') ||
     combinedMessage.includes('api key not found') ||
     combinedMessage.includes('authentication failed') ||

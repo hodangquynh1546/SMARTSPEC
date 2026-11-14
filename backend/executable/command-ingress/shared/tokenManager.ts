@@ -31,6 +31,39 @@ export interface ModelConfig {
  */
 export const MODEL_CONFIGS: Record<string, ModelConfig> = {
     // =========================
+    // 🅰️ CLAUDE (Anthropic API trực tiếp, trả phí) — cần key provider "claude"
+    // =========================
+    'claude-sonnet-5-5': {
+        provider: 'claude',
+        modelName: 'claude-sonnet-5-5',
+        category: 'worker',
+        contextWindow: 200000,
+        strategy: 'compress-long',
+        tokenEstimationRatio: 3.5,
+        supportsLongContext: true,
+        supportsCompression: true
+    },
+    'claude-opus-5-5': {
+        provider: 'claude',
+        modelName: 'claude-opus-5-5',
+        category: 'agent',
+        contextWindow: 200000,
+        strategy: 'compress-long',
+        tokenEstimationRatio: 3.5,
+        supportsLongContext: true,
+        supportsCompression: true
+    },
+    'claude-haiku-5-5': {
+        provider: 'claude',
+        modelName: 'claude-haiku-5-5',
+        category: 'worker',
+        contextWindow: 200000,
+        strategy: 'compress-long',
+        tokenEstimationRatio: 3.5,
+        supportsLongContext: true,
+        supportsCompression: true
+    },
+    // =========================
     // 🧠 AGENT (FREE)
     // =========================
     'nous-hermes-3-405b-instruct': {

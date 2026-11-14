@@ -816,20 +816,33 @@ export class LLMService {
             },
             body: JSON.stringify({
                 model: modelName,
-                max_tokens: 4096,
-                messages: [
-                    { role: 'user', content: prompt }
-                ],
+                // Đặc tả/UML/CSDL/test case là JSON dài: 4096 cắt cụt giữa chừng nên không parse được
+                max_tokens: 32000,
+                system:
+                    'Bạn là kỹ sư phân tích nghiệp vụ và thiết kế phần mềm. Làm đúng định dạng đầu ra mà yêu cầu chỉ định ' +
+                    '(khi yêu cầu JSON thì chỉ trả JSON hợp lệ, không thêm lời dẫn, không bọc markdown). Không bịa thông tin không có trong dữ liệu đầu vào.',
+                messages: [{ role: 'user', content: prompt }],
             }),
+            signal: AbortSignal.timeout(10 * 60 * 1000),
         });
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({ error: { message: response.statusText } }));
-            throw new Error(error.error?.message || `Claude API error: ${response.statusText}`);
+            const msg = error.error?.message || response.statusText;
+            const err: any = new Error(`Claude API error (${response.status}): ${msg}`);
+            err.status = response.status;
+            throw err;
         }
 
         const data = await response.json();
-        const text = data.content?.[0]?.text || '';
+        const text = (data.content ?? [])
+            .filter((b: any) => b.type === 'text')
+            .map((b: any) => b.text)
+            .join('');
+        if (data.stop_reason === 'max_tokens') {
+            throw new Error('Claude trả lời bị cắt cụt (đạt giới hạn đầu ra); hãy chia nhỏ tài liệu đầu vào');
+        }
+        if (!text) throw new Error(`Claude không trả nội dung (stop_reason: ${data.stop_reason ?? 'không rõ'})`);
 
         return {
             text,
@@ -854,6 +867,9 @@ export class LLMService {
                 // Nếu không tìm thấy trong config, tiếp tục detect
             }
         }
+
+        const claudeKeys = await this.apiKeyService.getAllActiveKeys('claude');
+        if (claudeKeys && claudeKeys.length > 0) return 'claude';
 
         // Ưu tiên OpenRouter vì nó có thể dùng cho nhiều models
         const openRouterKeys = await this.apiKeyService.getAllActiveKeys('openrouter');
@@ -897,7 +913,7 @@ export class LLMService {
         const defaults: Record<Provider, string> = {
             'gemini': 'gemini-2.0-flash-001',
             'openai': 'gpt-4o',
-            'claude': 'claude-3-5-sonnet',
+            'claude': 'claude-sonnet-5-5',
             'openrouter': 'google/gemma-3-12b-it:free',
             'nous': 'nousresearch/hermes-3-llama-3.1-405b:free',
             'qwen': 'qwen/qwen3-235b-a22b:free',
@@ -1052,6 +1068,14 @@ export class LLMService {
         if (preferredModel) {
             logger.info(`✅ [getRecommendedModel] Using preferredModel: ${preferredModel}`);
             return preferredModel;
+        }
+
+        // Ưu tiên Claude (Anthropic) nếu đã cấu hình key
+        const claudeKeys = await this.apiKeyService.getAllActiveKeys('claude');
+        if (claudeKeys && claudeKeys.length > 0) {
+            const defaultModel = claudeKeys[0].model_name || this.getDefaultModel('claude');
+            logger.info(`✅ [getRecommendedModel] Using Claude model: ${defaultModel}`);
+            return defaultModel;
         }
 
         // Ưu tiên OpenRouter
