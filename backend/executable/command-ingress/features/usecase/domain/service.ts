@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // features/usecase/domain/service.ts
 import mongoose, { Types } from 'mongoose';
 import Version from "../../../../../internal/model/version";
@@ -51,7 +52,7 @@ export class UsecaseService {
 
     if (existingActor) {
       // ✅ Trùng name → dùng ID cũ
-      console.log(`🔄 Actor mapping: "${actorName}" → ${existingActor.id} (existing)`);
+      logger.info(`🔄 Actor mapping: "${actorName}" → ${existingActor.id} (existing)`);
       return { id: existingActor.id, name: actorName, description: actorDescription };
     }
 
@@ -67,7 +68,7 @@ export class UsecaseService {
     const maxNumber = actorNumbers.length > 0 ? Math.max(...actorNumbers) : 0;
     const newActorId = `actor_${maxNumber + 1}`;
 
-    console.log(`🆕 New actor: "${actorName}" → ${newActorId}`);
+    logger.info(`🆕 New actor: "${actorName}" → ${newActorId}`);
     return { id: newActorId, name: actorName, description: actorDescription };
   }
 
@@ -357,7 +358,7 @@ export class UsecaseService {
           savedUsecase.toObject()
         );
       } catch (socketError) {
-        console.error('Socket broadcast failed:', socketError);
+        logger.error('Socket broadcast failed:', socketError);
       }
 
       return new ServiceResponse(
@@ -373,7 +374,7 @@ export class UsecaseService {
 
     } catch (error: any) {
       await session.abortTransaction();
-      console.error("❌ Add usecase error:", error);
+      logger.error("❌ Add usecase error:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message, null, 500);
     } finally {
       session.endSession();
@@ -524,7 +525,7 @@ export class UsecaseService {
         originalUsecase.toObject()
       );
 
-      console.log(`✅ Usecase ${usecaseId} updated successfully`);
+      logger.info(`✅ Usecase ${usecaseId} updated successfully`);
       return new ServiceResponse(
         ResponseStatus.Success,
         "Usecase updated successfully",
@@ -538,7 +539,7 @@ export class UsecaseService {
 
     } catch (error: any) {
       await session.abortTransaction();
-      console.error("❌ Update usecase error:", error);
+      logger.error("❌ Update usecase error:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message, null, 500);
     } finally {
       session.endSession();
@@ -649,7 +650,7 @@ export class UsecaseService {
 
     } catch (error: any) {
       await session.abortTransaction();
-      console.error("❌ Delete usecase error:", error);
+      logger.error("❌ Delete usecase error:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message, null, 500);
     } finally {
       session.endSession();
@@ -690,7 +691,7 @@ export class UsecaseService {
       );
 
     } catch (error: any) {
-      console.error("❌ Get usecases error:", error);
+      logger.error("❌ Get usecases error:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message, null, 500);
     }
   }

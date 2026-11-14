@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import Input from '../../../../../internal/model/input';
 import Version from '../../../../../internal/model/version';
 import { HashUtil } from '../../../utils/hash.util';
@@ -38,7 +39,7 @@ export class TextService {
         
         // Log warnings nếu có
         if (validation.warnings.length > 0) {
-            console.warn(`⚠️ Text input warnings:`, validation.warnings.slice(0, 3));
+            logger.warn(`⚠️ Text input warnings:`, validation.warnings.slice(0, 3));
         }
         
         const input = new Input({

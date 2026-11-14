@@ -146,6 +146,7 @@ const config = {
 
   // The test environment that will be used for testing
   testEnvironment: 'node',
+  testMatch: ['**/?(*.)+(spec|test).ts'],
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},

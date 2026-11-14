@@ -133,3 +133,9 @@ SmartSpec xây dựng một pipeline chuyên dụng để tiếp nhận, tiền 
    - Nếu file đã tồn tại và đã được trích xuất thành công (`is_processed: true`), hệ thống sẽ bỏ qua bước OCR/STT tốn kém và tái sử dụng kết quả đã bóc tách.
 3. **Incremental Mode Integration**:
    - Khi chạy ở chế độ **Incremental**, chỉ những file có nội dung mới (hash chưa tồn tại) mới được đưa vào phân tích để bổ sung hoặc kiểm tra xung đột với tập Use Case hiện hữu.
+
+## 4. Chờ hoàn tất extraction/refine
+
+Audio và image có thể được refine bất đồng bộ sau bước extraction. Orchestrator hiện lấy danh sách input mới theo `version_id` trong cửa sổ 10 giây, chờ các input đó hoàn tất; nếu không có target ID thì fallback truy vấn input chưa xử lý và có thể chờ refine tối đa 90 giây.
+
+Đây là heuristic theo thời gian, không phải liên kết chắc chắn với một request cụ thể. Khi có nhiều upload đồng thời vào cùng version, cần ưu tiên truyền rõ danh sách input IDs từ request thay cho time-window.

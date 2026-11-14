@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import {
   IsEmail,
   IsNotEmpty,
@@ -59,7 +60,7 @@ export class ExchangeGoogleTokenBody extends RequestDto {
 export class LogoutRequestBody extends RequestDto {
   constructor(body: any) {
     super();
-    console.log("45: ", body);
+    logger.info("45: ", body);
     if (body && body.refresh_token) {
       this.refreshToken = String(body.refresh_token);
     }

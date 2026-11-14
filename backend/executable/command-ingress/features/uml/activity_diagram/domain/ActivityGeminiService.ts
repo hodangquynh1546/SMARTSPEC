@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 import { ActivityEdge, ActivityNode, ActivityLane, ActivityDiagramDTO } from './interfaces';
 import { ApiKeyService } from '../../../orchestrator/domain/ApiKeyService';
 import { LLMService } from '../../../../shared/LLMService';
@@ -388,7 +389,7 @@ export class ActivityGeminiService {
 
       return this.cleanJson(response.text);
     } catch (err: any) {
-      console.error('❌ LLM call failed for activity diagram:', err.message);
+      logger.error('❌ LLM call failed for activity diagram:', err.message);
       throw err;
     }
   }
@@ -419,14 +420,14 @@ export class ActivityGeminiService {
       if (typeof parsed === 'object') return JSON.stringify(parsed); // đảm bảo là string JSON chuẩn
       throw new Error('Parsed result is not an object');
     } catch (parseError: any) {
-      console.error('❌ Could not parse AI response:', parseError);
+      logger.error('❌ Could not parse AI response:', parseError);
       throw new Error(`Failed to parse AI response: ${parseError.message || 'Invalid JSON format'}`);
     }
   }
 
   async generateFromUseCase(requirements: any[], language: string, userId?: string, projectId?: string): Promise<ActivityDiagramDTO> {
-    console.log('--- generateFromUseCase START ---');
-    console.log('Input requirements:', JSON.stringify(requirements, null, 2));
+    logger.info('--- generateFromUseCase START ---');
+    logger.info('Input requirements:', JSON.stringify(requirements, null, 2));
 
     const simplified = requirements.map(r => ({
       name: r.name,
@@ -446,7 +447,7 @@ export class ActivityGeminiService {
     const lang = language === 'en-US' ? 'en-US' : 'vi-VN';
     const prompt = prompts[lang].activityDiagram(JSON.stringify(simplified, null, 2));
 
-    console.log('Prompt sent to AI (preview):', prompt.substring(0, 400));
+    logger.info('Prompt sent to AI (preview):', prompt.substring(0, 400));
 
     // ✅ MỚI: Token analysis trước khi gọi LLM
     const { getModelConfig, logTokenInfo } = await import("../../../../shared/tokenManager");
@@ -457,10 +458,10 @@ export class ActivityGeminiService {
 
     // ✅ Không catch error ở đây - để service layer xử lý và emit failed event
     const raw = await this.callGemini(prompt, userId, projectId);
-    console.log('Raw AI response length:', raw.length);
+    logger.info('Raw AI response length:', raw.length);
 
     const cleanedJson = this.cleanJson(raw);
-    console.log('Cleaned JSON preview:', cleanedJson.substring(0, 400));
+    logger.info('Cleaned JSON preview:', cleanedJson.substring(0, 400));
 
     // ✅ cleanJson sẽ throw error nếu parse fail, không cần fallback
     const parsed = JSON.parse(cleanedJson);
@@ -494,7 +495,7 @@ export class ActivityGeminiService {
 
     // Nếu có nhiều start nodes, chỉ giữ lại node đầu tiên và chuyển edges
     if (startNodes.length > 1) {
-      console.warn(`⚠️ [Activity Diagram] Found ${startNodes.length} start nodes, keeping only the first one`);
+      logger.warn(`⚠️ [Activity Diagram] Found ${startNodes.length} start nodes, keeping only the first one`);
       const keptStartNodeId = startNodes[0].id;
       const removedStartNodeIds = startNodes.slice(1).map(n => n.id);
 
@@ -512,7 +513,7 @@ export class ActivityGeminiService {
 
     // Nếu có nhiều end nodes, chỉ giữ lại node đầu tiên và chuyển edges
     if (endNodes.length > 1) {
-      console.warn(`⚠️ [Activity Diagram] Found ${endNodes.length} end nodes, keeping only the first one`);
+      logger.warn(`⚠️ [Activity Diagram] Found ${endNodes.length} end nodes, keeping only the first one`);
       const keptEndNodeId = endNodes[0].id;
       const removedEndNodeIds = endNodes.slice(1).map(n => n.id);
 
@@ -545,8 +546,8 @@ export class ActivityGeminiService {
       edges
     });
 
-    console.log('Final ActivityDiagramDTO (translated):', JSON.stringify(translated, null, 2));
-    console.log('--- generateFromUseCase END ---');
+    logger.info('Final ActivityDiagramDTO (translated):', JSON.stringify(translated, null, 2));
+    logger.info('--- generateFromUseCase END ---');
 
     return translated;
   }
@@ -607,7 +608,7 @@ export class ActivityGeminiService {
             to: toId
           };
         }
-        console.warn(
+        logger.warn(
           `[DATA_WARN] Bỏ qua edge bị lỗi (không tìm thấy node): ${edge.from} -> ${edge.to}`
         );
         return null;

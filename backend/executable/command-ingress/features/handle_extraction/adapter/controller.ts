@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 import { ExtractorService } from "../domain/ExtractorService";
@@ -101,7 +102,7 @@ export class ExtractorController {
 
     } catch (error: any) {
       // Log lỗi chi tiết ở server để debug
-      console.error("[ExtractorController] uploadAndExtract error:", error);
+      logger.error("[ExtractorController] uploadAndExtract error:", error);
       
       // Xử lý lỗi định dạng ID không hợp lệ
       if (error.kind === 'ObjectId') {

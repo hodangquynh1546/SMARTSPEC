@@ -1,12 +1,16 @@
 import { Router } from "express";
 import { SequenceDiagramController } from "./controller";
 import { requireAuthorizedUser } from "../../../../middlewares/auth";
+import { guardProjectResources } from "../../../../middlewares/projectAccess";
 import express from "express";
 
 const initSequenceDiagramRoute: (
   controller: SequenceDiagramController
 ) => express.Router = (controller) => {
   const router = express.Router();
+  // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+  router.use(requireAuthorizedUser);
+  guardProjectResources(router, ["versionId", "sqdId", "sequenceId", "ucId"]);
 
   // FIX: Thêm base path "/sequence-diagram"
   router

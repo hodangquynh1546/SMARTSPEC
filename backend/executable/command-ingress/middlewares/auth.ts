@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 import { NextFunction, Response } from "express";
 import env from "../utils/env";
 import jwt from "jsonwebtoken";
@@ -9,7 +10,7 @@ import { HttpRequest } from "../types";
 //   next: NextFunction
 // ) => {
 //   try {
-//     console.log(11);
+//     logger.info(11);
 //     const bearerToken = req.headers["authorization"];
 //     const jwtToken = bearerToken?.split(" ")[1];
 
@@ -26,7 +27,7 @@ import { HttpRequest } from "../types";
 //     }
 
 //     req.getSubject = () => String(payload.sub);
-//     console.log(22);
+//     logger.info(22);
 //     // (req as HttpRequest).getSubject = () => String(payload.sub);
 //     next();
 //   } catch (error) {
@@ -93,8 +94,8 @@ const requireRole = (system_role: string) => {
 
       const payload = jwt.verify(jwtToken, env.JWT_SECRET) as jwt.JwtPayload;
 
-      console.log("Payload:", payload);
-      console.log("Required role:", system_role);
+      logger.info("Payload:", payload);
+      logger.info("Required role:", system_role);
 
       if (!payload.sub || payload.system_role !== system_role) {
         return res.status(403).json({

@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 import { Types } from "mongoose";
 import ActivityDiagramModel from '../../../../../../internal/model/activity_diagram';
 import { ActivityCoreService } from './ActivityCoreService';
@@ -64,7 +65,7 @@ export class ActivityDiagramService {
 
       if (!requirement) {
         const availableUsecases = await Usecase.find({ version_id: versionId }).select('_id name').lean();
-        console.error('❌ Activity Diagram: Requirement not found:', {
+        logger.error('❌ Activity Diagram: Requirement not found:', {
           requirementId,
           normalizedRequirementId,
           versionId,
@@ -134,7 +135,7 @@ export class ActivityDiagramService {
 
       return newDiagram;
     } catch (error: any) {
-      console.error('❌ Error generating activity diagram from usecase:', error);
+      logger.error('❌ Error generating activity diagram from usecase:', error);
       // Emit failed event với error message
       if (versionId && userId) {
         try {
@@ -144,7 +145,7 @@ export class ActivityDiagramService {
             umlSocketService.emitProgress(version.project_id.toString(), versionId, userId, 'activity', 100, 'failed', false, [errorMsg]);
           }
         } catch (emitError) {
-          console.error('❌ Error emitting failed event:', emitError);
+          logger.error('❌ Error emitting failed event:', emitError);
         }
       }
       throw error; // Re-throw để controller xử lý
@@ -252,12 +253,12 @@ export class ActivityDiagramService {
           });
         }
       } catch (logError) {
-        console.error("❌ Error logging activity diagram generation:", logError);
+        logger.error("❌ Error logging activity diagram generation:", logError);
       }
 
       return newDiagram;
     } catch (error: any) {
-      console.error('❌ Error generating activity diagram from actor:', error);
+      logger.error('❌ Error generating activity diagram from actor:', error);
       // Emit failed event với error message
       if (versionId && userId) {
         try {
@@ -267,7 +268,7 @@ export class ActivityDiagramService {
             umlSocketService.emitProgress(version.project_id.toString(), versionId, userId, 'activity', 100, 'failed', false, [errorMsg]);
           }
         } catch (emitError) {
-          console.error('❌ Error emitting failed event:', emitError);
+          logger.error('❌ Error emitting failed event:', emitError);
         }
       }
       throw error; // Re-throw để controller xử lý
@@ -336,7 +337,7 @@ export class ActivityDiagramService {
         }
       }
     } catch (logError) {
-      console.error("❌ Error logging activity diagram creation:", logError);
+      logger.error("❌ Error logging activity diagram creation:", logError);
     }
 
     return newDiagram;
@@ -376,7 +377,7 @@ export class ActivityDiagramService {
         .toBuffer();
       return pngBuffer;
     } catch (error) {
-      console.error('Error converting SVG to PNG:', error);
+      logger.error('Error converting SVG to PNG:', error);
       return null;
     }
   }
@@ -443,7 +444,7 @@ export class ActivityDiagramService {
           (member: any) => member.user_id.toString() === userId
         );
 
-        console.log("User attempting deletion:", userMember);
+        logger.info("User attempting deletion:", userMember);
 
         if (!userMember || userMember.status !== "accepted") {
           throw new Error("Unauthorized - User is not a member of this project");
@@ -508,7 +509,7 @@ export class ActivityDiagramService {
           }
         }
       } catch (logError) {
-        console.error("❌ Error logging activity diagram deletion:", logError);
+        logger.error("❌ Error logging activity diagram deletion:", logError);
       }
     }
 

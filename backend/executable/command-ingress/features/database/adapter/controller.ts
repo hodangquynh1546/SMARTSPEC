@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // src/features/database/adapter/controller.ts - UPDATED FOR COMPOSITE KEY
 
 import { Request, Response, NextFunction } from "express";
@@ -57,7 +58,7 @@ export class DatabaseController {
             });
 
         } catch (error: any) {
-            console.error("❌ Error generating database schema:", error);
+            logger.error("❌ Error generating database schema:", error);
 
             // ✅ Emit failed event với errors - các biến đã được khai báo ở đầu function
             if (userId && versionId) {
@@ -80,7 +81,7 @@ export class DatabaseController {
                         }
                     }
                 } catch (socketError) {
-                    console.error("❌ Error emitting failed event:", socketError);
+                    logger.error("❌ Error emitting failed event:", socketError);
                 }
             }
 
@@ -563,7 +564,7 @@ export class DatabaseController {
             });
 
         } catch (error: any) {
-            console.error('Error in updateMultipleTablePositions controller:', error);
+            logger.error('Error in updateMultipleTablePositions controller:', error);
 
             if (error.message.includes('not found')) {
                 res.status(404).json({ message: error.message });

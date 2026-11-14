@@ -1,6 +1,6 @@
 # Thư Viện Tài Liệu Dự Án SmartSpec (SmartSpec Technical Documentation)
 
-Chào mừng bạn đến với tài liệu kỹ thuật toàn diện của dự án **SmartSpec**. Bộ tài liệu này được biên soạn chi tiết nhằm giúp các kỹ sư phần mềm, kiến trúc sư hệ thống và các trợ lý AI (như Claude Code, Cursor, Antigravity) nhanh chóng nắm bắt bản chất, kiến trúc và quy trình phát triển của dự án.
+Đây là mục lục tài liệu kỹ thuật của **SmartSpec**. Bắt đầu với [README và quick start](../README.md), sau đó dùng các tài liệu dưới đây để tra cứu theo module.
 
 ---
 
@@ -45,17 +45,22 @@ Chào mừng bạn đến với tài liệu kỹ thuật toàn diện của dự
 7. [07. Danh Mục API Endpoints & WebSocket Events (API Reference)](./07-api-reference.md)
    - Danh sách REST APIs: Auth, Projects, Versions, Orchestrate, Input, Usecase, UML, Database, Testcase.
    - Danh sách WebSocket Events (Emit & Listen).
-   - Danh mục Admin APIs còn thiếu cần hoàn thiện.
+   - Trạng thái các API Admin frontend/backend đã đối chiếu.
 
 8. [08. Hướng Dẫn Cài Đặt, Cấu Hình & Triển Khai (Setup & Deployment Guide)](./08-setup-and-deployment.md)
    - Yêu cầu tiên quyết môi trường (Node.js, Python, Docker, FFmpeg, Tesseract).
    - Khởi chạy MongoDB Replica Set và Redis bằng Docker Compose.
-   - Cài đặt backend, thiết lập virtualenv Python, cấu hình file `.env`.
+   - Cài đặt backend/frontend từ lockfile và cấu hình `.env.example`.
    - Cài đặt frontend và khởi chạy môi trường dev.
    - Hướng dẫn seed tài khoản Admin và cấu hình API Key.
    - Xử lý các lỗi thường gặp (Troubleshooting).
 
 9. [09. Đánh Giá Hiện Trạng Dự Án & Lộ Trình Phát Triển (Project Review & Roadmap)](./09-project-review-and-roadmap.md)
-   - Đánh giá điểm mạnh vượt trội.
-   - Nhận diện các khoản nợ kỹ thuật (Technical Debt) và rủi ro kiến trúc.
+   - Mức độ xác minh chức năng và các giới hạn hiện tại.
+   - Nợ kỹ thuật, lint/test debt và roadmap.
+
+## Hướng dẫn thao tác bổ sung
+
+- [Tích hợp Admin](../ADMIN_INTEGRATION_GUIDE.md)
+- [Cấu hình OpenRouter](../OPENROUTER_SETUP.md)
    - Lộ trình phát triển 3 giai đoạn (Roadmap ngắn hạn và dài hạn).

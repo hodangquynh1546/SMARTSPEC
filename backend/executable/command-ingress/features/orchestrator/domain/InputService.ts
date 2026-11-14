@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { UploadedFile } from "express-fileupload";
 import Input from "../../../../../internal/model/input";
 import Version from "../../../../../internal/model/version";
@@ -38,14 +39,14 @@ export class InputService {
             });
 
             if (nonDuplicateFiles.length > 0) {
-                console.log(`Starting file extraction for ${nonDuplicateFiles.length} new files...`);
+                logger.info(`Starting file extraction for ${nonDuplicateFiles.length} new files...`);
                 const savedInputs = await this.extractor.extractFiles(nonDuplicateFiles, projectId, versionId, userId);
-                console.log("Input when save ", savedInputs);
+                logger.info("Input when save ", savedInputs);
                 newFilesCount = nonDuplicateFiles.length;
                 newInputs.push(...savedInputs);
-                console.log("Input when add newInput", newInputs);
+                logger.info("Input when add newInput", newInputs);
             } else {
-                console.log("All files are duplicates, skipping extraction");
+                logger.info("All files are duplicates, skipping extraction");
             }
         }
 
@@ -54,12 +55,12 @@ export class InputService {
             const textHash = HashUtil.calculateTextHash(rawText);
 
             if (!existingTextHashes.includes(textHash)) {
-                console.log("Saving new raw text...");
+                logger.info("Saving new raw text...");
                 const savedTextInput = await this.text.saveText(rawText, projectId, versionId);
                 newTextProvided = true;
                 newInputs.push(savedTextInput);
             } else {
-                console.log("Raw text is duplicate, skipping save");
+                logger.info("Raw text is duplicate, skipping save");
             }
         }
 
@@ -85,7 +86,7 @@ export class InputService {
      * Trả về dữ liệu khi incremental mà không có input mới
      */
     async returnIncremental(versionId: string) {
-        console.log("No new inputs provided in incremental mode, returning existing data");
+        logger.info("No new inputs provided in incremental mode, returning existing data");
 
         // Đảm bảo tất cả inputs được đánh dấu processed
         const unprocessedInputs = await Input.find({
@@ -98,7 +99,7 @@ export class InputService {
                 { _id: { $in: unprocessedInputs.map((i) => String(i._id)) } },
                 { $set: { is_processed: true } }
             );
-            console.log(`✅ Marked ${unprocessedInputs.length} unprocessed inputs as processed`);
+            logger.info(`✅ Marked ${unprocessedInputs.length} unprocessed inputs as processed`);
         }
 
         const version = await Version.findById(versionId).lean();

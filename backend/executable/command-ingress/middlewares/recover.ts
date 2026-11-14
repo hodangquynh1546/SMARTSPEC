@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 import { Request, Response, NextFunction } from 'express';
 
 export function recoverMiddleware(
@@ -8,10 +9,10 @@ export function recoverMiddleware(
 ) {
   // BƯỚC 1 (QUAN TRỌNG NHẤT): Ghi lại toàn bộ thông tin lỗi và stack trace ra console.
   // Lần tới khi server bị lỗi 500, bạn sẽ thấy chi tiết lỗi ở đây.
-  console.error("==================== UNHANDLED ERROR ====================");
-  console.error(`[${new Date().toISOString()}] Error on request ${req.method} ${req.path}`);
-  console.error(error); // In ra đối tượng lỗi đầy đủ, bao gồm cả stack trace
-  console.error("=======================================================");
+  logger.error("==================== UNHANDLED ERROR ====================");
+  logger.error(`[${new Date().toISOString()}] Error on request ${req.method} ${req.path}`);
+  logger.error(error); // In ra đối tượng lỗi đầy đủ, bao gồm cả stack trace
+  logger.error("=======================================================");
 
   // BƯỚC 2: Kiểm tra nếu response đã được gửi đi thì không làm gì nữa
   if (res.headersSent) {

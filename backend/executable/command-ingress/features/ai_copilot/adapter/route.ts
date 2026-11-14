@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { AICopilotController } from "./controller";
 import { requireAuthorizedUser } from "../../../middlewares/auth";
+import { guardProjectResources } from "../../../middlewares/projectAccess";
 
 export default function initAICopilotRoute(controller: AICopilotController) {
   const router = Router();
+  // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+  router.use(requireAuthorizedUser);
+  guardProjectResources(router, ["projectId"]);
 
   // Chat endpoint
   router.post(

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import ApiUsage from '../../../../../internal/model/api_usage';
 import { Provider } from '../../../shared/tokenManager';
 
@@ -48,7 +49,7 @@ export async function logApiUsage(params: LogApiUsageParams): Promise<void> {
     });
   } catch (error) {
     // Log lỗi nhưng không throw để không ảnh hưởng đến flow chính
-    console.error('❌ Error logging API usage:', error);
+    logger.error('❌ Error logging API usage:', error);
   }
 }
 

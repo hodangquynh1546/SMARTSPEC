@@ -1,11 +1,16 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { InputHandleController } from './controller'; // đường dẫn tới controller của bạn
 import { requireAuthorizedUser } from '../../../middlewares/auth';
+import { guardProjectResources } from "../../../middlewares/projectAccess";
 import multer from 'multer';
 
 export default function initInputHandleRoute(controller: InputHandleController) {
 
   const router = Router();
+
+  router.use(requireAuthorizedUser);
+
+  guardProjectResources(router, ["versionId"]);
   // POST /versions/:versionId/inputs -> Thêm input (file/text) vào một version đã có
   router.post(
     '/versions/:versionId/inputs',

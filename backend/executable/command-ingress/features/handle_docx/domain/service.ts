@@ -1,3 +1,6 @@
+import logger from "../../../../../lib/logger";
+import { pythonLimiter } from "../../../shared/pythonLimiter";
+import env from "../../../utils/env";
 import { UploadedFile } from 'express-fileupload';
 import path from 'path';
 import fs from 'fs/promises';
@@ -75,12 +78,12 @@ export class ReadDocxService {
         
         // Log warnings nếu có
         if (validation.warnings.length > 0) {
-            console.warn(`⚠️ DOCX extraction warnings for ${data.originalFilename}:`, validation.warnings.slice(0, 3));
+            logger.warn(`⚠️ DOCX extraction warnings for ${data.originalFilename}:`, validation.warnings.slice(0, 3));
         }
         
         // Cảnh báo nếu text bị mất nhiều sau khi clean
         if (validation.cleanedLength < validation.originalLength * 0.9) {
-            console.warn(`⚠️ DOCX text bị giảm ${((1 - validation.cleanedLength / validation.originalLength) * 100).toFixed(1)}% sau khi clean: ${data.originalFilename}`);
+            logger.warn(`⚠️ DOCX text bị giảm ${((1 - validation.cleanedLength / validation.originalLength) * 100).toFixed(1)}% sau khi clean: ${data.originalFilename}`);
         }
         
         const input = new Input({
@@ -111,11 +114,15 @@ export class ReadDocxService {
     }
 
     async runDocxToText(docxPath: string): Promise<any> {
+      return pythonLimiter.run(() => this.runDocxToTextUnlimited(docxPath));
+    }
+
+    private async runDocxToTextUnlimited(docxPath: string): Promise<any> {
         const scriptPath = path.join(__dirname, '../pythonScript/process_docx.py');
         const args = [scriptPath, docxPath];
 
         return new Promise((resolve, reject) => {
-            const python = spawn('python', args);
+            const python = spawn(env.PYTHON_PATH, args);
             let result = '';
             let error = '';
 

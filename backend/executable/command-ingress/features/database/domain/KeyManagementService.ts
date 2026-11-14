@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import DatabaseModel from "../../../../../internal/model/database";
 import { Table } from "./interfaces";
 
@@ -18,9 +19,9 @@ export class KeyManagementService {
         const oldPKs = oldTable.columns.filter((col: any) => col.is_primary_key);
         const newPKs = newTable.columns.filter((col: any) => col.is_primary_key);
 
-        console.log(`🔄 Primary key structure changed. Updating related FKs...`);
-        console.log(`   Old PKs: ${oldPKs.map(pk => `${pk.name}(${pk.type})`).join(', ')}`);
-        console.log(`   New PKs: ${newPKs.map(pk => `${pk.name}(${pk.type})`).join(', ')}`);
+        logger.info(`🔄 Primary key structure changed. Updating related FKs...`);
+        logger.info(`   Old PKs: ${oldPKs.map(pk => `${pk.name}(${pk.type})`).join(', ')}`);
+        logger.info(`   New PKs: ${newPKs.map(pk => `${pk.name}(${pk.type})`).join(', ')}`);
 
         // Tìm tất cả các bảng có FK reference đến bảng này
         const tablesWithReferences = database.tables.filter(table =>
@@ -50,7 +51,7 @@ export class KeyManagementService {
                     }
 
                     if (correspondingNewPK && correspondingNewPK.type !== column.type) {
-                        console.log(`↪️ Updating FK: ${referencingTable.name}.${column.name} from ${column.type} to ${correspondingNewPK.type}`);
+                        logger.info(`↪️ Updating FK: ${referencingTable.name}.${column.name} from ${column.type} to ${correspondingNewPK.type}`);
 
                         try {
                             const updateResult = await DatabaseModel.updateOne(
@@ -74,14 +75,14 @@ export class KeyManagementService {
                                 updatedCount++;
                             }
                         } catch (error) {
-                            console.error(`❌ Failed to update FK ${referencingTable.name}.${column.name}:`, error);
+                            logger.error(`❌ Failed to update FK ${referencingTable.name}.${column.name}:`, error);
                         }
                     }
                 }
             }
         }
 
-        console.log(`✅ Updated ${updatedCount} foreign keys across ${tablesWithReferences.length} tables`);
+        logger.info(`✅ Updated ${updatedCount} foreign keys across ${tablesWithReferences.length} tables`);
     }
 
     /**

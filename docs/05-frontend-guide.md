@@ -2,7 +2,7 @@
 
 ## 1. Cấu trúc Tổng thể Thư mục Frontend
 
-Frontend của SmartSpec được xây dựng bằng **Vue 3** kết hợp **Vite**, định dạng Single File Components (`.vue`), sử dụng cú pháp hiện đại `<script setup>` và **Composition API**.
+Frontend của SmartSpec được xây dựng bằng **Vue 3** và **Vite**, dùng Single File Components (`.vue`). Code hiện trộn Options API và Composition API; chưa được chuẩn hóa đồng nhất sang `<script setup>`.
 
 Thư mục Frontend nằm tại `frontend/`:
 ```
@@ -13,7 +13,7 @@ frontend/
 ├── src/
 │   ├── main.js                      # Entry point: Mount Vue app, Pinia, Vue Router, Toast
 │   ├── App.vue                      # Root component
-│   ├── assets/                      # Global styles, Tailwind base, logo SVG
+│   ├── assets/                      # Global CSS và static assets
 │   ├── router/                      # Cấu hình routing và navigation guards
 │   │   ├── index.js                 # Router chính của ứng dụng
 │   │   └── admin.js                 # Router các màn hình quản trị Admin
@@ -39,7 +39,6 @@ frontend/
 │   │   ├── HomePage.vue             # Trang chủ quản lý danh sách dự án
 │   │   ├── UsecaseManagement.vue    # Màn hình trích xuất & chỉnh sửa Use Cases
 │   │   ├── UmlManagement.vue        # Màn hình quản lý Use Case Diagram & Sequence Diagram
-│   │   ├── ActivityDiagramManagement.vue # Màn hình quản lý Activity Diagram
 │   │   ├── DatabaseManagement.vue   # Màn hình quản lý ERD & Database Design
 │   │   ├── TestcaseManagement.vue   # Màn hình quản lý Test Cases & Test Run
 │   │   ├── OutputManagement.vue     # Màn hình xuất tài liệu đặc tả tổng hợp
@@ -61,6 +60,8 @@ frontend/
 ---
 
 ## 2. Hệ thống Quản lý Trạng thái & Routing
+
+Frontend dùng Vue Router 4, Pinia và Axios. Tailwind CSS không được cài như dependency runtime trực tiếp; giao diện hiện chủ yếu dùng CSS trong component và `src/assets/`.
 
 ### 2.1. Router & Navigation Guards (`src/router/index.js`, `src/utils/authGuard.js`)
 - `authGuard`:

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response, NextFunction } from 'express';
 import { BaseController } from '../../../shared/base-controller';
 import { handleServiceResponse } from '../../../services/httpHandlerResponse';
@@ -37,7 +38,7 @@ export class ShareProjectController extends BaseController {
 
       // Gọi service mới với email
       const result = await this.service.inviteMemberByEmail(projectId, subId, dto.email, dto.role);
-      console.log(result);
+      logger.info(result);
       handleServiceResponse(result, res);
     });
   };

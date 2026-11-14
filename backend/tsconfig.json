@@ -5,16 +5,16 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
+    "rootDir": ".",
+    "outDir": "./dist",
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "emitDecoratorMetadata": true,
     "paths": {
       "@/*": [
         "./*"
       ]
     }
   },
-  "skipLibCheck": true,
-  "emitDecoratorMetadata": true,
   "include": [
     "executable/command-ingress/**/*",
     "internal/**/*"

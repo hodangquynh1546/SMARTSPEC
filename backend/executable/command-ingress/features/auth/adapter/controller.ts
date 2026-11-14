@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Response, Request, NextFunction } from "express";
 import env from "../../../utils/env";
 import { AuthService } from "../types";
@@ -37,7 +38,7 @@ class AuthController extends BaseController {
       next,
       async (req, res, _next) => {
         const exchangeGoogleTokenBody = new ExchangeGoogleTokenBody(req.query);
-        console.log("exchangeGoogleTokenBody: ", exchangeGoogleTokenBody);
+        logger.info("exchangeGoogleTokenBody: ", exchangeGoogleTokenBody);
         // lấy ip và userAgent
         const { ip, userAgent } = getClientInfo(req);
         //
@@ -86,7 +87,7 @@ class AuthController extends BaseController {
           responseValidationError(res, validateResult.errors[0]);
           return;
         }
-        console.log(
+        logger.info(
           "logoutRequestBody.refreshToken: ",
           logoutRequestBody.refreshToken
         );
@@ -106,7 +107,7 @@ class AuthController extends BaseController {
     _next: NextFunction
   ): Promise<void> {
     const refreshTokenRequestBody = new RefreshTokenRequestBody(req.body);
-    console.log(refreshTokenRequestBody);
+    logger.info(refreshTokenRequestBody);
     const validateResult = await refreshTokenRequestBody.validate();
     if (!validateResult.ok) {
       responseValidationError(res, validateResult.errors[0]);
@@ -144,7 +145,7 @@ class AuthController extends BaseController {
       const { day, month, year } = dob;
       // Sử dụng UTC để tránh timezone issues - tạo Date với UTC time 00:00:00
       const newDob = new Date(Date.UTC(year, month - 1, day));
-      console.log(req.body);
+      logger.info(req.body);
 
       const registerRequestBody = new RegisterRequestBody(req.body);
       // lấy ip và userAgent
@@ -152,7 +153,7 @@ class AuthController extends BaseController {
       //
       const validateResult = await registerRequestBody.validate();
 
-      console.log("register:", registerRequestBody);
+      logger.info("register:", registerRequestBody);
       if (!validateResult.ok) {
         responseValidationError(res, validateResult.errors[0]);
         return;
@@ -259,7 +260,7 @@ class AuthController extends BaseController {
       const { ip, userAgent } = getClientInfo(req);
       //
       const validateResult = await loginRequestBody.validate();
-      console.log(validateResult);
+      logger.info(validateResult);
       if (!validateResult.ok) {
         responseValidationError(res, validateResult.errors[0]);
         return;

@@ -70,7 +70,7 @@ export const chatWithAIStream = (data, onChunk, onComplete, onError) => {
   console.log('Request body string:', requestBodyString)
   
   // Ensure headers are clean
-  const headers: Record<string, string> = {
+  const headers = {
     'Content-Type': 'application/json',
   }
   

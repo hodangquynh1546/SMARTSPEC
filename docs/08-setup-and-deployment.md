@@ -31,17 +31,12 @@ Tài liệu này hướng dẫn chi tiết từng bước thiết lập môi tr�
 
 SmartSpec yêu cầu **MongoDB dạng Replica Set** (để kích hoạt MongoDB Change Streams) và **Redis**.
 
-1. Chuyển vào thư mục chứa file `docker-compose.yaml`:
-   ```bash
-   cd SMARTSPEC
-   ```
-
-2. Khởi động các container:
+1. Tại thư mục gốc repository, khởi động các container:
    ```bash
    docker compose up -d
    ```
 
-3. Kiểm tra trạng thái:
+2. Kiểm tra trạng thái:
    - MongoDB: Đang lắng nghe tại cổng `localhost:27017` với replica set tên `rs0`.
    - Redis: Đang lắng nghe tại cổng `localhost:6488` (mapping từ port 6379 trong container).
 
@@ -49,16 +44,16 @@ SmartSpec yêu cầu **MongoDB dạng Replica Set** (để kích hoạt MongoDB 
 
 ## 3. Cài đặt và Cấu hình Backend
 
-### 3.1. Cài đặt Node.js Dependencies
+### 3.1. Cài đặt Node.js dependencies
 ```bash
-cd SMARTSPEC/backend
-npm install
+cd backend
+npm ci
 ```
 
 ### 3.2. Cài đặt Môi trường Ảo Python (Python Virtual Environment)
 Các tiến trình OCR và Speech-to-Text yêu cầu các thư viện Python:
 ```bash
-# Đang đứng tại thư mục SMARTSPEC/backend
+# Đang đứng tại thư mục backend
 python3 -m venv venv
 
 # Kích hoạt môi trường ảo:
@@ -74,38 +69,20 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3.3. Cấu hình Biến Môi trường (`.env`)
-Tạo file `.env` tại thư mục `SMARTSPEC/backend/.env`:
+### 3.3. Cấu hình biến môi trường
+Tạo file `.env` từ template tại thư mục `backend/`:
 ```env
-PORT=8000
-MONGO_URI=mongodb://localhost:27017/smartspec?replicaSet=rs0
-DEV=true
-CLIENT_URL=http://localhost:5173
-
-# Cấu hình JWT Secrets
-JWT_SECRET=super_secret_jwt_access_key_smartspec_2026
-JWT_REFRESH_SECRET=super_secret_jwt_refresh_key_smartspec_2026
-JWT_OTP_SECRET=super_secret_jwt_otp_key_smartspec_2026
-JWT_EMAIL_SECRET=super_secret_jwt_email_key_smartspec_2026
-
-# Thư mục lưu trữ files upload
-UPLOADS_PATH=./uploads
-
-# Google OAuth 2.0 (Nếu sử dụng tính năng đăng nhập Google)
-GOOGLE_OAUTH_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
-GOOGLE_OAUTH_CLIENT_SECRET=your_google_client_secret
-GOOGLE_OAUTH_REDIRECT_URL=http://localhost:8000/api/auth/google/oauth/callback
-
-# Cấu hình Redis
-REDIS_HOST=localhost
-REDIS_PORT=6488
+cp .env.example .env
 ```
+
+Thay các placeholder JWT bằng secret ngẫu nhiên riêng; cấu hình Google OAuth credentials và giữ `GOOGLE_OAUTH_REDIRECT_URL` trùng với URL được khai báo trong Google Cloud. `.env.example` liệt kê toàn bộ biến bắt buộc. `REDIS_URI=redis://localhost:6488` là tùy chọn; khi không có Redis, Presence và stats cache bị tắt.
 
 ### 3.4. Khởi chạy Backend
 ```bash
 # Chạy ở chế độ phát triển (Nodemon tự reload khi sửa code):
 npm run dev
 ```
+Lệnh backend phải chạy với working directory `backend/`, vì dotenv đọc `.env` từ thư mục hiện tại.
 Backend sẽ khởi động và thông báo:
 ```
 Server running on port http://localhost:8000
@@ -119,22 +96,32 @@ Connected to MongoDB replica set rs0
 ### 4.1. Cài đặt Node.js Dependencies
 Mở một cửa sổ Terminal mới:
 ```bash
-cd SMARTSPEC/frontend
-npm install
+cd frontend
+npm ci
 ```
 
 ### 4.2. Cấu hình Môi trường Frontend (Tùy chọn)
-Tạo file `.env` tại `SMARTSPEC/frontend/.env` nếu cần đổi cổng kết nối:
+Tạo file `.env` từ template nếu cần cấu hình backend URL hoặc Google sign-in:
 ```env
 VITE_BACKEND_URL=http://localhost:8000
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 ```
-*(Mặc định `axiosClient.js` và `socket.js` đã trỏ về `http://localhost:8000`)*.
+Có thể tạo file bằng `cp .env.example .env` trong `frontend/`. `VITE_GOOGLE_CLIENT_ID` phải cùng OAuth client với backend.
 
 ### 4.3. Khởi chạy Frontend
 ```bash
 npm run dev
 ```
 Ứng dụng web sẽ chạy tại địa chỉ: `http://localhost:5173`.
+
+### 4.4. Cài Python workers (Audio/OCR)
+Chỉ cần bước này khi dùng Audio, OCR hoặc xử lý tài liệu bằng Python:
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ---
 
@@ -183,7 +170,7 @@ npm run dev
 - **Nguyên nhân**: Trong `domain/service.ts`, lệnh gọi subprocess sử dụng `spawn('python', args)`. Trên một số hệ điều hành (macOS/Linux), binary có tên là `python3`.
 - **Cách khắc phục**:
   - Đảm bảo đã kích hoạt virtualenv trước khi chạy `npm run dev`: `source venv/bin/activate`.
-  - Hoặc tạo alias/symlink: `sudo ln -s $(which python3) /usr/local/bin/python`.
+   - Kích hoạt virtualenv trước khi chạy backend và xác minh `which python` trỏ tới `backend/venv/bin/python`.
 
 ### 6.2. Lỗi CORS khi gọi từ Frontend
 - Kiểm tra `CLIENT_URL` trong file `.env` của Backend phải khớp với địa chỉ chạy của Frontend (ví dụ: `http://localhost:5173`).

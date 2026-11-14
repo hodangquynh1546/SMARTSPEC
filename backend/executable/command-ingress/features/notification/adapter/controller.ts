@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Response, Request, NextFunction } from "express";
 import env from "../../../utils/env";
 import { NotificationService } from "../types";
@@ -28,7 +29,7 @@ class NotificationController extends BaseController {
       next,
       async (req, res, _next) => {
         const sender_id = req.getSubject();
-        console.log("sender: ", sender_id);
+        logger.info("sender: ", sender_id);
         const { recipient_id, type, title, message, link } = req.body;
         const notificationRequestBody = new NotificationRequestBody(req.body);
         const validationResult = await notificationRequestBody.validate();

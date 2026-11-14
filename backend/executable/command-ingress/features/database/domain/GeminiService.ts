@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // DatabaseGeminiService.ts
 import { ApiKeyService } from "../../orchestrator/domain/ApiKeyService";
 import { LLMService } from "../../../shared/LLMService";
@@ -535,7 +536,7 @@ export class DatabaseGeminiService {
 
     const prompt = databasePrompts[lang].databaseDesign(requirementsJson);
 
-    console.log(
+    logger.info(
       `📊 Generating database schema batch for ${requirements.length} use cases`
     );
 
@@ -553,13 +554,13 @@ export class DatabaseGeminiService {
       throw new Error("Empty response from Gemini");
     }
 
-    console.log(`📄 Raw response length: ${generatedJsonString.length}`);
+    logger.info(`📄 Raw response length: ${generatedJsonString.length}`);
 
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(generatedJsonString);
     } catch (parseError) {
-      console.error(
+      logger.error(
         "❌ JSON parse error in batch, attempting repair...",
         parseError
       );
@@ -570,7 +571,7 @@ export class DatabaseGeminiService {
     // Xử lý response format
     let finalSchema: any;
     if (Array.isArray(parsedResponse)) {
-      console.log(
+      logger.info(
         `🔍 Detected array format with ${parsedResponse.length} tables`
       );
       finalSchema = {
@@ -580,7 +581,7 @@ export class DatabaseGeminiService {
         relationships: this.inferRelationships(parsedResponse),
       };
     } else if (parsedResponse && typeof parsedResponse === "object") {
-      console.log(`🔍 Detected object format`);
+      logger.info(`🔍 Detected object format`);
       finalSchema = parsedResponse;
 
       // Đảm bảo có đầy đủ các trường
@@ -600,25 +601,25 @@ export class DatabaseGeminiService {
       throw new Error("Invalid response format from Gemini");
     }
 
-    console.log(
+    logger.info(
       `✅ Raw schema processed with ${finalSchema.tables.length} tables`
     );
 
     // 🔴 ÁP DỤNG TẤT CẢ FIXES CHUẨN SQL
-    console.log("🔄 Applying SQL standardization fixes...");
+    logger.info("🔄 Applying SQL standardization fixes...");
     finalSchema = this.standardizeDatabaseSchema(finalSchema);
 
     // Xử lý type/length và composite key logic
     finalSchema = this._parseColumnTypesAndLengths(finalSchema);
 
     // Ultimate composite key fix
-    console.log("🔒 Running ultimate composite key validation...");
+    logger.info("🔒 Running ultimate composite key validation...");
     finalSchema = this.ultimateCompositeKeyFix(finalSchema);
 
     // Final validation
     this.validateAllCompositeKeys(finalSchema.tables);
 
-    console.log(
+    logger.info(
       `🎉 Final schema: ${finalSchema.tables.length} tables, ${finalSchema.relationships.length} relationships`
     );
 
@@ -629,7 +630,7 @@ export class DatabaseGeminiService {
    * STANDARDIZE: Chuẩn hóa toàn bộ database schema theo SQL standards
    */
   private standardizeDatabaseSchema(databaseSchema: any): any {
-    console.log("🔄 Standardizing database schema for SQL compliance...");
+    logger.info("🔄 Standardizing database schema for SQL compliance...");
 
     // Thực hiện tuần tự các bước chuẩn hóa
     databaseSchema = this.standardizeDataTypes(databaseSchema);
@@ -639,7 +640,7 @@ export class DatabaseGeminiService {
     databaseSchema = this.addMissingSystemColumns(databaseSchema);
     databaseSchema = this.validateNamingConventions(databaseSchema);
 
-    console.log("✅ Database schema standardization completed");
+    logger.info("✅ Database schema standardization completed");
     return databaseSchema;
   }
 
@@ -677,7 +678,7 @@ export class DatabaseGeminiService {
         if (originalType && typeMapping[originalType]) {
           const newType = typeMapping[originalType];
           if (originalType !== newType) {
-            console.log(
+            logger.info(
               `↪️ Standardizing type: ${table.name}.${column.name} ${originalType} → ${newType}`
             );
             column.type = newType;
@@ -690,7 +691,7 @@ export class DatabaseGeminiService {
           column.type.includes("(") &&
           !column.type.includes(")")
         ) {
-          console.warn(`⚠️ Fixing malformed type: ${column.type}`);
+          logger.warn(`⚠️ Fixing malformed type: ${column.type}`);
           column.type = column.type.replace("(", "").trim();
         }
       });
@@ -710,7 +711,7 @@ export class DatabaseGeminiService {
 
       if (primaryKeys.length === 0) {
         // Tự động thêm primary key nếu thiếu
-        console.log(`🔑 Adding auto primary key to table: ${table.name}`);
+        logger.info(`🔑 Adding auto primary key to table: ${table.name}`);
         table.columns.unshift({
           name: "id",
           type: "INT",
@@ -726,7 +727,7 @@ export class DatabaseGeminiService {
         // SINGLE PK: Xóa primary_key_order
         const singlePK = primaryKeys[0];
         if (singlePK.primary_key_order !== undefined) {
-          console.log(
+          logger.info(
             `🔧 Removing primary_key_order from single PK: ${table.name}.${singlePK.name}`
           );
           delete singlePK.primary_key_order;
@@ -735,7 +736,7 @@ export class DatabaseGeminiService {
         singlePK.nullable = false;
       } else {
         // COMPOSITE PK: Đảm bảo orders hợp lệ
-        console.log(`🔑 Normalizing composite key for table: ${table.name}`);
+        logger.info(`🔑 Normalizing composite key for table: ${table.name}`);
 
         // Sắp xếp columns theo thứ tự xuất hiện
         const tableColumnNames = table.columns.map((col: any) => col.name);
@@ -765,7 +766,7 @@ export class DatabaseGeminiService {
         );
 
         if (JSON.stringify(orders) !== JSON.stringify(expectedOrders)) {
-          console.warn(`🔄 Reordering composite key for table ${table.name}`);
+          logger.warn(`🔄 Reordering composite key for table ${table.name}`);
           primaryKeys.forEach((pk: any, index: number) => {
             pk.primary_key_order = index + 1;
           });
@@ -794,7 +795,7 @@ export class DatabaseGeminiService {
 
         // UNIQUE constraint warning cho nullable columns
         if (column.unique && column.nullable) {
-          console.warn(
+          logger.warn(
             `💡 UNIQUE constraint on nullable column: ${table.name}.${column.name}`
           );
         }
@@ -834,14 +835,14 @@ export class DatabaseGeminiService {
         table.columns.some((col) => col.is_foreign_key);
 
       if (isJunctionTable) {
-        console.log(`🔗 Validating junction table: ${table.name}`);
+        logger.info(`🔗 Validating junction table: ${table.name}`);
 
         const foreignKeys = table.columns.filter((col) => col.is_foreign_key);
         const primaryKeys = table.columns.filter((col) => col.is_primary_key);
 
         // Đảm bảo có ít nhất 2 foreign keys
         if (foreignKeys.length < 2) {
-          console.warn(
+          logger.warn(
             `⚠️ Junction table ${table.name} should have at least 2 foreign keys`
           );
         }
@@ -849,7 +850,7 @@ export class DatabaseGeminiService {
         // Đảm bảo foreign keys là NOT NULL
         foreignKeys.forEach((fk) => {
           if (fk.nullable !== false) {
-            console.log(
+            logger.info(
               `🔧 Fixing nullable foreign key: ${table.name}.${fk.name}`
             );
             fk.nullable = false;
@@ -858,7 +859,7 @@ export class DatabaseGeminiService {
 
         // Đảm bảo có composite primary key
         if (primaryKeys.length < 2 && foreignKeys.length >= 2) {
-          console.log(
+          logger.info(
             `🔧 Adding composite primary key to junction table: ${table.name}`
           );
 
@@ -874,7 +875,7 @@ export class DatabaseGeminiService {
         if (primaryKeys.length >= 2) {
           const invalidPKs = primaryKeys.filter((pk) => pk.nullable);
           if (invalidPKs.length > 0) {
-            console.warn(
+            logger.warn(
               `⚠️ Fixing nullable composite key columns in ${table.name}`
             );
             invalidPKs.forEach((pk) => (pk.nullable = false));
@@ -929,7 +930,7 @@ export class DatabaseGeminiService {
       systemColumns.forEach((sysCol) => {
         if (!existingColumns.has(sysCol.name)) {
           table.columns.push({ ...sysCol });
-          console.log(`⚙️ Added system column: ${table.name}.${sysCol.name}`);
+          logger.info(`⚙️ Added system column: ${table.name}.${sysCol.name}`);
         }
       });
 
@@ -945,7 +946,7 @@ export class DatabaseGeminiService {
           references: null,
           related_usecase_ids: [],
         });
-        console.log(`⚙️ Added soft delete column: ${table.name}.deleted_at`);
+        logger.info(`⚙️ Added soft delete column: ${table.name}.deleted_at`);
       }
     });
 
@@ -973,7 +974,7 @@ export class DatabaseGeminiService {
     databaseSchema.tables.forEach((table: any) => {
       // Table naming convention
       if (!/^[a-z][a-z0-9_]*$/.test(table.name)) {
-        console.warn(
+        logger.warn(
           `💡 Table name should be lowercase snake_case: ${table.name}`
         );
       }
@@ -997,7 +998,7 @@ export class DatabaseGeminiService {
           'view': 'views',
         };
         table.name = suffixMap[reservedWord] || `${table.name}_table`;
-        console.warn(
+        logger.warn(
           `⚠️ Table name '${oldName}' is a SQL reserved word. Auto-renamed to '${table.name}'.`
         );
       }
@@ -1005,7 +1006,7 @@ export class DatabaseGeminiService {
       table.columns.forEach((column: any) => {
         // Column naming convention
         if (!/^[a-z][a-z0-9_]*$/.test(column.name)) {
-          console.warn(
+          logger.warn(
             `💡 Column name should be lowercase snake_case: ${table.name}.${column.name}`
           );
         }
@@ -1036,14 +1037,14 @@ export class DatabaseGeminiService {
             // Regular column: thêm suffix _value
             column.name = `${column.name}_value`;
           }
-          console.warn(
+          logger.warn(
             `⚠️ Column name '${table.name}.${oldName}' is a SQL reserved word. Auto-renamed to '${column.name}'.`
           );
         }
 
         // Foreign key naming convention
         if (column.is_foreign_key && !column.name.endsWith("_id")) {
-          console.warn(
+          logger.warn(
             `💡 Foreign key should end with '_id': ${table.name}.${column.name}`
           );
         }
@@ -1052,7 +1053,7 @@ export class DatabaseGeminiService {
         const primaryKeys = table.columns.filter((col) => col.is_primary_key);
         if (primaryKeys.length === 1 && primaryKeys[0].name === column.name) {
           if (column.name !== "id" && !column.name.endsWith("_id")) {
-            console.warn(
+            logger.warn(
               `💡 Single primary key should be named 'id' or end with '_id': ${table.name}.${column.name}`
             );
           }
@@ -1096,7 +1097,7 @@ export class DatabaseGeminiService {
         isNaN(Number(defaultValue)) &&
         !["null", "true", "false"].includes(lowerValue)
       ) {
-        console.warn(
+        logger.warn(
           `⚠️ Invalid numeric default: ${defaultValue} for type ${columnType}`
         );
         return "NULL";
@@ -1112,7 +1113,7 @@ export class DatabaseGeminiService {
   private ultimateCompositeKeyFix(databaseSchema: any): any {
     if (!databaseSchema?.tables) return databaseSchema;
 
-    console.log("🛠️ Applying ULTIMATE composite key fix...");
+    logger.info("🛠️ Applying ULTIMATE composite key fix...");
 
     for (const table of databaseSchema.tables) {
       if (!table?.columns) continue;
@@ -1127,7 +1128,7 @@ export class DatabaseGeminiService {
       });
 
       if (primaryKeys.length > 1) {
-        console.log(
+        logger.info(
           `🔑 Table ${table.name}: Found ${primaryKeys.length} primary keys (COMPOSITE KEY)`
         );
 
@@ -1136,12 +1137,12 @@ export class DatabaseGeminiService {
         for (const pk of primaryKeys) {
           // ✅ FIX: Luôn set primary_key_order cho composite keys, bất kể giá trị hiện tại
           if (pk.primary_key_order == null || pk.primary_key_order === undefined) {
-            console.log(
+            logger.info(
               `   🛠️ FIXING: ${pk.name} - setting primary_key_order = ${order}`
             );
             pk.primary_key_order = order;
           } else if (pk.primary_key_order !== order) {
-            console.log(
+            logger.info(
               `   🛠️ FIXING: ${pk.name} - correcting primary_key_order ${pk.primary_key_order} → ${order}`
             );
             pk.primary_key_order = order;
@@ -1153,12 +1154,12 @@ export class DatabaseGeminiService {
           pk.is_primary_key = true; // ✅ Đảm bảo flag đúng
         }
 
-        console.log(`✅ Table ${table.name}: Composite key FIXED - [${primaryKeys.map((pk: any) => `${pk.name}(${pk.primary_key_order})`).join(', ')}]`);
+        logger.info(`✅ Table ${table.name}: Composite key FIXED - [${primaryKeys.map((pk: any) => `${pk.name}(${pk.primary_key_order})`).join(', ')}]`);
       } else if (primaryKeys.length === 1) {
         // Single primary key - đảm bảo primary_key_order là null
         const singlePK = primaryKeys[0];
         if (singlePK.primary_key_order != null && singlePK.primary_key_order !== undefined) {
-          console.log(
+          logger.info(
             `🛠️ Table ${table.name}: Converting to single primary key, setting primary_key_order = null`
           );
           singlePK.primary_key_order = null;
@@ -1166,7 +1167,7 @@ export class DatabaseGeminiService {
       }
     }
 
-    console.log("✅ ULTIMATE composite key fix completed");
+    logger.info("✅ ULTIMATE composite key fix completed");
     return databaseSchema;
   }
 
@@ -1174,7 +1175,7 @@ export class DatabaseGeminiService {
    * VALIDATION FINAL - Kiểm tra lần cuối trước khi trả về
    */
   private validateAllCompositeKeys(tables: any[]): void {
-    console.log("🔍 FINAL VALIDATION: Checking all composite keys...");
+    logger.info("🔍 FINAL VALIDATION: Checking all composite keys...");
 
     let errorCount = 0;
 
@@ -1194,22 +1195,22 @@ export class DatabaseGeminiService {
         );
 
         if (JSON.stringify(orders) !== JSON.stringify(expectedOrders)) {
-          console.error(
+          logger.error(
             `❌ CRITICAL: Table ${table.name} still has invalid composite key order after all fixes!`
           );
-          console.error(`   Current orders: [${orders.join(", ")}]`);
-          console.error(`   Expected orders: [${expectedOrders.join(", ")}]`);
+          logger.error(`   Current orders: [${orders.join(", ")}]`);
+          logger.error(`   Expected orders: [${expectedOrders.join(", ")}]`);
           errorCount++;
 
           // EMERGENCY FIX - Reset hoàn toàn
-          console.log(
+          logger.info(
             `   🚨 EMERGENCY FIX: Resetting all orders for table ${table.name}`
           );
           compositeKeys.forEach((pk, index) => {
             pk.primary_key_order = index + 1;
           });
         } else {
-          console.log(
+          logger.info(
             `   ✅ Table ${table.name}: Composite key VALID - [${compositeKeys
               .map((pk) => `${pk.name}(${pk.primary_key_order})`)
               .join(", ")}]`
@@ -1219,11 +1220,11 @@ export class DatabaseGeminiService {
     }
 
     if (errorCount > 0) {
-      console.error(
+      logger.error(
         `🚨 FINAL VALIDATION: Found ${errorCount} tables with composite key errors (EMERGENCY FIXED)`
       );
     } else {
-      console.log("🎉 FINAL VALIDATION: All composite keys are VALID!");
+      logger.info("🎉 FINAL VALIDATION: All composite keys are VALID!");
     }
   }
 
@@ -1267,7 +1268,7 @@ export class DatabaseGeminiService {
       }
     }
 
-    console.log(`🔗 Inferred ${relationships.length} relationships`);
+    logger.info(`🔗 Inferred ${relationships.length} relationships`);
     return relationships;
   }
 
@@ -1280,7 +1281,7 @@ export class DatabaseGeminiService {
     userId?: string,
     projectId?: string
   ): Promise<any> {
-    console.log(
+    logger.info(
       `🔀 Splitting ${requirements.length} requirements into chunks for database generation`
     );
 
@@ -1289,7 +1290,7 @@ export class DatabaseGeminiService {
       chunks.push(requirements.slice(i, i + this.DB_GEN_BATCH_SIZE));
     }
 
-    console.log(`📦 Created ${chunks.length} chunks for processing`);
+    logger.info(`📦 Created ${chunks.length} chunks for processing`);
 
     const allSchemas: any[] = [];
 
@@ -1298,7 +1299,7 @@ export class DatabaseGeminiService {
     // Xử lý từng batch tuần tự để tránh rate limit
     for (let i = 0; i < chunks.length; i++) {
       try {
-        console.log(`🔄 Processing chunk ${i + 1}/${chunks.length}`);
+        logger.info(`🔄 Processing chunk ${i + 1}/${chunks.length}`);
         const schema = await this.generateDatabaseSchemaBatch(
           chunks[i],
           language,
@@ -1306,7 +1307,7 @@ export class DatabaseGeminiService {
           projectId
         );
         allSchemas.push(schema);
-        console.log(`✅ Completed chunk ${i + 1}/${chunks.length}`);
+        logger.info(`✅ Completed chunk ${i + 1}/${chunks.length}`);
 
         // Thêm delay nhỏ giữa các batch để tránh rate limit
         if (i < chunks.length - 1) {
@@ -1314,7 +1315,7 @@ export class DatabaseGeminiService {
         }
       } catch (error: any) {
         const errorMsg = error.message || `Failed to generate chunk ${i + 1}`;
-        console.error(`❌ Failed chunk ${i + 1}:`, errorMsg);
+        logger.error(`❌ Failed chunk ${i + 1}:`, errorMsg);
         chunkErrors.push(`Chunk ${i + 1}/${chunks.length}: ${errorMsg}`);
         // Tiếp tục với các chunk khác thay vì dừng hoàn toàn
       }
@@ -1330,10 +1331,10 @@ export class DatabaseGeminiService {
 
     // ✅ Nếu có một số chunks fail, log warning nhưng vẫn tiếp tục merge
     if (chunkErrors.length > 0) {
-      console.warn(`⚠️ Some chunks failed (${chunkErrors.length}/${chunks.length}), but continuing with successful chunks. Errors:`, chunkErrors);
+      logger.warn(`⚠️ Some chunks failed (${chunkErrors.length}/${chunks.length}), but continuing with successful chunks. Errors:`, chunkErrors);
     }
 
-    console.log(`🔄 Merging ${allSchemas.length} schemas...`);
+    logger.info(`🔄 Merging ${allSchemas.length} schemas...`);
 
     // Merge tất cả schemas lại
     return this.mergeDatabaseSchemas(allSchemas);
@@ -1345,7 +1346,7 @@ export class DatabaseGeminiService {
   private mergeDatabaseSchemas(schemas: any[]): any {
     if (schemas.length === 1) return schemas[0];
 
-    console.log(`🔄 Merging ${schemas.length} database schemas`);
+    logger.info(`🔄 Merging ${schemas.length} database schemas`);
 
     const mergedSchema = {
       name: "merged_database",
@@ -1409,7 +1410,7 @@ export class DatabaseGeminiService {
 
     mergedSchema.tables = Array.from(tableMap.values());
 
-    console.log(
+    logger.info(
       `✅ Merged result: ${mergedSchema.tables.length} tables, ${mergedSchema.relationships.length} relationships`
     );
 
@@ -1481,17 +1482,17 @@ export class DatabaseGeminiService {
       return databaseSchema;
     }
 
-    console.log(
+    logger.info(
       `🔧 Processing ${databaseSchema.tables.length} tables for type parsing and key validation`
     );
 
     for (const table of databaseSchema.tables) {
       if (!table?.columns || !Array.isArray(table.columns)) {
-        console.warn(`⚠️ Table ${table.name} has no columns array, skipping`);
+        logger.warn(`⚠️ Table ${table.name} has no columns array, skipping`);
         continue;
       }
 
-      console.log(
+      logger.info(
         `📋 Processing table: ${table.name} with ${table.columns.length} columns`
       );
 
@@ -1528,7 +1529,7 @@ export class DatabaseGeminiService {
 
       if (primaryKeys.length === 0) {
         // TRƯỜNG HỢP 1: Không có primary key
-        console.warn(
+        logger.warn(
           `⚠️ Table ${table.name} has no primary key. Adding auto-increment 'id' column.`
         );
         table.columns.unshift({
@@ -1549,12 +1550,12 @@ export class DatabaseGeminiService {
         // ĐẢM BẢO: Single key phải có primary_key_order = null
         singlePK.primary_key_order = null;
         singlePK.nullable = false; // Primary key không thể null
-        console.log(
+        logger.info(
           `✅ Table ${table.name} has single primary key: ${singlePK.name}`
         );
       } else {
         // TRƯỜNG HỢP 3: Composite primary key - FIX LỖI CHÍNH
-        console.log(
+        logger.info(
           `🔑 Table ${table.name} uses COMPOSITE KEY with ${primaryKeys.length} columns`
         );
 
@@ -1564,7 +1565,7 @@ export class DatabaseGeminiService {
         // Kiểm tra và gán primary_key_order cho tất cả composite keys
         primaryKeys.forEach((pk, index) => {
           if (pk.primary_key_order == null) {
-            console.warn(
+            logger.warn(
               `   ↳ Missing primary_key_order for: ${pk.name}, assigning: ${index + 1
               }`
             );
@@ -1576,7 +1577,7 @@ export class DatabaseGeminiService {
         });
 
         if (needsOrderFix) {
-          console.log(
+          logger.info(
             `✅ Fixed missing primary_key_order for table ${table.name}`
           );
         }
@@ -1591,7 +1592,7 @@ export class DatabaseGeminiService {
         );
 
         if (JSON.stringify(orders) !== JSON.stringify(expectedOrders)) {
-          console.warn(
+          logger.warn(
             `🔄 Table ${table.name}: Reordering non-sequential primary_key_order`
           );
 
@@ -1609,7 +1610,7 @@ export class DatabaseGeminiService {
           });
         }
 
-        console.log(
+        logger.info(
           `✅ Table ${table.name} composite key: ${primaryKeys
             .map((pk) => `${pk.name}(${pk.primary_key_order})`)
             .join(", ")}`
@@ -1634,7 +1635,7 @@ export class DatabaseGeminiService {
         );
 
         if (invalidKeys.length > 0) {
-          console.error(
+          logger.error(
             `❌ CRITICAL: Table ${table.name} has invalid composite keys after processing. Emergency fix!`
           );
 
@@ -1644,7 +1645,7 @@ export class DatabaseGeminiService {
           });
         }
 
-        console.log(
+        logger.info(
           `🎯 Final validation: Table ${table.name} composite keys OK`
         );
       }
@@ -1653,7 +1654,7 @@ export class DatabaseGeminiService {
       this.addSystemColumns(table);
     }
 
-    console.log(
+    logger.info(
       `✅ Completed processing all tables for type parsing and key validation`
     );
     return databaseSchema;
@@ -1722,7 +1723,7 @@ export class DatabaseGeminiService {
     // Thêm system columns vào bảng
     if (systemColumns.length > 0) {
       table.columns.push(...systemColumns);
-      console.log(
+      logger.info(
         `⚙️ Added ${systemColumns.length} system columns to table ${table.name}`
       );
     }
@@ -1746,7 +1747,7 @@ export class DatabaseGeminiService {
         let order = 1;
         for (const pk of compositeKeys) {
           if (pk.primary_key_order !== order) {
-            console.log(
+            logger.info(
               `🔧 FINAL FIX: Setting primary_key_order for ${table.name}.${pk.name} to ${order}`
             );
             pk.primary_key_order = order;
@@ -1767,7 +1768,7 @@ export class DatabaseGeminiService {
     const modelName = await this.llmService.getRecommendedModel(undefined, userId);
 
     try {
-      console.log(`🔑 Calling LLM for database content with model: ${modelName}`);
+      logger.info(`🔑 Calling LLM for database content with model: ${modelName}`);
 
       const response = await this.llmService.callLLM({
         prompt: prompt,
@@ -1783,7 +1784,7 @@ export class DatabaseGeminiService {
       // Trả về ngay sau khi thành công
       return this.cleanJsonStringDatabase(text);
     } catch (err: any) {
-      console.error(`❌ LLM call failed during database content generation:`, err?.message || err);
+      logger.error(`❌ LLM call failed during database content generation:`, err?.message || err);
       throw err;
     }
   }
@@ -1902,7 +1903,7 @@ export class DatabaseGeminiService {
       JSON.parse(cleanedText);
       return cleanedText;
     } catch (error) {
-      console.warn("⚠️ Could not extract valid JSON from response:", {
+      logger.warn("⚠️ Could not extract valid JSON from response:", {
         originalLength: text?.length,
         cleanedLength: cleanedText?.length,
         preview: cleanedText.substring(0, 200),

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import { NotificationService, NotificationResponse } from "../types";
 import User from "../../../../../internal/model/user";
@@ -67,8 +68,8 @@ export class NotificationServiceImpl implements NotificationService {
     if (!notification) {
       throw new Error("Notification not found");
     }
-    console.log("RecipientID: ", notification.recipient_id);
-    console.log("Userid: ", user.id);
+    logger.info("RecipientID: ", notification.recipient_id);
+    logger.info("Userid: ", user.id);
     if (notification.recipient_id.toString() !== user.id) {
       throw new Error(`You do not have permission to view this notice`);
     }

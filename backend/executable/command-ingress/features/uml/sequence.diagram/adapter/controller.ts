@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 // src/features/database/adapter/controller.ts - UPDATED FOR COMPOSITE KEY
 
 import { Request, Response, NextFunction } from "express";
@@ -99,7 +100,7 @@ export class SequenceDiagramController extends BaseController {
 
         if (!useCaseContext) {
           const availableUsecases = await Usecase.find({ version_id: version._id }).select('_id name').lean();
-          console.error('❌ Sequence Diagram: Usecase not found:', {
+          logger.error('❌ Sequence Diagram: Usecase not found:', {
             usecaseId,
             normalizedUsecaseId,
             versionId,

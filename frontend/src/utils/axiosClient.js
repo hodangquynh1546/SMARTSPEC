@@ -1,8 +1,10 @@
 import axios from "axios";
 
+const backendBaseURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+
 // Tạo instance riêng
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8000", // backend API gốc
+  baseURL: backendBaseURL,
   withCredentials: true,
 });
 
@@ -35,7 +37,7 @@ axiosClient.interceptors.response.use(
         }
 
         // Gọi API refresh token
-        const res = await axios.post("http://localhost:8000/api/auth/token", {
+        const res = await axios.post(`${backendBaseURL}/api/auth/token`, {
           refreshToken,
         });
 

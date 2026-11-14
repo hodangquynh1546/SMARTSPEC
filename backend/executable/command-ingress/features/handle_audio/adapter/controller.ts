@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { SpeechToTextService } from '../../handle_audio/domain/service';
@@ -101,7 +102,7 @@ export class SpeechController {
 
     } catch (err) {
       const error = err as Error;
-      console.error('[SpeechController] Error:', error);
+      logger.error('[SpeechController] Error:', error);
 
       // Xử lý lỗi định dạng ID không hợp lệ
       if ((err as any).kind === 'ObjectId') {

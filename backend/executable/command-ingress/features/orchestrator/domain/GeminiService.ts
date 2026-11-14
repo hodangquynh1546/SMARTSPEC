@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Types } from "mongoose";
 import { ApiKeyService } from "./ApiKeyService";
 import { logApiUsage, extractGeminiTokens } from "../../stats/domain/apiUsageLogger";
@@ -1501,7 +1502,7 @@ export class GeminiService {
                 const filtered = this.filterValidUseCases(items);
                 const isTruncated = !extracted.complete;
                 if (isTruncated) {
-                    console.warn(`⚠️ [safeJsonParseRobust] Phát hiện response bị cắt (incomplete array). Parse được ${filtered.length} items.`);
+                    logger.warn(`⚠️ [safeJsonParseRobust] Phát hiện response bị cắt (incomplete array). Parse được ${filtered.length} items.`);
                 }
                 return { items: filtered, incomplete: !extracted.complete, isTruncated };
             } catch {
@@ -1511,13 +1512,13 @@ export class GeminiService {
                         const attempt = JSON.parse(extracted.jsonText + "]");
                         const items = Array.isArray(attempt) ? attempt : [attempt];
                         const filtered = this.filterValidUseCases(items);
-                        console.warn(`⚠️ [safeJsonParseRobust] Đã repair JSON bị cắt bằng cách thêm ']'. Parse được ${filtered.length} items.`);
+                        logger.warn(`⚠️ [safeJsonParseRobust] Đã repair JSON bị cắt bằng cách thêm ']'. Parse được ${filtered.length} items.`);
                         return { items: filtered, incomplete: false, isTruncated: true };
                     } catch {
                         // Thất bại, thử parse từng object riêng lẻ
                         const partialItems = this.parsePartialArray(extracted.jsonText);
                         if (partialItems.length > 0) {
-                            console.warn(`⚠️ [safeJsonParseRobust] Parse từng object riêng lẻ từ array bị cắt. Parse được ${partialItems.length} items.`);
+                            logger.warn(`⚠️ [safeJsonParseRobust] Parse từng object riêng lẻ từ array bị cắt. Parse được ${partialItems.length} items.`);
                             return { items: partialItems, incomplete: true, isTruncated: true };
                         }
                     }
@@ -1540,7 +1541,7 @@ export class GeminiService {
         if (parsedObjs.length > 0) {
             const filtered = this.filterValidUseCases(parsedObjs);
             if (filtered.length > 0) {
-                console.warn(`⚠️ [safeJsonParseRobust] Parse từng object riêng lẻ (fallback strategy). Parse được ${filtered.length} items.`);
+                logger.warn(`⚠️ [safeJsonParseRobust] Parse từng object riêng lẻ (fallback strategy). Parse được ${filtered.length} items.`);
                 return { items: filtered, incomplete: true, isTruncated: true };
             }
         }
@@ -1703,12 +1704,12 @@ export class GeminiService {
         const validation = textPreprocessor.validateTextForLLM(cleanText);
 
         if (!validation.isValid) {
-            console.warn(`⚠️ Invalid text in buildPrompt (offset=${offset}):`, validation.warnings);
+            logger.warn(`⚠️ Invalid text in buildPrompt (offset=${offset}):`, validation.warnings);
         }
 
         if (validation.warnings.length > 0 && offset % 10 === 0) {
             // Chỉ log warnings mỗi 10 batches để tránh spam log
-            console.warn(`⚠️ Text warnings in buildPrompt (offset=${offset}):`, validation.warnings.slice(0, 2));
+            logger.warn(`⚠️ Text warnings in buildPrompt (offset=${offset}):`, validation.warnings.slice(0, 2));
         }
 
         // Sử dụng cleaned text
@@ -1716,7 +1717,7 @@ export class GeminiService {
 
         // Kiểm tra token limit (ước tính) - chỉ cảnh báo nếu quá lớn
         if (validation.estimatedTokens > 100000) {
-            console.warn(`⚠️ Chunk quá lớn (${validation.estimatedTokens} tokens, offset=${offset}). Có thể LLM không đọc hết.`);
+            logger.warn(`⚠️ Chunk quá lớn (${validation.estimatedTokens} tokens, offset=${offset}). Có thể LLM không đọc hết.`);
         }
 
         return `${schemaDescription}\n\nVăn bản nguồn (Source text):\n${safeText}`;
@@ -1766,7 +1767,7 @@ export class GeminiService {
     ): Promise<any[]> {
         // ✅ related_usecases đã bị xóa khỏi schema, hàm này không còn cần thiết
         // Trả về dữ liệu gốc mà không xử lý gì
-        console.log("⏩ Skipping addRelatedUseCases: related_usecases field has been removed from schema.");
+        logger.info("⏩ Skipping addRelatedUseCases: related_usecases field has been removed from schema.");
         return useCases;
     }
 
@@ -1786,7 +1787,7 @@ export class GeminiService {
         reasoning?: string;
     }> {
         const textLength = text?.length ?? 0;
-        console.log(`📊 [ESTIMATE] Estimating use cases count. Text length: ${textLength} chars`);
+        logger.info(`📊 [ESTIMATE] Estimating use cases count. Text length: ${textLength} chars`);
 
         // ✅ FIX: Tính toán max allowed dựa trên text length để validate sau
         let maxAllowed = 100; // Default max
@@ -1808,7 +1809,7 @@ export class GeminiService {
         const prompt = prompts[lang].estimateUseCasesCount(text);
 
         try {
-            console.log(`🔑 Calling LLM for estimateUseCasesCount with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
+            logger.info(`🔑 Calling LLM for estimateUseCasesCount with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -1824,20 +1825,20 @@ export class GeminiService {
 
             // ✅ Kiểm tra nếu response rỗng hoặc không hợp lệ
             if (!text || text.trim().length === 0 || text.trim() === '{}') {
-                console.error(`❌ [ESTIMATE] Empty or invalid response from LLM`);
-                console.error(`   Model: ${effectiveModelName}`);
-                console.error(`   Response text: "${text}"`);
+                logger.error(`❌ [ESTIMATE] Empty or invalid response from LLM`);
+                logger.error(`   Model: ${effectiveModelName}`);
+                logger.error(`   Response text: "${text}"`);
                 throw new Error(`LLM returned empty or invalid response. The model "${effectiveModelName}" may not be working correctly. Please try a different model.`);
             }
 
             // Log raw response for debugging
-            console.log(`🔍 [ESTIMATE] Raw response (first 500 chars): ${text.substring(0, 500)}`);
+            logger.info(`🔍 [ESTIMATE] Raw response (first 500 chars): ${text.substring(0, 500)}`);
 
             text = this.cleanJsonString(text);
 
             // ✅ Kiểm tra lại sau khi clean
             if (!text || text.trim().length === 0 || text.trim() === '{}') {
-                console.error(`❌ [ESTIMATE] Response is still empty after cleaning`);
+                logger.error(`❌ [ESTIMATE] Response is still empty after cleaning`);
                 throw new Error(`LLM returned empty response after cleaning. The model "${effectiveModelName}" may not be working correctly.`);
             }
 
@@ -1852,13 +1853,13 @@ export class GeminiService {
                     try {
                         parsed = JSON.parse(jsonMatch[0]);
                     } catch (e) {
-                        console.error(`❌ [ESTIMATE] Failed to parse JSON: ${parseError.message}`);
-                        console.error(`❌ [ESTIMATE] Cleaned text: ${text.substring(0, 1000)}`);
+                        logger.error(`❌ [ESTIMATE] Failed to parse JSON: ${parseError.message}`);
+                        logger.error(`❌ [ESTIMATE] Cleaned text: ${text.substring(0, 1000)}`);
                         throw new Error(`Invalid JSON format: ${parseError.message}`);
                     }
                 } else {
-                    console.error(`❌ [ESTIMATE] No JSON object found in response`);
-                    console.error(`❌ [ESTIMATE] Cleaned text: ${text.substring(0, 1000)}`);
+                    logger.error(`❌ [ESTIMATE] No JSON object found in response`);
+                    logger.error(`❌ [ESTIMATE] Cleaned text: ${text.substring(0, 1000)}`);
                     throw new Error("No JSON object found in response");
                 }
             }
@@ -1869,14 +1870,14 @@ export class GeminiService {
 
                 // ✅ Kiểm tra nếu parsed object rỗng
                 if (Object.keys(estimate).length === 0) {
-                    console.error(`❌ [ESTIMATE] Parsed object is empty:`, estimate);
+                    logger.error(`❌ [ESTIMATE] Parsed object is empty:`, estimate);
                     throw new Error(`LLM returned empty JSON object. The model "${effectiveModelName}" may not be working correctly. Please try a different model.`);
                 }
 
                 // Validate required fields
                 if (typeof estimate.estimated_count !== 'number' || estimate.estimated_count < 1) {
-                    console.error(`❌ [ESTIMATE] Invalid estimated_count: ${estimate.estimated_count}`);
-                    console.error(`❌ [ESTIMATE] Full parsed object:`, JSON.stringify(estimate, null, 2));
+                    logger.error(`❌ [ESTIMATE] Invalid estimated_count: ${estimate.estimated_count}`);
+                    logger.error(`❌ [ESTIMATE] Full parsed object:`, JSON.stringify(estimate, null, 2));
                     throw new Error(`Invalid estimated_count: must be a positive number, got ${estimate.estimated_count}. The model "${effectiveModelName}" may not be following the prompt format correctly.`);
                 }
 
@@ -1885,13 +1886,13 @@ export class GeminiService {
                 // ✅ FIX: Giới hạn estimate dựa trên độ dài text input
                 // maxAllowed đã được tính ở trên dựa trên textLength
                 if (estimated_count > maxAllowed) {
-                    console.warn(`⚠️ [ESTIMATE] LLM estimated ${estimated_count} use cases, but text length (${textLength} chars) suggests max ${maxAllowed}. Adjusting to ${maxAllowed}.`);
+                    logger.warn(`⚠️ [ESTIMATE] LLM estimated ${estimated_count} use cases, but text length (${textLength} chars) suggests max ${maxAllowed}. Adjusting to ${maxAllowed}.`);
                     estimated_count = maxAllowed;
                 }
 
                 const estimated_batches = Math.ceil(estimated_count / 15);
 
-                console.log(`✅ [ESTIMATE] Estimated ${estimated_count} use cases (from ${textLength} chars text), ${estimated_batches} batches`);
+                logger.info(`✅ [ESTIMATE] Estimated ${estimated_count} use cases (from ${textLength} chars text), ${estimated_batches} batches`);
 
                 return {
                     estimated_count,
@@ -1901,11 +1902,11 @@ export class GeminiService {
                 };
             }
 
-            console.error(`❌ [ESTIMATE] Parsed result is not a valid object. Type: ${typeof parsed}, IsArray: ${Array.isArray(parsed)}`);
-            console.error(`❌ [ESTIMATE] Parsed value: ${JSON.stringify(parsed).substring(0, 500)}`);
+            logger.error(`❌ [ESTIMATE] Parsed result is not a valid object. Type: ${typeof parsed}, IsArray: ${Array.isArray(parsed)}`);
+            logger.error(`❌ [ESTIMATE] Parsed value: ${JSON.stringify(parsed).substring(0, 500)}`);
             throw new Error("Invalid estimate response format: expected JSON object, got " + (Array.isArray(parsed) ? "array" : typeof parsed));
         } catch (err: any) {
-            console.error(`❌ [ESTIMATE] LLM call failed:`, err?.message || err);
+            logger.error(`❌ [ESTIMATE] LLM call failed:`, err?.message || err);
             throw err;
         }
     }
@@ -1925,7 +1926,7 @@ export class GeminiService {
         projectId?: string,
         estimatedTotal?: number
     ): Promise<any[]> {
-        console.log(`📦 [BATCH ${batchNumber}/${totalBatches}] Generating use cases ${offset + 1} to ${offset + batchSize}${estimatedTotal ? ` (estimated total: ${estimatedTotal})` : ''}`);
+        logger.info(`📦 [BATCH ${batchNumber}/${totalBatches}] Generating use cases ${offset + 1} to ${offset + batchSize}${estimatedTotal ? ` (estimated total: ${estimatedTotal})` : ''}`);
 
         // ✅ Sử dụng LLMService để lấy model (ưu tiên model user đã chọn)
         const effectiveModelName = modelName || await this.llmService.getRecommendedModel(undefined, userId);
@@ -1934,7 +1935,7 @@ export class GeminiService {
         const prompt = prompts[lang].generateBatchUseCases(text, batchNumber, totalBatches, offset, batchSize, estimatedTotal);
 
         try {
-            console.log(`🔑 Calling LLM for generateUseCasesBatch with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
+            logger.info(`🔑 Calling LLM for generateUseCasesBatch with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -1953,7 +1954,7 @@ export class GeminiService {
             let useCases = parsed.items || [];
 
             if (useCases.length === 0) {
-                console.log(`⏩ [BATCH ${batchNumber}/${totalBatches}] No more use cases to generate`);
+                logger.info(`⏩ [BATCH ${batchNumber}/${totalBatches}] No more use cases to generate`);
                 return [];
             }
 
@@ -1961,17 +1962,17 @@ export class GeminiService {
             if (estimatedTotal && estimatedTotal > 0) {
                 const maxAllowed = estimatedTotal - offset;
                 if (useCases.length > maxAllowed) {
-                    console.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] LLM generated ${useCases.length} use cases, but estimate (${estimatedTotal}) allows only ${maxAllowed} (offset: ${offset}). Limiting to ${maxAllowed}.`);
+                    logger.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] LLM generated ${useCases.length} use cases, but estimate (${estimatedTotal}) allows only ${maxAllowed} (offset: ${offset}). Limiting to ${maxAllowed}.`);
                     useCases = useCases.slice(0, maxAllowed);
                 }
             }
 
             const normalized = this.normalizeUseCases(useCases);
-            console.log(`✅ [BATCH ${batchNumber}/${totalBatches}] Generated ${normalized.length} use cases${estimatedTotal ? ` (estimated total: ${estimatedTotal}, remaining: ${estimatedTotal - offset - normalized.length})` : ''}`);
+            logger.info(`✅ [BATCH ${batchNumber}/${totalBatches}] Generated ${normalized.length} use cases${estimatedTotal ? ` (estimated total: ${estimatedTotal}, remaining: ${estimatedTotal - offset - normalized.length})` : ''}`);
 
             return normalized;
         } catch (err: any) {
-            console.error(`❌ [BATCH ${batchNumber}/${totalBatches}] LLM call failed:`, err?.message || err);
+            logger.error(`❌ [BATCH ${batchNumber}/${totalBatches}] LLM call failed:`, err?.message || err);
             throw err;
         }
     }
@@ -1991,7 +1992,7 @@ export class GeminiService {
         totalChunks?: number
     ): Promise<any[]> {
         const chunkLabel = chunkIndex ? `[Chunk ${chunkIndex}${totalChunks ? `/${totalChunks}` : ''}]` : '';
-        console.log(`${chunkLabel} Analyzing text with LLM (lang: ${language}). Text length: ${cleanText?.length ?? 0}`);
+        logger.info(`${chunkLabel} Analyzing text with LLM (lang: ${language}). Text length: ${cleanText?.length ?? 0}`);
 
         // ✅ Sử dụng LLMService để lấy model (ưu tiên model user đã chọn)
         const { getModelConfig, estimateTokens, determineStrategy } = await import("../../../shared/tokenManager");
@@ -2000,18 +2001,18 @@ export class GeminiService {
         const estimatedTokens = estimateTokens(cleanText, modelConfig);
         const strategy = determineStrategy(cleanText, modelConfig);
 
-        console.log(`${chunkLabel} 📊 Token Analysis: ${estimatedTokens.toLocaleString()} tokens, Context Window: ${modelConfig.contextWindow.toLocaleString()}, Strategy: ${strategy.strategy}, Provider: ${modelConfig.provider}, Model: ${modelName}`);
+        logger.info(`${chunkLabel} 📊 Token Analysis: ${estimatedTokens.toLocaleString()} tokens, Context Window: ${modelConfig.contextWindow.toLocaleString()}, Strategy: ${strategy.strategy}, Provider: ${modelConfig.provider}, Model: ${modelName}`);
 
         // ✅ QUAN TRỌNG: Nếu text vừa với context window (< 80%) → single call, không batch
         const contextThreshold = modelConfig.contextWindow * 0.8; // 80% để reserve cho prompt và output
         const useSimpleStrategy = estimatedTokens < contextThreshold && !strategy.needsChunking;
 
         if (useSimpleStrategy) {
-            console.log(`${chunkLabel} ✅ Text nhỏ (${estimatedTokens.toLocaleString()} < ${Math.floor(contextThreshold).toLocaleString()} tokens). Sử dụng single call strategy.`);
+            logger.info(`${chunkLabel} ✅ Text nhỏ (${estimatedTokens.toLocaleString()} < ${Math.floor(contextThreshold).toLocaleString()} tokens). Sử dụng single call strategy.`);
             return await this.analyzeRequirementsSingleCall(cleanText, language, modelName, modelConfig, userId, projectId, chunkLabel);
         } else {
             // Text lớn hoặc đã được chunk → sử dụng batch strategy (giữ logic cũ nhưng tối ưu)
-            console.log(`${chunkLabel} 📦 Text lớn hoặc đã chunk. Sử dụng batch strategy.`);
+            logger.info(`${chunkLabel} 📦 Text lớn hoặc đã chunk. Sử dụng batch strategy.`);
             return await this.analyzeRequirementsBatch(cleanText, language, modelName, modelConfig, userId, projectId, chunkLabel);
         }
     }
@@ -2032,7 +2033,7 @@ export class GeminiService {
         const prompt = this.buildPromptSimple(cleanText, language);
 
         try {
-            console.log(`${chunkLabel} 🔑 Calling LLM with model: ${modelName} (single call)`);
+            logger.info(`${chunkLabel} 🔑 Calling LLM with model: ${modelName} (single call)`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -2046,34 +2047,34 @@ export class GeminiService {
 
             let text: string = response.text || "";
             text = this.cleanJsonString(text);
-            console.log(`${chunkLabel} 🤖 LLM response length: ${text.length} (single call)`);
+            logger.info(`${chunkLabel} 🤖 LLM response length: ${text.length} (single call)`);
 
             // Parse và normalize
             const parsed = this.safeJsonParseRobust(text);
 
             // ✅ CẢI THIỆN: Log chi tiết về truncation trong single call
             if (parsed.isTruncated) {
-                console.warn(`${chunkLabel} ⚠️ PHÁT HIỆN RESPONSE BỊ CẮT trong single call! Parse được ${parsed.items.length} items từ response dài ${text.length} chars.`);
-                console.warn(`${chunkLabel} ⚠️ Response preview (last 500 chars): ${text.slice(-500)}`);
-                console.warn(`${chunkLabel} ⚠️ LƯU Ý: Single call strategy không thể retry. Có thể cần chuyển sang batch strategy cho text lớn.`);
+                logger.warn(`${chunkLabel} ⚠️ PHÁT HIỆN RESPONSE BỊ CẮT trong single call! Parse được ${parsed.items.length} items từ response dài ${text.length} chars.`);
+                logger.warn(`${chunkLabel} ⚠️ Response preview (last 500 chars): ${text.slice(-500)}`);
+                logger.warn(`${chunkLabel} ⚠️ LƯU Ý: Single call strategy không thể retry. Có thể cần chuyển sang batch strategy cho text lớn.`);
             }
 
             if (parsed.items.length === 0) {
-                console.log(`${chunkLabel} ✅ No use cases found in response.`);
+                logger.info(`${chunkLabel} ✅ No use cases found in response.`);
                 return [];
             }
 
             const normalizeStartTime = Date.now();
             const normalized = this.normalizeUseCases(parsed.items);
             const normalizeTime = Date.now() - normalizeStartTime;
-            console.log(`${chunkLabel} ✅ Parsed ${normalized.length} use cases from single call (normalize took ${normalizeTime}ms, truncated=${parsed.isTruncated || false}).`);
+            logger.info(`${chunkLabel} ✅ Parsed ${normalized.length} use cases from single call (normalize took ${normalizeTime}ms, truncated=${parsed.isTruncated || false}).`);
 
             // ✅ QUAN TRỌNG: Return ngay sau khi parse xong để tránh timeout
             // ⚠️ Nếu response bị cắt, có thể cần chuyển sang batch strategy
             return normalized;
 
         } catch (err: any) {
-            console.error(`${chunkLabel} ❌ LLM call failed:`, err?.message || err);
+            logger.error(`${chunkLabel} ❌ LLM call failed:`, err?.message || err);
             throw err;
         }
     }
@@ -2104,7 +2105,7 @@ export class GeminiService {
             let attemptsForThisOffset = 0;
 
             if (allResults.length >= this.MAX_TOTAL_USE_CASES) {
-                console.warn(`${chunkLabel} ⚠️ Đã đạt giới hạn tối đa ${this.MAX_TOTAL_USE_CASES} use case. Dừng xử lý.`);
+                logger.warn(`${chunkLabel} ⚠️ Đã đạt giới hạn tối đa ${this.MAX_TOTAL_USE_CASES} use case. Dừng xử lý.`);
                 return allResults.slice(0, this.MAX_TOTAL_USE_CASES);
             }
 
@@ -2113,7 +2114,7 @@ export class GeminiService {
                 attemptsForThisOffset++;
                 const startTime = Date.now();
                 try {
-                    console.log(`${chunkLabel} 🔑 Calling LLM with model: ${modelName} (offset=${offset}, batch=${batchCount}, attempt=${attemptsForThisOffset})`);
+                    logger.info(`${chunkLabel} 🔑 Calling LLM with model: ${modelName} (offset=${offset}, batch=${batchCount}, attempt=${attemptsForThisOffset})`);
 
                     const prompt = this.buildPrompt(cleanText, language, offset, this.BATCH_SIZE);
 
@@ -2129,11 +2130,11 @@ export class GeminiService {
 
                     let text: string = response.text || "";
                     text = this.cleanJsonString(text);
-                    console.log(`${chunkLabel} 🤖 Gemini response length: ${text.length}, offset=${offset}, batch=${batchCount}`);
+                    logger.info(`${chunkLabel} 🤖 Gemini response length: ${text.length}, offset=${offset}, batch=${batchCount}`);
 
                     // Kiểm tra sớm nếu response là mảng rỗng
                     if (text.trim() === "[]" || text.trim().length === 0) {
-                        console.log(`✅ Gemini trả về mảng rỗng. Đã xử lý xong. Tổng: ${allResults.length} use case`);
+                        logger.info(`✅ Gemini trả về mảng rỗng. Đã xử lý xong. Tổng: ${allResults.length} use case`);
                         return allResults;
                     }
 
@@ -2141,8 +2142,8 @@ export class GeminiService {
 
                     // ✅ CẢI THIỆN: Log chi tiết về truncation
                     if (parsed.isTruncated) {
-                        console.warn(`${chunkLabel} ⚠️ PHÁT HIỆN RESPONSE BỊ CẮT! Parse được ${parsed.items.length} items từ response dài ${text.length} chars.`);
-                        console.warn(`${chunkLabel} ⚠️ Response preview (last 500 chars): ${text.slice(-500)}`);
+                        logger.warn(`${chunkLabel} ⚠️ PHÁT HIỆN RESPONSE BỊ CẮT! Parse được ${parsed.items.length} items từ response dài ${text.length} chars.`);
+                        logger.warn(`${chunkLabel} ⚠️ Response preview (last 500 chars): ${text.slice(-500)}`);
                     }
 
                     if (parsed.items.length > 0) {
@@ -2182,12 +2183,12 @@ export class GeminiService {
 
                         // Nếu không có items hợp lệ từ response, log warning và xử lý
                         if (validNormalized.length === 0) {
-                            console.warn(`⚠️ Response không chứa use case hợp lệ nào sau khi filter. Parsed items: ${parsed.items.length}, Normalized: ${normalized.length}, Response length: ${text.length}`);
+                            logger.warn(`⚠️ Response không chứa use case hợp lệ nào sau khi filter. Parsed items: ${parsed.items.length}, Normalized: ${normalized.length}, Response length: ${text.length}`);
                             // Không cập nhật offset nếu không có items
                             // Nhưng vẫn break để thử batch tiếp theo hoặc dừng nếu đã hết
                             if (!parsed.incomplete) {
                                 // Response hoàn chỉnh nhưng không có items → có thể đã hết
-                                console.log(`✅ Response hoàn chỉnh nhưng không có use case hợp lệ. Có thể đã phân tích hết.`);
+                                logger.info(`✅ Response hoàn chỉnh nhưng không có use case hợp lệ. Có thể đã phân tích hết.`);
                                 return allResults;
                             }
                             break; // Thử batch tiếp theo hoặc key tiếp theo
@@ -2197,12 +2198,12 @@ export class GeminiService {
                         // CHỈ kiểm tra sau batch đầu tiên (khi lastOffset đã được set từ batch trước)
                         // Và CHỈ khi có items hợp lệ (validNormalized.length > 0)
                         if (lastOffset !== 0 && offset === lastOffset && validNormalized.length > 0) {
-                            console.warn(`⚠️ Phát hiện offset không tăng (${offset}). Có thể Gemini đang lặp lại. Dừng xử lý.`);
+                            logger.warn(`⚠️ Phát hiện offset không tăng (${offset}). Có thể Gemini đang lặp lại. Dừng xử lý.`);
                             return allResults;
                         }
 
                         allResults = allResults.concat(validNormalized);
-                        console.log(`${chunkLabel} ✅ Parsed ${validNormalized.length} valid items from ${parsed.items.length} parsed items (incomplete=${parsed.incomplete}, truncated=${parsed.isTruncated || false}). total=${allResults.length}, offset=${offset} → ${offset + validNormalized.length}`);
+                        logger.info(`${chunkLabel} ✅ Parsed ${validNormalized.length} valid items from ${parsed.items.length} parsed items (incomplete=${parsed.incomplete}, truncated=${parsed.isTruncated || false}). total=${allResults.length}, offset=${offset} → ${offset + validNormalized.length}`);
 
                         lastOffset = offset;
                         offset += validNormalized.length;
@@ -2211,13 +2212,13 @@ export class GeminiService {
 
                         // Kiểm tra giới hạn tổng số use case sau khi thêm
                         if (allResults.length >= this.MAX_TOTAL_USE_CASES) {
-                            console.warn(`⚠️ Đã đạt giới hạn tối đa ${this.MAX_TOTAL_USE_CASES} use case. Dừng xử lý.`);
+                            logger.warn(`⚠️ Đã đạt giới hạn tối đa ${this.MAX_TOTAL_USE_CASES} use case. Dừng xử lý.`);
                             return allResults.slice(0, this.MAX_TOTAL_USE_CASES);
                         }
 
                         // ✅ CẢI THIỆN: Xử lý response bị cắt
                         if (parsed.isTruncated) {
-                            console.warn(`${chunkLabel} ⚠️ Response bị cắt nhưng đã parse được ${validNormalized.length} items. Tiếp tục batch tiếp theo để lấy phần còn lại.`);
+                            logger.warn(`${chunkLabel} ⚠️ Response bị cắt nhưng đã parse được ${validNormalized.length} items. Tiếp tục batch tiếp theo để lấy phần còn lại.`);
                             // Không dừng, tiếp tục batch tiếp theo với offset mới
                             // Có thể retry với chunk nhỏ hơn nếu cần
                             break;
@@ -2225,7 +2226,7 @@ export class GeminiService {
 
                         // Dừng nếu response hoàn chỉnh và số lượng < BATCH_SIZE (đã hết use case)
                         if (!parsed.incomplete && validNormalized.length < this.BATCH_SIZE) {
-                            console.log(`✅ Response hoàn chỉnh và số lượng (${validNormalized.length}) < BATCH_SIZE (${this.BATCH_SIZE}). Đã xử lý xong.`);
+                            logger.info(`✅ Response hoàn chỉnh và số lượng (${validNormalized.length}) < BATCH_SIZE (${this.BATCH_SIZE}). Đã xử lý xong.`);
                             return allResults;
                         } else {
                             break;
@@ -2233,16 +2234,16 @@ export class GeminiService {
                     } else {
                         // Không có items hợp lệ từ response
                         consecutiveEmptyBatches++;
-                        console.warn(`⚠️ No parsable items from LLM. Response preview: ${text.slice(0, 200)}`);
+                        logger.warn(`⚠️ No parsable items from LLM. Response preview: ${text.slice(0, 200)}`);
 
                         // Nếu có 2 batch liên tiếp không có items → dừng
                         if (consecutiveEmptyBatches >= 2) {
-                            console.warn(`⚠️ Có ${consecutiveEmptyBatches} batch liên tiếp không có items. Dừng xử lý.`);
+                            logger.warn(`⚠️ Có ${consecutiveEmptyBatches} batch liên tiếp không có items. Dừng xử lý.`);
                             return allResults;
                         }
 
                         if (text.trim() === "[]" || text.trim().length === 0) {
-                            console.log(`✅ Response rỗng. Đã xử lý xong. Tổng: ${allResults.length} use case`);
+                            logger.info(`✅ Response rỗng. Đã xử lý xong. Tổng: ${allResults.length} use case`);
                             return allResults;
                         }
                         lastError = new Error("No parsable items");
@@ -2252,11 +2253,11 @@ export class GeminiService {
                     const responseTime = Date.now() - startTime;
                     lastError = err;
 
-                    console.error(`${chunkLabel} ❌ LLM call failed (attempt ${attemptsForThisOffset}):`, err?.message || err);
+                    logger.error(`${chunkLabel} ❌ LLM call failed (attempt ${attemptsForThisOffset}):`, err?.message || err);
 
                     // Nếu đã thử hết attempts cho offset này, break để thử offset tiếp theo hoặc dừng
                     if (attemptsForThisOffset >= this.MAX_ATTEMPTS_PER_OFFSET) {
-                        console.warn(`${chunkLabel} ⚠️ Đã thử hết ${this.MAX_ATTEMPTS_PER_OFFSET} attempts cho offset ${offset}.`);
+                        logger.warn(`${chunkLabel} ⚠️ Đã thử hết ${this.MAX_ATTEMPTS_PER_OFFSET} attempts cho offset ${offset}.`);
                         break;
                     }
                     // Tiếp tục thử lại
@@ -2266,11 +2267,11 @@ export class GeminiService {
 
             if (!gotBatch) {
                 consecutiveEmptyBatches++;
-                console.warn(`${chunkLabel} ⚠️ Could not fetch a valid batch for current offset. Consecutive empty batches: ${consecutiveEmptyBatches}`);
+                logger.warn(`${chunkLabel} ⚠️ Could not fetch a valid batch for current offset. Consecutive empty batches: ${consecutiveEmptyBatches}`);
 
                 // Nếu có 2 batch liên tiếp không lấy được data → dừng
                 if (consecutiveEmptyBatches >= 2) {
-                    console.warn(`${chunkLabel} ⚠️ Có ${consecutiveEmptyBatches} batch liên tiếp không lấy được data. Dừng xử lý.`);
+                    logger.warn(`${chunkLabel} ⚠️ Có ${consecutiveEmptyBatches} batch liên tiếp không lấy được data. Dừng xử lý.`);
                     break;
                 }
             } else {
@@ -2278,7 +2279,7 @@ export class GeminiService {
             }
         } // end while
 
-        console.log(`${chunkLabel} 📊 Kết thúc vòng lặp. Tổng số use case: ${allResults.length}, batch count: ${batchCount}`);
+        logger.info(`${chunkLabel} 📊 Kết thúc vòng lặp. Tổng số use case: ${allResults.length}, batch count: ${batchCount}`);
 
         // ✅ QUAN TRỌNG: Nếu có partial results, luôn return chúng thay vì throw error
         // Điều này đảm bảo dữ liệu đã generate được không bị mất
@@ -2287,7 +2288,7 @@ export class GeminiService {
                 // Có lỗi nhưng đã có partial results → log warning nhưng vẫn return
                 const { analyzeApiKeyError } = await import("../../../shared/apiKeyErrorHandler");
                 const errorInfo = analyzeApiKeyError(lastError);
-                console.warn(`${chunkLabel} ⚠️ Có lỗi trong quá trình generate (${errorInfo.type}), nhưng đã có ${allResults.length} use cases. Trả về partial results.`);
+                logger.warn(`${chunkLabel} ⚠️ Có lỗi trong quá trình generate (${errorInfo.type}), nhưng đã có ${allResults.length} use cases. Trả về partial results.`);
             }
             return allResults;
         }
@@ -2309,7 +2310,7 @@ export class GeminiService {
         const modelName = await this.llmService.getRecommendedModel(undefined, userId);
 
         try {
-            console.log(`🔑 Calling LLM for checkConflict with model: ${modelName}${userId ? ` (user: ${userId})` : ''}`);
+            logger.info(`🔑 Calling LLM for checkConflict with model: ${modelName}${userId ? ` (user: ${userId})` : ''}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -2325,21 +2326,21 @@ export class GeminiService {
             text = this.cleanJsonString(text);
 
             // Debug log
-            console.log("🔎 LLM conflict check raw response:", text);
+            logger.info("🔎 LLM conflict check raw response:", text);
 
             const parsed = JSON.parse(text.trim());
 
             if (typeof parsed.conflict === "boolean") {
-                console.log(
+                logger.info(
                     `✅ LLM conflict decision: ${parsed.conflict ? "CONFLICT" : "NO CONFLICT"} | A="${textA}" | B="${textB}"`
                 );
                 return parsed.conflict;
             } else {
-                console.warn("⚠️ LLM did not return a valid { conflict: boolean } object:", text);
+                logger.warn("⚠️ LLM did not return a valid { conflict: boolean } object:", text);
                 return false; // Default to no conflict if invalid response
             }
         } catch (err: any) {
-            console.error("❌ LLM checkConflict error:", err);
+            logger.error("❌ LLM checkConflict error:", err);
             throw err;
         }
     }
@@ -2363,7 +2364,7 @@ export class GeminiService {
         const modelName = await this.llmService.getRecommendedModel(undefined, userId);
 
         try {
-            console.log(`🔑 Calling LLM for findConflictGroups with model: ${modelName}${userId ? ` (user: ${userId})` : ''}`);
+            logger.info(`🔑 Calling LLM for findConflictGroups with model: ${modelName}${userId ? ` (user: ${userId})` : ''}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -2380,14 +2381,14 @@ export class GeminiService {
             const parsed = JSON.parse(text.trim());
 
             if (Array.isArray(parsed) && (parsed.length === 0 || Array.isArray(parsed[0]))) {
-                console.log(`✅ LLM found ${parsed.length} conflict groups.`);
+                logger.info(`✅ LLM found ${parsed.length} conflict groups.`);
                 return parsed;
             } else {
-                console.warn("⚠️ LLM did not return a valid array of arrays:", text);
+                logger.warn("⚠️ LLM did not return a valid array of arrays:", text);
                 return [];
             }
         } catch (err: any) {
-            console.error("❌ LLM findConflictGroups error:", err);
+            logger.error("❌ LLM findConflictGroups error:", err);
             throw err;
         }
     }
@@ -2410,7 +2411,7 @@ export class GeminiService {
         summary: string;
         committed_usecases: Array<{ key: string; name: string; desc: string; module?: string }>;
     }> {
-        console.log(`📊 [ESTIMATE_V2] Estimating with commitment...`);
+        logger.info(`📊 [ESTIMATE_V2] Estimating with commitment...`);
 
         const effectiveModelName = modelName || await this.llmService.getRecommendedModel(undefined, userId);
         const lang = language === 'en-US' ? 'en-US' : 'vi-VN';
@@ -2420,7 +2421,7 @@ export class GeminiService {
             : this.getEstimateWithCommitmentPromptEN(text);
 
         try {
-            console.log(`🔑 Calling LLM for estimateWithCommitment with model: ${effectiveModelName}`);
+            logger.info(`🔑 Calling LLM for estimateWithCommitment with model: ${effectiveModelName}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -2450,7 +2451,7 @@ export class GeminiService {
                 module: uc.module || ''
             }));
 
-            console.log(`✅ [ESTIMATE_V2] Committed ${committed.length} usecases`);
+            logger.info(`✅ [ESTIMATE_V2] Committed ${committed.length} usecases`);
 
             return {
                 estimated_count: committed.length,
@@ -2459,7 +2460,7 @@ export class GeminiService {
             };
 
         } catch (err: any) {
-            console.error(`❌ [ESTIMATE_V2] Error:`, err.message);
+            logger.error(`❌ [ESTIMATE_V2] Error:`, err.message);
             throw err;
         }
     }
@@ -2569,7 +2570,7 @@ Return JSON:`;
         userId?: string,
         projectId?: string
     ): Promise<any[]> {
-        console.log(`📦 [BATCH_V2] Generating batch ${batchNumber}/${totalBatches} (${committedUsecases.length} usecases)`);
+        logger.info(`📦 [BATCH_V2] Generating batch ${batchNumber}/${totalBatches} (${committedUsecases.length} usecases)`);
 
         const effectiveModelName = modelName || await this.llmService.getRecommendedModel(undefined, userId);
         const lang = language === 'en-US' ? 'en-US' : 'vi-VN';
@@ -2582,7 +2583,7 @@ Return JSON:`;
         );
 
         try {
-            console.log(`🔑 Calling LLM for generateBatchFromCommitment with model: ${effectiveModelName}`);
+            logger.info(`🔑 Calling LLM for generateBatchFromCommitment with model: ${effectiveModelName}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -2600,12 +2601,12 @@ Return JSON:`;
             const parsed = this.safeJsonParseRobust(responseText);
             const useCases = parsed.items || [];
 
-            console.log(`✅ [BATCH_V2] Generated ${useCases.length}/${committedUsecases.length} usecases`);
+            logger.info(`✅ [BATCH_V2] Generated ${useCases.length}/${committedUsecases.length} usecases`);
 
             return useCases;
 
         } catch (err: any) {
-            console.error(`❌ [BATCH_V2] Error:`, err.message);
+            logger.error(`❌ [BATCH_V2] Error:`, err.message);
             throw err;
         }
     }
@@ -2650,7 +2651,7 @@ Return JSON:`;
         userId?: string,
         projectId?: string
     ): Promise<any[]> {
-        console.log(`🔄 [RETRY_V2] Retrying ${missingUsecases.length} missing usecases with blacklist (${existingUsecases.length} existing)`);
+        logger.info(`🔄 [RETRY_V2] Retrying ${missingUsecases.length} missing usecases with blacklist (${existingUsecases.length} existing)`);
 
         const effectiveModelName = modelName || await this.llmService.getRecommendedModel(undefined, userId);
 
@@ -2829,7 +2830,7 @@ ${originalText}
             return parsed.items || [];
 
         } catch (err: any) {
-            console.error(`❌ [RETRY_V2] Error:`, err.message);
+            logger.error(`❌ [RETRY_V2] Error:`, err.message);
             throw err;
         }
     }
@@ -2838,7 +2839,7 @@ ${originalText}
      * V2: Repair broken usecase với LLM
      */
     async repairUsecase(brokenUsecase: any, errorMessage: string): Promise<any | null> {
-        console.log(`🔧 [REPAIR] Attempting to fix: ${brokenUsecase.name}`);
+        logger.info(`🔧 [REPAIR] Attempting to fix: ${brokenUsecase.name}`);
 
         const effectiveModelName = await this.llmService.getRecommendedModel();
 
@@ -2890,15 +2891,15 @@ ${errorMessage}
 
             // Validate fixed usecase
             if (!fixed.name || !fixed.goal || !fixed.main_flow || !Array.isArray(fixed.main_flow)) {
-                console.warn(`⚠️ [REPAIR] Fixed usecase still invalid`);
+                logger.warn(`⚠️ [REPAIR] Fixed usecase still invalid`);
                 return null;
             }
 
-            console.log(`✅ [REPAIR] Successfully fixed: ${fixed.name}`);
+            logger.info(`✅ [REPAIR] Successfully fixed: ${fixed.name}`);
             return fixed;
 
         } catch (err: any) {
-            console.error(`❌ [REPAIR] Error:`, err.message);
+            logger.error(`❌ [REPAIR] Error:`, err.message);
             return null;
         }
     }

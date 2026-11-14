@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { DatabaseController } from './controller';
 import {requireAuthorizedUser} from '../../../middlewares/auth';
+import { guardProjectResources } from "../../../middlewares/projectAccess";
 
 export default function initDatabaseRoute(): Router {
     const router = Router();
+    // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+    router.use(requireAuthorizedUser);
+    guardProjectResources(router, ["databaseId", "versionId"]);
     const databaseController = new DatabaseController();
 
     // === ROUTES CHÍNH CHO DATABASE ===

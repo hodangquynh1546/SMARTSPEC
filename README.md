@@ -10,6 +10,8 @@ SmartSpec là nền tảng hỗ trợ tự động hóa quá trình phân tích 
 
 Dự án tập trung vào việc giảm thời gian chuyển từ yêu cầu nghiệp vụ thô sang các tài sản kỹ thuật có cấu trúc, dễ sử dụng và dễ kiểm tra.
 
+> **Trạng thái hiện tại:** các luồng nghiệp vụ cốt lõi đã có, nhưng dự án chưa được xác nhận production-ready. Kiểm kê thiếu E2E, lint còn nhiều lỗi và một số API Admin chưa có backend; xem [đánh giá và roadmap](docs/09-project-review-and-roadmap.md).
+
 ---
 
 ## 1. Tổng quan dự án
@@ -401,31 +403,33 @@ SmartSpec là một hệ thống AI-powered software specification platform, gi�
 
 ## 14. Hướng dẫn chạy dự án
 
-### Yêu cầu
-- Node.js
-- Docker / Docker Compose
-- MongoDB
-- Redis
+Chạy các lệnh sau từ thư mục gốc repository. Cần Node.js 20+, Python 3.10+ và Docker Compose.
 
-### Cài đặt
+### 1. Khởi động MongoDB và Redis
 ```bash
 docker compose up
-npm install
 ```
 
-### Chạy backend
+### 2. Cấu hình và chạy backend
 ```bash
 cd backend
-npm install
+npm ci
+cp .env.example .env
+# Điền OAuth credentials và thay các JWT placeholder trong .env
 npm run dev
 ```
 
-### Chạy frontend
+### 3. Cấu hình và chạy frontend
 ```bash
+# Mở terminal mới tại thư mục gốc repository
 cd frontend
-npm install
+npm ci
+cp .env.example .env
+# Điền VITE_GOOGLE_CLIENT_ID nếu dùng Google sign-in
 npm run dev
 ```
+
+Mở `http://localhost:5173`. Xử lý Audio/OCR cần thêm Python dependencies trong `backend/requirements.txt`, FFmpeg và Tesseract. Hướng dẫn đầy đủ: [docs/08-setup-and-deployment.md](docs/08-setup-and-deployment.md).
 
 ---
 

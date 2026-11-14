@@ -1,3 +1,6 @@
+import logger from "../../../../../lib/logger";
+import { pythonLimiter } from "../../../shared/pythonLimiter";
+import env from "../../../utils/env";
 // features/ocr/domain/service.ts
 import { UploadedFile } from 'express-fileupload';
 import path from 'path';
@@ -12,7 +15,7 @@ export class OcrService {
     private enqueueRefineJob(inputId: string, provider: 'gemini' | 'openai' | 'claude' = 'gemini') {
         import('../../handle_extraction/index')
             .then((m) => m.refineInputById(inputId, provider))
-            .catch((err) => console.error('[refine] image error', err?.message || err));
+            .catch((err) => logger.error('[refine] image error', err?.message || err));
     }
     /**
      * @method saveDocumentToDB
@@ -145,7 +148,7 @@ export class OcrService {
             //             $set: { merged_text: merged, updated_at: new Date() }
             //         });
             //     } catch (err) {
-            //         console.error('[OcrService] Merge text error:', err);
+            //         logger.error('[OcrService] Merge text error:', err);
             //     }
             // }
 
@@ -159,18 +162,22 @@ export class OcrService {
         try {
             await fsExtra.emptyDir(uploadDir);
         } catch (e) {
-            console.warn('⚠️ Không thể dọn thư mục uploads_ocr:', e);
+            logger.warn('⚠️ Không thể dọn thư mục uploads_ocr:', e);
         }
 
         return docs;
     }
 
     private async runOCR(imagePaths: string[]): Promise<any[]> {
+      return pythonLimiter.run(() => this.runOCRUnlimited(imagePaths));
+    }
+
+    private async runOCRUnlimited(imagePaths: string[]): Promise<any[]> {
         const scriptPath = path.join(__dirname, '../pythonScript/process_OCR.py');
         const args = [scriptPath, ...imagePaths];
 
         return new Promise((resolve, reject) => {
-            const python = spawn('python', args);
+            const python = spawn(env.PYTHON_PATH, args);
 
             let result = '';
             let error = '';

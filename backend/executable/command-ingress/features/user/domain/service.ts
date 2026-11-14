@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
@@ -87,9 +88,9 @@ export class UserServiceImpl implements UserService {
     }
   ): Promise<UserResponse> {
     const user = await User.findOne({ _id: userId });
-    console.log("User ID:", userId);
-    console.log("Updating user profile:", body);
-    console.log("Found user:", user);
+    logger.info("User ID:", userId);
+    logger.info("Updating user profile:", body);
+    logger.info("Found user:", user);
     if (!user) {
       throw new Error("User not found");
     }
@@ -114,7 +115,7 @@ export class UserServiceImpl implements UserService {
         user.setting = { language: "vi", theme: "light", selectedModel: null };
       }
       (user.setting as any).selectedModel = body.selectedModel || null;
-      console.log(`✅ [updateProfile] Updated selectedModel for user ${userId}: ${body.selectedModel || 'null'}`);
+      logger.info(`✅ [updateProfile] Updated selectedModel for user ${userId}: ${body.selectedModel || 'null'}`);
     }
 
     await user.save();

@@ -131,14 +131,12 @@ Content-Type: application/json
 
 ---
 
-## 9. Danh mục Admin API cần bổ sung (Theo `API_MISSING_SUMMARY.md`)
+## 9. Admin API: khoảng trống đã xác minh
 
-Hiện tại giao diện Admin Panel phía Frontend đã sẵn sàng, một số endpoint dưới đây đang dùng mock data và cần hoàn thiện ở Backend:
-1. `GET /api/admin/dashboard/stats`: Thống kê tổng số Users, Active Users, Projects, API Keys, biểu đồ tỷ lệ.
-2. `GET /api/admin/dashboard/activities`: Danh sách các hoạt động gần nhất trên toàn hệ thống.
-3. `POST /api/users`: Tạo tài khoản người dùng trực tiếp từ trang Admin.
-4. `PATCH /api/users/:id/status`: Kích hoạt hoặc khóa tài khoản user.
-5. `POST /api/users/bulk-action`: Thao tác hàng loạt trên người dùng (khóa, xóa, kích hoạt).
-6. `POST /api/keys/:id/test`: Kiểm tra kết nối và quota của một API key.
-7. `GET /api/admin/system/info`: Thông tin tài nguyên máy chủ (CPU, RAM, Uptime).
-8. `GET /api/admin/system/logs`: Truy vấn logs hệ thống có phân trang và lọc theo cấp độ (INFO, WARN, ERROR).
+Backend hiện có user CRUD cơ bản qua `/api/users`, API key CRUD qua `/api/keys` và danh sách project quản trị qua `/api/projects/admin/all`. Tuy nhiên, Frontend còn gọi các route chưa được đăng ký trong backend:
+
+- `GET /api/admin/dashboard/stats` và `GET /api/admin/dashboard/activities`.
+- `GET /api/admin/system/info` và `GET /api/admin/system/logs`.
+- `PATCH /api/users/:id/status` và `POST /api/users/bulk-action`.
+
+Tạo user từ Admin hiện gọi `POST /api/auth/register`, không phải một endpoint admin-only. Trước khi coi Admin Panel hoàn chỉnh, cần quyết định và triển khai các hợp đồng này hoặc loại bỏ các giao diện gọi chúng. Danh sách được đối chiếu với `frontend/src/api/admin.js` và route mounts trong `backend/executable/command-ingress/app.ts`.

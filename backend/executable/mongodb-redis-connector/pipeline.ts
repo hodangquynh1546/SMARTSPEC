@@ -1,3 +1,4 @@
+import logger from "../../lib/logger";
 import {Sink} from './sink';
 import {Source} from './source';
 
@@ -22,13 +23,13 @@ class Pipeline {
         const eventEmitter = await this.source.get();
 
         eventEmitter.on('change', async (data) => {
-            console.log('[Pipeline] Received data:', data);
+            logger.info('[Pipeline] Received data:', data);
 
             for (const operator of this.operators) {
                 data = await operator.run(data);
             }
 
-            console.log('[Pipeline] Transformed data:', data);
+            logger.info('[Pipeline] Transformed data:', data);
             await this.sink.save(data);
         });
     }

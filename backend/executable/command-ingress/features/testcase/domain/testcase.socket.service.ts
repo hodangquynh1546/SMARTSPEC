@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // features/testcase/domain/testcase.socket.service.ts
 import { io } from '../../../socket';
 
@@ -50,7 +51,7 @@ export class TestcaseSocketService {
      */
     broadcastToProject(projectId: string, event: TestcaseProgressEvent): void {
         io.to(`project_${projectId}`).emit('testcase_event', event);
-        console.log(`📢 Broadcast testcase event to project ${projectId}:`, event.type);
+        logger.info(`📢 Broadcast testcase event to project ${projectId}:`, event.type);
     }
 
     /**
@@ -84,7 +85,7 @@ export class TestcaseSocketService {
             timestamp: new Date()
         };
         this.broadcastToProject(projectId, event);
-        console.log(`📊 Broadcast testcase estimate received: ${estimate.estimated_count} test cases, ${estimate.estimated_batches} batches, ${committedTestcases?.length || 0} committed testcases`);
+        logger.info(`📊 Broadcast testcase estimate received: ${estimate.estimated_count} test cases, ${estimate.estimated_batches} batches, ${committedTestcases?.length || 0} committed testcases`);
     }
 
     /**
@@ -138,7 +139,7 @@ export class TestcaseSocketService {
         const stateInfo = agentState ? ` [${agentState}]` : '';
         const messageInfo = message ? ` - ${message}` : '';
         const refreshInfo = shouldRefresh ? ' [REFRESH]' : '';
-        console.log(`📊 Broadcast testcase progress: ${progress}% - ${stage}${stateInfo}${batchInfo ? ` (Batch ${batchInfo.currentBatch}/${batchInfo.totalBatches})` : ''}${messageInfo}${errorInfo}${refreshInfo}`);
+        logger.info(`📊 Broadcast testcase progress: ${progress}% - ${stage}${stateInfo}${batchInfo ? ` (Batch ${batchInfo.currentBatch}/${batchInfo.totalBatches})` : ''}${messageInfo}${errorInfo}${refreshInfo}`);
     }
 
     /**
@@ -171,7 +172,7 @@ export class TestcaseSocketService {
             timestamp: new Date()
         };
         this.broadcastToProject(projectId, event);
-        console.log(`✅ Broadcast testcase completion: ${saveResult.saved}/${saveResult.totalExpected} testcases saved. Frontend should refresh data.`);
+        logger.info(`✅ Broadcast testcase completion: ${saveResult.saved}/${saveResult.totalExpected} testcases saved. Frontend should refresh data.`);
     }
 }
 

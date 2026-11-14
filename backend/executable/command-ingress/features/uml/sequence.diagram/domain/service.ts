@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 // src/features/database/domain/service.ts
 
 import SequenceDiagramSchema from "../../../../../../internal/model/sequence_diagram";
@@ -164,7 +165,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
           }
         });
       } catch (logError) {
-        console.error("❌ Error logging sequence diagram generation:", logError);
+        logger.error("❌ Error logging sequence diagram generation:", logError);
       }
 
       // Emit completion event
@@ -174,7 +175,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
 
       return savedDocument.toObject({ getters: true }) as SequenceDiagramResponse;
     } catch (error: any) {
-      console.error('❌ Error generating sequence diagram:', error);
+      logger.error('❌ Error generating sequence diagram:', error);
       // Emit failed event với error message
       if (umlSocketService && projectId && versionId && userId) {
         const errorMsg = error.message || 'Failed to generate sequence diagram';
@@ -192,7 +193,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
       // Convert Mongoose documents to SequenceDiagramResponse
       return diagrams.map(diagram => this.mapToSequenceDiagramResponse(diagram));
     } catch (error) {
-      console.error('Error getting sequence diagrams:', error);
+      logger.error('Error getting sequence diagrams:', error);
       throw new Error('Failed to fetch sequence diagrams');
     }
   }
@@ -209,7 +210,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
 
       return this.mapToSequenceDiagramResponse(diagram);
     } catch (error) {
-      console.error('Error getting sequence diagram by id:', error);
+      logger.error('Error getting sequence diagram by id:', error);
       throw new Error('Failed to fetch sequence diagram');
     }
   }
@@ -222,7 +223,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
 
       return diagrams.map(diagram => this.mapToSequenceDiagramResponse(diagram));
     } catch (error) {
-      console.error('Error getting sequence diagrams by usecase:', error);
+      logger.error('Error getting sequence diagrams by usecase:', error);
       throw new Error('Failed to fetch sequence diagrams for usecase');
     }
   }
@@ -265,7 +266,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
     const user = project.members.find(
       (member) => member.user_id.toString() === subId
     );
-    console.log("User attempting deletion:", user);
+    logger.info("User attempting deletion:", user);
 
     if (!user || user.status !== "accepted") {
       throw new Error("Unauthorized");
@@ -319,7 +320,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
           });
         }
       } catch (logError) {
-        console.error("❌ Error logging sequence diagram deletion:", logError);
+        logger.error("❌ Error logging sequence diagram deletion:", logError);
       }
     }
 
@@ -349,7 +350,7 @@ export class SequenceDiagramServiceImpl implements SequenceDiagramService {
     );
 
     if (lifelineIndex === -1) {
-      console.error('❌ Lifeline not found:', {
+      logger.error('❌ Lifeline not found:', {
         sqdId,
         lifelineId,
         normalizedLifelineId,

@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 // src/features/database/domain/service.ts
 
 import UsecaseDiagramSchema from "../../../../../../internal/model/usecase_diagram";
@@ -133,7 +134,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
           });
         }
       } catch (logError) {
-        console.error("❌ Error logging usecase diagram generation:", logError);
+        logger.error("❌ Error logging usecase diagram generation:", logError);
       }
 
       // Emit completion event
@@ -143,7 +144,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
 
       return savedDocument.toObject({ getters: true }) as UseCaseDiagramResponse;
     } catch (error: any) {
-      console.error('❌ Error generating usecase diagram:', error);
+      logger.error('❌ Error generating usecase diagram:', error);
       // Emit failed event với error message
       if (umlSocketService && projectId && versionId && userId) {
         const errorMsg = error.message || 'Failed to generate usecase diagram';
@@ -343,8 +344,8 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
         relationship.target.equals(new mongoose.Types.ObjectId(data.target)) &&
         relationship.type === data.type
     );
-    console.log(existingRelationship);
-    console.log(data);
+    logger.info(existingRelationship);
+    logger.info(data);
     if (existingRelationship) {
       throw new Error("Relationship already exists in usecase diagram");
     }
@@ -377,7 +378,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
     const ucBySource = ucd.usecases.findIndex(
       (usecase: any) => (usecase._id ? String(usecase._id) : '') === data.source
     );
-    console.log(ucBySource);
+    logger.info(ucBySource);
     if (ucBySource === -1) {
       throw new Error("Source not found in usecase diagram");
     }
@@ -649,7 +650,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
       (member: any) => member.user_id.toString() === userId
     );
 
-    console.log("User attempting deletion:", userMember);
+    logger.info("User attempting deletion:", userMember);
 
     if (!userMember || userMember.status !== "accepted") {
       throw new Error("Unauthorized - User is not a member of this project");
@@ -707,7 +708,7 @@ export class UsecaseDiagramServiceImpl implements UseCaseDiagramService {
           });
         }
       } catch (logError) {
-        console.error("❌ Error logging usecase diagram deletion:", logError);
+        logger.error("❌ Error logging usecase diagram deletion:", logError);
       }
     }
   }

@@ -1,3 +1,6 @@
+import logger from "../../../../../lib/logger";
+import { pythonLimiter } from "../../../shared/pythonLimiter";
+import env from "../../../utils/env";
 import { UploadedFile } from 'express-fileupload';
 import path from 'path';
 import fs from 'fs/promises';
@@ -41,12 +44,12 @@ export class PdfService {
 
         // Quyết định refine: chỉ với pdf scan/image/audio; ở đây pdf: dựa theo is_scanned
         const isScanned = !!(result?.metadata?.is_scanned);
-        console.log(`[refine] decide | type=pdf isScanned=${isScanned} inputId=${savedInput._id}`);
+        logger.info(`[refine] decide | type=pdf isScanned=${isScanned} inputId=${savedInput._id}`);
         if (isScanned) {
-          console.log(`[refine] enqueue | inputId=${savedInput._id} provider=gemini`);
+          logger.info(`[refine] enqueue | inputId=${savedInput._id} provider=gemini`);
           this.enqueueRefineJob(savedInput._id.toString(), 'gemini');
         } else {
-          console.log(`[refine] skip | not scanned pdf inputId=${savedInput._id}`);
+          logger.info(`[refine] skip | not scanned pdf inputId=${savedInput._id}`);
         }
       } catch (error: any) {
         results.push({ text: null, confidence: 0, error: error.message || 'Internal error' });
@@ -69,14 +72,14 @@ export class PdfService {
     // Tạm thời chạy inline (đồng bộ) để demo. Sản xuất: dùng queue BullMQ.
     import('../../handle_extraction/index')
       .then((m) => {
-        console.log(`[refine] start worker | inputId=${inputId} provider=${provider}`);
+        logger.info(`[refine] start worker | inputId=${inputId} provider=${provider}`);
         return m.refineInputById(inputId, provider);
       })
       .then(() => {
-        console.log(`[refine] done worker | inputId=${inputId}`);
+        logger.info(`[refine] done worker | inputId=${inputId}`);
       })
       .catch((err) => {
-        console.error(`[refine] error worker | inputId=${inputId}`, err?.message || err);
+        logger.error(`[refine] error worker | inputId=${inputId}`, err?.message || err);
       });
   }
 
@@ -106,12 +109,12 @@ export class PdfService {
       
       // Log warnings nếu có
       if (textValidation.warnings.length > 0) {
-        console.warn(`⚠️ PDF extraction warnings for ${data.originalFilename}:`, textValidation.warnings.slice(0, 3));
+        logger.warn(`⚠️ PDF extraction warnings for ${data.originalFilename}:`, textValidation.warnings.slice(0, 3));
       }
       
       // Cảnh báo nếu text bị mất nhiều sau khi clean
       if (textValidation.cleanedLength < textValidation.originalLength * 0.9) {
-        console.warn(`⚠️ PDF text bị giảm ${((1 - textValidation.cleanedLength / textValidation.originalLength) * 100).toFixed(1)}% sau khi clean: ${data.originalFilename}`);
+        logger.warn(`⚠️ PDF text bị giảm ${((1 - textValidation.cleanedLength / textValidation.originalLength) * 100).toFixed(1)}% sau khi clean: ${data.originalFilename}`);
       }
     }
     
@@ -146,11 +149,15 @@ export class PdfService {
   }
 
   async runPdfToText(pdfPath: string): Promise<any> {
+    return pythonLimiter.run(() => this.runPdfToTextUnlimited(pdfPath));
+  }
+
+  private async runPdfToTextUnlimited(pdfPath: string): Promise<any> {
     const scriptPath = path.join(__dirname, '../pythonScript/process_pdf.py');
     const args = [scriptPath, pdfPath];
 
     return new Promise((resolve, reject) => {
-      const python = spawn('python', args);
+      const python = spawn(env.PYTHON_PATH, args);
       let result = '';
       let error = '';
 

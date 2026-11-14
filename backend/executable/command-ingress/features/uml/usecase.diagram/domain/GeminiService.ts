@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 import { ApiKeyService } from "../../../orchestrator/domain/ApiKeyService";
 import { LLMService } from "../../../../shared/LLMService";
 import { ObjectId } from "mongodb"; // <-- THÊM MỚI: Cần thiết để tạo ID
@@ -185,7 +186,7 @@ export class UsecaseDiagramGeminiService {
       const prompt =
         usecaseDiagramPrompts[lang].diagramDesign(requirementsJson);
 
-      console.log(
+      logger.info(
         `📊 Generating use case diagram for ${requirements.length} use cases`
       );
 
@@ -203,7 +204,7 @@ export class UsecaseDiagramGeminiService {
         throw new Error("Empty response from Gemini");
       }
 
-      console.log(`📄 Raw response length: ${generatedJsonString.length}`);
+      logger.info(`📄 Raw response length: ${generatedJsonString.length}`);
 
       // 2. Parse và validate cấu trúc JSON (vẫn dùng TÊN string)
       // <-- THAY ĐỔI: Đổi tên biến để rõ nghĩa
@@ -211,17 +212,17 @@ export class UsecaseDiagramGeminiService {
         this.validateAndParseDiagramJson(generatedJsonString);
 
       // 3. Dịch TÊN (string) sang ID (ObjectId)
-      console.log("🔄 Translating string names to ObjectIds...");
+      logger.info("🔄 Translating string names to ObjectIds...");
       const finalDiagramJsonWithIds = this.translateNamesToIds(
         diagramJsonWithStringNames
       );
 
-      console.log(
+      logger.info(
         `🎉 Final diagram JSON: ${finalDiagramJsonWithIds.actors.length} actors, ${finalDiagramJsonWithIds.usecases.length} usecases`
       );
       return finalDiagramJsonWithIds;
     } catch (error) {
-      console.error("❌ Error in generateUsecaseDiagram:", error);
+      logger.error("❌ Error in generateUsecaseDiagram:", error);
 
       return {
         name: "Generation Failed",
@@ -286,7 +287,7 @@ export class UsecaseDiagramGeminiService {
             usecase_id: usecaseId, // Dùng ID
           };
         }
-        console.warn(
+        logger.warn(
           `[DATA_WARN] Bỏ qua association bị lỗi (không tìm thấy tên): ${assoc.actor_name} -> ${assoc.usecase_title}`
         );
         return null;
@@ -311,7 +312,7 @@ export class UsecaseDiagramGeminiService {
             type: rel.type,
           };
         }
-        console.warn(
+        logger.warn(
           `[DATA_WARN] Bỏ qua relationship bị lỗi (không tìm thấy tên): ${rel.source} -> ${rel.target}`
         );
         return null;
@@ -338,20 +339,20 @@ export class UsecaseDiagramGeminiService {
    * (Hàm này giữ nguyên, vì nó validate JSON thô từ LLM)
    */
   private validateAndParseDiagramJson(jsonStr: string): any {
-    console.log("--- RAW STRING TO PARSE ---");
-    console.log(jsonStr);
-    console.log("--- END RAW STRING ---");
+    logger.info("--- RAW STRING TO PARSE ---");
+    logger.info(jsonStr);
+    logger.info("--- END RAW STRING ---");
 
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error("❌ JSON parse error, attempting repair...", parseError);
+      logger.error("❌ JSON parse error, attempting repair...", parseError);
       const repairedJson = this.repairTruncatedJson(jsonStr);
       try {
         parsedResponse = JSON.parse(repairedJson);
       } catch (repairError) {
-        console.error("❌ JSON repair failed:", repairError);
+        logger.error("❌ JSON repair failed:", repairError);
         throw new Error(
           `Failed to parse JSON even after repair: ${repairError.message}`
         );
@@ -378,12 +379,12 @@ export class UsecaseDiagramGeminiService {
         position: usecase.position || { x: 0, y: 0 }
       }));
 
-      console.log("✅ JSON structure is VALID (with position support)");
+      logger.info("✅ JSON structure is VALID (with position support)");
       return parsedResponse;
     }
 
-    console.error("❌ VALIDATION FAILED. Parsed object:", parsedResponse);
-    console.error(
+    logger.error("❌ VALIDATION FAILED. Parsed object:", parsedResponse);
+    logger.error(
       "❌ Invalid diagram JSON structure. Response did not contain 'name', 'actors', and 'usecases'."
     );
     throw new Error("Invalid diagram JSON structure from Gemini");
@@ -453,7 +454,7 @@ export class UsecaseDiagramGeminiService {
 
       return this.cleanJsonString(response.text);
     } catch (err: any) {
-      console.error('❌ LLM call failed for usecase diagram:', err.message);
+      logger.error('❌ LLM call failed for usecase diagram:', err.message);
       throw err;
     }
   }
@@ -476,7 +477,7 @@ export class UsecaseDiagramGeminiService {
     if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
       cleanedText = cleanedText.substring(jsonStart, jsonEnd + 1);
     } else {
-      console.warn(
+      logger.warn(
         "⚠️ cleanJsonString: Could not find a JSON object {}. Returning raw trimmed text for parsing."
       );
       return cleanedText;
@@ -486,7 +487,7 @@ export class UsecaseDiagramGeminiService {
       JSON.parse(cleanedText);
       return cleanedText;
     } catch (e) {
-      console.warn(
+      logger.warn(
         "⚠️ cleanJsonString: Could not parse cleaned JSON, falling back to repair."
       );
       return this.repairTruncatedJson(cleanedText);

@@ -1,62 +1,36 @@
-// import { describe, expect } from '@jest/globals'
-// import { ExchangeGoogleTokenBody, RefreshTokenRequestBody } from './dto';
+import { describe, expect, it } from '@jest/globals';
+import { ExchangeGoogleTokenBody, RefreshTokenRequestBody } from './dto';
 
-// describe('Validator test', function() {
-//   it('Should return error if the GoogleOAuthBody is invalid', async () => {
-//     const body = {
-//       code: '',
-//     };
+describe('Request validators', () => {
+	it('rejects an empty Google OAuth code', async () => {
+		const result = await new ExchangeGoogleTokenBody({ code: '' }).validate();
 
-//     const dto = new ExchangeGoogleTokenBody(body);
-//     const res = await dto.validate();
+		expect(result.ok).toBe(false);
+		expect(result.errors).toHaveLength(1);
+	});
 
-//     expect(res).not.toBeNull();
-//     expect(res.ok).toBe(false);
-//     expect(res.errors).toHaveLength(1);
-//   });
+	it('rejects a missing refresh token', async () => {
+		const result = await new RefreshTokenRequestBody({}).validate();
 
-//   it('Should return error if user refresh token without providing it', async () => {
-//     const body = {
-//       refresh_token: '',
-//     };
+		expect(result.ok).toBe(false);
+		expect(result.errors).toHaveLength(1);
+	});
 
-//     const dto = new RefreshTokenRequestBody(body);
-//     const res = await dto.validate();
+	it('rejects a refresh token that does not have three parts', async () => {
+		const result = await new RefreshTokenRequestBody({ refresh_token: 'abc' }).validate();
 
-//     expect(res).not.toBeNull();
-//     expect(res.ok).toBe(false);
-//     expect(res.errors).toHaveLength(1);
-//   });
+		expect(result.ok).toBe(false);
+		expect(result.errors[0].constraints).toEqual({
+			jsonwebtoken: 'Invalid JSON Web Token format',
+		});
+	});
 
-//   it('Should return error if the logout request is invalid', async () => {
-//     const body = {
-//       refresh_token: 'abc',
-//     };
+	it('accepts a refresh token with three parts', async () => {
+		const result = await new RefreshTokenRequestBody({
+			refresh_token: 'ey.body.signature',
+		}).validate();
 
-//     const dto = new RefreshTokenRequestBody(body);
-//     const res = await dto.validate();
-
-//     expect(res).not.toBeNull();
-//     expect(res.ok).toBe(false);
-
-//     console.log(res.errors);
-
-//     expect(res.errors).toHaveLength(1);
-//     expect(Object.values(res.errors[0]))
-//       .toContainEqual({ jsonwebtoken: 'Invalid JSON Web Token format' });
-//   });
-
-//   it('Should be okay when token is valid', async () => {
-//     const body = {
-//       refresh_token: 'ey.body.signature',
-//     };
-
-//     const dto = new RefreshTokenRequestBody(body);
-//     const res = await dto.validate();
-
-//     expect(res).not.toBeNull();
-//     expect(res.ok).toBe(true);
-//     expect(res.errors).toHaveLength(0);
-//   });
-
-// });
+		expect(result.ok).toBe(true);
+		expect(result.errors).toHaveLength(0);
+	});
+});

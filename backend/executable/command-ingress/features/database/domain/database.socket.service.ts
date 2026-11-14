@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // features/database/domain/database.socket.service.ts
 import { io } from '../../../socket';
 
@@ -20,7 +21,7 @@ export class DatabaseSocketService {
      */
     broadcastToProject(projectId: string, event: DatabaseProgressEvent): void {
         io.to(`project_${projectId}`).emit('database_event', event);
-        console.log(`📢 Broadcast database event to project ${projectId}:`, event.type);
+        logger.info(`📢 Broadcast database event to project ${projectId}:`, event.type);
     }
 
     /**
@@ -50,9 +51,9 @@ export class DatabaseSocketService {
         };
         this.broadcastToProject(projectId, event);
         if (errors && errors.length > 0) {
-            console.log(`❌ Broadcast database failed: ${progress}% - ${stage}`, errors);
+            logger.info(`❌ Broadcast database failed: ${progress}% - ${stage}`, errors);
         } else {
-            console.log(`📊 Broadcast database progress: ${progress}% - ${stage}`);
+            logger.info(`📊 Broadcast database progress: ${progress}% - ${stage}`);
         }
     }
 }

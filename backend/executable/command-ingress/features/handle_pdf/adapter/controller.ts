@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { PdfService } from '../domain/service';
@@ -98,7 +99,7 @@ export class PdfController {
       });
 
     } catch (error: any) {
-      console.error('Error processing PDF file:', error);
+      logger.error('Error processing PDF file:', error);
       if (error.kind === 'ObjectId') {
         return res.status(400).json({ success: false, error: `Invalid ID format for: ${error.path}` });
       }

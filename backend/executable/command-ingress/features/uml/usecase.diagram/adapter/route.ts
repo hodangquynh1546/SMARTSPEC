@@ -1,12 +1,16 @@
 import { Router } from "express";
 import { UsecaseDiagramController } from "./controller";
 import { requireAuthorizedUser } from "../../../../middlewares/auth";
+import { guardProjectResources } from "../../../../middlewares/projectAccess";
 import express from "express";
 
 const initUsecaseDiagramRoute: (
   controller: UsecaseDiagramController
 ) => express.Router = (controller) => {
   const router = express.Router();
+  // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+  router.use(requireAuthorizedUser);
+  guardProjectResources(router, ["versionId", "ucId"]);
 
   //UCD
   router

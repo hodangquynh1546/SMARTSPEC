@@ -66,7 +66,7 @@ export class PresenceSocketService {
             // - Socket đã bị cleanup trước đó (TTL hết hạn)
             // - Socket disconnect được gọi nhiều lần (race condition)
             // Chỉ log ở debug level nếu cần
-            // console.log(`🚪 No active user found for socket ${socket.id} - this is normal if socket was not in Redis`);
+            // logger.info(`🚪 No active user found for socket ${socket.id} - this is normal if socket was not in Redis`);
         }
 
         socket.leave(`project_${projectId}`);

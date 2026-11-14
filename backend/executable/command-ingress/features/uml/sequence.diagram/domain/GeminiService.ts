@@ -1,3 +1,4 @@
+import logger from "../../../../../../lib/logger";
 // services/SequenceDiagramGeminiService.ts
 
 import { ApiKeyService } from "../../../orchestrator/domain/ApiKeyService";
@@ -241,7 +242,7 @@ export class SequenceDiagramGeminiService {
       const prompt =
         sequenceDiagramPrompts[lang].diagramDesign(requirementsJson);
 
-      console.log(
+      logger.info(
         `📊 Generating sequence diagram for usecase ${payload.usecaseId}`
       );
 
@@ -259,24 +260,24 @@ export class SequenceDiagramGeminiService {
         throw new Error("Empty response from Gemini");
       }
 
-      console.log(`📄 Raw response length: ${generatedJsonString.length}`);
+      logger.info(`📄 Raw response length: ${generatedJsonString.length}`);
 
       // 2. Parse và validate JSON thô (Giữ nguyên)
       const diagramJsonWithStringKeys =
         this.validateAndParseSequenceJson(generatedJsonString);
 
       // 3. Dịch TÊN/KEY (string) sang ID (ObjectId) (Giữ nguyên)
-      console.log("🔄 Translating string keys/names to ObjectIds...");
+      logger.info("🔄 Translating string keys/names to ObjectIds...");
       const finalDiagramJsonWithIds = this.translateKeysToIds(
         diagramJsonWithStringKeys
       );
 
-      console.log(
+      logger.info(
         `🎉 Final diagram JSON: ${finalDiagramJsonWithIds.lifelines.length} lifelines, ${finalDiagramJsonWithIds.messages.length} messages`
       );
       return finalDiagramJsonWithIds;
     } catch (error) {
-      console.error("❌ Error in generateSequenceDiagram:", error);
+      logger.error("❌ Error in generateSequenceDiagram:", error);
 
       return {
         name: "Generation Failed",
@@ -352,7 +353,7 @@ export class SequenceDiagramGeminiService {
   //         }
   //         return newMessage;
   //       }
-  //       console.warn(
+  //       logger.warn(
   //         `[DATA_WARN] Bỏ qua message bị lỗi (không tìm thấy lifeline): ${msg.source_lifeline_name} -> ${msg.target_lifeline_name}`
   //       );
   //       return null;
@@ -374,7 +375,7 @@ export class SequenceDiagramGeminiService {
   //         if (newId) {
   //           return { ...node, id: newId.toString() }; // Thay thế 'id' (string) bằng ObjectId (dưới dạng string)
   //         }
-  //         console.warn(`[LAYOUT_WARN] Không tìm thấy node layout: ${node.id}`);
+  //         logger.warn(`[LAYOUT_WARN] Không tìm thấy node layout: ${node.id}`);
   //         return null; // Bỏ qua node không xác định
   //       })
   //       .filter((n: any) => n !== null);
@@ -393,7 +394,7 @@ export class SequenceDiagramGeminiService {
   //             target: newTargetId.toString(), // Thay 'target' bằng ObjectId
   //           };
   //         }
-  //         console.warn(
+  //         logger.warn(
   //           `[LAYOUT_WARN] Không tìm thấy edge layout: ${edge.source} -> ${edge.target}`
   //         );
   //         return null;
@@ -489,7 +490,7 @@ export class SequenceDiagramGeminiService {
           }
           return newMessage;
         }
-        console.warn(
+        logger.warn(
           `[DATA_WARN] Bỏ qua message bị lỗi (không tìm thấy lifeline): ${msg.source_lifeline_name} -> ${msg.target_lifeline_name}`
         );
         return null;
@@ -509,7 +510,7 @@ export class SequenceDiagramGeminiService {
           if (newId) {
             return { ...node, id: newId.toString() };
           }
-          console.warn(`[LAYOUT_WARN] Không tìm thấy node layout: ${node.id}`);
+          logger.warn(`[LAYOUT_WARN] Không tìm thấy node layout: ${node.id}`);
           return null;
         })
         .filter((n: any) => n !== null);
@@ -533,7 +534,7 @@ export class SequenceDiagramGeminiService {
               target: newTargetId.toString(), // Sửa: Dùng _id của lifeline
             };
           }
-          console.warn(
+          logger.warn(
             `[LAYOUT_WARN] Không tìm thấy edge layout: ${edge.id} (source: ${edge.source}, target: ${edge.target})`
           );
           return null;
@@ -567,20 +568,20 @@ export class SequenceDiagramGeminiService {
    * Parse và validate JSON thô từ LLM (cho Sequence Diagram)
    */
   private validateAndParseSequenceJson(jsonStr: string): any {
-    console.log("--- RAW STRING TO PARSE (Sequence) ---");
-    console.log(jsonStr);
-    console.log("--- END RAW STRING ---");
+    logger.info("--- RAW STRING TO PARSE (Sequence) ---");
+    logger.info(jsonStr);
+    logger.info("--- END RAW STRING ---");
 
     let parsedResponse;
     try {
       parsedResponse = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error("❌ JSON parse error, attempting repair...", parseError);
+      logger.error("❌ JSON parse error, attempting repair...", parseError);
       const repairedJson = this.repairTruncatedJson(jsonStr);
       try {
         parsedResponse = JSON.parse(repairedJson);
       } catch (repairError) {
-        console.error("❌ JSON repair failed:", repairError);
+        logger.error("❌ JSON repair failed:", repairError);
         throw new Error(
           `Failed to parse JSON even after repair: ${repairError.message}`
         );
@@ -596,12 +597,12 @@ export class SequenceDiagramGeminiService {
       Array.isArray(parsedResponse.lifelines) &&
       Array.isArray(parsedResponse.messages)
     ) {
-      console.log("✅ JSON structure is VALID (matches Sequence schema input)");
+      logger.info("✅ JSON structure is VALID (matches Sequence schema input)");
       return parsedResponse;
     }
 
-    console.error("❌ VALIDATION FAILED. Parsed object:", parsedResponse);
-    console.error(
+    logger.error("❌ VALIDATION FAILED. Parsed object:", parsedResponse);
+    logger.error(
       "❌ Invalid diagram JSON structure. Response did not contain 'name', 'lifelines', and 'messages'."
     );
     throw new Error("Invalid diagram JSON structure from Gemini");
@@ -671,7 +672,7 @@ export class SequenceDiagramGeminiService {
 
       return this.cleanJsonString(response.text);
     } catch (err: any) {
-      console.error('❌ LLM call failed for sequence diagram:', err.message);
+      logger.error('❌ LLM call failed for sequence diagram:', err.message);
       throw err;
     }
   }
@@ -694,7 +695,7 @@ export class SequenceDiagramGeminiService {
     if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
       cleanedText = cleanedText.substring(jsonStart, jsonEnd + 1);
     } else {
-      console.warn(
+      logger.warn(
         "⚠️ cleanJsonString: Could not find a JSON object {}. Returning raw trimmed text for parsing."
       );
       return cleanedText;
@@ -704,7 +705,7 @@ export class SequenceDiagramGeminiService {
       JSON.parse(cleanedText);
       return cleanedText;
     } catch (e) {
-      console.warn(
+      logger.warn(
         "⚠️ cleanJsonString: Could not parse cleaned JSON, falling back to repair."
       );
       return this.repairTruncatedJson(cleanedText);

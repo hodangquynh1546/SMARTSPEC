@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import Project from '../../../../../internal/model/project';
 import Input from '../../../../../internal/model/input';
 import Version from '../../../../../internal/model/version';
@@ -76,7 +77,7 @@ export class ProjectService {
         ownerId
       ).catch(async (err) => {
         const errorMessage = `Lỗi xử lý nền: ${err.message || 'Lỗi không xác định'}`;
-        console.error(`[SERVICE] ${errorMessage} cho version ${newVersion._id}`);
+        logger.error(`[SERVICE] ${errorMessage} cho version ${newVersion._id}`);
         await Version.findByIdAndUpdate(newVersion._id, { $push: { processing_errors: errorMessage } });
       });
 
@@ -103,7 +104,7 @@ export class ProjectService {
       return new ServiceResponse(ResponseStatus.Success, 'Project created successfully', newProject, 201);
     } catch (error: any) {
       await session.abortTransaction();
-      console.error("[SERVICE] ❌ Transaction đã được rollback.");
+      logger.error("[SERVICE] ❌ Transaction đã được rollback.");
       throw error;
     } finally {
       await session.endSession();
@@ -593,7 +594,7 @@ export class ProjectService {
         200
       );
     } catch (error) {
-      console.error("[SERVICE] Error fetching all projects for admin:", error);
+      logger.error("[SERVICE] Error fetching all projects for admin:", error);
       return new ServiceResponse(
         ResponseStatus.Failed,
         "Failed to retrieve all projects",

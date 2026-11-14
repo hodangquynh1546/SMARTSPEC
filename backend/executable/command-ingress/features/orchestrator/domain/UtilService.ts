@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import Input from "../../../../../internal/model/input";
 
 export class UtilService {
@@ -12,7 +13,7 @@ export class UtilService {
         const start = Date.now();
         while (Date.now() - start < timeoutMs) {
             const inputs = await Input.find({ _id: { $in: inputIds } }).lean();
-            console.log(`Waiting: ${inputs.length}/${inputIds.length} inputs fetched`);
+            logger.info(`Waiting: ${inputs.length}/${inputIds.length} inputs fetched`);
 
             if (
                 inputs.length === inputIds.length &&

@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { ActivityDiagramController } from '../adapter/controller';
 import { requireAuthorizedUser } from '../../../../middlewares/auth';
+import { guardProjectResources } from "../../../../middlewares/projectAccess";
 
 export default function initActivityDiagramRoute(): Router {
   const router = Router();
+  // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+  router.use(requireAuthorizedUser);
+  guardProjectResources(router, ["versionId", "activityDiagramId"]);
   const controller = new ActivityDiagramController();
 
   router.post('/version/:versionId/requirements/:requirementId/generate',

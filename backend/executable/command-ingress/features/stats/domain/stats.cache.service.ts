@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // 📄 features/stats/domain/stats.cache.service.ts
 import { createClient } from 'redis';
 import crypto from 'crypto';
@@ -36,7 +37,7 @@ export class StatsCacheService {
             }
             return JSON.parse(cached) as T;
         } catch (error) {
-            console.error(`[StatsCache] Error getting cache for key ${key}:`, error);
+            logger.error(`[StatsCache] Error getting cache for key ${key}:`, error);
             return null;
         }
     }
@@ -48,7 +49,7 @@ export class StatsCacheService {
         try {
             await this.redisClient.setEx(key, ttl, JSON.stringify(data));
         } catch (error) {
-            console.error(`[StatsCache] Error setting cache for key ${key}:`, error);
+            logger.error(`[StatsCache] Error setting cache for key ${key}:`, error);
         }
     }
 
@@ -85,7 +86,7 @@ export class StatsCacheService {
                 await this.redisClient.del(keys);
             }
         } catch (error) {
-            console.error(`[StatsCache] Error invalidating cache for pattern ${pattern}:`, error);
+            logger.error(`[StatsCache] Error invalidating cache for pattern ${pattern}:`, error);
         }
     }
 

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // features/uml/domain/uml.socket.service.ts
 import { io } from '../../../socket';
 
@@ -21,7 +22,7 @@ export class UmlSocketService {
      */
     broadcastToProject(projectId: string, event: UmlProgressEvent): void {
         io.to(`project_${projectId}`).emit('uml_event', event);
-        console.log(`📢 Broadcast uml event to project ${projectId}:`, event.type);
+        logger.info(`📢 Broadcast uml event to project ${projectId}:`, event.type);
     }
 
     /**
@@ -52,9 +53,9 @@ export class UmlSocketService {
         };
         this.broadcastToProject(projectId, event);
         if (errors && errors.length > 0) {
-            console.log(`❌ Broadcast uml failed (${diagramType}): ${progress}% - ${stage}`, errors);
+            logger.info(`❌ Broadcast uml failed (${diagramType}): ${progress}% - ${stage}`, errors);
         } else {
-            console.log(`📊 Broadcast uml progress (${diagramType}): ${progress}% - ${stage}`);
+            logger.info(`📊 Broadcast uml progress (${diagramType}): ${progress}% - ${stage}`);
         }
     }
 }

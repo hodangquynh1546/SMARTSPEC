@@ -32,6 +32,16 @@ backend/
 └── tsconfig.json                    # Cấu hình TypeScript compiler
 ```
 
+### Build, test và lint
+
+Chạy các lệnh trong `backend/`. TypeScript build được ghi vào `backend/dist/`, không phát sinh JavaScript cạnh mã nguồn; Jest chỉ thu thập test TypeScript. `npm run lint` kiểm tra mà không tự sửa file.
+
+```bash
+npm run build
+npm test -- --runInBand
+npm run lint
+```
+
 ---
 
 ## 2. Mô hình phân lớp Feature (Clean Architecture Feature Slice)

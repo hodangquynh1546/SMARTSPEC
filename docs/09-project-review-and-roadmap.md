@@ -2,6 +2,16 @@
 
 Tài liệu này cung cấp một bản phân tích, đánh giá kỹ thuật khách quan và toàn diện về toàn bộ dự án **SmartSpec**, chỉ rõ các điểm mạnh, các khoản nợ kỹ thuật (Technical Debt) còn tồn đọng và đề xuất lộ trình hoàn thiện (Roadmap).
 
+> Audit ngày 2026-11-13. Build được kiểm tra; test hiện có chỉ bao phủ validator, chưa có E2E với MongoDB, Redis, Google OAuth hoặc LLM credentials. Vì vậy chưa thể kết luận mọi luồng đã hoàn thiện hoặc production-ready.
+
+---
+
+## 0. Cập nhật bảo mật (2026-11-14)
+
+Đã xử lý: OTP 2FA dùng HMAC + `JWT_OTP_SECRET` + `crypto.randomInt`; thêm `helmet` và rate limit (`middlewares/rateLimit.ts`) cho auth/orchestrate; chỉ public `/uploads/avatars`; giới hạn kích thước file upload; sanitize `v-html` bằng DOMPurify (`frontend/src/utils/sanitize.js`); `PYTHON_PATH` cấu hình được; middleware phân quyền theo project (`middlewares/projectAccess.ts`, vai trò owner/editor/viewer) áp cho database, testcase, version, ai_copilot và 3 loại UML; thêm test và CI (`.github/workflows/ci.yml`).
+
+Còn lại: hàng đợi worker cho OCR/STT, object storage, giảm `any`/`console.*`, tách các view lớn, kiểm tra phân quyền cho các feature chưa guard (input, log, orchestrator) bằng integration test.
+
 ---
 
 ## 1. Đánh giá Điểm Mạnh của Dự Án (Key Strengths)
@@ -30,21 +40,17 @@ Tài liệu này cung cấp một bản phân tích, đánh giá kỹ thuật kh
 
 ## 2. Nhận diện Nợ Kỹ thuật & Hạn chế Hiện tại (Technical Debt & Limitations)
 
-### 2.1. Phụ thuộc vào Lệnh `spawn('python')` đồng bộ / tiến trình con
-- **Vấn đề**: Hiện tại Backend Node.js gọi trực tiếp các script Python thông qua `child_process.spawn('python', args)`.
+### 2.1. Phụ thuộc tên binary Python trong subprocess
+- **Vấn đề**: Backend gọi bất đồng bộ các script Python qua `child_process.spawn('python', args)`.
 - **Rủi ro**:
   - Tên nhị phân `python` khác nhau tùy môi trường (trên Linux/macOS thường là `python3`).
   - Nếu có nhiều người dùng cùng upload file audio dung lượng lớn hoặc ảnh OCR cùng lúc, việc spawn tiến trình Python nặng về CPU/RAM trực tiếp trên Node.js server sẽ gây nghẽn (CPU Starvation) và làm chậm toàn bộ server Express.
-- **Khuyến nghị**: Nên chuyển các tác vụ Python này sang một **Worker Pool bất đồng bộ** sử dụng hàng đợi tin nhắn (Message Queue như **BullMQ / Redis Streams / Celery / RabbitMQ**) chạy trên các container độc lập.
+- **Khuyến nghị**: Cấu hình `PYTHON_PATH` thay vì hardcode `python`, sau đó cân nhắc tách tác vụ nặng sang worker queue khi cần scale.
 
 ### 2.2. Khoảng cách API giữa Frontend và Backend (Admin Panel Gap)
-- **Vấn đề**: Như đã ghi nhận trong `API_MISSING_SUMMARY.md`, giao diện Frontend Admin Panel đã được thiết kế rất hoàn chỉnh nhưng một số API Backend tương ứng vẫn chưa được hiện thực hóa (đang dùng mock data hoặc fallback):
-  - `GET /api/admin/dashboard/stats`
-  - `GET /api/admin/dashboard/activities`
-  - `POST /api/users` (tạo user từ admin)
-  - `POST /api/keys/:id/test` (test kết nối key)
-  - `GET /api/admin/system/info` & `/api/admin/system/logs`
-- **Khuyến nghị**: Ưu tiên bổ sung các API này vào `features/user/`, `features/api_key/`, `features/log/` và tạo route group `/api/admin/` tương ứng.
+- **Đã xác minh thiếu**: Frontend gọi `GET /api/admin/dashboard/stats`, `GET /api/admin/dashboard/activities`, `GET /api/admin/system/info`, `GET /api/admin/system/logs`, `PATCH /api/users/:id/status` và `POST /api/users/bulk-action`, nhưng các route này chưa được mount ở backend.
+- User CRUD, API key CRUD và admin project list đã có route cơ bản. Tạo user từ Admin hiện dùng public registration endpoint; cần endpoint admin-only trước khi coi chức năng này hoàn tất.
+- Chi tiết hợp đồng và trạng thái route: [docs/07-api-reference.md](07-api-reference.md).
 
 ### 2.3. Thiếu Quản lý File Upload tập trung (Object Storage)
 - **Vấn đề**: File upload hiện được lưu trực tiếp trên ổ cứng cục bộ (`backend/uploads/`, `uploads_Audio/`, `uploads_docx/`).
@@ -54,6 +60,15 @@ Tài liệu này cung cấp một bản phân tích, đánh giá kỹ thuật kh
 ### 2.4. File Vue Views có độ dài quá lớn (Monolithic Components)
 - **Vấn đề**: Một số file Vue trong `frontend/src/views/` có dung lượng từ 1.500 đến 2.500 dòng code (ví dụ: `AdminDashboard.vue` 2.478 dòng, `UmlManagement.vue` 2.390 dòng, `TestcaseManagement.vue` 2.301 dòng).
 - **Khuyến nghị**: Tách nhỏ các logic tính toán (computed, methods) thành các **Vue Composables** (`useTestcases.js`, `useUmlDiagram.js`, `useAdminStats.js`) và tách các khối giao diện con thành components riêng biệt.
+
+### 2.5. Thiếu kiểm thử tự động và lint chưa đạt
+- Backend hiện có 4 unit tests cho validation; frontend chưa có test suite component/E2E.
+- Lint hiện thất bại trên nhiều file ở cả hai ứng dụng; cần xử lý theo module, không auto-fix toàn repo vì dễ tạo diff lớn và che lỗi chức năng.
+- Build pass không chứng minh Google OAuth, xử lý file Python, pipeline LLM, Redis realtime hoặc các thao tác CRUD chạy end-to-end.
+
+### 2.6. Orchestrator ghép input bằng time-window
+- `getNewlyCreatedInputs()` hiện tìm input mới trong 10 giây theo version; đây là heuristic và có thể trộn input của một request khác khi có upload đồng thời.
+- Ưu tiên truyền rõ input IDs theo từng request để correlation không phụ thuộc thời gian.
 
 ---
 
@@ -66,7 +81,9 @@ flowchart LR
 ```
 
 ### Giai đoạn 1: Hoàn thiện Core & Admin API (Ưu tiên cao)
-- [ ] Xây dựng đầy đủ các API Admin còn thiếu theo `docs/07-api-reference.md`.
+- [ ] Hoàn thiện hoặc gỡ các màn hình gọi API Admin còn thiếu theo `docs/07-api-reference.md`.
+- [ ] Bổ sung integration tests cho auth, project/version, usecase, upload/extraction và Admin.
+- [ ] Sửa lint theo từng feature và thêm CI để chặn lỗi mới.
 - [ ] Chuẩn hóa biến môi trường `PYTHON_PATH` trong `.env` để linh hoạt chỉ định đường dẫn thực thi của Python venv (`venv/bin/python`).
 - [ ] Bổ sung cơ chế Rate Limiting (dùng `express-rate-limit`) cho các endpoint công khai như `/api/auth/login`, `/api/auth/register`, `/api/orchestrate/run`.
 

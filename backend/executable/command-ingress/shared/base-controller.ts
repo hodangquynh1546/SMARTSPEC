@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 import { NextFunction, Response } from 'express';
 import { AsyncHandler, HttpRequest } from '../types';
 import { ApiKeyError, analyzeApiKeyError } from './apiKeyErrorHandler';
@@ -12,7 +13,7 @@ export class BaseController {
     try {
       await handler(req, res, next);
     } catch (error) {
-      console.error("❌ Error in execWithTryCatchBlock:", error);
+      logger.error("❌ Error in execWithTryCatchBlock:", error);
       if (!res.headersSent) {
         // Xử lý ApiKeyError đặc biệt
         if (error instanceof ApiKeyError) {

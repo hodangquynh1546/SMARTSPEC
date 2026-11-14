@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { OcrService } from '../domain/service';
@@ -92,7 +93,7 @@ export class OcrController {
 
     } catch (err) {
       const error = err as Error;
-      console.error('[OcrController] Error:', error);
+      logger.error('[OcrController] Error:', error);
 
       if ((err as any).kind === 'ObjectId') {
         return res.status(400).json({ 

@@ -1,3 +1,4 @@
+import logger from "../../lib/logger";
 // socket.ts
 import { Server } from 'socket.io';
 import { Server as HttpServer } from 'http';
@@ -17,9 +18,9 @@ export function initSocket(server: HttpServer) {
     const socketProjects = new Map<string, Set<string>>();
 
     io.on('connection', (socket) => {
-        //console.log(`✅ User connected: ${socket.id}, userId: ${socket.handshake.auth.userId}`);
+        //logger.info(`✅ User connected: ${socket.id}, userId: ${socket.handshake.auth.userId}`);
         socket.on('join_system_logs', () => {
-            //console.log(`🧩 User ${socket.id} joined global system log room`);
+            //logger.info(`🧩 User ${socket.id} joined global system log room`);
             logSocketService.joinSystemRoom(socket);
         });
         // Initialize projects set for this socket
@@ -36,11 +37,11 @@ export function initSocket(server: HttpServer) {
             const userId = socket.handshake.auth.userId;
 
             if (!userId) {
-                console.warn('⚠️ No userId in socket auth');
+                logger.warn('⚠️ No userId in socket auth');
                 return;
             }
 
-            //console.log(`🎯 User ${userId} joining project ${projectId}`);
+            //logger.info(`🎯 User ${userId} joining project ${projectId}`);
 
             // Track this project for the socket
             socketProjects.get(socket.id)?.add(projectId);
@@ -52,10 +53,10 @@ export function initSocket(server: HttpServer) {
             // ✅ Join presence tracking
             try {
                 const userInfo = await getUserInfo(userId);
-                //console.log(`👤 Retrieved user info for ${userId}:`, userInfo?.name);
+                //logger.info(`👤 Retrieved user info for ${userId}:`, userInfo?.name);
                 await presenceSocketService.joinProjectRoom(socket, projectId, userId, userInfo);
             } catch (error) {
-                //console.error('Error joining presence room:', error);
+                //logger.error('Error joining presence room:', error);
                 // Fallback với basic info
                 const fallbackUserInfo = {
                     name: 'Unknown User',
@@ -71,7 +72,7 @@ export function initSocket(server: HttpServer) {
         // ✅ Leave project room
         socket.on('leave_project', async (projectId: string) => {
             const userId = socket.handshake.auth.userId;
-            //console.log(`🚪 User ${userId} leaving project ${projectId}`);
+            //logger.info(`🚪 User ${userId} leaving project ${projectId}`);
 
             // Remove from tracking
             socketProjects.get(socket.id)?.delete(projectId);
@@ -84,12 +85,12 @@ export function initSocket(server: HttpServer) {
         });
 
         socket.on('disconnect', async (reason) => {
-            //console.log(`❌ User disconnected: ${socket.id}, reason: ${reason}`);
+            //logger.info(`❌ User disconnected: ${socket.id}, reason: ${reason}`);
 
             // ✅ Auto cleanup on disconnect - Leave all projects
             const userProjects = socketProjects.get(socket.id);
             if (userProjects && userProjects.size > 0) {
-                //console.log(`🧹 Cleaning up ${userProjects.size} projects for disconnected user`);
+                //logger.info(`🧹 Cleaning up ${userProjects.size} projects for disconnected user`);
                 // Convert Set to Array để tương thích với TypeScript config
                 const projectIds = Array.from(userProjects);
                 for (const projectId of projectIds) {
@@ -107,7 +108,7 @@ export function initSocket(server: HttpServer) {
 
         // Error handling
         socket.on('error', (error) => {
-            console.error(`❌ Socket error for ${socket.id}:`, error);
+            logger.error(`❌ Socket error for ${socket.id}:`, error);
         });
     });
 
@@ -121,13 +122,13 @@ async function getUserInfo(userId: string) {
         const user = await User.findById(userId).select('name email avatar_url');
 
         if (!user) {
-            //console.warn(`⚠️ User not found: ${userId}`);
+            //logger.warn(`⚠️ User not found: ${userId}`);
             return null;
         }
 
         return user;
     } catch (error) {
-        console.error(`❌ Error fetching user ${userId}:`, error);
+        logger.error(`❌ Error fetching user ${userId}:`, error);
         throw error;
     }
 }

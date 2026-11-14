@@ -1,3 +1,4 @@
+import logger from "../../lib/logger";
 import "reflect-metadata";
 import { config } from "dotenv";
 import { initSocket } from "./socket";
@@ -16,18 +17,18 @@ async function start() {
   try {
     if (process.env.REDIS_URI) {
       redisClient = await connectRedis();
-      console.log('✅ Redis connected successfully');
-      console.log(`   Redis URI: ${process.env.REDIS_URI.replace(/:[^:@]+@/, ':****@')}`); // Ẩn password nếu có
+      logger.info('✅ Redis connected successfully');
+      logger.info(`   Redis URI: ${process.env.REDIS_URI.replace(/:[^:@]+@/, ':****@')}`); // Ẩn password nếu có
     } else {
-      console.warn('⚠️ REDIS_URI not set in .env file');
-      console.warn('   Redis features (Presence Service, Stats Caching) will be disabled');
-      console.warn('   To enable Redis/Memurai, add to .env: REDIS_URI=redis://localhost:6380');
+      logger.warn('⚠️ REDIS_URI not set in .env file');
+      logger.warn('   Redis features (Presence Service, Stats Caching) will be disabled');
+      logger.warn('   To enable Redis/Memurai, add to .env: REDIS_URI=redis://localhost:6380');
     }
   } catch (error) {
-    console.error('❌ Failed to connect to Redis:', error);
-    console.warn('⚠️ Continuing without Redis, some features will be disabled');
-    console.warn('   Make sure Redis/Memurai is running');
-    console.warn('   Set REDIS_URI in .env: REDIS_URI=redis://localhost:6380');
+    logger.error('❌ Failed to connect to Redis:', error);
+    logger.warn('⚠️ Continuing without Redis, some features will be disabled');
+    logger.warn('   Make sure Redis/Memurai is running');
+    logger.warn('   Set REDIS_URI in .env: REDIS_URI=redis://localhost:6380');
   }
 
   const server = createHttpServer(redisClient);
@@ -35,7 +36,7 @@ async function start() {
   initSocket(server);
 
   server.listen(env.PORT, () => {
-    console.log(`Server running on port http://localhost:${env.PORT}`);
+    logger.info(`Server running on port http://localhost:${env.PORT}`);
   });
 
   process.on("SIGINT", async () => {
@@ -49,6 +50,6 @@ async function start() {
 }
 
 start().catch((err) => {
-  console.error(err);
+  logger.error(err);
   process.exit(1);
 });

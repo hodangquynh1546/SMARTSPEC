@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import { ApiKeyService, APIKeysResponse } from "../types";
 import Key from "../../../../../internal/model/api_key";
@@ -21,7 +22,7 @@ export class ApiKeyServiceImpl implements ApiKeyService {
         },
       ],
     });
-    console.log("Keys found:", keys); // Debug log
+    logger.info("Keys found:", keys); // Debug log
 
     return keys.map((key) => ({
       id: key._id?.toString() || key.id, // Ensure we use _id.toString() for consistency
@@ -99,9 +100,9 @@ export class ApiKeyServiceImpl implements ApiKeyService {
   }
   async getAllAPIKey(): Promise<APIKeysResponse[]> {
     const keys = await Key.find();
-    console.log("📋 getAllAPIKey - Found keys:", keys.length);
+    logger.info("📋 getAllAPIKey - Found keys:", keys.length);
     if (keys.length > 0) {
-      console.log("📋 Sample key IDs:", keys.slice(0, 3).map(k => ({ 
+      logger.info("📋 Sample key IDs:", keys.slice(0, 3).map(k => ({ 
         _id: k._id?.toString(), 
         id: k.id,
         idType: typeof k.id 
@@ -194,11 +195,11 @@ export class ApiKeyServiceImpl implements ApiKeyService {
     }
   ): Promise<APIKeysResponse> {
     try {
-      console.log("🔍 updateAPIKey called with:", { id, idType: typeof id, body });
+      logger.info("🔍 updateAPIKey called with:", { id, idType: typeof id, body });
       
       // Validate ObjectId format
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        console.error("❌ Invalid ObjectId format:", id);
+        logger.error("❌ Invalid ObjectId format:", id);
         throw new Error(`Invalid API Key ID format: ${id}`);
       }
       
@@ -210,7 +211,7 @@ export class ApiKeyServiceImpl implements ApiKeyService {
           const objectId = new mongoose.Types.ObjectId(id);
           key = await Key.findById(objectId);
         } catch (e) {
-          console.error("❌ Failed to create ObjectId:", e);
+          logger.error("❌ Failed to create ObjectId:", e);
         }
       }
       if (!key) {
@@ -220,14 +221,14 @@ export class ApiKeyServiceImpl implements ApiKeyService {
       if (!key) {
         // List all keys to debug
         const allKeys = await Key.find().limit(10).select('_id');
-        console.error("❌ API Key not found. ID searched:", id);
-        console.error("📋 All keys in DB (first 10):", allKeys.map(k => k._id?.toString()));
+        logger.error("❌ API Key not found. ID searched:", id);
+        logger.error("📋 All keys in DB (first 10):", allKeys.map(k => k._id?.toString()));
         throw new Error(`API Key not found with ID: ${id}`);
       }
       
-      console.log("✅ Found API Key:", { _id: key._id?.toString(), id: (key as any).id });
+      logger.info("✅ Found API Key:", { _id: key._id?.toString(), id: (key as any).id });
       
-      console.log("🔧 Updating API Key:", { id, body });
+      logger.info("🔧 Updating API Key:", { id, body });
       
       if (body.key_value) {
         key.key_value = body.key_value;
@@ -294,13 +295,13 @@ export class ApiKeyServiceImpl implements ApiKeyService {
         }
       }
       
-      console.log("💾 Saving API Key...");
+      logger.info("💾 Saving API Key...");
       await key.save();
-      console.log("✅ API Key saved successfully");
+      logger.info("✅ API Key saved successfully");
 
       return await this.getAPIKeyById(id);
     } catch (error) {
-      console.error("❌ Error in updateAPIKey service:", error);
+      logger.error("❌ Error in updateAPIKey service:", error);
       if (error instanceof Error) {
         throw new Error(`Failed to update API Key: ${error.message}`);
       }

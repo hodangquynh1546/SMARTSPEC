@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import DatabaseModel from "../../../../../internal/model/database";
 import { Column, Table, DatabaseSchema } from "./interfaces";
 
@@ -447,7 +448,7 @@ export class SQLGenerationService {
     private escapeIdentifier(identifier: string, dialect: SQLDialect): string {
         // Check if it's a reserved word
         if (this.SQL_RESERVED_WORDS.has(identifier.toLowerCase())) {
-            console.warn(`⚠️ Identifier '${identifier}' is a SQL reserved word`);
+            logger.warn(`⚠️ Identifier '${identifier}' is a SQL reserved word`);
         }
 
         switch (dialect) {

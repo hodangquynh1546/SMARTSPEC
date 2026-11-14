@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { UploadedFile } from "express-fileupload";
 import Version from "../../../../../internal/model/version";
 import Input from "../../../../../internal/model/input";
@@ -31,7 +32,7 @@ export class OrchestratorService {
         const randomDelay = 2000;
 
         // 🟢 Bắt đầu: clear lỗi cũ nhưng giữ checkpoint
-        console.log(`[SERVICE] Clearing previous errors for version ${versionId} before running...`);
+        logger.info(`[SERVICE] Clearing previous errors for version ${versionId} before running...`);
 
         // ✅ QUAN TRỌNG: Atomic check và set is_processing để tránh race condition
         // Sử dụng findOneAndUpdate với condition để đảm bảo chỉ một process có thể chạy
@@ -71,7 +72,7 @@ export class OrchestratorService {
         const hasCheckpoint = checkpoint && typeof checkpoint === 'object' && Array.isArray(checkpoint.processed_chunks) && checkpoint.processed_chunks.length > 0;
 
         if (hasCheckpoint) {
-            console.log(`🔄 Checkpoint detected: ${checkpoint.processed_chunks.length} chunks already processed. Will resume from checkpoint.`);
+            logger.info(`🔄 Checkpoint detected: ${checkpoint.processed_chunks.length} chunks already processed. Will resume from checkpoint.`);
             // Cập nhật stage và progress dựa trên checkpoint
             await Version.findByIdAndUpdate(versionId, {
                 $set: {
@@ -90,7 +91,7 @@ export class OrchestratorService {
                 throw new Error("Auto bump failed");
             }
             version = bumpRes.data.newVersion;
-            console.log("version Id after bump", version._id);
+            logger.info("version Id after bump", version._id);
             versionId = version._id.toString();
 
             // ✅ QUAN TRỌNG: Set is_processing cho version mới sau khi bump
@@ -107,7 +108,7 @@ export class OrchestratorService {
             // Lấy lại checkpoint sau khi bump
             const newVersion = await Version.findById(versionId).lean();
             if (newVersion && (newVersion as any).processing_checkpoint) {
-                console.log(`🔄 Checkpoint preserved after version bump`);
+                logger.info(`🔄 Checkpoint preserved after version bump`);
             }
         }
 
@@ -129,7 +130,7 @@ export class OrchestratorService {
             });
 
             if (hasUnprocessed) {
-                console.log("⚙️ Detected unprocessed inputs → forcing incremental mode");
+                logger.info("⚙️ Detected unprocessed inputs → forcing incremental mode");
                 opts.mode = "incremental";
             }
         }
@@ -204,7 +205,7 @@ export class OrchestratorService {
                 const extractedInputs = allUnprocessedInputs.filter((i: any) => i.processing_status === "extracted");
 
                 if (extractedInputs.length > 0) {
-                    console.log(`⏳ Đợi ${extractedInputs.length} input(s) với status "extracted" hoàn thành refine...`);
+                    logger.info(`⏳ Đợi ${extractedInputs.length} input(s) với status "extracted" hoàn thành refine...`);
                     const extractedIds = extractedInputs.map((i: any) => String(i._id));
                     // Đợi refine hoàn thành (timeout 90s cho audio/images)
                     const refinedInputs = await this.util.waitForInputsCompletionByIds(extractedIds, 90000);
@@ -212,9 +213,9 @@ export class OrchestratorService {
                     const successfullyRefined = refinedInputs.filter((i: any) => i.processing_status === "completed");
                     const failedRefined = refinedInputs.filter((i: any) => i.processing_status === "failed");
                     if (failedRefined.length > 0) {
-                        console.warn(`⚠️ ${failedRefined.length} input(s) refine failed, sẽ bỏ qua`);
+                        logger.warn(`⚠️ ${failedRefined.length} input(s) refine failed, sẽ bỏ qua`);
                     }
-                    console.log(`✅ ${successfullyRefined.length} input(s) refine thành công`);
+                    logger.info(`✅ ${successfullyRefined.length} input(s) refine thành công`);
                     // Kết hợp với completed inputs ban đầu
                     inputs = [...completedInputs, ...successfullyRefined];
                 } else {
@@ -222,12 +223,12 @@ export class OrchestratorService {
                     inputs = completedInputs;
                 }
 
-                console.log(`📊 Tổng số inputs sẽ xử lý: ${inputs.length} (${completedInputs.length} completed + ${extractedInputs.length > 0 ? extractedInputs.length : 0} refined)`);
+                logger.info(`📊 Tổng số inputs sẽ xử lý: ${inputs.length} (${completedInputs.length} completed + ${extractedInputs.length > 0 ? extractedInputs.length : 0} refined)`);
             }
         }
 
         if (!inputs || inputs.length === 0) {
-            console.warn("Không có input hợp lệ để xử lý. Trả về trạng thái hiện tại.");
+            logger.warn("Không có input hợp lệ để xử lý. Trả về trạng thái hiện tại.");
             // ✅ BROADCAST: No inputs to process
             inputSocketService.emitIncrementalProgress(
                 projectId,
@@ -292,7 +293,7 @@ export class OrchestratorService {
         try {
             // ✅ Sử dụng LLMService để lấy model (ưu tiên model user đã chọn)
             const modelName = await this.llmService.getRecommendedModel(undefined, userId);
-            console.log(`🔑 [ORCHESTRATOR] Using model: ${modelName}${userId ? ` (for user: ${userId})` : ''}`);
+            logger.info(`🔑 [ORCHESTRATOR] Using model: ${modelName}${userId ? ` (for user: ${userId})` : ''}`);
 
             const result = await this.requirementService.finalize(
                 versionId,
@@ -307,7 +308,7 @@ export class OrchestratorService {
 
             // Kiểm tra nếu có errors trong result
             if (result.errors && result.errors.length > 0) {
-                console.error("❌ Errors detected in finalize result:", result.errors);
+                logger.error("❌ Errors detected in finalize result:", result.errors);
 
                 // Cập nhật version status thành failed
                 await Version.findByIdAndUpdate(versionId, {
@@ -374,7 +375,7 @@ export class OrchestratorService {
 
         } catch (error: any) {
             // Xử lý lỗi từ finalize hoặc các bước khác
-            console.error("❌ Error during finalize processing:", error);
+            logger.error("❌ Error during finalize processing:", error);
 
             const errorMessage = error.message || "Unknown error during processing";
             const processingErrors = Array.isArray(error.errors)
@@ -386,7 +387,7 @@ export class OrchestratorService {
 
             if (existingUseCases > 0) {
                 // Có partial results → đánh dấu completed với warnings
-                console.warn(`⚠️ Processing failed but ${existingUseCases} use cases were saved. Marking as completed with warnings.`);
+                logger.warn(`⚠️ Processing failed but ${existingUseCases} use cases were saved. Marking as completed with warnings.`);
 
                 await Version.findByIdAndUpdate(versionId, {
                     $set: {

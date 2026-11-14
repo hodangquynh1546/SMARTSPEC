@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { HttpRequest } from "../../../types";
 import { OrchestratorService } from '../domain/service';
@@ -34,9 +35,9 @@ export class OrchestratorController {
         const isRetryOrIncremental = (!rawText || rawText.trim().length === 0) && (!files || files.length === 0);
 
         if (isRetryOrIncremental) {
-            console.log("Request is either a Retry or an incremental run on existing data.");
+            logger.info("Request is either a Retry or an incremental run on existing data.");
         } else {
-            console.log("Request contains new data for processing.");
+            logger.info("Request contains new data for processing.");
         }
         // Khối validation cũ đã được loại bỏ để cho phép request đi tiếp.
 
@@ -47,7 +48,7 @@ export class OrchestratorController {
         // ✅ QUAN TRỌNG: Kiểm tra xem version đang processing không để tránh chạy đồng thời
         const currentVersion = await Version.findById(version_id).lean();
         if (currentVersion && (currentVersion as any).is_processing === true) {
-            console.warn(`⚠️ Version ${version_id} is already processing. Rejecting concurrent request.`);
+            logger.warn(`⚠️ Version ${version_id} is already processing. Rejecting concurrent request.`);
             return res.status(409).json({ 
                 success: false, 
                 error: 'Version is already being processed. Please wait for the current process to complete.' 
@@ -64,7 +65,7 @@ export class OrchestratorController {
                 mode
             }, language, userId).catch((error: any) => {
                 // Log lỗi để debug
-                console.error("❌ Error in background processing:", error);
+                logger.error("❌ Error in background processing:", error);
                 // Version status đã được cập nhật thành "failed" trong service.run()
                 // Frontend sẽ nhận được thông báo lỗi qua polling status
             });
@@ -73,7 +74,7 @@ export class OrchestratorController {
             return res.status(202).json({ success: true, message: 'Processing started. Check status for results.' });
         } catch (e: any) {
             // Lỗi xảy ra trước khi service.run() được gọi (validation, etc.)
-            console.error("❌ Error before processing:", e);
+            logger.error("❌ Error before processing:", e);
             return res.status(500).json({ success: false, error: e?.message || 'Internal error' });
         }
     }
@@ -97,7 +98,7 @@ export class OrchestratorController {
             // ✅ QUAN TRỌNG: Kiểm tra xem version đang processing không
             const currentVersion = await Version.findById(version_id).lean();
             if (currentVersion && (currentVersion as any).is_processing === true) {
-                console.warn(`⚠️ Version ${version_id} is already processing. Rejecting retry request.`);
+                logger.warn(`⚠️ Version ${version_id} is already processing. Rejecting retry request.`);
                 return res.status(409).json({ 
                     success: false, 
                     error: 'Version is already being processed. Please wait for the current process to complete.' 
@@ -117,7 +118,7 @@ export class OrchestratorController {
                 userId 
             ).catch((error: any) => {
                 // Log lỗi để debug
-                console.error("❌ Error in retry background processing:", error);
+                logger.error("❌ Error in retry background processing:", error);
                 // Version status đã được cập nhật thành "failed" trong service.run()
                 // Frontend sẽ nhận được thông báo lỗi qua polling status
             });

@@ -2,9 +2,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { VersionController } from "./controller";
 import { requireAuthorizedUser } from "../../../middlewares/auth";
+import { guardProjectResources } from "../../../middlewares/projectAccess";
 
 export default function initVersionRoute(controller: VersionController) {
   const router = Router();
+  // Mọi route đều yêu cầu đăng nhập + kiểm tra quyền theo project của tài nguyên
+  router.use(requireAuthorizedUser);
+  guardProjectResources(router, ["projectId", "versionId"]);
 
   // ✅ Version Management
   router.get(

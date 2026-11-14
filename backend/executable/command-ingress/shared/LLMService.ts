@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 /**
  * LLMService - Universal LLM API Wrapper
  * Hỗ trợ Gemini, OpenRouter và các providers khác
@@ -65,7 +66,7 @@ export class LLMService {
         // ✅ CẢI THIỆN: Nếu model được chọn là có phí (không có :free), tự động tắt FREE mode
         let effectiveFreeMode = isProductionFreeMode;
         if (modelName && !modelName.includes(':free')) {
-            console.log(`💰 [callLLM] Paid model "${modelName}" detected, disabling FREE mode`);
+            logger.info(`💰 [callLLM] Paid model "${modelName}" detected, disabling FREE mode`);
             effectiveFreeMode = false;
         }
 
@@ -84,7 +85,7 @@ export class LLMService {
             if (openRouterKeys && openRouterKeys.length > 0) {
                 targetProvider = 'openrouter';
                 targetModelName = modelName; // Dùng modelName gốc cho OpenRouter
-                console.log(`✅ [callLLM] Force model "${modelName}" detected as OpenRouter format, using openrouter provider`);
+                logger.info(`✅ [callLLM] Force model "${modelName}" detected as OpenRouter format, using openrouter provider`);
             } else {
                 throw new Error(
                     `Model "${modelName}" requires OpenRouter API key (OpenRouter format detected), but no active keys found. ` +
@@ -106,7 +107,7 @@ export class LLMService {
             targetProvider = modelConfig.provider;
             targetModelName = modelConfig.modelName;
 
-            console.log(`✅ [callLLM] Force model "${modelName}" → provider: ${targetProvider}, modelName: ${targetModelName}`);
+            logger.info(`✅ [callLLM] Force model "${modelName}" → provider: ${targetProvider}, modelName: ${targetModelName}`);
 
             // Kiểm tra có keys cho provider này không
             const keysForProvider = await this.apiKeyService.getAllActiveKeys(targetProvider);
@@ -126,7 +127,7 @@ export class LLMService {
                 // Model OpenRouter format → giữ nguyên modelName, set provider = openrouter
                 targetProvider = 'openrouter';
                 targetModelName = modelName; // ✅ Giữ nguyên modelName gốc
-                console.log(`✅ [callLLM] OpenRouter format detected, keeping original modelName: ${modelName}`);
+                logger.info(`✅ [callLLM] OpenRouter format detected, keeping original modelName: ${modelName}`);
             } else {
                 // Model native format → dùng getModelConfig
                 const modelConfig = getModelConfig(modelName, provider, effectiveFreeMode);
@@ -152,7 +153,7 @@ export class LLMService {
             if (targetProvider !== 'openrouter') {
                 const openRouterKeys = await this.apiKeyService.getAllActiveKeys('openrouter');
                 if (openRouterKeys && openRouterKeys.length > 0) {
-                    console.log(`🔄 Fallback to OpenRouter (no keys for ${targetProvider})`);
+                    logger.info(`🔄 Fallback to OpenRouter (no keys for ${targetProvider})`);
                     targetProvider = 'openrouter';
                     keys = openRouterKeys;
                     // Nếu có modelName, dùng modelName đó với OpenRouter
@@ -169,7 +170,7 @@ export class LLMService {
             if (!keys || keys.length === 0) {
                 const fallbackProvider = await this.findAvailableProvider();
                 if (fallbackProvider) {
-                    console.log(`🔄 Fallback to ${fallbackProvider} (no keys for ${targetProvider})`);
+                    logger.info(`🔄 Fallback to ${fallbackProvider} (no keys for ${targetProvider})`);
                     targetProvider = fallbackProvider;
                     keys = await this.apiKeyService.getAllActiveKeys(fallbackProvider);
                 }
@@ -206,13 +207,13 @@ export class LLMService {
             } else {
                 // ✅ Chỉ fallback về key.model_name hoặc default khi không có targetModelName
                 effectiveModelName = key.model_name || this.getDefaultModel(targetProvider);
-                console.log(`⚠️ [callLLM] No targetModelName, using key.model_name or default: ${effectiveModelName}`);
+                logger.info(`⚠️ [callLLM] No targetModelName, using key.model_name or default: ${effectiveModelName}`);
             }
 
             try {
                 const keyIndex = rotatedKeys.indexOf(key) + 1;
                 const totalKeys = rotatedKeys.length;
-                console.log(`🔑 [${keyIndex}/${totalKeys}] Trying ${targetProvider} key: ${key.key_value.slice(0, 12)}... (model: ${effectiveModelName})`);
+                logger.info(`🔑 [${keyIndex}/${totalKeys}] Trying ${targetProvider} key: ${key.key_value.slice(0, 12)}... (model: ${effectiveModelName})`);
 
                 let response: LLMResponse;
 
@@ -247,7 +248,7 @@ export class LLMService {
                     status: 'success',
                     status_code: 200,
                     response_time: responseTime,
-                }).catch(err => console.error('Failed to log API usage:', err));
+                }).catch(err => logger.error('Failed to log API usage:', err));
 
                 return response;
 
@@ -268,9 +269,9 @@ export class LLMService {
                     status_code: err.status || 500,
                     response_time: responseTime,
                     error_message: err.message,
-                }).catch(logErr => console.error('Failed to log API usage error:', logErr));
+                }).catch(logErr => logger.error('Failed to log API usage error:', logErr));
 
-                console.error(`❌ ${targetProvider} API call failed with key ${key.key_value.slice(0, 12)}...:`, err.message);
+                logger.error(`❌ ${targetProvider} API call failed with key ${key.key_value.slice(0, 12)}...:`, err.message);
 
                 // ✅ MỚI: Xử lý rate limit - tự động chuyển model/provider
                 const isRateLimit = err.status === 429 || err.status === 503 ||
@@ -281,7 +282,7 @@ export class LLMService {
                     ));
 
                 if (isRateLimit) {
-                    console.warn(`⚠️ [RATE LIMIT] Key ${key.key_value.slice(0, 12)}... bị rate limit: ${err.message}`);
+                    logger.warn(`⚠️ [RATE LIMIT] Key ${key.key_value.slice(0, 12)}... bị rate limit: ${err.message}`);
 
                     // ✅ ƯU TIÊN: Nếu là OpenRouter, thử key tiếp theo trước
                     if (targetProvider === 'openrouter') {
@@ -290,12 +291,12 @@ export class LLMService {
                         const remainingKeys = keys.slice(currentKeyIndex + 1);
 
                         if (remainingKeys.length > 0) {
-                            console.log(`🔄 [RATE LIMIT] Còn ${remainingKeys.length} key(s) OpenRouter. Tiếp tục thử key tiếp theo...`);
+                            logger.info(`🔄 [RATE LIMIT] Còn ${remainingKeys.length} key(s) OpenRouter. Tiếp tục thử key tiếp theo...`);
                             continue; // Thử key tiếp theo trong vòng lặp
                         }
 
                         // Tất cả keys đều rate limit, thử các model khác với key đầu tiên
-                        console.warn(`⚠️ [RATE LIMIT] Tất cả ${keys.length} key(s) OpenRouter đều bị rate limit. Thử model khác...`);
+                        logger.warn(`⚠️ [RATE LIMIT] Tất cả ${keys.length} key(s) OpenRouter đều bị rate limit. Thử model khác...`);
 
                         if (effectiveModelName?.includes(':free')) {
                             // Thử các free models khác trên OpenRouter (dùng model names hợp lệ từ MODEL_CONFIGS)
@@ -313,7 +314,7 @@ export class LLMService {
                                 if (altModel === effectiveModelName) continue; // Đã thử rồi
 
                                 try {
-                                    console.log(`🔄 [RATE LIMIT] Thử model ${altModel} với key đầu tiên...`);
+                                    logger.info(`🔄 [RATE LIMIT] Thử model ${altModel} với key đầu tiên...`);
                                     const altResponse = await this.callOpenRouterAPI(keys[0].key_value, altModel, prompt);
 
                                     const altResponseTime = Date.now() - startTime;
@@ -331,17 +332,17 @@ export class LLMService {
                                         status: 'success',
                                         status_code: 200,
                                         response_time: altResponseTime,
-                                    }).catch(err => console.error('Failed to log API usage:', err));
+                                    }).catch(err => logger.error('Failed to log API usage:', err));
 
-                                    console.log(`✅ [RATE LIMIT] Model ${altModel} thành công!`);
+                                    logger.info(`✅ [RATE LIMIT] Model ${altModel} thành công!`);
                                     return altResponse;
                                 } catch (altErr: any) {
                                     const isAltRateLimit = altErr.message?.toLowerCase().includes('rate limit') ||
                                         altErr.message?.toLowerCase().includes('free-models-per-day');
                                     if (isAltRateLimit) {
-                                        console.warn(`⚠️ [RATE LIMIT] Model ${altModel} cũng bị rate limit:`, altErr.message);
+                                        logger.warn(`⚠️ [RATE LIMIT] Model ${altModel} cũng bị rate limit:`, altErr.message);
                                     } else {
-                                        console.warn(`⚠️ [RATE LIMIT] Model ${altModel} thất bại:`, altErr.message);
+                                        logger.warn(`⚠️ [RATE LIMIT] Model ${altModel} thất bại:`, altErr.message);
                                     }
                                     continue;
                                 }
@@ -349,7 +350,7 @@ export class LLMService {
                         }
 
                         // Nếu tất cả free models đều fail, thử chuyển sang provider khác
-                        console.warn(`⚠️ [RATE LIMIT] Tất cả models OpenRouter đều fail. Chuyển sang provider khác...`);
+                        logger.warn(`⚠️ [RATE LIMIT] Tất cả models OpenRouter đều fail. Chuyển sang provider khác...`);
                         const fallbackProvider = await this.findAvailableProvider(['openrouter']); // Loại trừ openrouter
                         if (fallbackProvider) {
                             try {
@@ -357,7 +358,7 @@ export class LLMService {
                                 if (fallbackKeys && fallbackKeys.length > 0) {
                                     const fallbackKey = fallbackKeys[0];
                                     const fallbackModel = fallbackKey.model_name || this.getDefaultModel(fallbackProvider);
-                                    console.log(`🔄 [RATE LIMIT] Chuyển sang ${fallbackProvider} với model ${fallbackModel}`);
+                                    logger.info(`🔄 [RATE LIMIT] Chuyển sang ${fallbackProvider} với model ${fallbackModel}`);
 
                                     let fallbackResponse: LLMResponse;
                                     if (fallbackProvider === 'gemini') {
@@ -385,13 +386,13 @@ export class LLMService {
                                         status: 'success',
                                         status_code: 200,
                                         response_time: fallbackResponseTime,
-                                    }).catch(err => console.error('Failed to log API usage:', err));
+                                    }).catch(err => logger.error('Failed to log API usage:', err));
 
-                                    console.log(`✅ [RATE LIMIT] Provider ${fallbackProvider} thành công!`);
+                                    logger.info(`✅ [RATE LIMIT] Provider ${fallbackProvider} thành công!`);
                                     return fallbackResponse;
                                 }
                             } catch (fallbackErr: any) {
-                                console.warn(`⚠️ [RATE LIMIT] Provider ${fallbackProvider} cũng thất bại:`, fallbackErr.message);
+                                logger.warn(`⚠️ [RATE LIMIT] Provider ${fallbackProvider} cũng thất bại:`, fallbackErr.message);
                             }
                         }
                     }
@@ -399,7 +400,7 @@ export class LLMService {
 
                 // Nếu là lỗi model không hợp lệ, thử fallback model
                 if (err.message && (err.message.includes('not a valid model') || err.message.includes('model ID'))) {
-                    console.warn(`⚠️ Model ${effectiveModelName} không hợp lệ. Thử fallback model...`);
+                    logger.warn(`⚠️ Model ${effectiveModelName} không hợp lệ. Thử fallback model...`);
 
                     // Thử fallback models cho OpenRouter (dùng model names hợp lệ từ MODEL_CONFIGS)
                     if (targetProvider === 'openrouter') {
@@ -415,7 +416,7 @@ export class LLMService {
                             if (fallbackModel === effectiveModelName) continue; // Đã thử rồi
 
                             try {
-                                console.log(`🔄 Thử fallback model: ${fallbackModel}`);
+                                logger.info(`🔄 Thử fallback model: ${fallbackModel}`);
                                 const fallbackResponse = await this.callOpenRouterAPI(key.key_value, fallbackModel, prompt);
 
                                 const fallbackResponseTime = Date.now() - startTime;
@@ -435,12 +436,12 @@ export class LLMService {
                                     status: 'success',
                                     status_code: 200,
                                     response_time: fallbackResponseTime,
-                                }).catch(err => console.error('Failed to log API usage:', err));
+                                }).catch(err => logger.error('Failed to log API usage:', err));
 
-                                console.log(`✅ Fallback model ${fallbackModel} thành công!`);
+                                logger.info(`✅ Fallback model ${fallbackModel} thành công!`);
                                 return fallbackResponse;
                             } catch (fallbackErr: any) {
-                                console.warn(`⚠️ Fallback model ${fallbackModel} cũng thất bại:`, fallbackErr.message);
+                                logger.warn(`⚠️ Fallback model ${fallbackModel} cũng thất bại:`, fallbackErr.message);
                                 continue; // Thử model tiếp theo
                             }
                         }
@@ -463,15 +464,15 @@ export class LLMService {
                 lastError?.message?.includes('model ID');
 
             if (isInvalidModel && targetProvider === 'openrouter' && keys && keys.length > 0) {
-                console.warn(`⚠️ [callLLM] Model "${modelName}" is not available on OpenRouter. Trying fallback model...`);
+                logger.warn(`⚠️ [callLLM] Model "${modelName}" is not available on OpenRouter. Trying fallback model...`);
 
                 // Thử fallback sang model đã được verify hoạt động
                 const fallbackModel = 'google/gemma-3-12b-it:free';
-                console.log(`🔄 [callLLM] Falling back to verified model: ${fallbackModel}`);
+                logger.info(`🔄 [callLLM] Falling back to verified model: ${fallbackModel}`);
 
                 try {
                     const fallbackResponse = await this.callOpenRouterAPI(keys[0].key_value, fallbackModel, prompt);
-                    console.log(`✅ [callLLM] Fallback model "${fallbackModel}" succeeded`);
+                    logger.info(`✅ [callLLM] Fallback model "${fallbackModel}" succeeded`);
 
                     // Log API usage với fallback model
                     await logApiUsage({
@@ -488,11 +489,11 @@ export class LLMService {
                         status: 'success',
                         status_code: 200,
                         response_time: Date.now() - Date.now(),
-                    }).catch(err => console.error('Failed to log API usage:', err));
+                    }).catch(err => logger.error('Failed to log API usage:', err));
 
                     return fallbackResponse;
                 } catch (fallbackErr: any) {
-                    console.error(`❌ [callLLM] Fallback model also failed:`, fallbackErr.message);
+                    logger.error(`❌ [callLLM] Fallback model also failed:`, fallbackErr.message);
                 }
             }
 
@@ -525,11 +526,11 @@ export class LLMService {
             const keys = await this.apiKeyService.getAllActiveKeys(provider);
             if (keys && keys.length > 0) {
                 providersWithKeys.add(provider);
-                console.log(`✅ [getAvailableModels] Found ${keys.length} key(s) for provider: ${provider}`);
+                logger.info(`✅ [getAvailableModels] Found ${keys.length} key(s) for provider: ${provider}`);
             }
         }
 
-        console.log(`📊 [getAvailableModels] Providers with keys: ${Array.from(providersWithKeys).join(', ') || 'NONE'}`);
+        logger.info(`📊 [getAvailableModels] Providers with keys: ${Array.from(providersWithKeys).join(', ') || 'NONE'}`);
 
         // Kiểm tra có OpenRouter key không (quan trọng vì nhiều models dùng OpenRouter)
         const hasOpenRouterKey = providersWithKeys.has('openrouter');
@@ -580,7 +581,7 @@ export class LLMService {
             return a.displayName.localeCompare(b.displayName);
         });
 
-        console.log(`✅ [getAvailableModels] Found ${availableModels.length} available models${category ? ` for category: ${category}` : ''}`);
+        logger.info(`✅ [getAvailableModels] Found ${availableModels.length} available models${category ? ` for category: ${category}` : ''}`);
 
         // ✅ Nếu không có models nào, vẫn trả về empty array (không throw error)
         // Frontend sẽ hiển thị "No models available"
@@ -594,16 +595,16 @@ export class LLMService {
      */
     async validateModel(modelName: string): Promise<{ valid: boolean; reason?: string; provider?: Provider }> {
         try {
-            console.log(`🔍 [validateModel] Validating model: ${modelName}`);
+            logger.info(`🔍 [validateModel] Validating model: ${modelName}`);
 
             // ✅ QUAN TRỌNG: Nếu model có format OpenRouter (có /), chỉ cần check OpenRouter keys
             if (modelName.includes('/')) {
                 const openRouterKeys = await this.apiKeyService.getAllActiveKeys('openrouter');
                 if (openRouterKeys && openRouterKeys.length > 0) {
-                    console.log(`✅ [validateModel] OpenRouter model "${modelName}" validated (OpenRouter keys available)`);
+                    logger.info(`✅ [validateModel] OpenRouter model "${modelName}" validated (OpenRouter keys available)`);
                     return { valid: true, provider: 'openrouter' };
                 } else {
-                    console.warn(`⚠️ [validateModel] OpenRouter model "${modelName}" requires OpenRouter keys, but none found`);
+                    logger.warn(`⚠️ [validateModel] OpenRouter model "${modelName}" requires OpenRouter keys, but none found`);
                     return {
                         valid: false,
                         reason: 'OpenRouter API key is required for this model. Please add an OpenRouter API key first.',
@@ -619,7 +620,7 @@ export class LLMService {
             // Kiểm tra có keys cho provider này không
             const keys = await this.apiKeyService.getAllActiveKeys(modelConfig.provider);
             if (!keys || keys.length === 0) {
-                console.warn(`⚠️ [validateModel] No active API keys found for provider: ${modelConfig.provider}`);
+                logger.warn(`⚠️ [validateModel] No active API keys found for provider: ${modelConfig.provider}`);
                 return {
                     valid: false,
                     reason: `No active API keys found for provider: ${modelConfig.provider}`,
@@ -627,10 +628,10 @@ export class LLMService {
                 };
             }
 
-            console.log(`✅ [validateModel] Non-OpenRouter model "${modelName}" validated (${modelConfig.provider} keys available)`);
+            logger.info(`✅ [validateModel] Non-OpenRouter model "${modelName}" validated (${modelConfig.provider} keys available)`);
             return { valid: true, provider: modelConfig.provider };
         } catch (error: any) {
-            console.error(`❌ [validateModel] Error validating model "${modelName}":`, error.message);
+            logger.error(`❌ [validateModel] Error validating model "${modelName}":`, error.message);
             return {
                 valid: false,
                 reason: error.message || 'Invalid model name'
@@ -661,7 +662,7 @@ export class LLMService {
         // Đảm bảo :free suffix được giữ nguyên nếu có
         // OpenRouter có thể yêu cầu format khác, nhưng thử format hiện tại trước
 
-        console.log(`🌐 Calling OpenRouter API with model: ${normalizedModelName}`);
+        logger.info(`🌐 Calling OpenRouter API with model: ${normalizedModelName}`);
 
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
@@ -686,22 +687,22 @@ export class LLMService {
             const errorType = errorData.error?.type || 'unknown';
 
             // ✅ Log chi tiết lỗi từ OpenRouter
-            console.error(`❌ OpenRouter API Error:`);
-            console.error(`   Status: ${response.status} ${response.statusText}`);
-            console.error(`   Model: ${normalizedModelName} (original: ${modelName})`);
-            console.error(`   Error Code: ${errorCode}`);
-            console.error(`   Error Type: ${errorType}`);
-            console.error(`   Error Message: ${errorMessage}`);
-            console.error(`   Full Error Data:`, JSON.stringify(errorData, null, 2));
+            logger.error(`❌ OpenRouter API Error:`);
+            logger.error(`   Status: ${response.status} ${response.statusText}`);
+            logger.error(`   Model: ${normalizedModelName} (original: ${modelName})`);
+            logger.error(`   Error Code: ${errorCode}`);
+            logger.error(`   Error Type: ${errorType}`);
+            logger.error(`   Error Message: ${errorMessage}`);
+            logger.error(`   Full Error Data:`, JSON.stringify(errorData, null, 2));
 
             // Nếu lỗi là model không hợp lệ, log chi tiết hơn
             if (errorMessage.includes('not a valid model') ||
                 errorMessage.includes('model ID') ||
                 errorMessage.includes('model not found') ||
                 errorType === 'invalid_model') {
-                console.error(`   💡 Tip: Model "${normalizedModelName}" không tồn tại hoặc không available trên OpenRouter`);
-                console.error(`   💡 Tip: Kiểm tra model name trên https://openrouter.ai/models`);
-                console.error(`   💡 Tip: Có thể model này không có sẵn trong free tier hoặc đã bị deprecated`);
+                logger.error(`   💡 Tip: Model "${normalizedModelName}" không tồn tại hoặc không available trên OpenRouter`);
+                logger.error(`   💡 Tip: Kiểm tra model name trên https://openrouter.ai/models`);
+                logger.error(`   💡 Tip: Có thể model này không có sẵn trong free tier hoặc đã bị deprecated`);
             }
 
             throw new Error(`OpenRouter API error (${response.status}): ${errorMessage}`);
@@ -712,19 +713,19 @@ export class LLMService {
 
         // ✅ Kiểm tra nếu response rỗng hoặc không hợp lệ
         if (!text || text.trim().length === 0) {
-            console.error(`❌ [callOpenRouterAPI] Empty response from OpenRouter:`);
-            console.error(`   Model: ${normalizedModelName}`);
-            console.error(`   Response data:`, JSON.stringify(data, null, 2));
+            logger.error(`❌ [callOpenRouterAPI] Empty response from OpenRouter:`);
+            logger.error(`   Model: ${normalizedModelName}`);
+            logger.error(`   Response data:`, JSON.stringify(data, null, 2));
             throw new Error(`OpenRouter returned empty response for model "${normalizedModelName}". The model may not be available or may have returned an error.`);
         }
 
         // ✅ Kiểm tra nếu response chỉ là "{}" hoặc object rỗng
         const trimmedText = text.trim();
         if (trimmedText === '{}' || trimmedText === '[]' || trimmedText.length < 10) {
-            console.warn(`⚠️ [callOpenRouterAPI] Suspicious response from OpenRouter (too short or empty object):`);
-            console.warn(`   Model: ${normalizedModelName}`);
-            console.warn(`   Response length: ${trimmedText.length}`);
-            console.warn(`   Response preview: ${trimmedText.substring(0, 200)}`);
+            logger.warn(`⚠️ [callOpenRouterAPI] Suspicious response from OpenRouter (too short or empty object):`);
+            logger.warn(`   Model: ${normalizedModelName}`);
+            logger.warn(`   Response length: ${trimmedText.length}`);
+            logger.warn(`   Response preview: ${trimmedText.substring(0, 200)}`);
             // Không throw error ngay, để caller xử lý (có thể là valid response cho một số trường hợp)
         }
 
@@ -952,7 +953,7 @@ export class LLMService {
             ...keys.slice(0, nextCounter)
         ];
 
-        console.log(`🔄 [KEY ROTATION] ${provider}: Using key ${nextCounter + 1}/${keys.length} (${rotatedKeys[0]._id.slice(0, 8)}...)`);
+        logger.info(`🔄 [KEY ROTATION] ${provider}: Using key ${nextCounter + 1}/${keys.length} (${rotatedKeys[0]._id.slice(0, 8)}...)`);
 
         return rotatedKeys;
     }
@@ -964,7 +965,7 @@ export class LLMService {
      */
     async getUserSelectedModel(userId?: string): Promise<string | null> {
         if (!userId) {
-            console.log(`⚠️ [getUserSelectedModel] No userId provided`);
+            logger.info(`⚠️ [getUserSelectedModel] No userId provided`);
             return null;
         }
 
@@ -973,27 +974,27 @@ export class LLMService {
             const user = await User.findById(userId).lean();
 
             if (!user) {
-                console.log(`⚠️ [getUserSelectedModel] User ${userId} not found`);
+                logger.info(`⚠️ [getUserSelectedModel] User ${userId} not found`);
                 return null;
             }
 
             const selectedModel = (user as any).setting?.selectedModel;
             if (!selectedModel) {
-                console.log(`⚠️ [getUserSelectedModel] User ${userId} has no selected model in settings`);
+                logger.info(`⚠️ [getUserSelectedModel] User ${userId} has no selected model in settings`);
                 return null;
             }
 
-            console.log(`✅ [getUserSelectedModel] User ${userId} selected model: ${selectedModel}`);
+            logger.info(`✅ [getUserSelectedModel] User ${userId} selected model: ${selectedModel}`);
 
             // ✅ CẢI THIỆN: Nếu model có format OpenRouter (có /), chỉ cần check OpenRouter keys
             // Không cần validate phức tạp vì OpenRouter có thể dùng nhiều models
             if (selectedModel.includes('/')) {
                 const openRouterKeys = await this.apiKeyService.getAllActiveKeys('openrouter');
                 if (openRouterKeys && openRouterKeys.length > 0) {
-                    console.log(`✅ [getUserSelectedModel] OpenRouter model "${selectedModel}" detected, OpenRouter keys available. Returning user selected model.`);
+                    logger.info(`✅ [getUserSelectedModel] OpenRouter model "${selectedModel}" detected, OpenRouter keys available. Returning user selected model.`);
                     return selectedModel; // ✅ QUAN TRỌNG: Trả về model user đã chọn, không fallback
                 } else {
-                    console.warn(`⚠️ [getUserSelectedModel] OpenRouter model "${selectedModel}" requires OpenRouter keys, but none found`);
+                    logger.warn(`⚠️ [getUserSelectedModel] OpenRouter model "${selectedModel}" requires OpenRouter keys, but none found`);
                     return null;
                 }
             }
@@ -1001,14 +1002,14 @@ export class LLMService {
             // Validate model có thể dùng được không (cho non-OpenRouter models)
             const validation = await this.validateModel(selectedModel);
             if (validation.valid) {
-                console.log(`✅ [getUserSelectedModel] Non-OpenRouter model "${selectedModel}" validated successfully. Returning user selected model.`);
+                logger.info(`✅ [getUserSelectedModel] Non-OpenRouter model "${selectedModel}" validated successfully. Returning user selected model.`);
                 return selectedModel; // ✅ QUAN TRỌNG: Trả về model user đã chọn
             } else {
-                console.warn(`⚠️ [getUserSelectedModel] User selected model "${selectedModel}" is not available: ${validation.reason}`);
+                logger.warn(`⚠️ [getUserSelectedModel] User selected model "${selectedModel}" is not available: ${validation.reason}`);
                 return null;
             }
         } catch (error: any) {
-            console.error(`❌ [getUserSelectedModel] Error getting user model preference:`, error.message);
+            logger.error(`❌ [getUserSelectedModel] Error getting user model preference:`, error.message);
             return null;
         }
     }
@@ -1031,25 +1032,25 @@ export class LLMService {
      * @throws Error nếu không có API keys nào
      */
     async getRecommendedModel(preferredModel?: string, userId?: string): Promise<string> {
-        console.log(`🔍 [getRecommendedModel] Called with preferredModel: ${preferredModel || 'none'}, userId: ${userId || 'none'}`);
+        logger.info(`🔍 [getRecommendedModel] Called with preferredModel: ${preferredModel || 'none'}, userId: ${userId || 'none'}`);
 
         // ✅ MỚI: Ưu tiên model user đã chọn
         if (userId) {
-            console.log(`🔍 [getRecommendedModel] Checking user selected model for userId: ${userId}`);
+            logger.info(`🔍 [getRecommendedModel] Checking user selected model for userId: ${userId}`);
             const userSelectedModel = await this.getUserSelectedModel(userId);
             if (userSelectedModel) {
-                console.log(`✅ [getRecommendedModel] Using user selected model: ${userSelectedModel}`);
+                logger.info(`✅ [getRecommendedModel] Using user selected model: ${userSelectedModel}`);
                 return userSelectedModel;
             } else {
-                console.log(`⚠️ [getRecommendedModel] No user selected model found, falling back to auto-detect`);
+                logger.info(`⚠️ [getRecommendedModel] No user selected model found, falling back to auto-detect`);
             }
         } else {
-            console.log(`⚠️ [getRecommendedModel] No userId provided, skipping user preference check`);
+            logger.info(`⚠️ [getRecommendedModel] No userId provided, skipping user preference check`);
         }
 
         // Nếu có preferredModel, thử dùng nó
         if (preferredModel) {
-            console.log(`✅ [getRecommendedModel] Using preferredModel: ${preferredModel}`);
+            logger.info(`✅ [getRecommendedModel] Using preferredModel: ${preferredModel}`);
             return preferredModel;
         }
 
@@ -1060,7 +1061,7 @@ export class LLMService {
             // Nếu key.model_name là empty/null, dùng default
             // Nhưng ưu tiên luôn là user selected model (đã check ở trên)
             const defaultModel = openRouterKeys[0].model_name || this.getDefaultModel('openrouter');
-            console.log(`✅ [getRecommendedModel] Using OpenRouter model: ${defaultModel} (from key.model_name: ${openRouterKeys[0].model_name || 'empty'})`);
+            logger.info(`✅ [getRecommendedModel] Using OpenRouter model: ${defaultModel} (from key.model_name: ${openRouterKeys[0].model_name || 'empty'})`);
             return defaultModel;
         }
 
@@ -1068,7 +1069,7 @@ export class LLMService {
         const geminiKeys = await this.apiKeyService.getAllActiveKeys('gemini');
         if (geminiKeys && geminiKeys.length > 0) {
             const defaultModel = geminiKeys[0].model_name || this.getDefaultModel('gemini');
-            console.log(`✅ [getRecommendedModel] Using Gemini default model: ${defaultModel}`);
+            logger.info(`✅ [getRecommendedModel] Using Gemini default model: ${defaultModel}`);
             return defaultModel;
         }
 
@@ -1078,7 +1079,7 @@ export class LLMService {
             const keys = await this.apiKeyService.getAllActiveKeys(provider);
             if (keys && keys.length > 0) {
                 const defaultModel = keys[0].model_name || this.getDefaultModel(provider);
-                console.log(`✅ [getRecommendedModel] Using ${provider} default model: ${defaultModel}`);
+                logger.info(`✅ [getRecommendedModel] Using ${provider} default model: ${defaultModel}`);
                 return defaultModel;
             }
         }

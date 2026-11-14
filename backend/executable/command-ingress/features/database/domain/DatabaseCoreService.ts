@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import DatabaseModel from "../../../../../internal/model/database";
 import { DatabaseGeminiService } from "../domain/GeminiService";
 import { GenerateDatabasePayload, Table } from "./interfaces";
@@ -93,7 +94,7 @@ export class DatabaseCoreService {
                         let order = 1;
                         for (const pk of primaryKeys) {
                             if (pk.primary_key_order == null || pk.primary_key_order === undefined) {
-                                console.log(`🔧 [Pre-Validation Fix] Setting primary_key_order for ${table.name}.${pk.name} = ${order}`);
+                                logger.info(`🔧 [Pre-Validation Fix] Setting primary_key_order for ${table.name}.${pk.name} = ${order}`);
                                 pk.primary_key_order = order;
                             }
                             pk.nullable = false; // Composite keys không thể null
@@ -166,7 +167,7 @@ export class DatabaseCoreService {
 
             return newDatabase;
         } catch (error: any) {
-            console.error('❌ Error generating database schema:', error);
+            logger.error('❌ Error generating database schema:', error);
             // Emit failed event với error message
             if (databaseSocketService && projectId && versionId && userId) {
                 const errorMsg = error.message || 'Failed to generate database schema';

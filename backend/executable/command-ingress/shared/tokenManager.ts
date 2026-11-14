@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 /**
  * Token Management Utility
  * Quản lý token estimation, context window limits, và strategies cho từng LLM model
@@ -524,7 +525,7 @@ export function getModelConfig(modelName: string, provider?: Provider, isProduct
             return config;
         } else {
             // Model OpenRouter không có trong MODEL_CONFIGS → tạo config tạm (không validate FREE mode)
-            console.log(`ℹ️ [getModelConfig] OpenRouter model "${modelName}" not in MODEL_CONFIGS, creating temporary config`);
+            logger.info(`ℹ️ [getModelConfig] OpenRouter model "${modelName}" not in MODEL_CONFIGS, creating temporary config`);
             return createOpenRouterModelConfig(modelName);
         }
     }
@@ -729,18 +730,18 @@ export function logTokenInfo(
     const strategy = determineStrategy(text, modelConfig);
 
     const logPrefix = context ? `[${context}]` : '';
-    console.log(`${logPrefix} 📊 Token Analysis:`);
-    console.log(`   Model: ${modelConfig.modelName} (${modelConfig.provider})`);
-    console.log(`   Context Window: ${modelConfig.contextWindow.toLocaleString()} tokens`);
-    console.log(`   Estimated Tokens: ${estimatedTokens.toLocaleString()} tokens`);
-    console.log(`   Text Length: ${text.length.toLocaleString()} chars`);
-    console.log(`   Exceeds Limit: ${exceeds ? '⚠️ YES' : '✅ NO'}`);
-    console.log(`   Strategy: ${strategy.strategy}`);
-    console.log(`   Needs Chunking: ${strategy.needsChunking ? '✅ YES' : '❌ NO'}`);
+    logger.info(`${logPrefix} 📊 Token Analysis:`);
+    logger.info(`   Model: ${modelConfig.modelName} (${modelConfig.provider})`);
+    logger.info(`   Context Window: ${modelConfig.contextWindow.toLocaleString()} tokens`);
+    logger.info(`   Estimated Tokens: ${estimatedTokens.toLocaleString()} tokens`);
+    logger.info(`   Text Length: ${text.length.toLocaleString()} chars`);
+    logger.info(`   Exceeds Limit: ${exceeds ? '⚠️ YES' : '✅ NO'}`);
+    logger.info(`   Strategy: ${strategy.strategy}`);
+    logger.info(`   Needs Chunking: ${strategy.needsChunking ? '✅ YES' : '❌ NO'}`);
     if (strategy.needsChunking) {
-        console.log(`   Recommended Chunk Size: ${strategy.recommendedChunkSize.toLocaleString()} chars`);
+        logger.info(`   Recommended Chunk Size: ${strategy.recommendedChunkSize.toLocaleString()} chars`);
         const numChunks = Math.ceil(text.length / strategy.recommendedChunkSize);
-        console.log(`   Estimated Chunks: ${numChunks}`);
+        logger.info(`   Estimated Chunks: ${numChunks}`);
     }
 }
 

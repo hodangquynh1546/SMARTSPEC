@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 import {createClient} from 'redis';
 import {Source} from '../source';
 import {Db} from 'mongodb';
@@ -33,12 +34,12 @@ class MongoDBChangeStreamSource implements Source {
 
         changeStream.on('change', (change) => {
             if (change && change.operationType) {
-                console.info('Source flushed data:', change);
+                logger.info('Source flushed data:', change);
                 eventEmitter.emit('change', change);
             }
         });
 
-        console.info('Change stream started on collection:', this.mongoDbCollectionName);
+        logger.info('Change stream started on collection:', this.mongoDbCollectionName);
 
         return eventEmitter;
     };

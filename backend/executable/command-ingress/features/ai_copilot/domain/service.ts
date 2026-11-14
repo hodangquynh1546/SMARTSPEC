@@ -1,9 +1,11 @@
+import logger from "../../../../../lib/logger";
 import { ApiKeyService } from "../../orchestrator/domain/ApiKeyService";
 import { UsecaseService } from "../../usecase/domain/service";
 import { TestcaseService } from "../../testcase/domain/service";
 import { DatabaseCoreService } from "../../database/domain/DatabaseCoreService";
 import { ProjectService } from "../../project/domain/service";
 import Version from "../../../../../internal/model/version";
+import Usecase from "../../../../../internal/model/usecase";
 import Testcase from "../../../../../internal/model/testcase";
 import Database from "../../../../../internal/model/database";
 import AICopilotChat from "../../../../../internal/model/ai_copilot_chat";
@@ -190,9 +192,10 @@ export class AICopilotService {
       // Load use cases from version
       if (versionId) {
         const version = await Version.findById(versionId).lean();
-        if (version && version.requirement_model) {
-          data.usecases = version.requirement_model || [];
-          data.requirements = version.requirement_model || [];
+        if (version) {
+          const usecases = await Usecase.find({ version_id: version._id }).lean();
+          data.usecases = usecases;
+          data.requirements = usecases;
         }
       }
 
@@ -214,7 +217,7 @@ export class AICopilotService {
         }
       }
     } catch (error) {
-      console.error("Error loading project data:", error);
+      logger.error("Error loading project data:", error);
     }
 
     return data;
@@ -426,7 +429,7 @@ Provide analysis in JSON format:
 
     for (const key of keys) {
       try {
-        console.log(
+        logger.info(
           `🔑 Trying Gemini key for AI Copilot: ${key.key_value.slice(0, 12)}...`
         );
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
@@ -441,13 +444,13 @@ Provide analysis in JSON format:
         return this.cleanJsonResponse(text);
       } catch (error: any) {
         lastError = error;
-        console.error(`❌ Gemini key failed:`, error.message);
+        logger.error(`❌ Gemini key failed:`, error.message);
 
         const message = error.message.toLowerCase();
         if (message.includes("invalid") || message.includes("unauthorized")) {
           try {
             await this.apiKeyService.disableKey(key._id);
-            console.warn(`⚠️ Disabled invalid key: ${key._id}`);
+            logger.warn(`⚠️ Disabled invalid key: ${key._id}`);
           } catch {
             // Ignore disable errors
           }
@@ -471,7 +474,7 @@ Provide analysis in JSON format:
 
     for (const key of keys) {
       try {
-        console.log(
+        logger.info(
           `🔑 Trying Gemini key for AI Copilot (streaming): ${key.key_value.slice(0, 12)}...`
         );
         const { GoogleGenerativeAI } = await import("@google/generative-ai");
@@ -492,13 +495,13 @@ Provide analysis in JSON format:
         return; // Success
       } catch (error: any) {
         lastError = error;
-        console.error(`❌ Gemini key failed (streaming):`, error.message);
+        logger.error(`❌ Gemini key failed (streaming):`, error.message);
 
         const message = error.message.toLowerCase();
         if (message.includes("invalid") || message.includes("unauthorized")) {
           try {
             await this.apiKeyService.disableKey(key._id);
-            console.warn(`⚠️ Disabled invalid key: ${key._id}`);
+            logger.warn(`⚠️ Disabled invalid key: ${key._id}`);
           } catch {
             // Ignore disable errors
           }
@@ -536,7 +539,7 @@ Provide analysis in JSON format:
         .lean();
       return chats;
     } catch (error: any) {
-      console.error("Error getting chat sessions:", error);
+      logger.error("Error getting chat sessions:", error);
       throw new Error("Failed to get chat sessions");
     }
   }
@@ -561,7 +564,7 @@ Provide analysis in JSON format:
       await chat.save();
       return chat.toObject();
     } catch (error: any) {
-      console.error("Error creating chat session:", error);
+      logger.error("Error creating chat session:", error);
       throw new Error("Failed to create chat session");
     }
   }
@@ -575,7 +578,7 @@ Provide analysis in JSON format:
       }).lean();
       return chat;
     } catch (error: any) {
-      console.error("Error getting chat session:", error);
+      logger.error("Error getting chat session:", error);
       throw new Error("Failed to get chat session");
     }
   }
@@ -613,7 +616,7 @@ Provide analysis in JSON format:
       ).lean();
       return chat;
     } catch (error: any) {
-      console.error("Error updating chat session:", error);
+      logger.error("Error updating chat session:", error);
       throw new Error("Failed to update chat session");
     }
   }
@@ -626,7 +629,7 @@ Provide analysis in JSON format:
         user_id: userId,
       });
     } catch (error: any) {
-      console.error("Error deleting chat session:", error);
+      logger.error("Error deleting chat session:", error);
       throw new Error("Failed to delete chat session");
     }
   }

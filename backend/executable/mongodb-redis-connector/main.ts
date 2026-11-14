@@ -1,3 +1,4 @@
+import logger from "../../lib/logger";
 import { config } from 'dotenv';
 import { MongoClient } from 'mongodb';
 import { createClient } from 'redis';
@@ -29,7 +30,7 @@ async function main() {
     const { db, mongoClient } = await connectMongoDB();
 
     const closeFn = () => {
-        console.log('Received OS Signal. Exiting gracefully...');
+        logger.info('Received OS Signal. Exiting gracefully...');
         redisClient.quit();
         mongoClient.close();
         process.exit(0);
@@ -59,6 +60,6 @@ async function main() {
 }
 
 main().catch((err) => {
-    console.error(err);
+    logger.error(err);
     process.exit(1);
 });

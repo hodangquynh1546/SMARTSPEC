@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import ApiUsage from '../../../../../internal/model/api_usage';
 import User from '../../../../../internal/model/user';
 import Project from '../../../../../internal/model/project';
@@ -109,7 +110,7 @@ export class StatsService {
         total_failed: result.total_failed,
       };
     } catch (error) {
-      console.error('Error fetching usage summary:', error);
+      logger.error('Error fetching usage summary:', error);
       return {
         total_requests: 0,
         total_tokens: 0,
@@ -203,7 +204,7 @@ export class StatsService {
         { provider: 'Claude', requests: 0, tokens: 0, success: 0, failed: 0 },
       ];
     } catch (error) {
-      console.error('Error fetching provider usage:', error);
+      logger.error('Error fetching provider usage:', error);
       return [
         { provider: 'Gemini', requests: 0, tokens: 0, success: 0, failed: 0 },
         { provider: 'OpenAI', requests: 0, tokens: 0, success: 0, failed: 0 },
@@ -303,7 +304,7 @@ export class StatsService {
         newProjectsToday: projectStats.newProjectsToday,
       };
     } catch (error) {
-      console.error('Error fetching quick stats:', error);
+      logger.error('Error fetching quick stats:', error);
       return {
         totalUsers: 0,
         activeUsers: 0,
@@ -501,7 +502,7 @@ export class StatsService {
         rangeDays,
       };
     } catch (error) {
-      console.error('Error fetching user analytics:', error);
+      logger.error('Error fetching user analytics:', error);
       return {
         counters: {
           totalUsers: 0,
@@ -662,7 +663,7 @@ export class StatsService {
       const results = await ApiUsage.aggregate(pipeline);
       return results;
     } catch (error) {
-      console.error('Error fetching filtered usage:', error);
+      logger.error('Error fetching filtered usage:', error);
       return [];
     }
   }
@@ -833,7 +834,7 @@ export class StatsService {
 
       return { type: filters.chartType, data: [] };
     } catch (error) {
-      console.error('Error fetching chart data:', error);
+      logger.error('Error fetching chart data:', error);
       return { type: filters.chartType, data: [] };
     }
   }

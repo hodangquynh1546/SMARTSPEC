@@ -1,3 +1,4 @@
+import logger from "./logger";
 import {createClient} from 'redis';
 
 async function connectRedis(): Promise<ReturnType<typeof createClient>> {
@@ -5,7 +6,7 @@ async function connectRedis(): Promise<ReturnType<typeof createClient>> {
     await redis.connect();
 
     redis.on('error', (err) => {
-        console.log('Redis error', err);
+        logger.info('Redis error', err);
     });
 
     return redis;

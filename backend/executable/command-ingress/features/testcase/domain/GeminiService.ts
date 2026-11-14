@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // TestcaseGeminiService.ts
 import { ApiKeyService } from "../../orchestrator/domain/ApiKeyService";
 import { LLMService } from "../../../shared/LLMService";
@@ -596,7 +597,7 @@ export class TestcaseGeminiService {
             const stillNeeded = remainingCount - allCommittedTestcases.length;
             const currentExistingTitles = Array.from(existingTitlesSet);
 
-            console.log(`🔄 [ESTIMATE_LOOP] Attempt ${attempt}/${maxRetries}: Generating ${stillNeeded} more testcases (already have ${allCommittedTestcases.length}/${remainingCount})`);
+            logger.info(`🔄 [ESTIMATE_LOOP] Attempt ${attempt}/${maxRetries}: Generating ${stillNeeded} more testcases (already have ${allCommittedTestcases.length}/${remainingCount})`);
 
             // Tạo prompt với danh sách đã có
             const prompt = testcasePrompts[lang].estimateTestCasesCount(
@@ -663,7 +664,7 @@ export class TestcaseGeminiService {
                                 // ✅ Loại bỏ duplicate
                                 const titleLower = tc.title.toLowerCase().trim();
                                 if (existingTitlesSet.has(titleLower)) {
-                                    console.log(`⏩ [ESTIMATE_LOOP] Skipping duplicate: "${tc.title}"`);
+                                    logger.info(`⏩ [ESTIMATE_LOOP] Skipping duplicate: "${tc.title}"`);
                                     return false;
                                 }
                                 existingTitlesSet.add(titleLower);
@@ -671,19 +672,19 @@ export class TestcaseGeminiService {
                             });
 
                         allCommittedTestcases.push(...newTestcases);
-                        console.log(`✅ [ESTIMATE_LOOP] Attempt ${attempt}: Got ${newTestcases.length} new testcases (total: ${allCommittedTestcases.length}/${remainingCount})`);
+                        logger.info(`✅ [ESTIMATE_LOOP] Attempt ${attempt}: Got ${newTestcases.length} new testcases (total: ${allCommittedTestcases.length}/${remainingCount})`);
 
                         // Nếu đã đủ, dừng
                         if (allCommittedTestcases.length >= remainingCount) {
-                            console.log(`✅ [ESTIMATE_LOOP] Reached target count: ${allCommittedTestcases.length}/${remainingCount}`);
+                            logger.info(`✅ [ESTIMATE_LOOP] Reached target count: ${allCommittedTestcases.length}/${remainingCount}`);
                             break;
                         }
                     }
                 }
             } catch (error: any) {
-                console.warn(`⚠️ [ESTIMATE_LOOP] Attempt ${attempt} failed: ${error.message}`);
+                logger.warn(`⚠️ [ESTIMATE_LOOP] Attempt ${attempt} failed: ${error.message}`);
                 if (attempt >= maxRetries) {
-                    console.warn(`⚠️ [ESTIMATE_LOOP] Max retries reached. Using ${allCommittedTestcases.length} testcases instead of ${remainingCount}`);
+                    logger.warn(`⚠️ [ESTIMATE_LOOP] Max retries reached. Using ${allCommittedTestcases.length} testcases instead of ${remainingCount}`);
                     break;
                 }
             }
@@ -730,7 +731,7 @@ export class TestcaseGeminiService {
         }
 
         try {
-            console.log(`📊 [ESTIMATE] Estimating test cases count for ${requirements.length} requirements, testType: ${testType}, model: ${effectiveModelName}`);
+            logger.info(`📊 [ESTIMATE] Estimating test cases count for ${requirements.length} requirements, testType: ${testType}, model: ${effectiveModelName}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -750,12 +751,12 @@ export class TestcaseGeminiService {
             try {
                 parsed = JSON.parse(text);
             } catch (parseError: any) {
-                console.warn(`⚠️ [ESTIMATE] JSON parse failed, attempting repair... Error: ${parseError.message}`);
+                logger.warn(`⚠️ [ESTIMATE] JSON parse failed, attempting repair... Error: ${parseError.message}`);
                 try {
                     // Thử sửa JSON bị truncate
                     const repairedJson = this.repairTruncatedJson(text);
                     parsed = JSON.parse(repairedJson);
-                    console.log(`✅ [ESTIMATE] JSON repair successful`);
+                    logger.info(`✅ [ESTIMATE] JSON repair successful`);
                 } catch (repairError: any) {
                     // Nếu repair không thành công, thử extract JSON object từ response
                     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -763,13 +764,13 @@ export class TestcaseGeminiService {
                         try {
                             const extractedJson = this.repairTruncatedJson(jsonMatch[0]);
                             parsed = JSON.parse(extractedJson);
-                            console.log(`✅ [ESTIMATE] JSON extraction and repair successful`);
+                            logger.info(`✅ [ESTIMATE] JSON extraction and repair successful`);
                         } catch (extractError: any) {
-                            console.error(`❌ [ESTIMATE] Failed to parse JSON even after repair: ${extractError.message}`);
+                            logger.error(`❌ [ESTIMATE] Failed to parse JSON even after repair: ${extractError.message}`);
                             throw new Error(`Invalid JSON format: ${extractError.message}`);
                         }
                     } else {
-                        console.error(`❌ [ESTIMATE] No JSON object found in response`);
+                        logger.error(`❌ [ESTIMATE] No JSON object found in response`);
                         throw new Error("No JSON object found in response");
                     }
                 }
@@ -780,14 +781,14 @@ export class TestcaseGeminiService {
                 const estimate = parsed as any;
 
                 if (typeof estimate.estimated_count !== 'number' || estimate.estimated_count < 1) {
-                    console.error(`❌ [ESTIMATE] Invalid estimated_count: ${estimate.estimated_count}`);
+                    logger.error(`❌ [ESTIMATE] Invalid estimated_count: ${estimate.estimated_count}`);
                     throw new Error(`Invalid estimated_count: must be a positive number, got ${estimate.estimated_count}`);
                 }
 
                 let estimated_count = Math.max(1, Math.floor(estimate.estimated_count || 1));
                 const estimated_batches = Math.ceil(estimated_count / this.TESTCASE_BATCH_SIZE);
 
-                console.log(`✅ [ESTIMATE] Estimated ${estimated_count} test cases, ${estimated_batches} batches (batch size: ${this.TESTCASE_BATCH_SIZE})`);
+                logger.info(`✅ [ESTIMATE] Estimated ${estimated_count} test cases, ${estimated_batches} batches (batch size: ${this.TESTCASE_BATCH_SIZE})`);
 
                 // ✅ Validate và format committed_testcases từ LLM (lần đầu)
                 let committedTestcases: Array<{ title: string; requirement_id?: string; test_type?: string; priority?: string }> = [];
@@ -805,7 +806,7 @@ export class TestcaseGeminiService {
                 // ✅ QUAN TRỌNG: Nếu số lượng không đủ, loop để generate thêm
                 if (committedTestcases.length < estimated_count) {
                     const remaining = estimated_count - committedTestcases.length;
-                    console.log(`🔄 [ESTIMATE] Only got ${committedTestcases.length}/${estimated_count} testcases. Looping to generate ${remaining} more...`);
+                    logger.info(`🔄 [ESTIMATE] Only got ${committedTestcases.length}/${estimated_count} testcases. Looping to generate ${remaining} more...`);
 
                     // Lấy danh sách titles đã có
                     const existingTitles = committedTestcases.map(tc => tc.title);
@@ -824,15 +825,15 @@ export class TestcaseGeminiService {
 
                     // Merge với danh sách đã có
                     committedTestcases.push(...additionalTestcases);
-                    console.log(`✅ [ESTIMATE] After loop: Got ${committedTestcases.length}/${estimated_count} testcases`);
+                    logger.info(`✅ [ESTIMATE] After loop: Got ${committedTestcases.length}/${estimated_count} testcases`);
                 }
 
                 // ✅ Nếu vẫn không đủ, điều chỉnh estimated_count
                 if (committedTestcases.length !== estimated_count) {
-                    console.warn(`⚠️ [ESTIMATE] committed_testcases count (${committedTestcases.length}) doesn't match estimated_count (${estimated_count}). Adjusting estimated_count to match.`);
+                    logger.warn(`⚠️ [ESTIMATE] committed_testcases count (${committedTestcases.length}) doesn't match estimated_count (${estimated_count}). Adjusting estimated_count to match.`);
                     estimated_count = committedTestcases.length;
                     const adjustedBatches = Math.ceil(estimated_count / this.TESTCASE_BATCH_SIZE);
-                    console.log(`✅ [ESTIMATE] Adjusted to ${estimated_count} test cases, ${adjustedBatches} batches to match committed_testcases`);
+                    logger.info(`✅ [ESTIMATE] Adjusted to ${estimated_count} test cases, ${adjustedBatches} batches to match committed_testcases`);
                 }
 
                 // ✅ Chỉ trả về nếu có đủ số lượng
@@ -851,11 +852,11 @@ export class TestcaseGeminiService {
                 throw new Error("Invalid response format: expected JSON object");
             }
         } catch (error: any) {
-            console.error(`❌ [ESTIMATE] Error estimating test cases:`, error);
+            logger.error(`❌ [ESTIMATE] Error estimating test cases:`, error);
             // Fallback estimate
             const fallbackCount = requirements.length * (testType === 'all' ? 25 : 5); // 5 test cases per requirement, or 25 if all types
             const fallbackBatches = Math.ceil(fallbackCount / this.TESTCASE_BATCH_SIZE);
-            console.warn(`⚠️ [ESTIMATE] Using fallback estimate: ${fallbackCount} test cases, ${fallbackBatches} batches`);
+            logger.warn(`⚠️ [ESTIMATE] Using fallback estimate: ${fallbackCount} test cases, ${fallbackBatches} batches`);
             return {
                 estimated_count: fallbackCount,
                 estimated_batches: fallbackBatches,
@@ -885,7 +886,7 @@ export class TestcaseGeminiService {
         committedTitles?: string[] // ✅ Thêm parameter để đảm bảo order theo committedTestcases
     ): Promise<any[]> {
         try {
-            console.log(`📦 [BATCH ${batchNumber}/${totalBatches}] Generating test cases ${offset + 1} to ${offset + batchSize} (estimated total: ${estimatedTotal || 'unknown'})...`);
+            logger.info(`📦 [BATCH ${batchNumber}/${totalBatches}] Generating test cases ${offset + 1} to ${offset + batchSize} (estimated total: ${estimatedTotal || 'unknown'})...`);
 
             // Tạo prompt cho batch này
             const requirementsJson = JSON.stringify(requirements, null, 2);
@@ -953,7 +954,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
                 effectiveModelName = await this.llmService.getRecommendedModel();
             }
 
-            console.log(`🔑 [BATCH ${batchNumber}/${totalBatches}] Calling LLM with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
+            logger.info(`🔑 [BATCH ${batchNumber}/${totalBatches}] Calling LLM with model: ${effectiveModelName}${userId ? ` (user: ${userId})` : ''}`);
 
             const response = await this.llmService.callLLM({
                 prompt: batchPrompt,
@@ -973,12 +974,12 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
             try {
                 parsed = JSON.parse(responseText);
             } catch (parseError: any) {
-                console.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] JSON parse failed, attempting repair... Error: ${parseError.message}`);
+                logger.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] JSON parse failed, attempting repair... Error: ${parseError.message}`);
                 try {
                     // Thử sửa JSON bị truncate
                     const repairedJson = this.repairTruncatedJson(responseText);
                     parsed = JSON.parse(repairedJson);
-                    console.log(`✅ [BATCH ${batchNumber}/${totalBatches}] JSON repair successful`);
+                    logger.info(`✅ [BATCH ${batchNumber}/${totalBatches}] JSON repair successful`);
                 } catch (repairError: any) {
                     // Nếu repair không thành công, thử extract JSON object từ response
                     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
@@ -986,14 +987,14 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
                         try {
                             const extractedJson = this.repairTruncatedJson(jsonMatch[0]);
                             parsed = JSON.parse(extractedJson);
-                            console.log(`✅ [BATCH ${batchNumber}/${totalBatches}] JSON extraction and repair successful`);
+                            logger.info(`✅ [BATCH ${batchNumber}/${totalBatches}] JSON extraction and repair successful`);
                         } catch (extractError: any) {
-                            console.error(`❌ [BATCH ${batchNumber}/${totalBatches}] Failed to parse JSON even after repair: ${extractError.message}`);
-                            console.error(`❌ [BATCH ${batchNumber}/${totalBatches}] Response length: ${responseText.length}, First 500 chars: ${responseText.substring(0, 500)}`);
+                            logger.error(`❌ [BATCH ${batchNumber}/${totalBatches}] Failed to parse JSON even after repair: ${extractError.message}`);
+                            logger.error(`❌ [BATCH ${batchNumber}/${totalBatches}] Response length: ${responseText.length}, First 500 chars: ${responseText.substring(0, 500)}`);
                             throw new Error(`Invalid JSON format: ${extractError.message}`);
                         }
                     } else {
-                        console.error(`❌ [BATCH ${batchNumber}/${totalBatches}] No JSON object found in response`);
+                        logger.error(`❌ [BATCH ${batchNumber}/${totalBatches}] No JSON object found in response`);
                         throw new Error("No JSON object found in response");
                     }
                 }
@@ -1008,18 +1009,18 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
             if (estimatedTotal && estimatedTotal > 0) {
                 const maxAllowed = estimatedTotal - offset;
                 if (testCases.length > maxAllowed) {
-                    console.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] LLM generated ${testCases.length} test cases, but estimate (${estimatedTotal}) allows only ${maxAllowed} (offset: ${offset}). Limiting to ${maxAllowed}.`);
+                    logger.warn(`⚠️ [BATCH ${batchNumber}/${totalBatches}] LLM generated ${testCases.length} test cases, but estimate (${estimatedTotal}) allows only ${maxAllowed} (offset: ${offset}). Limiting to ${maxAllowed}.`);
                     testCases = testCases.slice(0, maxAllowed);
                 }
             }
 
             // Normalize test cases
             const normalized = this.standardizeTestCases(testCases, requirements, databaseSchema);
-            console.log(`✅ [BATCH ${batchNumber}/${totalBatches}] Generated ${normalized.length} test cases${estimatedTotal ? ` (estimated total: ${estimatedTotal}, remaining: ${estimatedTotal - offset - normalized.length})` : ''}`);
+            logger.info(`✅ [BATCH ${batchNumber}/${totalBatches}] Generated ${normalized.length} test cases${estimatedTotal ? ` (estimated total: ${estimatedTotal}, remaining: ${estimatedTotal - offset - normalized.length})` : ''}`);
 
             return normalized;
         } catch (err: any) {
-            console.error(`❌ [BATCH ${batchNumber}/${totalBatches}] LLM call failed:`, err?.message || err);
+            logger.error(`❌ [BATCH ${batchNumber}/${totalBatches}] LLM call failed:`, err?.message || err);
             throw err;
         }
     }
@@ -1029,7 +1030,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
      */
     async generateTestCases(requirements: any[], databaseSchema: any, language: string = 'vi-VN', testType: string = 'integration'): Promise<any[]> {
         try {
-            console.log(`🧪 Generating ${testType} test cases for ${requirements.length} requirements`);
+            logger.info(`🧪 Generating ${testType} test cases for ${requirements.length} requirements`);
 
             // Nếu testType = "all" nhưng được gọi trực tiếp, xử lý đặc biệt
             if (testType === 'all' && requirements.length > 0) {
@@ -1043,7 +1044,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
                 return await this.processInBatches(requirements, databaseSchema, language, testType);
             }
         } catch (error) {
-            console.error("❌ Error generating test cases:", error);
+            logger.error("❌ Error generating test cases:", error);
             return this.createFallbackTestCases(requirements, databaseSchema, testType);
         }
     }
@@ -1089,7 +1090,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
 
                 await new Promise(resolve => setTimeout(resolve, 300));
             } catch (error) {
-                console.error(`❌ Error generating ${testType} tests:`, error);
+                logger.error(`❌ Error generating ${testType} tests:`, error);
             }
         }
 
@@ -1162,7 +1163,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
         const lang = language === 'en-US' ? 'en-US' : 'vi-VN';
         const prompt = testcasePrompts[lang].testcaseDesign(requirementsJson, databaseJson, testType);
 
-        console.log(`📝 Generating test cases for ${requirements.length} use cases`);
+        logger.info(`📝 Generating test cases for ${requirements.length} use cases`);
 
         // ✅ MỚI: Token analysis trước khi gọi LLM
         const { getModelConfig, estimateTokens, determineStrategy, logTokenInfo } = await import("../../../shared/tokenManager");
@@ -1178,22 +1179,22 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
             throw new Error("Empty response from Gemini");
         }
 
-        console.log(`📄 Raw response length: ${response.length}`);
+        logger.info(`📄 Raw response length: ${response.length}`);
 
         let parsedData;
         try {
             parsedData = JSON.parse(response);
         } catch (parseError) {
-            console.error("❌ JSON parse error, attempting repair...");
+            logger.error("❌ JSON parse error, attempting repair...");
             const repaired = this.repairJSON(response);
             parsedData = JSON.parse(repaired);
         }
 
         const testCases = this.extractTestCases(parsedData);
-        console.log(`🔄 Processing ${testCases.length} raw test cases`);
+        logger.info(`🔄 Processing ${testCases.length} raw test cases`);
 
         const standardized = this.standardizeTestCases(testCases, requirements, databaseSchema);
-        console.log(`🎉 Final test cases: ${standardized.length}`);
+        logger.info(`🎉 Final test cases: ${standardized.length}`);
 
         return standardized;
     }
@@ -1446,20 +1447,20 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
      * Process requirements in batches
      */
     private async processInBatches(requirements: any[], databaseSchema: any, language: string, testType: string): Promise<any[]> {
-        console.log(`🔀 Splitting ${requirements.length} requirements into batches`);
+        logger.info(`🔀 Splitting ${requirements.length} requirements into batches`);
 
         const batches: any[][] = [];
         for (let i = 0; i < requirements.length; i += this.BATCH_SIZE) {
             batches.push(requirements.slice(i, i + this.BATCH_SIZE));
         }
 
-        console.log(`📦 Created ${batches.length} batches`);
+        logger.info(`📦 Created ${batches.length} batches`);
 
         const allTestCases: any[] = [];
 
         for (let i = 0; i < batches.length; i++) {
             try {
-                console.log(`🔄 Processing batch ${i + 1}/${batches.length}`);
+                logger.info(`🔄 Processing batch ${i + 1}/${batches.length}`);
                 const testCases = await this.processBatch(batches[i], databaseSchema, language, testType);
                 allTestCases.push(...testCases);
 
@@ -1468,12 +1469,12 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             } catch (error) {
-                console.error(`❌ Batch ${i + 1} failed:`, error);
+                logger.error(`❌ Batch ${i + 1} failed:`, error);
             }
         }
 
         if (allTestCases.length === 0) {
-            console.warn("⚠️ All batches failed, using fallback");
+            logger.warn("⚠️ All batches failed, using fallback");
             return this.createFallbackTestCases(requirements, databaseSchema);
         }
 
@@ -1484,7 +1485,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
      * Create fallback test cases when generation fails
      */
     private createFallbackTestCases(requirements: any[], databaseSchema?: any, testType: string = 'integration'): any[] {
-        console.log("🔄 Creating fallback test cases");
+        logger.info("🔄 Creating fallback test cases");
 
         return requirements.flatMap(requirement => {
             const scenarios = [
@@ -1553,7 +1554,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
         const modelName = await this.llmService.getRecommendedModel();
 
         try {
-            console.log(`🔑 Calling LLM for testcase generation with model: ${modelName}`);
+            logger.info(`🔑 Calling LLM for testcase generation with model: ${modelName}`);
 
             const response = await this.llmService.callLLM({
                 prompt: prompt,
@@ -1567,7 +1568,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
             const text = response.text || "";
             return this.cleanJSONResponse(text);
         } catch (error: any) {
-            console.error(`❌ LLM call failed for testcase generation:`, error?.message || error);
+            logger.error(`❌ LLM call failed for testcase generation:`, error?.message || error);
             throw error;
         }
     }
@@ -1606,7 +1607,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
             JSON.parse(cleaned);
             return cleaned;
         } catch {
-            console.warn("❌ Could not extract valid JSON, returning raw text");
+            logger.warn("❌ Could not extract valid JSON, returning raw text");
             return text.replace(/```(?:json)?\s*|```/g, '').trim();
         }
     }
@@ -1615,7 +1616,7 @@ ${committedTitles && committedTitles.length > 0 ? `- **ORDER MATCHING**: The fir
      * Repair truncated JSON
      */
     private repairJSON(jsonStr: string): string {
-        console.log(`🔧 Repairing JSON, length: ${jsonStr.length}`);
+        logger.info(`🔧 Repairing JSON, length: ${jsonStr.length}`);
 
         let balance = 0;
         let inString = false;

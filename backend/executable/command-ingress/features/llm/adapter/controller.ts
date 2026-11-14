@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { LLMService } from '../../../shared/LLMService';
 import User from '../../../../../internal/model/user';
@@ -25,7 +26,7 @@ export class LLMController {
                 message: `Found ${models.length} available models`
             });
         } catch (error: any) {
-            console.error('Error getting available models:', error);
+            logger.error('Error getting available models:', error);
             return res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to get available models'
@@ -55,7 +56,7 @@ export class LLMController {
                 data: validation
             });
         } catch (error: any) {
-            console.error('Error validating model:', error);
+            logger.error('Error validating model:', error);
             return res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to validate model'
@@ -88,30 +89,30 @@ export class LLMController {
 
             // ✅ CẢI THIỆN: Nếu model có format OpenRouter (có /), chỉ cần check OpenRouter keys
             // Không cần validate phức tạp vì OpenRouter có thể dùng nhiều models
-            console.log(`🔍 [saveModelPreference] Validating model: ${modelName}`);
+            logger.info(`🔍 [saveModelPreference] Validating model: ${modelName}`);
 
             if (modelName.includes('/')) {
                 // Model OpenRouter format → chỉ cần check OpenRouter keys qua validateModel
                 const validation = await this.llmService.validateModel(modelName);
                 if (!validation.valid) {
-                    console.warn(`⚠️ [saveModelPreference] OpenRouter model "${modelName}" validation failed: ${validation.reason}`);
+                    logger.warn(`⚠️ [saveModelPreference] OpenRouter model "${modelName}" validation failed: ${validation.reason}`);
                     return res.status(400).json({
                         success: false,
                         message: validation.reason || 'OpenRouter API key is required for this model. Please add an OpenRouter API key first.'
                     });
                 }
-                console.log(`✅ [saveModelPreference] OpenRouter model "${modelName}" validated (OpenRouter keys available)`);
+                logger.info(`✅ [saveModelPreference] OpenRouter model "${modelName}" validated (OpenRouter keys available)`);
             } else {
                 // Validate model có thể dùng được không (cho non-OpenRouter models)
                 const validation = await this.llmService.validateModel(modelName);
                 if (!validation.valid) {
-                    console.warn(`⚠️ [saveModelPreference] Model "${modelName}" validation failed: ${validation.reason}`);
+                    logger.warn(`⚠️ [saveModelPreference] Model "${modelName}" validation failed: ${validation.reason}`);
                     return res.status(400).json({
                         success: false,
                         message: validation.reason || 'Model is not available'
                     });
                 }
-                console.log(`✅ [saveModelPreference] Non-OpenRouter model "${modelName}" validated successfully`);
+                logger.info(`✅ [saveModelPreference] Non-OpenRouter model "${modelName}" validated successfully`);
             }
 
             // Lưu vào database
@@ -131,19 +132,19 @@ export class LLMController {
             (user.setting as any).selectedModel = modelName;
 
             // ✅ Log trước khi save
-            console.log(`💾 [saveModelPreference] Saving model preference for user ${userId}:`);
-            console.log(`   - Current setting:`, JSON.stringify(user.setting));
-            console.log(`   - New selectedModel: ${modelName}`);
+            logger.info(`💾 [saveModelPreference] Saving model preference for user ${userId}:`);
+            logger.info(`   - Current setting:`, JSON.stringify(user.setting));
+            logger.info(`   - New selectedModel: ${modelName}`);
 
             await user.save();
 
             // ✅ Verify sau khi save
             const savedUser = await User.findById(userId).lean();
             const savedModel = (savedUser as any)?.setting?.selectedModel;
-            console.log(`✅ [saveModelPreference] User ${userId} selected model saved: ${savedModel}`);
+            logger.info(`✅ [saveModelPreference] User ${userId} selected model saved: ${savedModel}`);
 
             if (savedModel !== modelName) {
-                console.error(`❌ [saveModelPreference] Model mismatch! Expected: ${modelName}, Got: ${savedModel}`);
+                logger.error(`❌ [saveModelPreference] Model mismatch! Expected: ${modelName}, Got: ${savedModel}`);
                 return res.status(500).json({
                     success: false,
                     message: 'Failed to save model preference. Please try again.'
@@ -156,7 +157,7 @@ export class LLMController {
                 data: { modelName }
             });
         } catch (error: any) {
-            console.error('Error saving model preference:', error);
+            logger.error('Error saving model preference:', error);
             return res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to save model preference'
@@ -193,7 +194,7 @@ export class LLMController {
                 data: { modelName: selectedModel }
             });
         } catch (error: any) {
-            console.error('Error getting model preference:', error);
+            logger.error('Error getting model preference:', error);
             return res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to get model preference'

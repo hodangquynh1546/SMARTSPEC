@@ -1,4 +1,8 @@
 coverage
+/backend/dist/
+**/.env
+**/.env.*
+!**/.env.example
 
 *.jpg
 
@@ -9,3 +13,10 @@ backend/executable/command-ingress/uploads_ocr/
 *.docx
 /backend/uploads/avatars
 /backend/uploads/avatars
+
+# Runtime artifacts
+/backend/debug_images/
+/backend/uploads_Audio/
+/backend/uploads/*
+!/backend/uploads/avatars/
+*.log

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import DatabaseModel from "../../../../../internal/model/database";
 import { Column, Table } from "./interfaces";
 
@@ -38,7 +39,7 @@ export class TableValidationService {
             );
 
             if (referencingTables.length > 0) {
-                console.warn(`⚠️ Table '${tableName}' is referenced by ${referencingTables.length} tables. PK changes may require FK updates.`);
+                logger.warn(`⚠️ Table '${tableName}' is referenced by ${referencingTables.length} tables. PK changes may require FK updates.`);
             }
         }
 
@@ -114,7 +115,7 @@ export class TableValidationService {
                 ?.columns.find(c => c.name === columnName);
 
             if (column?.length !== matchingPrimaryKey.length) {
-                console.warn(`DECIMAL precision/scale mismatch between foreign key and referenced primary key`);
+                logger.warn(`DECIMAL precision/scale mismatch between foreign key and referenced primary key`);
             }
         }
 
@@ -125,7 +126,7 @@ export class TableValidationService {
 
         // 6. Cảnh báo đặc biệt cho composite key references
         if (targetPrimaryKeys.length > 1) {
-            console.warn(`⚠️ Referenced table '${referencedTable}' has composite primary key. ` +
+            logger.warn(`⚠️ Referenced table '${referencedTable}' has composite primary key. ` +
                 `Ensure foreign key relationships are properly defined for all key columns.`);
         }
 
@@ -217,7 +218,7 @@ export class TableValidationService {
     private validateCompositePrimaryKey(tableData: Table) {
         const primaryKeyColumns = tableData.columns.filter((col: Column) => col.is_primary_key);
 
-        console.log(`🔑 Composite primary key detected with ${primaryKeyColumns.length} columns`);
+        logger.info(`🔑 Composite primary key detected with ${primaryKeyColumns.length} columns`);
 
         // 1. Kiểm tra tất cả primary key columns phải có primary_key_order
         const columnsWithoutOrder = primaryKeyColumns.filter((col: Column) =>
@@ -261,7 +262,7 @@ export class TableValidationService {
         }
 
         // 5. Cảnh báo về performance
-        console.warn(`⚠️ Composite primary key may impact performance. Consider using surrogate key.`);
+        logger.warn(`⚠️ Composite primary key may impact performance. Consider using surrogate key.`);
 
         // 6. Kiểm tra tên cột không trùng
         const columnNames = primaryKeyColumns.map(col => col.name.toLowerCase());
@@ -322,13 +323,13 @@ export class TableValidationService {
                 throw new Error(`Foreign key column '${column.name}' must reference a table`);
             }
             if (column.nullable === false && !column.default) {
-                console.warn(`Foreign key column '${column.name}' is NOT NULL but has no default value`);
+                logger.warn(`Foreign key column '${column.name}' is NOT NULL but has no default value`);
             }
         }
 
         // Kiểm tra UNIQUE constraint
         if (column.unique && column.nullable) {
-            console.warn(`UNIQUE constraint on nullable column '${column.name}' may behave differently across databases`);
+            logger.warn(`UNIQUE constraint on nullable column '${column.name}' may behave differently across databases`);
         }
 
         // Kiểm tra kiểu dữ liệu và length
@@ -382,11 +383,11 @@ export class TableValidationService {
     private validateNamingConventions(column: Column, primaryKeyCount: number) {
         if (column.is_primary_key && !column.name.toLowerCase().endsWith('_id') &&
             column.name.toLowerCase() !== 'id' && primaryKeyCount === 1) {
-            console.warn(`💡 Consider naming primary key as 'id' or ending with '_id': ${column.name}`);
+            logger.warn(`💡 Consider naming primary key as 'id' or ending with '_id': ${column.name}`);
         }
 
         if (column.is_foreign_key && !column.name.toLowerCase().endsWith('_id')) {
-            console.warn(`💡 Foreign key columns should typically end with '_id': ${column.name}`);
+            logger.warn(`💡 Foreign key columns should typically end with '_id': ${column.name}`);
         }
     }
 
@@ -399,7 +400,7 @@ export class TableValidationService {
         );
 
         if (indexedColumns.length > 10) {
-            console.warn(`⚠️ Table '${tableData.name}' has ${indexedColumns.length} indexed columns - consider performance impact`);
+            logger.warn(`⚠️ Table '${tableData.name}' has ${indexedColumns.length} indexed columns - consider performance impact`);
         }
 
         // Cảnh báo về large text/BLOB columns
@@ -408,7 +409,7 @@ export class TableValidationService {
         );
 
         if (largeColumns.length > 3) {
-            console.warn(`⚠️ Table '${tableData.name}' has ${largeColumns.length} large object columns - consider normalization`);
+            logger.warn(`⚠️ Table '${tableData.name}' has ${largeColumns.length} large object columns - consider normalization`);
         }
 
         // VALIDATION: Logic nghiệp vụ cơ bản
@@ -417,7 +418,7 @@ export class TableValidationService {
         );
 
         if (!hasTimestamps) {
-            console.warn(`💡 Consider adding 'created_at' and 'updated_at' timestamp columns for audit trail`);
+            logger.warn(`💡 Consider adding 'created_at' and 'updated_at' timestamp columns for audit trail`);
         }
 
         // Khuyến nghị soft delete
@@ -426,7 +427,7 @@ export class TableValidationService {
         );
 
         if (!hasSoftDelete) {
-            console.warn(`💡 Consider adding 'deleted_at' column for soft delete functionality`);
+            logger.warn(`💡 Consider adding 'deleted_at' column for soft delete functionality`);
         }
     }
 

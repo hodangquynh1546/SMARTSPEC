@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // exportService.ts
 import * as ExcelJS from 'exceljs';
 import Testcase from "../../../../../internal/model/testcase";
@@ -28,7 +29,7 @@ export class TestcaseExportService {
         versionId?: string,
         filters: ExportFilters = {}
     ): Promise<Buffer> {
-        console.log(`📊 Exporting test cases to Excel for project: ${projectId}`, { versionId, filters });
+        logger.info(`📊 Exporting test cases to Excel for project: ${projectId}`, { versionId, filters });
 
         // Lấy test cases với filters
         const testCases = await this.getTestCasesWithFilters(projectId, versionId, filters);
@@ -64,7 +65,7 @@ export class TestcaseExportService {
         fields: string[],
         filters: ExportFilters = {}
     ): Promise<Buffer> {
-        console.log(`📊 Exporting test cases with custom sheets for project: ${projectId}`, {
+        logger.info(`📊 Exporting test cases with custom sheets for project: ${projectId}`, {
             sheetsCount: sheets.length,
             fieldsCount: fields.length
         });
@@ -806,7 +807,7 @@ export class TestcaseExportService {
             }));
 
         if (columns.length === 0) {
-            console.warn('No valid fields selected, using default fields');
+            logger.warn('No valid fields selected, using default fields');
             columns.push(
                 { header: 'Test Case ID', key: 'test_case_id', width: 15 },
                 { header: 'Test Case Name/Title', key: 'test_case_name', width: 40 }

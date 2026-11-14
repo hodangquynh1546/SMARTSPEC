@@ -1,3 +1,4 @@
+import logger from "../../../lib/logger";
 import {createClient} from 'redis';
 import {Sink} from '../sink';
 
@@ -10,7 +11,7 @@ export class RedisSink implements Sink {
 
 
     async save(data: any): Promise<void> {
-        console.log('[RedisSink] Writing data to Redis:', data);
+        logger.info('[RedisSink] Writing data to Redis:', data);
         const sinkMetadata = data.sinkMetadata;
         const {
             followers,
@@ -18,7 +19,7 @@ export class RedisSink implements Sink {
             timestamp,
         } = sinkMetadata;
 
-        console.log('[RedisSink] Writing data to Redis:', followers, postID, timestamp);
+        logger.info('[RedisSink] Writing data to Redis:', followers, postID, timestamp);
 
         const pipeline = this.redisClient.multi();
         for (const follower of followers) {
@@ -29,7 +30,7 @@ export class RedisSink implements Sink {
         }
 
         await pipeline.execAsPipeline();
-        console.log('[RedisSink] Data written to Redis');
+        logger.info('[RedisSink] Data written to Redis');
     };
 }
 

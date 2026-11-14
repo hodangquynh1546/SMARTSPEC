@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // src/features/testcase/adapter/controller.ts
 
 import { Response, NextFunction } from "express";
@@ -64,7 +65,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`🎯 Generating ${testType} test cases for ${selectedRequirementIds.length} requirements`);
+            logger.info(`🎯 Generating ${testType} test cases for ${selectedRequirementIds.length} requirements`);
 
             const testCases = await this.testcaseService.generateTestCases(
                 projectId,
@@ -92,7 +93,7 @@ export class TestcaseController {
             });
 
         } catch (error: any) {
-            console.error("❌ Error generating test cases:", error);
+            logger.error("❌ Error generating test cases:", error);
 
             // ✅ Emit failed event với errors - các biến đã được khai báo ở đầu function
             if (userId && projectId && versionId) {
@@ -112,7 +113,7 @@ export class TestcaseController {
                         );
                     }
                 } catch (socketError) {
-                    console.error("❌ Error emitting failed event:", socketError);
+                    logger.error("❌ Error emitting failed event:", socketError);
                 }
             }
 
@@ -166,7 +167,7 @@ export class TestcaseController {
             const { testCases } = req.body;
             const createdBy = req.getSubject ? req.getSubject() : undefined;
 
-            console.log('📥 Controller received:', {
+            logger.info('📥 Controller received:', {
                 projectId,
                 versionId,
                 testCasesCount: testCases?.length,
@@ -193,7 +194,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`💾 Saving ${testCases.length} test cases`);
+            logger.info(`💾 Saving ${testCases.length} test cases`);
 
             const savedTestCases = await this.testcaseService.saveTestCases(
                 projectId,
@@ -202,7 +203,7 @@ export class TestcaseController {
                 createdBy
             );
 
-            console.log('✅ Controller: Test cases saved successfully', savedTestCases.length);
+            logger.info('✅ Controller: Test cases saved successfully', savedTestCases.length);
 
             res.status(201).json({
                 message: `Successfully saved ${savedTestCases.length} test cases`,
@@ -212,7 +213,7 @@ export class TestcaseController {
             });
 
         } catch (error: any) {
-            console.error("❌ Error saving test cases:", error);
+            logger.error("❌ Error saving test cases:", error);
 
             if (error.message.includes('validation failed')) {
                 res.status(400).json({
@@ -262,7 +263,7 @@ export class TestcaseController {
             if (database_tables) filters.database_tables = database_tables;
             if (search) filters.search = search;  // Thêm search vào filters
 
-            console.log(`📋 Getting test cases for project ${projectId}`, {
+            logger.info(`📋 Getting test cases for project ${projectId}`, {
                 filters,
                 searchQuery: search
             });
@@ -280,7 +281,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting test cases:", error);
+            logger.error("❌ Error getting test cases:", error);
             next(error);
         }
     }
@@ -310,7 +311,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting test case:", error);
+            logger.error("❌ Error getting test case:", error);
             next(error);
         }
     }
@@ -334,7 +335,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`✏️ Updating test case ${testCaseId}`);
+            logger.info(`✏️ Updating test case ${testCaseId}`);
 
             const result = await this.testcaseService.updateTestCase(
                 testCaseId,
@@ -355,7 +356,7 @@ export class TestcaseController {
             });
 
         } catch (error: any) {
-            console.error("❌ Error updating test case:", error);
+            logger.error("❌ Error updating test case:", error);
 
             if (error.message.includes('validation failed')) {
                 res.status(400).json({
@@ -396,7 +397,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`🎯 Executing test case ${testCaseId}`);
+            logger.info(`🎯 Executing test case ${testCaseId}`);
 
             const executedTestCase = await this.testcaseService.executeTestCase(
                 testCaseId,
@@ -415,7 +416,7 @@ export class TestcaseController {
             });
 
         } catch (error: any) {
-            console.error("❌ Error executing test case:", error);
+            logger.error("❌ Error executing test case:", error);
 
             if (error.message.includes('validation failed')) {
                 res.status(400).json({
@@ -447,7 +448,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`🗑️ Deleting test case ${testCaseId}`);
+            logger.info(`🗑️ Deleting test case ${testCaseId}`);
 
             // SỬA LẠI: Thêm userId làm tham số đầu tiên
             const deletedTestCase = await this.testcaseService.deleteTestCase(userId, testCaseId);
@@ -463,7 +464,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error deleting test case:", error);
+            logger.error("❌ Error deleting test case:", error);
             next(error);
         }
     }
@@ -481,7 +482,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📊 Getting test statistics for project ${projectId}`);
+            logger.info(`📊 Getting test statistics for project ${projectId}`);
 
             const statistics = await this.testcaseService.getTestStatistics(
                 projectId,
@@ -494,7 +495,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting test statistics:", error);
+            logger.error("❌ Error getting test statistics:", error);
             next(error);
         }
     }
@@ -512,7 +513,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📊 Getting database coverage report for project ${projectId}`);
+            logger.info(`📊 Getting database coverage report for project ${projectId}`);
 
             const coverageReport = await this.testcaseService.getDatabaseCoverageReport(
                 projectId,
@@ -525,7 +526,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting database coverage report:", error);
+            logger.error("❌ Error getting database coverage report:", error);
             next(error);
         }
     }
@@ -543,7 +544,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📋 Getting requirement coverage report for project ${projectId}`);
+            logger.info(`📋 Getting requirement coverage report for project ${projectId}`);
 
             const coverageReport = await this.testcaseService.getRequirementCoverageReport(
                 projectId,
@@ -556,7 +557,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting requirement coverage report:", error);
+            logger.error("❌ Error getting requirement coverage report:", error);
             next(error);
         }
     }
@@ -574,7 +575,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`🔍 Finding duplicate test cases for project ${projectId}`);
+            logger.info(`🔍 Finding duplicate test cases for project ${projectId}`);
 
             const duplicates = await this.testcaseService.findDuplicateTestCases(
                 projectId,
@@ -588,7 +589,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error finding duplicate test cases:", error);
+            logger.error("❌ Error finding duplicate test cases:", error);
             next(error);
         }
     }
@@ -606,7 +607,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`🗃️ Getting test cases for table ${tableName}`);
+            logger.info(`🗃️ Getting test cases for table ${tableName}`);
 
             const testCases = await this.testcaseService.getTestCasesByDatabaseTable(
                 projectId,
@@ -621,7 +622,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting test cases by database table:", error);
+            logger.error("❌ Error getting test cases by database table:", error);
             next(error);
         }
     }
@@ -655,7 +656,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`⚡ Bulk executing ${testCaseIds.length} test cases`);
+            logger.info(`⚡ Bulk executing ${testCaseIds.length} test cases`);
 
             const results = [];
             const errors = [];
@@ -688,7 +689,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error in bulk execute test cases:", error);
+            logger.error("❌ Error in bulk execute test cases:", error);
             next(error);
         }
     }
@@ -717,7 +718,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`⚡ Bulk updating ${testCaseIds.length} test cases`);
+            logger.info(`⚡ Bulk updating ${testCaseIds.length} test cases`);
 
             const result = await this.testcaseService.bulkUpdateTestCases(
                 testCaseIds,
@@ -731,7 +732,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error in bulk update test cases:", error);
+            logger.error("❌ Error in bulk update test cases:", error);
             next(error);
         }
     }
@@ -754,7 +755,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`⚡ Bulk deleting ${testCaseIds.length} test cases`);
+            logger.info(`⚡ Bulk deleting ${testCaseIds.length} test cases`);
 
             const result = await this.testcaseService.bulkDeleteTestCases(testCaseIds);
 
@@ -764,7 +765,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error in bulk delete test cases:", error);
+            logger.error("❌ Error in bulk delete test cases:", error);
             next(error);
         }
     }
@@ -782,7 +783,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📤 Exporting test cases for project ${projectId}`);
+            logger.info(`📤 Exporting test cases for project ${projectId}`);
 
             const exportData = await this.testcaseService.exportTestCases(
                 projectId,
@@ -795,7 +796,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error exporting test cases:", error);
+            logger.error("❌ Error exporting test cases:", error);
             next(error);
         }
     }
@@ -819,7 +820,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📥 Importing ${importData.test_cases.length} test cases`);
+            logger.info(`📥 Importing ${importData.test_cases.length} test cases`);
 
             const result = await this.testcaseService.importTestCases(
                 projectId,
@@ -834,7 +835,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error importing test cases:", error);
+            logger.error("❌ Error importing test cases:", error);
             next(error);
         }
     }
@@ -852,7 +853,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📈 Getting dashboard metrics for project ${projectId}`);
+            logger.info(`📈 Getting dashboard metrics for project ${projectId}`);
 
             const metrics = await this.testcaseService.getDashboardMetrics(
                 projectId,
@@ -865,7 +866,7 @@ export class TestcaseController {
             });
 
         } catch (error) {
-            console.error("❌ Error getting dashboard metrics:", error);
+            logger.error("❌ Error getting dashboard metrics:", error);
             next(error);
         }
     }
@@ -957,7 +958,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📊 Exporting test cases to Excel for project ${projectId}`, {
+            logger.info(`📊 Exporting test cases to Excel for project ${projectId}`, {
                 versionId,
                 testCaseIds: testCaseIds ? (Array.isArray(testCaseIds) ? testCaseIds.length : 1) : 0,
                 requirementIds: requirementIds ? (Array.isArray(requirementIds) ? requirementIds.length : 1) : 0
@@ -1020,7 +1021,7 @@ export class TestcaseController {
             res.send(excelBuffer);
 
         } catch (error) {
-            console.error("❌ Error exporting test cases to Excel:", error);
+            logger.error("❌ Error exporting test cases to Excel:", error);
             next(error);
         }
     }
@@ -1038,7 +1039,7 @@ export class TestcaseController {
                 return;
             }
 
-            console.log(`📑 Exporting comprehensive report for project ${projectId}`);
+            logger.info(`📑 Exporting comprehensive report for project ${projectId}`);
 
             // Tạo workbook tổng hợp
             const workbook = new ExcelJS.Workbook();
@@ -1064,7 +1065,7 @@ export class TestcaseController {
             res.send(Buffer.from(buffer));
 
         } catch (error) {
-            console.error("❌ Error exporting comprehensive report:", error);
+            logger.error("❌ Error exporting comprehensive report:", error);
             next(error);
         }
     }

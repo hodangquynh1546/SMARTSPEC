@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 // features/input/domain/service/input.socket.service.ts
 import { io } from '../../../socket';
 import {
@@ -21,7 +22,7 @@ export class InputSocketService {
         event: InputCreatedEvent | InputDeletedEvent | InputsUpdatedEvent | InputsReloadEvent | IncrementalProgressEvent | InputsAddedSummaryEvent | EstimateReceivedEvent
     ): void {
         io.to(`project_${projectId}`).emit('input_event', event);
-        console.log(`📢 Broadcast input event to project ${projectId}:`, event.type);
+        logger.info(`📢 Broadcast input event to project ${projectId}:`, event.type);
     }
 
     /**
@@ -29,7 +30,7 @@ export class InputSocketService {
      */
     joinProjectRoom(socket: any, projectId: string): void {
         socket.join(`project_${projectId}`);
-        //console.log(`✅ User ${socket.id} joined project room: project_${projectId}`);
+        //logger.info(`✅ User ${socket.id} joined project room: project_${projectId}`);
     }
 
     /**
@@ -37,7 +38,7 @@ export class InputSocketService {
      */
     leaveProjectRoom(socket: any, projectId: string): void {
         socket.leave(`project_${projectId}`);
-        //console.log(`🚪 User ${socket.id} left project room: project_${projectId}`);
+        //logger.info(`🚪 User ${socket.id} left project room: project_${projectId}`);
     }
 
     // Các helper methods cho từng loại event
@@ -75,7 +76,7 @@ export class InputSocketService {
             timestamp: new Date()
         };
         this.broadcastToProject(projectId, event);
-        console.log(`📊 Broadcast inputs updated: ${unprocessedCount} unprocessed inputs`);
+        logger.info(`📊 Broadcast inputs updated: ${unprocessedCount} unprocessed inputs`);
     }
 
     emitInputsReload(projectId: string, versionId: string, userId: string, inputs: any[]): void {
@@ -159,7 +160,7 @@ export class InputSocketService {
         const stateInfo = agentState ? ` [${agentState}]` : '';
         const messageInfo = message ? ` - ${message}` : '';
         const refreshInfo = shouldRefresh ? ' [REFRESH]' : '';
-        console.log(`📊 Broadcast incremental progress: ${progress}% - ${stage}${stateInfo}${messageInfo}${batchInfo ? ` (Batch ${batchInfo.currentBatch}/${batchInfo.totalBatches})` : ''}${errorInfo}${refreshInfo}`);
+        logger.info(`📊 Broadcast incremental progress: ${progress}% - ${stage}${stateInfo}${messageInfo}${batchInfo ? ` (Batch ${batchInfo.currentBatch}/${batchInfo.totalBatches})` : ''}${errorInfo}${refreshInfo}`);
     }
 
     emitEstimateReceived(
@@ -190,7 +191,7 @@ export class InputSocketService {
             timestamp: new Date()
         };
         this.broadcastToProject(projectId, event);
-        console.log(`📊 Broadcast estimate received: ${estimate.estimated_count} use cases, ${estimate.estimated_batches} batches, ${committedUsecases?.length || 0} committed usecases`);
+        logger.info(`📊 Broadcast estimate received: ${estimate.estimated_count} use cases, ${estimate.estimated_batches} batches, ${committedUsecases?.length || 0} committed usecases`);
     }
 }
 

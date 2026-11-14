@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import DatabaseModel from "../../../../../internal/model/database";
 import { Table, TablePositionUpdate } from "./interfaces";
 import { TableValidationService } from "./TableValidationService";
@@ -106,7 +107,7 @@ export class TableManagementService {
     public async updateTableInDatabase(userId:string, databaseId: string, tableName: string, tableData: Table) {
         // Guard: tránh payload nhầm route
         if ((tableName || '').toLowerCase() === 'positions') {
-            console.warn('[updateTableInDatabase] Received reserved name "positions". Skip update.');
+            logger.warn('[updateTableInDatabase] Received reserved name "positions". Skip update.');
             return await DatabaseModel.findById(databaseId);
         }
 
@@ -191,7 +192,7 @@ export class TableManagementService {
         );
 
         if (result.matchedCount === 0) {
-            console.warn(`[updateTableInDatabase] Table not found by name="${tableName}". Skipping update.`);
+            logger.warn(`[updateTableInDatabase] Table not found by name="${tableName}". Skipping update.`);
             return await DatabaseModel.findById(databaseId);
         }
         // 4️⃣ Ghi log
@@ -277,22 +278,22 @@ export class TableManagementService {
      * Cập nhật vị trí nhiều bảng cùng lúc
      */
     public async updateMultipleTablePositions(databaseId: string, positionUpdates: TablePositionUpdate[]) {
-        console.log("✅✅✅ RUNNING THE FIXED AND ROBUST BATCH UPDATE v2 ✅✅✅");
+        logger.info("✅✅✅ RUNNING THE FIXED AND ROBUST BATCH UPDATE v2 ✅✅✅");
 
         const database = await DatabaseModel.findById(databaseId);
         if (!database) {
             throw new Error("Database not found");
         }
 
-        console.log('🔍 Database tables:', database.tables.map(t => t.name));
-        console.log('📝 Requested updates:', positionUpdates.map(u => u.tableName));
+        logger.info('🔍 Database tables:', database.tables.map(t => t.name));
+        logger.info('📝 Requested updates:', positionUpdates.map(u => u.tableName));
 
         for (const update of positionUpdates) {
             try {
                 const tableExists = database.tables.some(t => t.name === update.tableName);
 
                 if (!tableExists) {
-                    console.warn(`Table "${update.tableName}" not found in database, skipping`);
+                    logger.warn(`Table "${update.tableName}" not found in database, skipping`);
                     continue;
                 }
 
@@ -309,10 +310,10 @@ export class TableManagementService {
                 );
 
                 if (result.matchedCount > 0) {
-                    console.log(`✓ Updated position for: ${update.tableName}`);
+                    logger.info(`✓ Updated position for: ${update.tableName}`);
                 }
             } catch (tableError) {
-                console.error(`Error updating table ${update.tableName}:`, tableError);
+                logger.error(`Error updating table ${update.tableName}:`, tableError);
             }
         }
 

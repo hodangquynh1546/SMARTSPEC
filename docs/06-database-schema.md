@@ -95,39 +95,12 @@ Quản lý các mốc phiên bản đặc tả của một dự án.
   inputs: [ObjectId -> inputs],      // Các tài liệu/văn bản đầu vào nạp vào version này
   outputs: [ObjectId -> outputs],    // Các kết quả đặc tả đã sinh ra
   progress: Number,                  // Tiến độ xử lý AI (0 - 100)
-  stage: "normalization" | "input" | "analyzing" | "finalizing" | "completed" | "failed",
-  status: "processing" | "completed" | "failed" | "has_conflicts",
-  requirement_model: [               // Danh sách Use Cases chuẩn hóa
-    {
-      id: String,                    // Ví dụ: "UC1"
-      name: String,                  // Tên Use Case
-      role: {
-        id: String,
-        name: String,
-        description: String
-      },
-      goal: String,
-      reason: String,
-      tasks: [String],
-      inputs: [String],
-      outputs: [String],
-      context: String,
-      priority: "low" | "medium" | "high",
-      feedback: Mixed,
-      rules: [String],
-      triggers: [String],
-      preconditions: [String],
-      postconditions: [String],
-      exceptions: [String],
-      stakeholders: [String],
-      constraints: [String],
-      related_usecases: [String]
-    }
-  ],
+  stage: "normalization" | "input" | "analyzing" | "finalizing" | "completed" | "failed" | "paused",
+  status: "processing" | "completed" | "failed" | "has_conflicts" | "paused",
   pending_conflicts: [               // Danh sách các cặp/nhóm xung đột cần người dùng giải quyết
     {
       conflict_id: String,
-      items: [requirementModelSchema]
+      items: [ObjectId -> usecases]
     }
   ],
   processing_errors: [String],       // Danh sách thông điệp lỗi nếu có
@@ -135,6 +108,8 @@ Quản lý các mốc phiên bản đặc tả của một dự án.
   timestamps: true
 }
 ```
+
+Use cases không được nhúng trong `versions`. Chúng được lưu riêng trong collection `usecases` (`backend/internal/model/usecase.ts`) và liên kết tới phiên bản qua `version_id`; các truy vấn use case theo phiên bản phải dùng liên kết này.
 
 ---
 

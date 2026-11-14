@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Response, Request, NextFunction } from "express";
 import env from "../../../utils/env";
 import { ApiKeyService } from "../types";
@@ -218,7 +219,7 @@ class ApiKeyController extends BaseController {
             data: serviceResponse,
           });
         } catch (serviceError) {
-          console.error("❌ Error in updateAPIKey service:", serviceError);
+          logger.error("❌ Error in updateAPIKey service:", serviceError);
           throw serviceError;
         }
       }

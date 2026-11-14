@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import {
   AuthService,
@@ -8,6 +9,7 @@ import {
 import User from "../../../../../internal/model/user";
 import Session from "../../../../../internal/model/session";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { GoogleIdentityBroker } from "../identity-broker/google-idp.broker";
 import bcrypt from "bcrypt";
 import {
@@ -16,9 +18,6 @@ import {
 } from "../../../services/serviceResponse";
 import { generateJwt, generateJwtOTP } from "../../../services/jwtService";
 import mailService from "../../../services/sendMail.service";
-import { ac, L } from "@faker-js/faker/dist/airline-BcEu2nRk";
-import { Double } from "mongodb";
-import { NumberingPlan } from "libphonenumber-js";
 import { LogService } from "../../log/domain/service";
 
 export class AuthServiceImpl implements AuthService {
@@ -43,6 +42,10 @@ export class AuthServiceImpl implements AuthService {
     this.jwtEmailSecret = jwtEmailSecret;
     //Khởi tạo log
     this.logService = new LogService();
+  }
+
+  private hashOtp(email: string, otp: string): string {
+    return crypto.createHmac("sha256", this.jwtOtpSecret).update(`${email}:${otp}`).digest("hex");
   }
 
   signAccessToken(payload: any): string {
@@ -252,7 +255,7 @@ export class AuthServiceImpl implements AuthService {
     if (existingUser) {
       throw new Error("User already exists");
     }
-    console.log("password before hash:", password)
+    logger.info("password before hash:", password)
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       email,
@@ -327,11 +330,14 @@ export class AuthServiceImpl implements AuthService {
     }
 
     if (user.isTwoFactorEnabled) {
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otp = crypto.randomInt(100000, 1000000).toString();
 
-      // ✨ FIX: Ký token OTP bằng một secret key RIÊNG BIỆT và có thời gian hết hạn ngắn.
-      // Lưu ý: Bạn cần thêm this.jwtOtpSecret vào constructor.
-      const otpToken = jwt.sign({ email, otp }, this.jwtSecret, { expiresIn: '5m' }); // THAY this.jwtSecret BẰNG this.jwtOtpSecret
+      // Token chỉ chứa HMAC của OTP (khóa bí mật phía server) nên client không đọc được mã OTP.
+      const otpToken = jwt.sign(
+        { email, otpHash: this.hashOtp(email, otp), typ: "otp" },
+        this.jwtOtpSecret,
+        { expiresIn: "5m" }
+      );
 
       const subject = "Your OTP Code";
       const data = `Your OTP code is: ${otp}`;
@@ -383,14 +389,21 @@ export class AuthServiceImpl implements AuthService {
       throw new Error("User not found");
     }
 
-    // ✨ FIX: Xác thực token OTP bằng secret key RIÊNG BIỆT của nó.
-    // Đây là bước quan trọng nhất để sửa lỗi login-logout.
-    const payload = jwt.verify(otpToken, this.jwtSecret) as { // THAY this.jwtSecret BẰNG this.jwtOtpSecret
-      email: string;
-      otp: string;
-    };
+    let payload: { email: string; otpHash: string; typ?: string };
+    try {
+      payload = jwt.verify(otpToken, this.jwtOtpSecret) as typeof payload;
+    } catch {
+      throw new Error("Invalid OTP or token");
+    }
 
-    if (payload.otp !== otp || payload.email !== email) {
+    const expected = Buffer.from(this.hashOtp(email, String(otp)));
+    const actual = Buffer.from(String(payload.otpHash ?? ""));
+    if (
+      payload.typ !== "otp" ||
+      payload.email !== email ||
+      expected.length !== actual.length ||
+      !crypto.timingSafeEqual(expected, actual)
+    ) {
       throw new Error("Invalid OTP or token");
     }
 
@@ -436,7 +449,7 @@ export class AuthServiceImpl implements AuthService {
         emailText: `${data}`,
       });
 
-      console.log("mailIsSent", mailIsSent);
+      logger.info("mailIsSent", mailIsSent);
 
       if (!mailIsSent) {
         return false;
@@ -453,7 +466,7 @@ export class AuthServiceImpl implements AuthService {
       throw new Error("Email not found");
     }
     const token = await generateJwt({ email });
-    console.log("verifyEmailToken generated");
+    logger.info("verifyEmailToken generated");
     const subject = "Reset your password";
     const data = `Click the link to reset your password: http://localhost:5173/reset-password?token=${token}`;
     await this.logService.createLog({

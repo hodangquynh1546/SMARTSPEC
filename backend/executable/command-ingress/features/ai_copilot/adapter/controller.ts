@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from "express";
 import { AICopilotService } from "../domain/service";
 
@@ -21,7 +22,7 @@ export class AICopilotController {
       const chats = await this.service.getChatSessions(projectId, userId);
       res.json({ data: chats });
     } catch (error: any) {
-      console.error("Error getting chat sessions:", error);
+      logger.error("Error getting chat sessions:", error);
       res.status(500).json({ error: error.message || "Failed to get chat sessions" });
     }
   };
@@ -46,7 +47,7 @@ export class AICopilotController {
       );
       res.status(201).json({ data: chat });
     } catch (error: any) {
-      console.error("Error creating chat session:", error);
+      logger.error("Error creating chat session:", error);
       res.status(500).json({ error: error.message || "Failed to create chat session" });
     }
   };
@@ -66,7 +67,7 @@ export class AICopilotController {
       }
       res.json({ data: chat });
     } catch (error: any) {
-      console.error("Error getting chat session:", error);
+      logger.error("Error getting chat session:", error);
       res.status(500).json({ error: error.message || "Failed to get chat session" });
     }
   };
@@ -92,7 +93,7 @@ export class AICopilotController {
       }
       res.json({ data: chat });
     } catch (error: any) {
-      console.error("Error updating chat session:", error);
+      logger.error("Error updating chat session:", error);
       res.status(500).json({ error: error.message || "Failed to update chat session" });
     }
   };
@@ -109,7 +110,7 @@ export class AICopilotController {
       await this.service.deleteChatSession(projectId, chatId, userId);
       res.json({ message: "Chat session deleted successfully" });
     } catch (error: any) {
-      console.error("Error deleting chat session:", error);
+      logger.error("Error deleting chat session:", error);
       res.status(500).json({ error: error.message || "Failed to delete chat session" });
     }
   };
@@ -119,9 +120,9 @@ export class AICopilotController {
       const { projectId } = req.params;
       
       // Debug: Log raw request body
-      console.log('Raw request body:', JSON.stringify(req.body, null, 2));
-      console.log('Request headers:', req.headers);
-      console.log('Content-Type:', req.headers['content-type']);
+      logger.info('Raw request body:', JSON.stringify(req.body, null, 2));
+      logger.info('Request headers:', req.headers);
+      logger.info('Content-Type:', req.headers['content-type']);
       
       // Try to get message from different possible locations
       let message = req.body?.message;
@@ -131,7 +132,7 @@ export class AICopilotController {
       let stream = req.body?.stream || false;
 
       // Debug log
-      console.log('Chat request received:', {
+      logger.info('Chat request received:', {
         projectId,
         versionId,
         message: message ? `${message.substring(0, 50)}...` : 'null/undefined',
@@ -145,7 +146,7 @@ export class AICopilotController {
       });
 
       if (!message || typeof message !== 'string' || !message.trim()) {
-        console.error('Invalid message:', { 
+        logger.error('Invalid message:', { 
           message, 
           type: typeof message,
           body: req.body,
@@ -178,7 +179,7 @@ export class AICopilotController {
           res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
           res.end();
         } catch (error: any) {
-          console.error("Streaming error:", error);
+          logger.error("Streaming error:", error);
           res.write(`data: ${JSON.stringify({ error: error.message || "Internal server error" })}\n\n`);
           res.end();
         }
@@ -196,7 +197,7 @@ export class AICopilotController {
 
       res.json(result);
     } catch (error: any) {
-      console.error("AI Copilot chat error:", error);
+      logger.error("AI Copilot chat error:", error);
       res.status(500).json({ error: error.message || "Internal server error" });
     }
   };
@@ -218,7 +219,7 @@ export class AICopilotController {
 
       res.json({ success: true, data: result });
     } catch (error: any) {
-      console.error("AI Copilot action error:", error);
+      logger.error("AI Copilot action error:", error);
       res.status(500).json({ error: error.message || "Internal server error" });
     }
   };
@@ -235,7 +236,7 @@ export class AICopilotController {
 
       res.json(summary);
     } catch (error: any) {
-      console.error("AI Copilot summary error:", error);
+      logger.error("AI Copilot summary error:", error);
       res.status(500).json({ error: error.message || "Internal server error" });
     }
   };
@@ -253,7 +254,7 @@ export class AICopilotController {
 
       res.json(analysis);
     } catch (error: any) {
-      console.error("AI Copilot analysis error:", error);
+      logger.error("AI Copilot analysis error:", error);
       res.status(500).json({ error: error.message || "Internal server error" });
     }
   };

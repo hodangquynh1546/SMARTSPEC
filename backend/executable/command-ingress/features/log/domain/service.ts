@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Types } from "mongoose";
 import { Parser as Json2CsvParser } from "json2csv";
 import PDFDocument from "pdfkit";
@@ -11,7 +12,7 @@ import { logSocketService } from "./log.socket.service";
 export class LogService {
   async createLog(dto: CreateLogDTO) {
     try {
-      console.log("🟢 [createLog] DTO:", dto);
+      logger.info("🟢 [createLog] DTO:", dto);
 
       const docData: any = {
         action: dto.action,
@@ -30,10 +31,10 @@ export class LogService {
       if (dto.target_id) docData.target_id = new Types.ObjectId(dto.target_id);
       if (dto.project_id) docData.project_id = new Types.ObjectId(dto.project_id);
 
-      console.log("🟡 [createLog] Final docData:", docData);
+      logger.info("🟡 [createLog] Final docData:", docData);
 
       const doc = await LogModel.create(docData);
-      console.log("✅ [createLog] Created log:", doc._id);
+      logger.info("✅ [createLog] Created log:", doc._id);
 
       // 🔔 Emit socket event cho project & user
       if (dto.project_id) {
@@ -49,35 +50,35 @@ export class LogService {
 
       // 🚨 Gửi cảnh báo bảo mật nếu là lỗi đăng nhập
       if (["failed_login"].includes(dto.action)) {
-        console.warn("🚨 [Security Alert Triggered]", dto.action, dto.target_type);
+        logger.warn("🚨 [Security Alert Triggered]", dto.action, dto.target_type);
         this.sendSecurityAlert(doc);
       }
 
       return new ServiceResponse(ResponseStatus.Success, "Log created", doc, 201);
     } catch (err: any) {
-      console.error("❌ [createLog] Error:", err);
+      logger.error("❌ [createLog] Error:", err);
       return new ServiceResponse(ResponseStatus.Failed, err.message, null, 500);
     }
   }
 
   async queryLogs(filters: any = {}, options: { page?: number; limit?: number; sort?: any } = {}) {
     try {
-      console.log("🟢 [queryLogs] filters:", filters);
-      console.log("🟢 [queryLogs] options:", options);
+      logger.info("🟢 [queryLogs] filters:", filters);
+      logger.info("🟢 [queryLogs] options:", options);
 
       const result = await this._query(filters, options);
-      console.log(`✅ [queryLogs] Got ${result.total} logs`);
+      logger.info(`✅ [queryLogs] Got ${result.total} logs`);
 
       return new ServiceResponse(ResponseStatus.Success, "Fetched logs", result, 200);
     } catch (err: any) {
-      console.error("❌ [queryLogs] Error:", err);
+      logger.error("❌ [queryLogs] Error:", err);
       return new ServiceResponse(ResponseStatus.Failed, err.message, null, 500);
     }
   }
 
   async exportLogs(filters: any = {}, format: "csv" | "json" | "pdf" = "csv", res?: any) {
     try {
-      console.log("🟡 [exportLogs] Input filters:", filters, "format:", format);
+      logger.info("🟡 [exportLogs] Input filters:", filters, "format:", format);
       const mongoFilters: any = { ...filters };
       delete mongoFilters.format;
       const { items } = await this._query(mongoFilters, { page: 1, limit: 100000 });
@@ -217,24 +218,24 @@ export class LogService {
         });
 
         doc.end();
-        console.log("✅ [exportLogs] PDF table aligned, truncated Action/User columns, full width");
+        logger.info("✅ [exportLogs] PDF table aligned, truncated Action/User columns, full width");
         return new ServiceResponse(ResponseStatus.Success, "PDF generated", null, 200);
       }
       return new ServiceResponse(ResponseStatus.Failed, "Invalid export format", null, 400);
     } catch (err: any) {
-      console.error("❌ [exportLogs] Error:", err);
+      logger.error("❌ [exportLogs] Error:", err);
       return new ServiceResponse(ResponseStatus.Failed, err.message, null, 500);
     }
   }
 
   // cảnh báo
   private sendSecurityAlert(log: any) {
-    console.warn(`🚨 [Security Alert] User ${log.user_id} performed ${log.action} on ${log.target_type}`);
+    logger.warn(`🚨 [Security Alert] User ${log.user_id} performed ${log.action} on ${log.target_type}`);
   }
 
   // Lọc các log về hoạt động người dùng
   async getUserActivityLogs(userId: string, projectId?: string) {
-    console.log("🟡 [getUserActivityLogs] Params:", { userId, projectId });
+    logger.info("🟡 [getUserActivityLogs] Params:", { userId, projectId });
     const user = await UserModel.findById(userId);
     if (!user)
       return new ServiceResponse(ResponseStatus.Failed, "User not found", null, 404);
@@ -265,12 +266,12 @@ export class LogService {
       filter.action = { $in: ["login", "logout", "failed_login"] };
     }
 
-    console.log("🟢 [getUserActivityLogs] Final filter:", filter);
+    logger.info("🟢 [getUserActivityLogs] Final filter:", filter);
     return this.queryLogs(filter);
   }
   // Lọc các log liên quan đến dự án
   async getProjectLogs(userId: string, projectId: string, target_type?: string) {
-    console.log("🟡 [getProjectLogs] Params:", { userId, projectId, target_type });
+    logger.info("🟡 [getProjectLogs] Params:", { userId, projectId, target_type });
     const project = await ProjectModel.findById(projectId);
     if (!project)
       return new ServiceResponse(ResponseStatus.Failed, "Project not found", null, 404);
@@ -281,7 +282,7 @@ export class LogService {
     if (!member)
       return new ServiceResponse(ResponseStatus.Failed, "User is not a project member", null, 403);
     const role = member.role?.toLowerCase(); // "viewer" | "editor" | "owner"
-    console.log(`🟢 [getProjectLogs] User role in project: ${role}`);
+    logger.info(`🟢 [getProjectLogs] User role in project: ${role}`);
     const filter: any = { project_id: new Types.ObjectId(projectId) };
     if (target_type) {
       filter.target_type = target_type;
@@ -312,12 +313,12 @@ export class LogService {
     } else {
       return new ServiceResponse(ResponseStatus.Failed, "Invalid member role", null, 400);
     }
-    console.log("🟢 [getProjectLogs] Final filter:", JSON.stringify(filter, null, 2));
+    logger.info("🟢 [getProjectLogs] Final filter:", JSON.stringify(filter, null, 2));
     return this.queryLogs(filter);
   }
 
   async getOutputLogs(userId: string, targetType: string, projectId?: string) {
-    console.log("🟡 [getLogs] Params:", { userId, targetType, projectId });
+    logger.info("🟡 [getLogs] Params:", { userId, targetType, projectId });
     const allowedTargets = ["databases", "testcases", "activity_diagrams", "usecase_diagrams", "sequence_diagrams"];
     if (!allowedTargets.includes(targetType)) {
       return new ServiceResponse(ResponseStatus.Failed, "Invalid target_type", null, 400);
@@ -337,14 +338,14 @@ export class LogService {
     const actions = ["generate_output", "update_output", "delete_output", "export_data"];
     filter.action = { $in: actions };
 
-    console.log("🟢 [getLogs] Final filter:", filter);
+    logger.info("🟢 [getLogs] Final filter:", filter);
 
     const logs = await LogModel.find(filter).populate("user_id", "name email");
     return new ServiceResponse(ResponseStatus.Success, `${targetType} logs retrieved`, logs, 200);
   }
 
   async getSystemLogs(userId: string, level?: string) {
-    console.log("🟡 [getSystemLogs] Params:", { userId, level });
+    logger.info("🟡 [getSystemLogs] Params:", { userId, level });
     const user = await UserModel.findById(userId).lean();
     if (!user)
       return new ServiceResponse(ResponseStatus.Failed, "User not found", null, 404);
@@ -362,9 +363,9 @@ export class LogService {
       ],
     };
     if (level) filter.level = level;
-    console.log("🟢 [getSystemLogs] Final filter:", filter);
+    logger.info("🟢 [getSystemLogs] Final filter:", filter);
     const result = await this._query(filter, { sort: { created_at: -1 }, limit: 500 });
-    console.log(`✅ [getSystemLogs] Retrieved ${result.total} system logs`);
+    logger.info(`✅ [getSystemLogs] Retrieved ${result.total} system logs`);
 
     return new ServiceResponse(ResponseStatus.Success, "Fetched system & user system logs successfully", result, 200);
   }
@@ -373,7 +374,7 @@ export class LogService {
     const page = options.page && options.page > 0 ? options.page : 1;
     const limit = options.limit && options.limit > 0 ? Math.min(1000, options.limit) : 50;
     const skip = (page - 1) * limit;
-    console.log("🟡 [LogService._query] RAW filters:", filters);
+    logger.info("🟡 [LogService._query] RAW filters:", filters);
     const mongoFilter: any = { ...filters };
     if (filters.project_id) mongoFilter.project_id = new Types.ObjectId(filters.project_id);
     if (filters.user_id) mongoFilter.user_id = new Types.ObjectId(filters.user_id);
@@ -388,7 +389,7 @@ export class LogService {
         $lt: nextDay,
       };
       delete mongoFilter.at;
-      console.log("🟢 [UTC Filter - at]", mongoFilter.created_at);
+      logger.info("🟢 [UTC Filter - at]", mongoFilter.created_at);
     } else if (filters.from || filters.to) {
       mongoFilter.created_at = {};
       if (filters.from) {
@@ -407,9 +408,9 @@ export class LogService {
       }
       delete mongoFilter.from;
       delete mongoFilter.to;
-      console.log("🟢 [UTC Filter - from/to]", mongoFilter.created_at);
+      logger.info("🟢 [UTC Filter - from/to]", mongoFilter.created_at);
     }
-    console.log("🔵 [LogService._query] Final mongoFilter:", mongoFilter);
+    logger.info("🔵 [LogService._query] Final mongoFilter:", mongoFilter);
     const sort = options.sort ?? { created_at: -1 };
     const [items, total] = await Promise.all([
       LogModel.find(mongoFilter)
@@ -420,7 +421,7 @@ export class LogService {
         .lean(),
       LogModel.countDocuments(mongoFilter),
     ]);
-    console.log(`✅ [LogService._query] Found ${total} logs`);
+    logger.info(`✅ [LogService._query] Found ${total} logs`);
     return { items, total, page, limit };
   }
   // ------------------ RETENTION ------------------
@@ -429,7 +430,7 @@ export class LogService {
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
     try {
-      console.log("🟡 [LogRetention] Deleting logs older than:", cutoffDate);
+      logger.info("🟡 [LogRetention] Deleting logs older than:", cutoffDate);
 
       // Lấy danh sách project có log
       const projectIds = await LogModel.distinct("projectId");
@@ -440,14 +441,14 @@ export class LogService {
           created_at: { $lt: cutoffDate },
         });
 
-        console.log(`✅ [LogRetention] Deleted ${result.deletedCount} logs for project ${projectId}`);
+        logger.info(`✅ [LogRetention] Deleted ${result.deletedCount} logs for project ${projectId}`);
 
         if (result.deletedCount && result.deletedCount > 0) {
           logSocketService.emitLogsPurged(projectId.toString(), result.deletedCount, cutoffDate);
         }
       }
     } catch (err: any) {
-      console.error("❌ [LogRetention] Error:", err);
+      logger.error("❌ [LogRetention] Error:", err);
     }
   }
 }

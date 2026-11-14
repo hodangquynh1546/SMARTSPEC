@@ -1,3 +1,6 @@
+import logger from "../../../../../lib/logger";
+import { pythonLimiter } from "../../../shared/pythonLimiter";
+import env from "../../../utils/env";
 import { spawn } from 'child_process';
 import fs from 'fs/promises'; // IMPROVEMENT: Dùng fs/promises để code async/await sạch hơn
 import path from 'path';
@@ -32,7 +35,7 @@ export class SpeechToTextService {
     private enqueueRefineJob(inputId: string, userId?: string) {
         import('../../handle_extraction/index')
             .then((m) => m.refineInputById(inputId, userId))
-            .catch((err) => console.error('[refine] audio error', err?.message || err));
+            .catch((err) => logger.error('[refine] audio error', err?.message || err));
     }
 
     /**
@@ -115,7 +118,7 @@ export class SpeechToTextService {
             // Điều này ngăn chặn việc file rác bị bỏ lại trên server.
             const pathsToClean = processedFiles.map(f => f.savedPath);
             if (pathsToClean.length > 0) {
-                console.log(`Cleaning up ${pathsToClean.length} temporary audio files...`);
+                logger.info(`Cleaning up ${pathsToClean.length} temporary audio files...`);
                 // Xóa cả thư mục tạm chứa file
                 await fs.rm(path.dirname(pathsToClean[0]), { recursive: true, force: true });
             }
@@ -221,7 +224,7 @@ export class SpeechToTextService {
             //             $set: { merged_text: merged, updated_at: new Date() }
             //         });
             //     } catch (err) {
-            //         console.error('[SpeechToTextService] Merge text error:', err);
+            //         logger.error('[SpeechToTextService] Merge text error:', err);
             //     }
             // }
 
@@ -240,15 +243,19 @@ export class SpeechToTextService {
     }
 
     private runPython(audioPaths: string[]): Promise<SpeechToTextResult[]> {
+      return pythonLimiter.run(() => this.runPythonUnlimited(audioPaths));
+    }
+
+    private runPythonUnlimited(audioPaths: string[]): Promise<SpeechToTextResult[]> {
         return new Promise((resolve, reject) => {
             const scriptPath = path.join(__dirname, '../pythonScript/process_STT.py');
-            const python = spawn('python', [scriptPath, ...audioPaths]);
+            const python = spawn(env.PYTHON_PATH, [scriptPath, ...audioPaths]);
 
             let stdout = '';
             let stderr = '';
 
             python.stdout.on('data', data => (stdout += data));
-            python.stderr.on('data', data => console.error('[PYTHON STDERR]', data.toString()));
+            python.stderr.on('data', data => logger.error('[PYTHON STDERR]', data.toString()));
             python.on('error', err => reject(err));
             python.on('close', code => {
                 if (code !== 0) {

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Types } from "mongoose";
 import Version from "../../../../../internal/model/version";
 import Usecase from "../../../../../internal/model/usecase";
@@ -131,7 +132,7 @@ export class UsecaseGenerationAgentV2 {
 
         // Resume từ state đã lưu nếu có
         if (this.context.resumeState) {
-            console.log(`🔄 [AGENT_V2] Resuming from: ${this.context.resumeState.state}`);
+            logger.info(`🔄 [AGENT_V2] Resuming from: ${this.context.resumeState.state}`);
             this.state = this.context.resumeState.state;
             this.context.currentBatchIndex = this.context.resumeState.currentBatchIndex;
         } else {
@@ -161,7 +162,7 @@ export class UsecaseGenerationAgentV2 {
         totalGenerated: number;
         saveResult: SaveResult;
     }> {
-        console.log(`🤖 [AGENT_V2] Starting in state: ${this.state}`);
+        logger.info(`🤖 [AGENT_V2] Starting in state: ${this.state}`);
 
         while (this.state !== AgentStateV2.DONE) {
             try {
@@ -194,7 +195,7 @@ export class UsecaseGenerationAgentV2 {
                         throw new Error(`Unknown state: ${this.state}`);
                 }
             } catch (error: any) {
-                console.error(`❌ [AGENT_V2] Error in ${this.state}:`, error.message);
+                logger.error(`❌ [AGENT_V2] Error in ${this.state}:`, error.message);
                 await this.handleError(error);
             }
         }
@@ -221,13 +222,13 @@ export class UsecaseGenerationAgentV2 {
      * PHASE 1: Estimate với commitment - LLM cam kết danh sách usecase
      */
     private async phase1_estimateWithCommitment(): Promise<void> {
-        console.log(`📊 [PHASE 1] Estimating with commitment...`);
+        logger.info(`📊 [PHASE 1] Estimating with commitment...`);
         await this.broadcastProgress(10, "estimating", "Đang ước tính usecases...");
 
         // ✅ QUAN TRỌNG: Lưu số lượng usecases ban đầu để tính số lượng mới save trong session
         const existingCount = await Usecase.countDocuments({ version_id: this.context.versionId });
         this.context.initialUsecaseCount = existingCount;
-        console.log(`📊 [ESTIMATE] Initial usecase count in DB: ${existingCount} (sẽ chỉ tính usecases mới được thêm vào sau thời điểm này)`);
+        logger.info(`📊 [ESTIMATE] Initial usecase count in DB: ${existingCount} (sẽ chỉ tính usecases mới được thêm vào sau thời điểm này)`);
 
         const result = await this.gemini.estimateWithCommitment(
             this.context.mergedText,
@@ -248,7 +249,7 @@ export class UsecaseGenerationAgentV2 {
             });
         });
 
-        console.log(`✅ [PHASE 1] Committed ${result.committed_usecases.length} usecases`);
+        logger.info(`✅ [PHASE 1] Committed ${result.committed_usecases.length} usecases`);
         await this.broadcastProgress(15, "estimating",
             `Đã cam kết ${result.committed_usecases.length} usecases: ${result.summary}`);
 
@@ -262,7 +263,7 @@ export class UsecaseGenerationAgentV2 {
      * PHASE 2: Batch planning - Chia committed usecases thành batches
      */
     private async phase2_batchPlanning(): Promise<void> {
-        console.log(`📋 [PHASE 2] Planning batches...`);
+        logger.info(`📋 [PHASE 2] Planning batches...`);
 
         if (!this.context.estimateResult) {
             throw new Error("No estimate result for batch planning");
@@ -283,7 +284,7 @@ export class UsecaseGenerationAgentV2 {
         this.context.batchPlan = batchPlan;
         this.context.currentBatchIndex = 0;
 
-        console.log(`✅ [PHASE 2] Planned ${batchPlan.length} batches`);
+        logger.info(`✅ [PHASE 2] Planned ${batchPlan.length} batches`);
         await this.broadcastProgress(18, "planning", `Đã lập kế hoạch ${batchPlan.length} batches`);
 
         this.state = AgentStateV2.GENERATE_BATCH;
@@ -304,7 +305,7 @@ export class UsecaseGenerationAgentV2 {
             return;
         }
 
-        console.log(`📦 [PHASE 3] Generating batch ${currentBatch.batchNumber}/${this.context.batchPlan.length}...`);
+        logger.info(`📦 [PHASE 3] Generating batch ${currentBatch.batchNumber}/${this.context.batchPlan.length}...`);
         const progress = 20 + Math.floor((currentBatch.batchNumber / this.context.batchPlan.length) * 50);
         await this.broadcastProgress(progress, "generating",
             `Đang generate batch ${currentBatch.batchNumber}/${this.context.batchPlan.length} (${currentBatch.keys.length} usecases)...`);
@@ -365,7 +366,7 @@ export class UsecaseGenerationAgentV2 {
                 }
             }
 
-            console.log(`✅ [PHASE 3] Batch ${currentBatch.batchNumber}: ${generatedCount} generated, ${missingCount} missing`);
+            logger.info(`✅ [PHASE 3] Batch ${currentBatch.batchNumber}: ${generatedCount} generated, ${missingCount} missing`);
 
             // ✅ MỚI: Save batch này ngay sau khi generate (tương tự testcase)
             await this.saveBatch(currentBatch);
@@ -385,7 +386,7 @@ export class UsecaseGenerationAgentV2 {
      * ✅ MỚI: Save batch ngay sau khi generate (tương tự testcase)
      */
     private async saveBatch(batch: BatchPlanV2): Promise<void> {
-        console.log(`💾 [SAVE_BATCH] Saving batch ${batch.batchNumber}...`);
+        logger.info(`💾 [SAVE_BATCH] Saving batch ${batch.batchNumber}...`);
 
         // Collect valid usecases từ batch này
         const batchUsecases: any[] = [];
@@ -397,7 +398,7 @@ export class UsecaseGenerationAgentV2 {
         }
 
         if (batchUsecases.length === 0) {
-            console.log(`⏩ [SAVE_BATCH] Batch ${batch.batchNumber}: No valid usecases to save`);
+            logger.info(`⏩ [SAVE_BATCH] Batch ${batch.batchNumber}: No valid usecases to save`);
             return;
         }
 
@@ -418,7 +419,7 @@ export class UsecaseGenerationAgentV2 {
             const initialCount = this.context.initialUsecaseCount || 0;
             const totalSavedInSession = finalCountAfterSave - initialCount;
 
-            console.log(`✅ [SAVE_BATCH] Batch ${batch.batchNumber}: Saved ${saveResult.saved} usecases (total in session: ${totalSavedInSession})`);
+            logger.info(`✅ [SAVE_BATCH] Batch ${batch.batchNumber}: Saved ${saveResult.saved} usecases (total in session: ${totalSavedInSession})`);
 
             // ✅ Broadcast progress với shouldRefresh flag
             await this.broadcastProgress(
@@ -430,7 +431,7 @@ export class UsecaseGenerationAgentV2 {
             );
 
         } catch (error: any) {
-            console.error(`❌ [SAVE_BATCH] Batch ${batch.batchNumber} save failed:`, error.message);
+            logger.error(`❌ [SAVE_BATCH] Batch ${batch.batchNumber} save failed:`, error.message);
             // Không throw, tiếp tục với batch tiếp theo
         }
     }
@@ -439,7 +440,7 @@ export class UsecaseGenerationAgentV2 {
      * PHASE 4: Retry missing - Retry các usecase bị missing/invalid
      */
     private async phase4_retryMissing(): Promise<void> {
-        console.log(`🔄 [PHASE 4] Checking for missing usecases...`);
+        logger.info(`🔄 [PHASE 4] Checking for missing usecases...`);
 
         // Collect missing/invalid
         const missingEntries: TempStorageEntry[] = [];
@@ -450,15 +451,15 @@ export class UsecaseGenerationAgentV2 {
         });
 
         if (missingEntries.length === 0) {
-            console.log(`✅ [PHASE 4] No missing usecases`);
+            logger.info(`✅ [PHASE 4] No missing usecases`);
             this.state = AgentStateV2.FINAL_VALIDATION;
             return;
         }
 
         // ✅ Kiểm tra: nếu đã retry nhiều lần nhưng vẫn thiếu, cảnh báo và tiếp tục retry với LLM (không dùng mock data)
         if (this.context.retryAttempts >= this.context.maxRetryAttempts) {
-            console.warn(`⚠️ [PHASE 4] Max retry attempts (${this.context.maxRetryAttempts}) reached. ${missingEntries.length} still missing.`);
-            console.warn(`⚠️ [PHASE 4] Attempting final LLM retry with enhanced prompt...`);
+            logger.warn(`⚠️ [PHASE 4] Max retry attempts (${this.context.maxRetryAttempts}) reached. ${missingEntries.length} still missing.`);
+            logger.warn(`⚠️ [PHASE 4] Attempting final LLM retry with enhanced prompt...`);
 
             // ✅ Final retry: Gọi LLM một lần nữa với prompt đặc biệt (KHÔNG dùng mock data)
             try {
@@ -496,9 +497,9 @@ export class UsecaseGenerationAgentV2 {
                     }
                 }
 
-                console.log(`✅ [PHASE 4] Final retry recovered ${finalRecoveredCount}/${missingCommitted.length} usecases`);
+                logger.info(`✅ [PHASE 4] Final retry recovered ${finalRecoveredCount}/${missingCommitted.length} usecases`);
             } catch (error: any) {
-                console.error(`❌ [PHASE 4] Final retry failed:`, error.message);
+                logger.error(`❌ [PHASE 4] Final retry failed:`, error.message);
             }
 
             // Check lại sau final retry
@@ -506,7 +507,7 @@ export class UsecaseGenerationAgentV2 {
                 .filter(e => e.status === 'missing' || e.status === 'invalid').length;
 
             if (stillMissingAfterFinalRetry > 0) {
-                console.error(`❌ [PHASE 4] After ${this.context.maxRetryAttempts} retries + final LLM retry, ${stillMissingAfterFinalRetry} usecases still missing. Proceeding with validation.`);
+                logger.error(`❌ [PHASE 4] After ${this.context.maxRetryAttempts} retries + final LLM retry, ${stillMissingAfterFinalRetry} usecases still missing. Proceeding with validation.`);
             }
 
             this.state = AgentStateV2.FINAL_VALIDATION;
@@ -514,7 +515,7 @@ export class UsecaseGenerationAgentV2 {
         }
 
         this.context.retryAttempts++;
-        console.log(`🔄 [PHASE 4] Retry attempt ${this.context.retryAttempts}/${this.context.maxRetryAttempts} for ${missingEntries.length} usecases`);
+        logger.info(`🔄 [PHASE 4] Retry attempt ${this.context.retryAttempts}/${this.context.maxRetryAttempts} for ${missingEntries.length} usecases`);
         await this.broadcastProgress(75, "retrying",
             `Retry lần ${this.context.retryAttempts}: ${missingEntries.length} usecases còn thiếu`);
 
@@ -533,7 +534,7 @@ export class UsecaseGenerationAgentV2 {
 
             // Update temp storage
             let recoveredCount = 0;
-            console.log(`🔍 [PHASE 4] Retry returned ${retriedUsecases.length} usecases, looking for ${missingCommitted.length} missing...`);
+            logger.info(`🔍 [PHASE 4] Retry returned ${retriedUsecases.length} usecases, looking for ${missingCommitted.length} missing...`);
 
             for (const committed of missingCommitted) {
                 const retried = retriedUsecases.find((uc: any) =>
@@ -542,11 +543,11 @@ export class UsecaseGenerationAgentV2 {
                 );
 
                 if (!retried) {
-                    console.warn(`⚠️ [PHASE 4] Not found retried usecase for committed: ${committed.key} - "${committed.name}"`);
+                    logger.warn(`⚠️ [PHASE 4] Not found retried usecase for committed: ${committed.key} - "${committed.name}"`);
                     // Log available keys/names from retried
                     if (retriedUsecases.length > 0) {
-                        console.log(`   Available retried keys: ${retriedUsecases.map((uc: any) => uc.key || 'NO_KEY').join(', ')}`);
-                        console.log(`   Available retried names: ${retriedUsecases.map((uc: any) => uc.name || 'NO_NAME').slice(0, 3).join(', ')}...`);
+                        logger.info(`   Available retried keys: ${retriedUsecases.map((uc: any) => uc.key || 'NO_KEY').join(', ')}`);
+                        logger.info(`   Available retried names: ${retriedUsecases.map((uc: any) => uc.name || 'NO_NAME').slice(0, 3).join(', ')}...`);
                     }
                     continue;
                 }
@@ -557,16 +558,16 @@ export class UsecaseGenerationAgentV2 {
                     entry.generated = this.normalizeUsecase(retried, committed);
                     entry.retryCount++;
                     recoveredCount++;
-                    console.log(`✅ [PHASE 4] Recovered usecase: ${committed.key} - "${committed.name}"`);
+                    logger.info(`✅ [PHASE 4] Recovered usecase: ${committed.key} - "${committed.name}"`);
                 } else if (!entry) {
-                    console.warn(`⚠️ [PHASE 4] Entry not found in tempStorage for key: ${committed.key}`);
+                    logger.warn(`⚠️ [PHASE 4] Entry not found in tempStorage for key: ${committed.key}`);
                 }
             }
 
-            console.log(`✅ [PHASE 4] Recovered ${recoveredCount}/${missingEntries.length} usecases`);
+            logger.info(`✅ [PHASE 4] Recovered ${recoveredCount}/${missingEntries.length} usecases`);
 
         } catch (error: any) {
-            console.error(`❌ [PHASE 4] Retry failed:`, error.message);
+            logger.error(`❌ [PHASE 4] Retry failed:`, error.message);
         }
 
         // Check lại xem còn missing không
@@ -590,7 +591,7 @@ export class UsecaseGenerationAgentV2 {
      * PHASE 5: Final validation - Validate toàn bộ trước khi save
      */
     private async phase5_finalValidation(): Promise<void> {
-        console.log(`🔍 [PHASE 5] Final validation...`);
+        logger.info(`🔍 [PHASE 5] Final validation...`);
         await this.broadcastProgress(85, "validating", "Đang validate toàn bộ usecases...");
 
         const version = await Version.findById(this.context.versionId).lean();
@@ -618,7 +619,7 @@ export class UsecaseGenerationAgentV2 {
             }
         });
 
-        console.log(`✅ [PHASE 5] Validation complete: ${validCount} valid, ${invalidCount} invalid`);
+        logger.info(`✅ [PHASE 5] Validation complete: ${validCount} valid, ${invalidCount} invalid`);
         await this.broadcastProgress(88, "validating",
             `Validation: ${validCount} valid, ${invalidCount} invalid`);
 
@@ -629,7 +630,7 @@ export class UsecaseGenerationAgentV2 {
      * PHASE 6: Atomic save - Save với retry + LLM repair
      */
     private async phase6_atomicSave(): Promise<void> {
-        console.log(`💾 [PHASE 6] Atomic save to database...`);
+        logger.info(`💾 [PHASE 6] Atomic save to database...`);
         await this.broadcastProgress(90, "saving", "Đang lưu vào database...");
 
         // Collect valid usecases
@@ -643,7 +644,7 @@ export class UsecaseGenerationAgentV2 {
         });
 
         if (validUsecases.length === 0) {
-            console.warn(`⚠️ [PHASE 6] No valid usecases to save`);
+            logger.warn(`⚠️ [PHASE 6] No valid usecases to save`);
             this.context.saveResult = {
                 success: false,
                 total_expected: this.context.estimateResult?.estimated_count || 0,
@@ -679,7 +680,7 @@ export class UsecaseGenerationAgentV2 {
         const initialCount = this.context.initialUsecaseCount || 0;
         const totalSavedInSession = finalCountAfterSave - initialCount;
 
-        console.log(`✅ [PHASE 6] Save complete:`, saveResult);
+        logger.info(`✅ [PHASE 6] Save complete:`, saveResult);
         await this.broadcastProgress(100, "completed",
             `Hoàn thành: ${totalSavedInSession}/${saveResult.total_expected} usecases (${saveResult.repaired_by_llm} repaired by LLM)`,
             totalSavedInSession, // ✅ Truyền savedCount thực tế từ database
@@ -697,7 +698,7 @@ export class UsecaseGenerationAgentV2 {
 
         // ✅ Lưu số lượng usecases trước khi insert (để tính số lượng mới insert)
         const countBeforeInsert = await Usecase.countDocuments({ version_id: this.context.versionId });
-        console.log(`📊 [SAVE] Usecases in database before insert: ${countBeforeInsert}`);
+        logger.info(`📊 [SAVE] Usecases in database before insert: ${countBeforeInsert}`);
 
         let saved: any[] = [];
         let repaired = 0;
@@ -713,19 +714,19 @@ export class UsecaseGenerationAgentV2 {
         // Step 1: Try batch insert
         for (let attempt = 1; attempt <= MAX_INSERT_RETRIES; attempt++) {
             try {
-                console.log(`💾 [SAVE] Attempt ${attempt}: inserting ${toInsert.length} usecases...`);
+                logger.info(`💾 [SAVE] Attempt ${attempt}: inserting ${toInsert.length} usecases...`);
                 const result = await Usecase.insertMany(toInsert, { ordered: false });
 
                 // ✅ Kiểm tra nếu số lượng insert khác với số lượng yêu cầu
                 if (result.length !== toInsert.length) {
-                    console.warn(`⚠️ [SAVE] Insert mismatch: requested ${toInsert.length}, inserted ${result.length} (${toInsert.length - result.length} missing)`);
+                    logger.warn(`⚠️ [SAVE] Insert mismatch: requested ${toInsert.length}, inserted ${result.length} (${toInsert.length - result.length} missing)`);
                     // Có thể do duplicate index - cần query lại để xác nhận
                     const actualCount = await Usecase.countDocuments({ version_id: this.context.versionId });
-                    console.log(`📊 [SAVE] Actual usecases in database: ${actualCount}`);
+                    logger.info(`📊 [SAVE] Actual usecases in database: ${actualCount}`);
                 }
 
                 saved = result;
-                console.log(`✅ [SAVE] Successfully inserted ${result.length} usecases`);
+                logger.info(`✅ [SAVE] Successfully inserted ${result.length} usecases`);
                 break;
 
             } catch (error: any) {
@@ -733,7 +734,7 @@ export class UsecaseGenerationAgentV2 {
                     const writeErrors = error.writeErrors || [];
                     const insertedCount = toInsert.length - writeErrors.length;
 
-                    console.log(`⚠️ [SAVE] Partial insert: ${insertedCount} succeeded, ${writeErrors.length} failed`);
+                    logger.info(`⚠️ [SAVE] Partial insert: ${insertedCount} succeeded, ${writeErrors.length} failed`);
 
                     // Get succeeded documents
                     const failedIndices = new Set(writeErrors.map((e: any) => e.index));
@@ -768,22 +769,22 @@ export class UsecaseGenerationAgentV2 {
                         } else if (err.code === 11000) {
                             // Duplicate - skip
                             skipped++;
-                            console.warn(`⚠️ [SAVE] Skipping duplicate usecase: ${tempKey} - "${failedUC.name}" (error: ${err.errmsg})`);
+                            logger.warn(`⚠️ [SAVE] Skipping duplicate usecase: ${tempKey} - "${failedUC.name}" (error: ${err.errmsg})`);
                         } else {
                             failed.push({ key: tempKey, error: err.errmsg, data: failedUC });
-                            console.error(`❌ [SAVE] Failed usecase: ${tempKey} - "${failedUC.name}" (code: ${err.code}, error: ${err.errmsg})`);
+                            logger.error(`❌ [SAVE] Failed usecase: ${tempKey} - "${failedUC.name}" (code: ${err.code}, error: ${err.errmsg})`);
                         }
                     }
                     break;
 
                 } else if (attempt < MAX_INSERT_RETRIES) {
                     // Connection error - retry
-                    console.warn(`⚠️ [SAVE] Attempt ${attempt} failed, retrying...`);
+                    logger.warn(`⚠️ [SAVE] Attempt ${attempt} failed, retrying...`);
                     await this.delay(1000 * attempt);
                     continue;
                 } else {
                     // Final attempt failed - try one by one
-                    console.warn(`⚠️ [SAVE] Batch insert failed, trying one by one...`);
+                    logger.warn(`⚠️ [SAVE] Batch insert failed, trying one by one...`);
                     const oneByOneResult = await this.insertOneByOne(usecases);
                     saved = oneByOneResult.saved;
                     failed = oneByOneResult.failed;
@@ -795,13 +796,13 @@ export class UsecaseGenerationAgentV2 {
         // ✅ Query lại database để xác nhận số lượng thực tế đã lưu (chỉ những usecases mới insert)
         const countAfterInsert = await Usecase.countDocuments({ version_id: this.context.versionId });
         const actualNewlyInserted = countAfterInsert - countBeforeInsert;
-        console.log(`📊 [SAVE] Database: ${countAfterInsert} total (${countBeforeInsert} before, ${actualNewlyInserted} newly inserted)`);
-        console.log(`📊 [SAVE] insertMany returned: ${saved.length}, expected: ${toInsert.length}`);
+        logger.info(`📊 [SAVE] Database: ${countAfterInsert} total (${countBeforeInsert} before, ${actualNewlyInserted} newly inserted)`);
+        logger.info(`📊 [SAVE] insertMany returned: ${saved.length}, expected: ${toInsert.length}`);
 
         // ✅ Nếu số lượng mới insert khác với số lượng insertMany trả về, có thể do duplicate index im lặng
         if (actualNewlyInserted !== saved.length) {
             const missingCount = saved.length - actualNewlyInserted;
-            console.warn(`⚠️ [SAVE] Mismatch: insertMany returned ${saved.length} but only ${actualNewlyInserted} were actually inserted (${missingCount} may be duplicates)`);
+            logger.warn(`⚠️ [SAVE] Mismatch: insertMany returned ${saved.length} but only ${actualNewlyInserted} were actually inserted (${missingCount} may be duplicates)`);
             // Cập nhật skipped count
             skipped += missingCount;
         }
@@ -809,7 +810,7 @@ export class UsecaseGenerationAgentV2 {
         // ✅ Nếu số lượng insertMany trả về khác với số lượng yêu cầu, có thể do duplicate trong batch
         if (saved.length !== toInsert.length) {
             const missingCount = toInsert.length - saved.length;
-            console.warn(`⚠️ [SAVE] insertMany mismatch: requested ${toInsert.length}, returned ${saved.length} (${missingCount} missing - may be duplicates)`);
+            logger.warn(`⚠️ [SAVE] insertMany mismatch: requested ${toInsert.length}, returned ${saved.length} (${missingCount} missing - may be duplicates)`);
             skipped += missingCount;
         }
 
@@ -822,12 +823,12 @@ export class UsecaseGenerationAgentV2 {
             failed
         };
 
-        console.log(`📊 [SAVE] Final result: ${result.saved} saved, ${result.repaired_by_llm} repaired, ${result.skipped} skipped, ${result.failed.length} failed`);
+        logger.info(`📊 [SAVE] Final result: ${result.saved} saved, ${result.repaired_by_llm} repaired, ${result.skipped} skipped, ${result.failed.length} failed`);
         if (result.skipped > 0) {
-            console.warn(`⚠️ [SAVE] ${result.skipped} usecases were skipped (likely duplicates)`);
+            logger.warn(`⚠️ [SAVE] ${result.skipped} usecases were skipped (likely duplicates)`);
         }
         if (result.failed.length > 0) {
-            console.error(`❌ [SAVE] ${result.failed.length} usecases failed:`, result.failed.map(f => `${f.key}: ${f.error}`).join(', '));
+            logger.error(`❌ [SAVE] ${result.failed.length} usecases failed:`, result.failed.map(f => `${f.key}: ${f.error}`).join(', '));
         }
 
         return result;
@@ -839,7 +840,7 @@ export class UsecaseGenerationAgentV2 {
     private async tryLLMRepair(brokenUC: any, errorMsg: string): Promise<{ success: boolean; doc?: any }> {
         for (let attempt = 1; attempt <= this.MAX_REPAIR_ATTEMPTS; attempt++) {
             try {
-                console.log(`🔧 [LLM REPAIR] Attempt ${attempt} for: ${brokenUC.name}`);
+                logger.info(`🔧 [LLM REPAIR] Attempt ${attempt} for: ${brokenUC.name}`);
 
                 const fixedUC = await this.gemini.repairUsecase(brokenUC, errorMsg);
                 if (fixedUC) {
@@ -848,11 +849,11 @@ export class UsecaseGenerationAgentV2 {
                     fixedUC.version_id = brokenUC.version_id;
 
                     const doc = await Usecase.create(fixedUC);
-                    console.log(`✅ [LLM REPAIR] Fixed: ${brokenUC.name}`);
+                    logger.info(`✅ [LLM REPAIR] Fixed: ${brokenUC.name}`);
                     return { success: true, doc };
                 }
             } catch (err: any) {
-                console.error(`❌ [LLM REPAIR] Attempt ${attempt} failed:`, err.message);
+                logger.error(`❌ [LLM REPAIR] Attempt ${attempt} failed:`, err.message);
             }
         }
         return { success: false };
@@ -1023,7 +1024,7 @@ export class UsecaseGenerationAgentV2 {
      * Handle batch error
      */
     private async handleBatchError(error: any, batch: BatchPlanV2): Promise<void> {
-        console.error(`❌ [PHASE 3] Batch ${batch.batchNumber} error:`, error.message);
+        logger.error(`❌ [PHASE 3] Batch ${batch.batchNumber} error:`, error.message);
 
         // Mark all usecases in batch as missing
         for (const key of batch.keys) {

@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import { Request, Response } from 'express';
 import { UploadedFile } from 'express-fileupload';
 import { ReadDocxService } from '../../handle_docx/domain/service';
@@ -101,7 +102,7 @@ export class ReadDocxController {
             });
 
         } catch (error: any) {
-            console.error('Error processing DOCX file:', error);
+            logger.error('Error processing DOCX file:', error);
             // Bắt lỗi nếu ID không hợp lệ (ví dụ: không phải ObjectId)
             if (error.kind === 'ObjectId') {
                  return res.status(400).json({ success: false, error: `Invalid ID format for: ${error.path}` });

@@ -1,9 +1,12 @@
 import { Router } from 'express';
 import {requireAuthorizedUser} from '../../../middlewares/auth';
+import { guardProjectResources } from "../../../middlewares/projectAccess";
 import { OrchestratorController } from './controller';
 
 export default function initOrchestratorRoute(controller: OrchestratorController): Router {
     const router = Router();
+    router.use(requireAuthorizedUser);
+    guardProjectResources(router, ["project_id", "version_id", "projectId", "versionId"]);
     const runHandler = controller.run.bind(controller);
     // const resolveHandler = controller.resolveDuplicate.bind(controller);
     const retryProjectAnalysis = controller.retryProjectAnalysis.bind(controller);
