@@ -1,6 +1,6 @@
 import { io } from "../../../socket";
 
-export type WorkhubSyncState = "syncing" | "synced" | "link_required" | "error";
+export type WorkhubSyncState = "syncing" | "synced" | "link_required" | "error" | "paused";
 
 export const workhubSocketService = {
   /** Tells everyone viewing the project how the WorkHub sync is doing. */

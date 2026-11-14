@@ -1,3 +1,4 @@
+import { workhubSyncService } from "../../workhub/domain/service";
 import logger from "../../../../../lib/logger";
 import Project from '../../../../../internal/model/project';
 import Input from '../../../../../internal/model/input';
@@ -207,6 +208,7 @@ export class ProjectService {
       }
 
       await project.save();
+      workhubSyncService.projectTrashed(projectId); // dự án WorkHub → lưu trữ (chỉ đọc)
 
       const user = await User.findById(userId).select("name email").lean();
 
@@ -257,6 +259,7 @@ export class ProjectService {
     }
 
     await project.save();
+    workhubSyncService.projectRestored(projectId); // mở lại dự án WorkHub
 
     const user = await User.findById(userId).select("name email").lean();
 

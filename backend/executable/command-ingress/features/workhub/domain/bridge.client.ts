@@ -56,6 +56,22 @@ export class BridgeClient {
     return this.call<any>("POST", "/v1/testcases/report", payload);
   }
 
+  unlinkUser(ssUserId: string) {
+    return this.call<{ unlinked: boolean; projects: number }>("DELETE", `/v1/users/${ssUserId}`);
+  }
+
+  setPaused(ssProjectId: string, paused: boolean) {
+    return this.call<{ paused: boolean }>("POST", `/v1/projects/${ssProjectId}/pause`, { paused });
+  }
+
+  archiveProject(ssProjectId: string) {
+    return this.call<{ archived: boolean }>("POST", `/v1/projects/${ssProjectId}/archive`);
+  }
+
+  restoreProject(ssProjectId: string) {
+    return this.call<{ restored: boolean }>("POST", `/v1/projects/${ssProjectId}/restore`);
+  }
+
   reconcile(ssProjectId: string) {
     return this.call<{ changed: number }>("POST", `/v1/projects/${ssProjectId}/reconcile`);
   }

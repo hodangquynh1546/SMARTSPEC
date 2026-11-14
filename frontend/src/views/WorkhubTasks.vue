@@ -134,6 +134,9 @@ onBeforeUnmount(() => {
     </div>
 
     <template v-else>
+      <p v-if="projectState.paused" class="banner">Đồng bộ với WorkHub đang tạm dừng. Dữ liệu dưới đây là lần đồng bộ cuối; chủ dự án có thể tiếp tục từ menu ⋯ ở đầu trang.</p>
+      <p v-else-if="projectState.archived" class="banner">Dự án WorkHub đang được lưu trữ vì dự án này ở thùng rác. Khôi phục dự án để mở lại.</p>
+
       <section class="summary card">
         <div class="summary-top">
           <div>
@@ -218,6 +221,7 @@ h2 { font-size: 1.05rem; margin: 0 0 6px; }
 h3 { font-size: 0.95rem; margin: 6px 0 0; }
 .muted { color: var(--muted); margin: 0; }
 .small { font-size: 0.8rem; }
+.banner { margin: 0; padding: 10px 16px; border-radius: var(--radius-field); background: var(--warning-soft); color: var(--warning); font-size: 0.88rem; }
 .note { margin: 12px 0 0; font-size: 0.8rem; color: var(--muted); }
 .summary-top { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
 .summary-actions { display: flex; gap: 8px; align-items: center; }

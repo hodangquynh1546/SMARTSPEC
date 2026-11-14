@@ -332,6 +332,32 @@ export class WorkhubSyncService {
     }
   }
 
+  /** Project moved to the SmartSpec trash: the WorkHub project becomes read-only (archived). Best effort. */
+  async projectTrashed(projectId: string) {
+    if (!env.WORKHUB_ENABLED) return;
+    clearTimeout(this.timers.get(projectId));
+    try { await bridgeClient.archiveProject(projectId); } catch (e: any) { logger.warn(`WorkHub archive ${projectId} failed: ${e?.message ?? e}`); }
+  }
+
+  /** Restored from the trash: reopen the WorkHub project, then bring it up to date. */
+  async projectRestored(projectId: string) {
+    if (!env.WORKHUB_ENABLED) return;
+    try { await bridgeClient.restoreProject(projectId); } catch (e: any) { logger.warn(`WorkHub restore ${projectId} failed: ${e?.message ?? e}`); }
+    this.schedule(projectId, undefined, 500);
+  }
+
+  /** Owner pauses/resumes syncing of one project (nothing is deleted in WorkHub). */
+  async setPaused(projectId: string, paused: boolean) {
+    const r = await bridgeClient.setPaused(projectId, paused);
+    if (!paused) this.schedule(projectId, undefined, 300);
+    workhubSocketService.emitSync(projectId, paused ? "paused" : "syncing");
+    return r;
+  }
+
+  async unlinkUser(userId: string) {
+    return bridgeClient.unlinkUser(userId);
+  }
+
   async userStatus(userId: string) {
     try {
       const s = await bridgeClient.userStatus(userId);

@@ -15,7 +15,7 @@ export interface DesignDoc {
 
 export const ROOT_FOLDER = "SmartSpec";
 const MAX = 95_000;
-const BANNER = "> Tài liệu được **SmartSpec** tạo và cập nhật tự động. Hãy sửa ở SmartSpec; chỉnh sửa tại đây sẽ bị ghi đè ở lần đồng bộ kế tiếp (lịch sử phiên bản vẫn được giữ).\n\n";
+const BANNER = "> Tài liệu được **SmartSpec** tạo và cập nhật tự động nên chỉ đọc ở WorkHub. Hãy chỉnh sửa ở SmartSpec; mỗi thay đổi là một phiên bản mới trong lịch sử tài liệu.\n\n";
 
 const clip = (s: string) => (s.length <= MAX ? s : s.slice(0, MAX - 40) + "\n\n_… (đã cắt bớt do quá dài)_");
 const label = (s: unknown) => String(s ?? "").replace(/["\n\r]/g, " ").replace(/[<>]/g, "").trim() || " ";

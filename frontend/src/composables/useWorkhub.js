@@ -38,6 +38,8 @@ function onEvent(e) {
     const p = ensureProject(e.projectId)
     p.sync = e.state
     if (e.workhub) { p.workhub = e.workhub; p.linked = true }
+    if (e.state === 'paused') p.paused = true
+    else if (e.state === 'syncing' || e.state === 'synced') p.paused = false
     if (e.state === 'synced') loadProject(e.projectId)
     if (e.state === 'link_required' && !workhub.linked && !workhub.dismissed) workhub.modalOpen = true
   } else if (e?.type === 'WORKHUB_BUG') {
@@ -93,6 +95,8 @@ export async function loadProject(projectId) {
     p.workhub = s.workhub || null
     p.items = s.items || {}
     p.lastSyncedAt = s.lastSyncedAt || null
+    p.paused = !!s.paused
+    p.archived = !!s.archived
     for (const [key, it] of Object.entries(p.items)) {
       if (it.progress) workhub.progress[key] = { ...progressToImplementation(it.progress), removed: it.removed }
     }
@@ -113,6 +117,20 @@ export async function syncNow(projectId) {
     p.sync = e.response?.data?.code === 'WORKHUB_LINK_REQUIRED' ? 'link_required' : 'error'
     throw e
   }
+}
+
+/** Huỷ liên kết tài khoản WorkHub của tôi (token bị thu hồi; task/tài liệu đã tạo vẫn còn). */
+export async function unlinkAccount() {
+  await axiosClient.delete('/api/workhub/link')
+  workhub.linked = false
+  workhub.email = ''
+  workhub.dismissed = true // đã chủ động huỷ: đừng bật lại modal ngay
+}
+
+/** Chủ dự án tạm dừng/tiếp tục đồng bộ một dự án. */
+export async function setProjectPaused(projectId, paused) {
+  await axiosClient.put(`/api/workhub/projects/${projectId}/paused`, { paused })
+  ensureProject(projectId).paused = paused
 }
 
 export const workhubErrorMessage = (e) =>

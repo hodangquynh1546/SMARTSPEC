@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { requireAuthorizedUser } from "../../../middlewares/auth";
 import { guardProjectResources } from "../../../middlewares/projectAccess";
 import env from "../../../utils/env";
+import Project from "../../../../../internal/model/project";
 import { HttpRequest } from "../../../types";
 import { BridgeError, bridgeClient } from "../domain/bridge.client";
 import { workhubSyncService } from "../domain/service";
@@ -27,6 +28,20 @@ export default function initWorkhubRoute(): Router {
     const { email, password, register, fullName } = req.body ?? {};
     if (!password) return void res.status(400).json({ success: false, code: "BAD_REQUEST", message: "Thiếu mật khẩu WorkHub" });
     res.json({ success: true, data: await workhubSyncService.linkUser(req.getSubject(), { email, password, register: !!register, fullName }) });
+  }));
+
+  // Unlink my WorkHub account: the token is revoked in WorkHub; tasks/documents already created stay untouched.
+  router.delete("/link", wrap(async (req, res) => {
+    res.json({ success: true, data: await workhubSyncService.unlinkUser(req.getSubject()) });
+  }));
+
+  // Pause/resume syncing of a project (owner only).
+  router.put("/projects/:projectId/paused", wrap(async (req, res) => {
+    const project: any = await Project.findById(String(req.params.projectId)).select("owner_id").lean();
+    if (!project || String(project.owner_id) !== req.getSubject()) {
+      return void res.status(403).json({ success: false, code: "OWNER_ONLY", message: "Chỉ chủ dự án mới tạm dừng/tiếp tục đồng bộ" });
+    }
+    res.json({ success: true, data: await workhubSyncService.setPaused(String(req.params.projectId), !!req.body?.paused) });
   }));
 
   // Link + use case progress of one project (for the "Mở WorkHub" button and the badges).
