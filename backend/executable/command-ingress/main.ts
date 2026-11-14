@@ -1,3 +1,4 @@
+import "dotenv/config"; // phải là import đầu tiên: các module bên dưới đọc process.env ngay khi được nạp
 import logger from "../../lib/logger";
 import "reflect-metadata";
 import { config } from "dotenv";

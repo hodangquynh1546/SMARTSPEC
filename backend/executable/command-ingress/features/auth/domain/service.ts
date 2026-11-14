@@ -1,3 +1,4 @@
+import env from "../../../utils/env";
 import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -19,6 +20,10 @@ import {
 import { generateJwt, generateJwtOTP } from "../../../services/jwtService";
 import mailService from "../../../services/sendMail.service";
 import { LogService } from "../../log/domain/service";
+import { AuthError } from "./errors";
+import { assertPasswordPolicy } from "./password";
+import { workhubIdentity } from "./identity";
+import { workhubSyncService } from "../../workhub/domain/service";
 
 export class AuthServiceImpl implements AuthService {
   googleIdentityBroker: GoogleIdentityBroker;
@@ -83,6 +88,7 @@ export class AuthServiceImpl implements AuthService {
           },
         ],
         provider: "GOOGLE",
+        email_verified: true,
       });
 
       await user.save();
@@ -159,35 +165,6 @@ export class AuthServiceImpl implements AuthService {
     return "User logged out successfully";
   }
 
-  async refreshToken(token: string): Promise<ExchangeTokenResult> {
-    const jwtClaims = this.verifyToken(token, this.jwtRefreshSecret);
-    const sessionID = jwtClaims["sid"];
-    const subject = jwtClaims["sub"];
-
-    const session = await Session.findOne({ sessionID });
-
-    // ✨ FIX: Ném ra lỗi với thông báo rõ ràng hơn.
-    if (!session) {
-      throw new Error("Invalid or expired session. Please log in again.");
-    }
-
-    const jwtPayload = {
-      _id: jwtClaims["sub"],
-      sub: jwtClaims["sub"],
-      sid: sessionID,
-    };
-
-    // Tạo lại cả access token và refresh token mới (xoay vòng token)
-    const newAccessToken = this.signAccessToken(jwtPayload);
-    const newRefreshToken = this.signRefreshToken(jwtPayload);
-
-    return {
-      sub: String(subject),
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    };
-  }
-
   async getProfile(userId: string): Promise<any> {
     const user = await User.findById(userId).select('-password'); // Lấy user và loại bỏ trường password
     if (!user) {
@@ -211,171 +188,208 @@ export class AuthServiceImpl implements AuthService {
   }
 
 
-  async sendVerificationEmail(email: string): Promise<boolean> {
-    const user = await User.findOne({ email });
-    if (user) {
-      throw new Error("Email already exists");
-    }
-    const verifyToken = await generateJwtOTP({ email });
+  // ---------------------------------------------------------------- accounts (shared with WorkHub)
 
-    const subject = "Verify your email";
-    const data = `Click the link to verify your email: http://localhost:5173/verify-email?token=${verifyToken}`;
+  private normalizeEmail(email: string): string {
+    return String(email ?? "").trim().toLowerCase();
+  }
 
-    const mailIsSent = await this.sendmail(email, subject, data);
-    if (!mailIsSent) {
-      throw new Error("Failed to send email");
+  /** Case-insensitive lookup (older accounts may have been stored with capitals). */
+  private async findUserByEmail(email: string): Promise<any | null> {
+    const normalized = this.normalizeEmail(email);
+    const exact = await User.findOne({ email: normalized });
+    if (exact) return exact;
+    const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return User.findOne({ email: new RegExp(`^${escaped}$`, "i") });
+  }
+
+  private checkPassword(password: string) {
+    assertPasswordPolicy(password);
+  }
+
+  private async startSession(user: any, message: string, ip?: string, userAgent?: string): Promise<ExchangeTokenResult> {
+    const sessionID = uuidv4();
+    const jwtPayload = { _id: user._id, sub: user._id, sid: sessionID, system_role: user.system_role };
+    const accessToken = this.signAccessToken(jwtPayload);
+    const refreshToken = this.signRefreshToken(jwtPayload);
+    await new Session({ sessionID, userID: user._id }).save();
+    await this.logService.createLog({
+      user_id: user._id.toString(), target_id: user._id.toString(), action: "login", target_type: "system",
+      details: { message }, level: "info", ip, user_agent: userAgent,
+    });
+    return { refreshToken, accessToken, sub: String(user._id) };
+  }
+
+  private signEmailToken(email: string, typ: "verify" | "reset", expiresIn: string): string {
+    return jwt.sign({ email, typ }, this.jwtEmailSecret, { expiresIn } as jwt.SignOptions);
+  }
+
+  private readEmailToken(token: string, typ: "verify" | "reset"): string {
+    let payload: any;
+    try {
+      payload = jwt.verify(token, this.jwtEmailSecret);
+    } catch {
+      throw new AuthError(400, "INVALID_TOKEN", "Liên kết không hợp lệ hoặc đã hết hạn");
     }
-    return true;
+    if (payload?.typ !== typ || !payload.email) throw new AuthError(400, "INVALID_TOKEN", "Liên kết không hợp lệ hoặc đã hết hạn");
+    return String(payload.email);
+  }
+
+  /** Sends the verification link (best effort: a mail outage must not block the account). */
+  async sendVerificationEmail(userId: string): Promise<boolean> {
+    const user = await User.findById(userId);
+    if (!user) throw new AuthError(404, "USER_NOT_FOUND", "Không tìm thấy tài khoản");
+    if (user.email_verified) return true;
+    const token = this.signEmailToken(user.email, "verify", "24h");
+    const link = `${env.CLIENT_URL}/verify-email?token=${token}`;
+    return this.sendmail(user.email, "Xác thực email SmartSpec",
+      `<p>Xin chào ${user.name ?? ""},</p><p>Nhấn vào liên kết sau để xác thực email của bạn (có hiệu lực 24 giờ):</p><p><a href="${link}">${link}</a></p>`);
   }
 
   async verifyEmail(token: string): Promise<boolean> {
-    // ✨ FIX: Dùng secret key riêng cho email.
-    const payload = jwt.verify(token, this.jwtSecret) as { email: string }; // THAY this.jwtSecret BẰNG this.jwtEmailSecret
-    if (!payload.email) {
-      throw new Error("Invalid token");
+    const email = this.readEmailToken(token, "verify");
+    const user = await this.findUserByEmail(email);
+    if (!user) throw new AuthError(404, "USER_NOT_FOUND", "Không tìm thấy tài khoản");
+    if (!user.email_verified) {
+      user.email_verified = true;
+      await user.save();
     }
     return true;
   }
-  async register(
-    email: string,
-    password: string,
-    confirmPassword: string,
-    name: string,
-    isTwoFactorEnabled: boolean,
-    dob: Date,
-    gender: string,
-    ip?: string, userAgent?: string
-  ): Promise<ExchangeTokenResult> {
-    // ✨ FIX: Thêm bước kiểm tra mật khẩu trùng khớp.
-    if (password !== confirmPassword) {
-      throw new Error("Passwords do not match");
-    }
 
-    let existingUser = await User.findOne({ email });
-    if (existingUser) {
-      throw new Error("User already exists");
+  /**
+   * Sign up with e-mail, password and confirmation only. If the address already has a WorkHub account with the same
+   * password this is the same person, so the account is simply created here too; a different password is refused.
+   */
+  async register(email: string, password: string, confirmPassword: string, ip?: string, userAgent?: string): Promise<ExchangeTokenResult & { emailVerified: boolean }> {
+    const normalized = this.normalizeEmail(email);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) throw new AuthError(400, "INVALID_EMAIL", "Email không hợp lệ");
+    this.checkPassword(password);
+    if (password !== confirmPassword) throw new AuthError(400, "PASSWORD_MISMATCH", "Mật khẩu xác nhận không khớp");
+    if (await this.findUserByEmail(normalized)) throw new AuthError(409, "EMAIL_TAKEN", "Email này đã được đăng ký");
+
+    const peer = await workhubIdentity.verify(normalized, password);
+    if (peer.status === "wrong_password") {
+      throw new AuthError(409, "EMAIL_TAKEN_ELSEWHERE", "Email này đã có tài khoản WorkHub với mật khẩu khác. Hãy đăng nhập bằng mật khẩu của WorkHub.");
     }
-    logger.info("password before hash:", password)
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      email,
-      password: hashedPassword,
-      name,
-      isTwoFactorEnabled,
-      dob,
-      gender,
-    });
-    await user.save();
+    const name = peer.name || normalized.split("@")[0];
+    const user = await new User({
+      email: normalized, password: await bcrypt.hash(password, 10), name, email_verified: peer.status === "ok" && !!peer.emailVerified, password_changed_at: new Date(),
+    }).save();
 
     await this.logService.createLog({
-      user_id: user._id.toString(),
-      target_id: user._id.toString(),
-      action: "create_user",
-      target_type: "system",
-      details: { message: `User "${email}" registered successfully (ID: ${user._id}) via local registration.` },
-      level: "info",
-      ip: ip,
-      user_agent: userAgent
+      user_id: user._id.toString(), target_id: user._id.toString(), action: "create_user", target_type: "system",
+      details: { message: `User "${normalized}" registered (ID: ${user._id}).` }, level: "info", ip, user_agent: userAgent,
     });
-
-    const sessionID = uuidv4();
-    const jwtPayload = {
-      _id: user._id,
-      sub: user._id,
-      sid: sessionID,
-      system_role: user.system_role
-    };
-    const accessToken = this.signAccessToken(jwtPayload);
-    const refreshToken = this.signRefreshToken(jwtPayload);
-
-    const session = new Session({ sessionID, userID: user._id });
-    await session.save();
-
-    return {
-      refreshToken,
-      accessToken,
-      sub: String(user._id),
-    };
+    if (!user.email_verified) this.sendVerificationEmail(String(user._id)).catch(() => undefined);
+    await this.linkWorkhub(user, password, peer.status !== "ok");
+    return { ...(await this.startSession(user, `User "${normalized}" registered and signed in.`, ip, userAgent)), emailVerified: !!user.email_verified };
   }
 
-  // có chỉnh thêm tham số
+  /** Links the user's WorkHub account (creating it when needed) so projects appear there without any extra step. */
+  private async linkWorkhub(user: any, password: string, createIfMissing: boolean): Promise<void> {
+    await Promise.race([
+      workhubSyncService.autoLink(String(user._id), user.email, password, user.name, createIfMissing).catch(() => undefined),
+      new Promise((resolve) => setTimeout(resolve, 6000)), // never make sign-in wait long for the peer
+    ]);
+  }
+
   async login(email: string, password: string, ip?: string, userAgent?: string): Promise<LoginResponse> {
-    const user = await User.findOne({ email });
-    if (!user) {
-      await this.logService.createLog({
-        user_id: undefined,
-        target_id: undefined,
-        action: "failed_login",
-        target_type: "system",
-        details: { message: `Failed login attempt for "${email}" — reason: "User not found"` },
-        level: "warning",
-        ip: ip,
-        user_agent: userAgent
-      });
-      throw new Error("User not found");
+    const normalized = this.normalizeEmail(email);
+    let user = await this.findUserByEmail(normalized);
+    let ok = !!user?.password && (await bcrypt.compare(password, user.password));
+
+    if (!ok) {
+      // Not here (or a different password): the other system may know this account, e.g. it was created or its
+      // password changed there. Adopt it.
+      const peer = await workhubIdentity.verify(normalized, password);
+      const peerChanged = peer.passwordChangedAt ? new Date(peer.passwordChangedAt) : null;
+      // An existing account only takes the peer's password when it was changed there AFTER ours: otherwise the peer
+      // is just stale (an old password) and must not come back to life.
+      const peerIsNewer = !!peerChanged && (!user?.password_changed_at || peerChanged.getTime() > new Date(user.password_changed_at).getTime());
+      if (peer.status === "ok" && (!user || peerIsNewer)) {
+        const hash = await bcrypt.hash(password, 10);
+        if (!user) {
+          user = await new User({ email: normalized, password: hash, name: peer.name || normalized.split("@")[0], email_verified: !!peer.emailVerified, password_changed_at: peerChanged ?? new Date() }).save();
+          await this.logService.createLog({ user_id: user._id.toString(), target_id: user._id.toString(), action: "create_user", target_type: "system",
+            details: { message: `User "${normalized}" created from the WorkHub account on first sign-in.` }, level: "info", ip, user_agent: userAgent });
+        } else {
+          user.password = hash;
+          user.password_changed_at = peerChanged ?? new Date();
+          if (peer.emailVerified) user.email_verified = true;
+          await user.save();
+        }
+        ok = true;
+      }
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      await this.logService.createLog({
-        user_id: undefined,
-        target_id: undefined,
-        action: "failed_login",
-        target_type: "system",
-        details: { message: `Failed login attempt for "${email}" — reason: "Invalid password"` },
-        level: "warning",
-        ip: ip,
-        user_agent: userAgent
-      });
-      throw new Error("Invalid password");
+    if (!user || !ok) {
+      await this.logService.createLog({ user_id: user ? user._id.toString() : undefined, target_id: undefined, action: "failed_login", target_type: "system",
+        details: { message: `Failed login attempt for "${normalized}"` }, level: "warning", ip, user_agent: userAgent });
+      // one message for "no such account" and "wrong password": do not reveal which e-mails exist
+      throw new AuthError(401, "INVALID_CREDENTIALS", "Email hoặc mật khẩu không đúng");
     }
+    if (user.status === "INACTIVE") throw new AuthError(403, "ACCOUNT_DISABLED", "Tài khoản đã bị vô hiệu hoá");
+
+    // keep the WorkHub link (and its projects) up to date; the password is only known right now
+    this.linkWorkhub(user, password, false).catch(() => undefined);
 
     if (user.isTwoFactorEnabled) {
       const otp = crypto.randomInt(100000, 1000000).toString();
-
-      // Token chỉ chứa HMAC của OTP (khóa bí mật phía server) nên client không đọc được mã OTP.
-      const otpToken = jwt.sign(
-        { email, otpHash: this.hashOtp(email, otp), typ: "otp" },
-        this.jwtOtpSecret,
-        { expiresIn: "5m" }
-      );
-
-      const subject = "Your OTP Code";
-      const data = `Your OTP code is: ${otp}`;
-      await this.sendmail(email, subject, data);
-
-      return {
-        isTwoFactorEnabled: true,
-        otpToken: otpToken,
-      };
+      // The token only carries an HMAC of the OTP (server-side secret), so the client cannot read the code.
+      const otpToken = jwt.sign({ email: user.email, otpHash: this.hashOtp(user.email, otp), typ: "otp" }, this.jwtOtpSecret, { expiresIn: "5m" });
+      await this.sendmail(user.email, "Mã OTP đăng nhập SmartSpec", `Mã OTP của bạn là: ${otp}`);
+      return { isTwoFactorEnabled: true, otpToken };
     }
+    const tokens = await this.startSession(user, `User "${user.email}" logged in successfully.`, ip, userAgent);
+    return { isTwoFactorEnabled: false, ...tokens };
+  }
 
-    const sessionID = uuidv4();
-    const jwtPayload = {
-      _id: user._id,
-      sub: user._id,
-      sid: sessionID,
-      system_role: user.system_role
-    };
-    const accessToken = this.signAccessToken(jwtPayload);
-    const refreshToken = this.signRefreshToken(jwtPayload);
-    const session = new Session({ sessionID, userID: user._id });
-    await session.save();
-    await this.logService.createLog({
-      user_id: user._id.toString(),
-      target_id: user._id.toString(),
-      action: "login",
-      target_type: "system",
-      details: { message: `User "${email}" logged in successfully (Session ID: ${sessionID}).` },
-      level: "info",
-      ip: ip,
-      user_agent: userAgent
-    });
-    return {
-      isTwoFactorEnabled: false,
-      refreshToken,
-      accessToken,
-      sub: String(user._id),
-    };
+  /** Always answers the same way, and never returns the token: it only goes to the mailbox. */
+  async forgotPassword(email: string, ip?: string, userAgent?: string): Promise<string> {
+    const user = await this.findUserByEmail(email);
+    if (user) {
+      const token = this.signEmailToken(user.email, "reset", "1h");
+      const link = `${env.CLIENT_URL}/reset-password?token=${token}`;
+      await this.logService.createLog({ user_id: user._id.toString(), target_id: user._id.toString(), action: "update_user", target_type: "system",
+        details: { message: `Password reset requested by "${user.email}".` }, level: "info", ip, user_agent: userAgent });
+      const sent = await this.sendmail(user.email, "Đặt lại mật khẩu SmartSpec",
+        `<p>Nhấn vào liên kết sau để đặt lại mật khẩu (có hiệu lực 1 giờ):</p><p><a href="${link}">${link}</a></p><p>Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>`);
+      if (!sent) logger.warn(`Could not send the password reset e-mail to ${user.email}`);
+    }
+    return "Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.";
+  }
+
+  async resetPassword(token: string, newPassword: string, ip?: string, userAgent?: string): Promise<string> {
+    const email = this.readEmailToken(token, "reset");
+    this.checkPassword(newPassword);
+    const user = await this.findUserByEmail(email);
+    if (!user) throw new AuthError(400, "INVALID_TOKEN", "Liên kết không hợp lệ hoặc đã hết hạn");
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.password_changed_at = new Date();
+    user.email_verified = true; // following the link proves the address is theirs
+    await user.save();
+    await Session.deleteMany({ userID: user._id }); // sign out everywhere, like WorkHub
+    await workhubIdentity.setPassword(user.email, newPassword); // the same account in WorkHub gets the new password now
+    await this.logService.createLog({ user_id: user._id.toString(), target_id: user._id.toString(), action: "update_user", target_type: "system",
+      details: { message: `User "${user.email}" reset the password.` }, level: "info", ip, user_agent: userAgent });
+    return "Đặt lại mật khẩu thành công";
+  }
+
+  async refreshToken(token: string): Promise<ExchangeTokenResult> {
+    let claims: any;
+    try {
+      claims = this.verifyToken(token, this.jwtRefreshSecret);
+    } catch {
+      throw new AuthError(401, "INVALID_REFRESH_TOKEN", "Phiên đăng nhập đã hết hạn");
+    }
+    const session = await Session.findOne({ sessionID: claims.sid });
+    if (!session) throw new AuthError(401, "INVALID_REFRESH_TOKEN", "Phiên đăng nhập đã hết hạn, hãy đăng nhập lại");
+    const user = await User.findById(claims.sub).select("system_role status");
+    if (!user || user.status === "INACTIVE") throw new AuthError(401, "INVALID_REFRESH_TOKEN", "Tài khoản không còn hiệu lực");
+
+    // system_role must survive a refresh, otherwise an admin turns into a participant after the first token rotation
+    const jwtPayload = { _id: claims.sub, sub: claims.sub, sid: claims.sid, system_role: user.system_role };
+    return { sub: String(claims.sub), accessToken: this.signAccessToken(jwtPayload), refreshToken: this.signRefreshToken(jwtPayload) };
   }
 
   async verifyOTP(
@@ -443,7 +457,7 @@ export class AuthServiceImpl implements AuthService {
   ): Promise<boolean> {
     try {
       const mailIsSent = await mailService.sendEmail({
-        emailFrom: "hngvtdat010@gmail.com",
+        emailFrom: mailService.from(),
         emailTo: email,
         emailSubject: subject,
         emailText: `${data}`,
@@ -456,69 +470,11 @@ export class AuthServiceImpl implements AuthService {
       }
       return true;
     } catch (ex) {
-      const errorMessage = `Error activating email: ${(ex as Error).message}`;
+      // the real reason (bad host, wrong password, blocked port…) must be visible, not swallowed
+      logger.error(`Error sending email: ${(ex as Error).message}`);
       return false;
     }
   }
-  async forgotPassword(email: string, ip?: string, userAgent?: string): Promise<string> {
-    const user = await User.findOne({ email });
-    if (!user) {
-      throw new Error("Email not found");
-    }
-    const token = await generateJwt({ email });
-    logger.info("verifyEmailToken generated");
-    const subject = "Reset your password";
-    const data = `Click the link to reset your password: http://localhost:5173/reset-password?token=${token}`;
-    await this.logService.createLog({
-      user_id: user?._id?.toString(),
-      target_id: user?._id?.toString(),
-      action: "update_user",
-      target_type: "system",
-      details: { message: `Password reset requested by "${email}" — verification email sent.` },
-      level: "info",
-      ip,
-      user_agent: userAgent
-    });
-
-    const mailIsSent = await this.sendmail(email, subject, data);
-    if (!mailIsSent) {
-      throw new Error("Failed to send email");
-    }
-    return token;
-  }
-
-  async resetPassword(token: string, newPassword: string, ip?: string, userAgent?: string): Promise<string> {
-    try {
-      const payload = jwt.verify(token, this.jwtSecret) as { email: string };
-      const user = await User.findOne({ email: payload.email });
-      if (!user) {
-        throw new Error("User not found");
-      }
-      const oldPasswordHash = user.password;
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedPassword;
-      await user.save();
-
-      await this.logService.createLog({
-        user_id: user._id.toString(),
-        target_id: user._id.toString(),
-        action: "update_user",
-        target_type: "system",
-        details: {
-          before: { password: oldPasswordHash.slice(0, 10) + "..." },
-          after: { password: hashedPassword.slice(0, 10) + "..." },
-          message: `User "${user.email}" reset password successfully (User ID: ${user._id}).`
-        },
-        level: "info",
-        ip: ip,
-        user_agent: userAgent
-      });
-      return "Password reset successfully";
-    } catch (error) {
-      throw new Error("Invalid or expired token");
-    }
-  }
-
   async toggleTwoFactorAuth(userId: string, enable: boolean, ip?: string, userAgent?: string): Promise<string> {
     try {
       const user = await User.findOne({ _id: userId });

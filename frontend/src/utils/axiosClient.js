@@ -26,8 +26,11 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Các endpoint đăng nhập/đăng ký tự trả 401 có ý nghĩa (sai mật khẩu...): không refresh, để trang tự hiện lỗi.
+    const isAuthEndpoint = /\/api\/auth\/(login|register|verify-otp|forgot-password|reset-password|verify-email|token)\b/.test(originalRequest?.url || "");
+
     // Nếu lỗi là 401 (token hết hạn) và chưa thử refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -41,8 +44,10 @@ axiosClient.interceptors.response.use(
           refreshToken,
         });
 
-        const newAccessToken = res.data.accessToken;
-        const newRefreshToken = res.data.refreshToken;
+        // backend trả cả snake_case và camelCase; chấp nhận cả hai và không bao giờ lưu "undefined"
+        const newAccessToken = res.data.accessToken || res.data.access_token;
+        const newRefreshToken = res.data.refreshToken || res.data.refresh_token;
+        if (!newAccessToken || !newRefreshToken) throw new Error("Refresh response has no tokens");
 
         // Lưu lại
         localStorage.setItem("accessToken", newAccessToken);

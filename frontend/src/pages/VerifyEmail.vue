@@ -1,93 +1,40 @@
-<template>
-  <div class="verification-container">
-    <div v-if="loading" class="spinner"></div>
-    <div v-if="success" class="message success">
-      <p>{{ success }}</p>
-      <p>Đang chuyển hướng bạn...</p>
-    </div>
-    <div v-if="error" class="message error">
-      <p>{{ error }}</p>
-      <p>Đang chuyển hướng bạn...</p>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import { useRoute } from 'vue-router'
+import axiosClient from '@/utils/axiosClient'
+import AuthShell from '@/components/auth/AuthShell.vue'
 
 const route = useRoute()
-const router = useRouter()
-const loading = ref(true)
-const error = ref('')
-const success = ref('')
+const state = ref('loading') // loading | ok | failed
+const message = ref('')
+let started = false // the effect can run twice in dev; a verification link is single-purpose
 
 onMounted(async () => {
-  const token = route.query.token
-
-  if (!token) {
-    error.value = 'Không tìm thấy token xác thực.'
-    loading.value = false
-    setTimeout(() => router.push({ path: '/register', query: { verify_status: 'failed' } }), 2000)
-    return
-  }
-
+  if (started) return
+  started = true
+  const token = String(route.query.token || '')
+  if (!token) { state.value = 'failed'; message.value = 'Liên kết xác thực không hợp lệ.'; return }
   try {
-    const res = await axios.post('http://localhost:8000/api/auth/verify-email', { token })
-    loading.value = false
-
-    if (res.data.status === 'Success' && res.data.data === true) {
-      success.value = 'Xác thực email thành công!'
-      localStorage.setItem('emailVerified', 'true')
-      // Chuyển hướng về trang đăng ký (không cần query param khi thành công)
-      setTimeout(() => router.push({ path: '/register' }), 1500)
-    } else {
-      error.value = res.data.message || 'Xác thực thất bại.'
-      setTimeout(() => router.push({ path: '/register', query: { verify_status: 'failed' } }), 2000)
-    }
-  } catch (err) {
-    console.error(err)
-    loading.value = false
-    error.value = 'Lỗi xác thực email. Vui lòng thử lại.'
-    setTimeout(() => router.push({ path: '/register', query: { verify_status: 'failed' } }), 2000)
+    await axiosClient.post('/api/auth/verify-email', { token })
+    state.value = 'ok'
+  } catch (e) {
+    state.value = 'failed'
+    message.value = e.response?.data?.message || 'Liên kết không hợp lệ hoặc đã hết hạn.'
   }
 })
 </script>
 
-<style scoped>
-.verification-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-family: sans-serif;
-}
-.message {
-  text-align: center;
-  padding: 20px;
-  border-radius: var(--radius-sm);
-}
-.success {
-  color: var(--success);
-}
-.error {
-  color: var(--danger);
-}
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border-left-color: var(--ink);
-  animation: spin 1s ease infinite;
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-</style>
+<template>
+  <AuthShell title="Xác thực email">
+    <p v-if="state === 'loading'" class="auth-muted">Đang xác thực…</p>
+    <template v-else-if="state === 'ok'">
+      <p class="auth-success" role="status">Email của bạn đã được xác thực.</p>
+      <router-link class="auth-btn" to="/dashboard">Vào SmartSpec</router-link>
+    </template>
+    <template v-else>
+      <p class="auth-error" role="alert">{{ message }}</p>
+      <p class="auth-muted">Đăng nhập rồi chọn "Gửi lại email xác thực" ở thanh thông báo để nhận liên kết mới.</p>
+      <router-link class="auth-btn secondary" to="/login">Đăng nhập</router-link>
+    </template>
+  </AuthShell>
+</template>

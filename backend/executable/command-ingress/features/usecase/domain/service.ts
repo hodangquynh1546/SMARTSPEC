@@ -404,6 +404,9 @@ export class UsecaseService {
         if (!bumpRes.data) throw new Error("Auto bump failed");
         version = bumpRes.data.newVersion;
         versionId = version._id.toString();
+        // Bump clones every use case to a new _id: the one being edited/deleted is now the clone.
+        const mapped = bumpRes.data.idMaps?.usecaseMap?.get(String(usecaseId));
+        if (mapped) usecaseId = mapped;
       }
 
       // 🔍 2. Kiểm tra project & quyền truy cập
@@ -570,6 +573,9 @@ export class UsecaseService {
         if (!bumpRes.data) throw new Error("Auto bump failed");
         version = bumpRes.data.newVersion;
         versionId = version._id.toString();
+        // Bump clones every use case to a new _id: the one being edited/deleted is now the clone.
+        const mapped = bumpRes.data.idMaps?.usecaseMap?.get(String(usecaseId));
+        if (mapped) usecaseId = mapped;
       }
 
       // 🔍 Bước 2: Kiểm tra project & quyền truy cập

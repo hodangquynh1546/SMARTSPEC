@@ -69,8 +69,9 @@ export class ProjectService {
 
       await session.commitTransaction();
 
-      // Xử lý nền
-      this.orchestratorService.run(
+      // Xử lý nền: chỉ khi có đầu vào. Dự án tạo trống thì không có gì để phân tích (trước đây vẫn chạy và treo ở "processing").
+      const hasInput = (files?.length ?? 0) > 0 || !!rawText?.trim();
+      if (hasInput) this.orchestratorService.run(
         newProject._id.toString(),
         newVersion._id.toString(),
         { files, rawText, mode: "full" },
@@ -134,8 +135,10 @@ export class ProjectService {
 
   async updateProject(projectId: string, userId: string, data: UpdateProjectDto): Promise<ServiceResponse<any>> {
     // THÊM RÀNG BUỘC: Kiểm tra user có status accepted trong project
+    // Đổi tên / mô tả / ngôn ngữ là thiết lập của dự án: chỉ chủ dự án (xoá, khôi phục cũng chỉ chủ dự án).
     const project = await Project.findOne({
       _id: new Types.ObjectId(projectId),
+      owner_id: new Types.ObjectId(userId),
       'status.is_trashed': { $ne: true },
       'members': {
         $elemMatch: {
@@ -155,7 +158,11 @@ export class ProjectService {
       language: project.language,
     };
 
-    const { members, ...otherData } = data;
+    // chỉ các trường được phép; không cho client ghi đè status/owner/members qua đường này
+    const otherData: Record<string, unknown> = {};
+    for (const key of ['name', 'description', 'language'] as const) {
+      if ((data as any)[key] !== undefined) otherData[key] = (data as any)[key];
+    }
     Object.assign(project, otherData);
 
     const updatedProject = await project.save();

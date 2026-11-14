@@ -375,7 +375,7 @@ function getFullAvatarUrl(avatarUrl) {
   }
 
   const cleanUrl = avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`
-  const baseUrl = 'http://localhost:8000'
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
   const fullUrl = `${baseUrl}${cleanUrl}`
 
   return fullUrl

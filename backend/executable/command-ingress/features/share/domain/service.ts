@@ -324,7 +324,7 @@ export class ShareProjectService {
 
     try {
       const mailIsSent = await mailService.sendEmail({
-        emailFrom: process.env.EMAIL_USER!,
+        emailFrom: mailService.from(),
         emailTo: email,
         emailSubject: subject,
         emailText: data,

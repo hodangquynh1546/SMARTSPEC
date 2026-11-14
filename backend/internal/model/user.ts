@@ -12,6 +12,9 @@ const userSchema = new Schema({
     enum: ["ADMIN", "PARTICIPANT"],
     default: "PARTICIPANT",
   },
+  email_verified: { type: Boolean, default: false },
+  // Khi mật khẩu được đổi lần cuối. So sánh với WorkHub để mật khẩu đổi ở một bên được bên kia nhận, và mật khẩu cũ không bao giờ sống lại.
+  password_changed_at: { type: Date, default: null },
   status: {
     type: String,
     enum: ["ACTIVE", "INACTIVE"],

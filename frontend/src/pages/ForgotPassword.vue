@@ -1,286 +1,40 @@
-<template>
-  <div class="container-center">
-    <div class="login-card">
-      <div class="card-content">
-        <router-link to="/"><i class="fa-brands fa-slack"></i></router-link>
-        <h1 class="card-title">Forgot Password</h1>
+<script setup>
+import { computed, ref } from 'vue'
+import axiosClient from '@/utils/axiosClient'
+import AuthShell from '@/components/auth/AuthShell.vue'
 
-        <div class="form-group">
-          <form @submit.prevent="handleSubmit">
-            <div class="form-group-input">
-              <label for="email" class="form-label">Email or username</label>
-              <input
-                type="text"
-                v-model="email"
-                class="form-control"
-                :class="{ error: emailError }"
-                id="email"
-                placeholder="Enter your email or username"
-                @input="clearErrors"
-              />
-              <p v-if="emailError" class="field-error">{{ emailError }}</p>
-            </div>
+const email = ref('')
+const loading = ref(false)
+const error = ref('')
+const done = ref('')
+const canSubmit = computed(() => /^\S+@\S+\.\S+$/.test(email.value.trim()) && !loading.value)
 
-            <div class="continue-button-wrapper">
-              <button type="submit" class="btn btn-primary" :disabled="loading">
-                <span v-if="loading" class="button-spinner"></span>
-                <span v-else>Send Reset Link</span>
-              </button>
-            </div>
-          </form>
-
-          <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        </div>
-
-        <router-link to="/login" class="forgot-password-link">Back to Login</router-link>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script>
-import { ref } from 'vue'
-import axios from 'axios'
-
-export default {
-  name: 'ForgotPasswordView',
-  setup() {
-    const email = ref('')
-    const emailError = ref('')
-    const errorMessage = ref('')
-    const successMessage = ref('')
-    const loading = ref(false)
-
-    const clearErrors = () => {
-      emailError.value = ''
-      errorMessage.value = ''
-      successMessage.value = ''
-    }
-
-    const validateEmail = () => {
-      emailError.value = ''
-      if (!email.value) {
-        emailError.value = 'Email or username is required'
-        return false
-      }
-      if (!/\S+@\S+\.\S+/.test(email.value) && email.value.length < 3) {
-        emailError.value = 'Please enter a valid email or username'
-        return false
-      }
-      return true
-    }
-
-    const handleSubmit = async () => {
-      clearErrors()
-      if (!validateEmail()) return
-
-      loading.value = true
-      try {
-        // Gọi API forgot password
-        const res = await axios.post('http://localhost:8000/api/auth/forgot-password', {
-          email: email.value,
-        })
-
-        if (res.data.status === 'Success') {
-          successMessage.value = 'Reset link has been sent. Interface will close in 10 seconds.'
-          setTimeout(() => {
-            window.close()
-          }, 10000)
-        } else {
-          errorMessage.value = 'Unable to send reset link. Please try again.'
-        }
-      } catch (err) {
-        errorMessage.value = 'An error occurred. Please try again.'
-      } finally {
-        loading.value = false
-      }
-    }
-
-    return {
-      email,
-      emailError,
-      errorMessage,
-      successMessage,
-      loading,
-      clearErrors,
-      handleSubmit,
-    }
-  },
+async function submit() {
+  if (!canSubmit.value) return
+  loading.value = true
+  error.value = ''
+  try {
+    const { data } = await axiosClient.post('/api/auth/forgot-password', { email: email.value.trim() })
+    done.value = data?.message || 'Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.'
+  } catch (e) {
+    error.value = e.response?.data?.message || 'Không gửi được yêu cầu, hãy thử lại'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
-<style scoped>
-.container-center {
-  width: 100%;
-  width: 450px;
-  padding: 20px;
-  margin: 0 auto;
-}
-
-.login-card {
-  border-radius: var(--radius-field);
-  padding: 30px;
-  text-align: center;
-}
-
-.fa-slack {
-  font-size: 50px;
-  color: var(--ink);
-  margin-bottom: 24px;
-  display: block;
-}
-
-.card-title {
-  font-size: 24px;
-  margin-bottom: 24px;
-  font-weight: bold;
-  color: var(--ink);
-}
-
-.form-group {
-  text-align: left;
-  margin-bottom: 16px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.form-control {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  transition: border-color 0.3s;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--ink);
-  box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.2);
-}
-
-.form-control.error {
-  border-color: var(--danger);
-}
-
-.continue-button-wrapper {
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 14px 20px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background-color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.btn-primary {
-  background-color: var(--ink);
-  border-color: var(--ink);
-  color: white;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 16px 20px;
-}
-
-.btn-primary:hover {
-  background-color: var(--ink);
-  border-color: var(--ink);
-}
-
-.btn-primary:disabled {
-  background-color: var(--muted);
-  border-color: var(--border-strong);
-  cursor: not-allowed;
-}
-
-.error-message {
-  color: var(--danger);
-  font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
-}
-
-.success-message {
-  color: var(--success);
-  font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
-}
-
-.field-error {
-  color: var(--danger);
-  font-size: 13px;
-  margin-top: 5px;
-}
-
-.forgot-password-link {
-  color: var(--ink);
-  text-decoration: none;
-  display: block;
-  margin-top: 24px;
-  font-size: 14px;
-}
-
-.forgot-password-link:hover {
-  text-decoration: underline;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 👇 NEW SPINNER STYLES ADDED HERE 👇 */
-@keyframes spinner-a4dj62 {
-  100% {
-    transform: rotate(1turn);
-  }
-}
-
-.button-spinner {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  border: 3px solid #0000;
-  border-radius: 50%;
-  border-right-color: var(--border); /* Color for spinner */
-  animation: spinner-a4dj62 1s infinite linear;
-}
-
-.button-spinner::before,
-.button-spinner::after {
-  content: '';
-  grid-area: 1/1;
-  margin: 1.5px;
-  border: inherit;
-  border-radius: 50%;
-  animation: spinner-a4dj62 2s infinite;
-}
-
-.button-spinner::after {
-  margin: 6px;
-  animation-duration: 3s;
-}
-</style>
-
-<style>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-</style>
+<template>
+  <AuthShell title="Quên mật khẩu" subtitle="Nhập email, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.">
+    <p v-if="done" class="auth-success" role="status">{{ done }}</p>
+    <form v-else class="auth-form" @submit.prevent="submit">
+      <label class="auth-field">
+        <span>Email</span>
+        <input v-model="email" type="email" autocomplete="email" placeholder="ban@example.com" autofocus />
+      </label>
+      <p v-if="error" class="auth-error" role="alert">{{ error }}</p>
+      <button class="auth-btn" type="submit" :disabled="!canSubmit">{{ loading ? 'Đang gửi…' : 'Gửi liên kết' }}</button>
+    </form>
+    <template #footer><router-link to="/login">← Quay lại đăng nhập</router-link></template>
+  </AuthShell>
+</template>

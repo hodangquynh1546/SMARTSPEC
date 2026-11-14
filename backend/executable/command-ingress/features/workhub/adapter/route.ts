@@ -3,6 +3,9 @@ import { requireAuthorizedUser } from "../../../middlewares/auth";
 import { guardProjectResources } from "../../../middlewares/projectAccess";
 import env from "../../../utils/env";
 import Project from "../../../../../internal/model/project";
+import User from "../../../../../internal/model/user";
+import bcrypt from "bcrypt";
+import Session from "../../../../../internal/model/session";
 import { HttpRequest } from "../../../types";
 import { BridgeError, bridgeClient } from "../domain/bridge.client";
 import { workhubSyncService } from "../domain/service";
@@ -101,6 +104,32 @@ export function initWorkhubCallbackRoute(): Router {
     const b = req.body ?? {};
     if (!b.ssProjectId || !Array.isArray(b.items)) return void res.status(400).json({ success: false });
     await workhubSyncService.applyBatch(b);
+    res.status(204).end();
+  });
+  // WorkHub asks (through the Bridge) whether an e-mail/password pair is valid here. Local check only (no loop back).
+  router.post("/identity/verify", async (req, res) => {
+    if (req.header("x-bridge-key") !== env.BRIDGE_SECRET) return void res.status(401).json({ success: false });
+    const email = String(req.body?.email ?? "").trim().toLowerCase();
+    const password = String(req.body?.password ?? "");
+    const user: any = email ? await User.findOne({ email }).select("password name email_verified status password_changed_at") : null;
+    if (!user) return void res.json({ status: "not_found" });
+    const ok = !!user.password && (await bcrypt.compare(password, user.password));
+    if (!ok || user.status === "INACTIVE") return void res.json({ status: "wrong_password" });
+    res.json({ status: "ok", name: user.name, emailVerified: !!user.email_verified, passwordChangedAt: user.password_changed_at ? new Date(user.password_changed_at).toISOString() : undefined });
+  });
+
+  // WorkHub changed this person's password (reset or change there): take it and sign out everywhere. No loop back.
+  router.post("/identity/set-password", async (req, res) => {
+    if (req.header("x-bridge-key") !== env.BRIDGE_SECRET) return void res.status(401).json({ success: false });
+    const email = String(req.body?.email ?? "").trim().toLowerCase();
+    const password = String(req.body?.password ?? "");
+    const user: any = email ? await User.findOne({ email }) : null;
+    if (user && password.length >= 8 && Buffer.byteLength(password, "utf8") <= 72) {
+      user.password = await bcrypt.hash(password, 10);
+      user.password_changed_at = new Date();
+      await user.save();
+      await Session.deleteMany({ userID: user._id });
+    }
     res.status(204).end();
   });
   return router;

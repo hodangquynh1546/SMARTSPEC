@@ -25,7 +25,10 @@ interface UserService {
   getAllUsers(): Promise<UserResponse[]>;
   getUserById(id: string): Promise<UserResponse>;
   getme(token: string): Promise<any>;
-  updateProfile(userId: string, body: any): Promise<UserResponse>;
+  updateProfile(userId: string, body: any, asAdmin?: boolean): Promise<UserResponse>;
+  createUserByAdmin(input: { email: string; password: string; name?: string; system_role?: string }): Promise<UserResponse>;
+  setUserStatus(actorId: string, id: string, active: boolean): Promise<string>;
+  bulkAction(actorId: string, ids: string[], action: "activate" | "deactivate" | "delete"): Promise<{ done: number; skipped: number }>;
   changePassword(userId: string, body: any): Promise<string>;
   resetPasswordById(id: string): Promise<string>;
   deleteUserById(id: string): Promise<string>;

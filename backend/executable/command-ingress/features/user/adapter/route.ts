@@ -7,7 +7,9 @@ const initUserRoute: (controller: UserController) => express.Router = (
 ) => {
   const router = express.Router();
 
-  //for admin
+   //for admin
+  router.route("/bulk-action").post(requireAuthorizedUser, requireRole("ADMIN"), controller.bulk.bind(controller));
+  router.route("/:id/status").patch(requireAuthorizedUser, requireRole("ADMIN"), controller.setStatus.bind(controller));
   router
     .route("/update-profile")
     .patch(requireAuthorizedUser, controller.updateProfile.bind(controller));
@@ -28,6 +30,7 @@ const initUserRoute: (controller: UserController) => express.Router = (
       requireRole("ADMIN"),
       controller.filterUsers.bind(controller)
     );
+  router.route("").post(requireAuthorizedUser, requireRole("ADMIN"), controller.createUser.bind(controller));
   router
     .route("")
     .get(

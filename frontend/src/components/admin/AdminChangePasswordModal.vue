@@ -217,7 +217,7 @@ const handleChangePassword = async () => {
 
   try {
     // 🚀 Gọi API qua axiosClient (tự động kèm token)
-    const response = await axiosClient.post('/users/change-password', {
+    const response = await axiosClient.post('/api/users/change-password', {
       oldPassword: formData.currentPassword,
       newPassword: formData.newPassword,
     })

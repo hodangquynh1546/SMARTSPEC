@@ -181,6 +181,8 @@
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
+import { useToast } from 'vue-toastification'
+import axiosClient from '@/utils/axiosClient'
 
 const emit = defineEmits(['add', 'close'])
 
@@ -300,23 +302,20 @@ const generateRandomPassword = () => {
   return password
 }
 
+const toast = useToast()
+
 const handleAddUser = async () => {
   if (!validateForm()) return
 
   loading.value = true
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const userData = {
-      ...formData,
-      password: formData.generateRandomPassword ? generateRandomPassword() : formData.password,
-      status: 'ACTIVE',
-      system_role: formData.role,
-      created_at: new Date(),
-    }
-
-    emit('add', userData)
+    const password = formData.generateRandomPassword ? generateRandomPassword() : formData.password
+    // Tạo tài khoản thật (trước đây chỉ giả lập rồi đóng hộp thoại). Mật khẩu ngẫu nhiên được hiện một lần để quản trị viên chuyển cho người dùng.
+    const { data } = await axiosClient.post('/api/users', {
+      email: formData.email.trim(), name: formData.name.trim(), password, system_role: formData.role === 'ADMIN' ? 'ADMIN' : 'PARTICIPANT',
+    })
+    toast.success(formData.generateRandomPassword ? `Đã tạo tài khoản. Mật khẩu tạm: ${password}` : 'Đã tạo tài khoản', { timeout: formData.generateRandomPassword ? 20000 : 3000 })
+    emit('add', data?.data)
 
     // Reset form
     Object.assign(formData, {
@@ -333,7 +332,8 @@ const handleAddUser = async () => {
       generateRandomPassword: true,
     })
   } catch (error) {
-    console.error('Error adding user:', error)
+    errors.email = error.response?.data?.message || 'Không tạo được tài khoản'
+    toast.error(errors.email)
   } finally {
     loading.value = false
   }

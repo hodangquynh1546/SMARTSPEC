@@ -18,6 +18,7 @@ import { HttpRequest } from "../../../types";
 import { handleServiceResponse } from "../../../services/httpHandlerResponse";
 import { StatusCodes } from "http-status-codes";
 import { getClientInfo } from "../../../utils/networkInfo";
+import { AuthError } from "../domain/errors";
 
 class AuthController extends BaseController {
   service: AuthService;
@@ -87,10 +88,6 @@ class AuthController extends BaseController {
           responseValidationError(res, validateResult.errors[0]);
           return;
         }
-        logger.info(
-          "logoutRequestBody.refreshToken: ",
-          logoutRequestBody.refreshToken
-        );
         await this.service.logout(logoutRequestBody.refreshToken,ip, userAgent);
 
         res.status(StatusCodes.OK).json({
@@ -107,180 +104,26 @@ class AuthController extends BaseController {
     _next: NextFunction
   ): Promise<void> {
     const refreshTokenRequestBody = new RefreshTokenRequestBody(req.body);
-    logger.info(refreshTokenRequestBody);
     const validateResult = await refreshTokenRequestBody.validate();
     if (!validateResult.ok) {
       responseValidationError(res, validateResult.errors[0]);
       return;
     }
 
-    const token = await this.service.refreshToken(
-      refreshTokenRequestBody.refreshToken
-    );
-
-    res.status(200).json({
-      refresh_token: token.refreshToken,
-      access_token: token.accessToken,
-    });
+    try {
+      const token = await this.service.refreshToken(refreshTokenRequestBody.refreshToken);
+      res.status(200).json({
+        refresh_token: token.refreshToken,
+        access_token: token.accessToken,
+        refreshToken: token.refreshToken,
+        accessToken: token.accessToken,
+        sub: token.sub,
+      });
+    } catch (error) {
+      this.fail(res, error, "Error refreshing token");
+    }
 
     return;
-  }
-
-  async register(
-    req: Request,
-    res: Response,
-    _next: NextFunction
-  ): Promise<void> {
-    try {
-      const {
-        email,
-        password,
-        confirmPassword,
-        name,
-        isTwoFactorEnabled,
-        dob,
-        gender,
-      } = req.body;
-
-      const { day, month, year } = dob;
-      // Sử dụng UTC để tránh timezone issues - tạo Date với UTC time 00:00:00
-      const newDob = new Date(Date.UTC(year, month - 1, day));
-      logger.info(req.body);
-
-      const registerRequestBody = new RegisterRequestBody(req.body);
-      // lấy ip và userAgent
-      const { ip, userAgent } = getClientInfo(req);
-      //
-      const validateResult = await registerRequestBody.validate();
-
-      logger.info("register:", registerRequestBody);
-      if (!validateResult.ok) {
-        responseValidationError(res, validateResult.errors[0]);
-        return;
-      }
-
-      const registerResult = await this.service.register(
-        email,
-        password,
-        confirmPassword,
-        name,
-        isTwoFactorEnabled,
-        newDob,
-        gender,
-        ip, userAgent
-      );
-
-      const serviceResponse = {
-        success: true,
-        message: "User registered successfully",
-        data: registerResult,
-        code: StatusCodes.OK,
-      };
-
-      handleServiceResponse(serviceResponse, res);
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: "Error register",
-        error: (error as Error).message,
-      });
-    }
-  }
-
-  async sendVerificationEmail(
-    req: Request,
-    res: Response,
-    _next: NextFunction
-  ): Promise<void> {
-    try {
-      const { email } = req.body;
-      const verifyEmail = new verifyEmailRequestBody(req.body);
-      const validateResult = await verifyEmail.validate();
-      if (!validateResult.ok) {
-        responseValidationError(res, validateResult.errors[0]);
-        return;
-      }
-      const verifyEmailResult = await this.service.sendVerificationEmail(email);
-
-      const serviceResponse = {
-        success: true,
-        message: "Verify email successfully",
-        data: verifyEmailResult,
-        code: StatusCodes.OK,
-      };
-
-      handleServiceResponse(serviceResponse, res);
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: (error as Error).message,
-        error: (error as Error).message,
-      });
-    }
-  }
-
-  async verifyEmail(
-    req: Request,
-    res: Response,
-    _next: NextFunction
-  ): Promise<void> {
-    try {
-      const { token } = req.body;
-      if (!token || typeof token !== "string") {
-        res.status(StatusCodes.BAD_REQUEST).json({
-          status: "Failed",
-          message: "Invalid or missing token",
-        });
-        return;
-      }
-      const verifyEmailResult = await this.service.verifyEmail(token);
-
-      const serviceResponse = {
-        success: true,
-        message: "Verify email successfully",
-        data: verifyEmailResult,
-        code: StatusCodes.OK,
-      };
-
-      handleServiceResponse(serviceResponse, res);
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: "Error verifying email",
-        error: (error as Error).message,
-      });
-    }
-  }
-  
-  async login(req: Request, res: Response, _next: NextFunction): Promise<void> {
-    try {
-      const { email, password } = req.body;
-      const loginRequestBody = new LoginRequestBody(req.body);
-      // lấy ip và userAgent
-      const { ip, userAgent } = getClientInfo(req);
-      //
-      const validateResult = await loginRequestBody.validate();
-      logger.info(validateResult);
-      if (!validateResult.ok) {
-        responseValidationError(res, validateResult.errors[0]);
-        return;
-      }
-      // có sửa tham số
-      const loginResult = await this.service.login(email, password,ip, userAgent);
-      const serviceResponse = {
-        success: true,
-        message: "User logged in successfully",
-        data: loginResult,
-        code: StatusCodes.OK,
-      };
-      handleServiceResponse(serviceResponse, res);
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: "Error logging in",
-        error: (error as Error).message,
-      });
-    }
   }
 
   async getProfile(
@@ -345,82 +188,108 @@ class AuthController extends BaseController {
     }
   }
 
-  async forgotPassword(
-    req: Request,
-    res: Response,
-    _next: NextFunction
-  ): Promise<void> {
+  /** Expected failures keep their status and code; anything else is a 500 with the message. */
+  private fail(res: Response, error: unknown, fallback: string): void {
+    if (error instanceof AuthError) {
+      res.status(error.status).json({ status: "Failed", code: error.code, message: error.message, error: error.message });
+      return;
+    }
+    logger.error(`${fallback}: ${(error as Error).message}`);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ status: "Failed", message: fallback, error: (error as Error).message });
+  }
+
+  /** Sign up: e-mail, password and confirmation only. */
+  async register(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
-      const { email } = req.body;
-      const forgotPasswordRequestBody = new ForgotPasswordRequestBody(req.body);
-      // lấy ip và userAgent
-      const { ip, userAgent } = getClientInfo(req);
-      //
-      const validateResult = await forgotPasswordRequestBody.validate();
+      const body = new RegisterRequestBody(req.body);
+      const validateResult = await body.validate();
       if (!validateResult.ok) {
         responseValidationError(res, validateResult.errors[0]);
         return;
       }
-
-      const serviceResponse = await this.service.forgotPassword(email,ip, userAgent);
-
-      res.status(StatusCodes.OK).json({
-        status: "Success",
-        message: `Password reset link sent to ${email} if it exists in our system.`,
-        data: serviceResponse,
-      });
+      const { ip, userAgent } = getClientInfo(req);
+      const result = await this.service.register(body.email, body.password, body.confirmPassword, ip, userAgent);
+      handleServiceResponse({ success: true, message: "User registered successfully", data: result, code: StatusCodes.OK }, res);
     } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: "Error processing forgot password request",
-        error: (error as Error).message,
-      });
+      this.fail(res, error, "Error register");
     }
   }
 
-  async resetPassword(
-    req: Request,
-    res: Response,
-    _next: NextFunction
-  ): Promise<void> {
+  /** Re-sends the verification link to the signed-in user. */
+  async resendVerification(req: HttpRequest, res: Response, _next: NextFunction): Promise<void> {
     try {
-      const { token } = req.query;
-      const { newPassword, confirmNewPassword } = req.body;
-
-      if (!token || typeof token !== "string") {
-        res.status(StatusCodes.BAD_REQUEST).json({
-          status: "Failed",
-          message: "Invalid or missing token",
-        });
-        return;
-      }
-
-      const resetPasswordRequestBody = new ResetPasswordRequestBody({
-        newPassword,
-        confirmNewPassword,
-      });
-      // lấy ip và userAgent
-      const { ip, userAgent } = getClientInfo(req);
-      //
-      const validatePasswords = await resetPasswordRequestBody.validate();
-
-      if (!validatePasswords.ok) {
-        responseValidationError(res, validatePasswords.errors[0]);
-        return;
-      }
-
-      await this.service.resetPassword(token, newPassword,ip, userAgent);
-
-      res.status(StatusCodes.OK).json({
-        status: "Success",
-        message: "Password has been reset successfully",
-      });
+      const sent = await this.service.sendVerificationEmail(req.getSubject());
+      res.status(StatusCodes.OK).json({ success: true, message: sent ? "Đã gửi email xác thực" : "Không gửi được email, hãy thử lại sau", data: sent });
     } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        status: "Failed",
-        message: "Error resetting password",
-        error: (error as Error).message,
-      });
+      this.fail(res, error, "Error sending verification email");
+    }
+  }
+
+  async verifyEmail(req: Request, res: Response, _next: NextFunction): Promise<void> {
+    try {
+      const { token } = req.body ?? {};
+      if (!token || typeof token !== "string") {
+        res.status(StatusCodes.BAD_REQUEST).json({ status: "Failed", message: "Invalid or missing token" });
+        return;
+      }
+      await this.service.verifyEmail(token);
+      handleServiceResponse({ success: true, message: "Verify email successfully", data: true, code: StatusCodes.OK }, res);
+    } catch (error) {
+      this.fail(res, error, "Error verifying email");
+    }
+  }
+
+  async login(req: Request, res: Response, _next: NextFunction): Promise<void> {
+    try {
+      const body = new LoginRequestBody(req.body);
+      const validateResult = await body.validate();
+      if (!validateResult.ok) {
+        responseValidationError(res, validateResult.errors[0]);
+        return;
+      }
+      const { ip, userAgent } = getClientInfo(req);
+      const loginResult = await this.service.login(body.email, body.password, ip, userAgent);
+      handleServiceResponse({ success: true, message: "User logged in successfully", data: loginResult, code: StatusCodes.OK }, res);
+    } catch (error) {
+      this.fail(res, error, "Error logging in");
+    }
+  }
+
+  /** Same answer whether or not the e-mail exists; the reset link is only ever sent to the mailbox. */
+  async forgotPassword(req: Request, res: Response, _next: NextFunction): Promise<void> {
+    try {
+      const body = new ForgotPasswordRequestBody(req.body);
+      const validateResult = await body.validate();
+      if (!validateResult.ok) {
+        responseValidationError(res, validateResult.errors[0]);
+        return;
+      }
+      const { ip, userAgent } = getClientInfo(req);
+      const message = await this.service.forgotPassword(body.email, ip, userAgent);
+      res.status(StatusCodes.OK).json({ success: true, message, data: null });
+    } catch (error) {
+      this.fail(res, error, "Error processing forgot password request");
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, _next: NextFunction): Promise<void> {
+    try {
+      const token = typeof req.query.token === "string" ? req.query.token : typeof req.body?.token === "string" ? req.body.token : "";
+      if (!token) {
+        res.status(StatusCodes.BAD_REQUEST).json({ status: "Failed", code: "INVALID_TOKEN", message: "Invalid or missing token" });
+        return;
+      }
+      const body = new ResetPasswordRequestBody({ newPassword: req.body?.newPassword, confirmNewPassword: req.body?.confirmNewPassword });
+      const validateResult = await body.validate();
+      if (!validateResult.ok) {
+        responseValidationError(res, validateResult.errors[0]);
+        return;
+      }
+      const { ip, userAgent } = getClientInfo(req);
+      const message = await this.service.resetPassword(token, body.newPassword, ip, userAgent);
+      res.status(StatusCodes.OK).json({ success: true, message, data: null });
+    } catch (error) {
+      this.fail(res, error, "Error resetting password");
     }
   }
 

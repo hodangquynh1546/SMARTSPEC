@@ -36,7 +36,7 @@ onMounted(async () => {
     } else if (code) {
       // 👉 Đây là redirect lần 1 từ Google
       // Gọi backend để đổi code sang token
-      window.location.href = `http://localhost:8000/api/auth/google/oauth?code=${code}`
+      window.location.href = `${import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'}/api/auth/google/oauth?code=${code}`
     } else {
       console.error('❌ Missing token or code from Google OAuth redirect')
       router.push('/login')

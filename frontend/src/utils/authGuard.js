@@ -99,7 +99,7 @@ export const logout = async () => {
     console.log('refreshToken before logout:', refreshToken)
 
     if (refreshToken) {
-      await axios.post('http://localhost:8000/api/auth/logout', { refresh_token: refreshToken })
+      await axios.post((import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000') + '/api/auth/logout', { refresh_token: refreshToken })
     }
   } catch (error) {
     console.error('Logout API error:', error)

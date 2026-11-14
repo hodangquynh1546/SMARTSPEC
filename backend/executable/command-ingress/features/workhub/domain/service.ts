@@ -354,6 +354,25 @@ export class WorkhubSyncService {
     return r;
   }
 
+  /**
+   * Called right after sign-up / sign-in, when the password is known: links the user's WorkHub account without any
+   * extra step. With createIfMissing a WorkHub account is created when the address has none. Best effort.
+   */
+  async autoLink(userId: string, email: string, password: string, name: string | undefined, createIfMissing: boolean) {
+    if (!env.WORKHUB_ENABLED) return;
+    const status = await bridgeClient.userStatus(userId).catch(() => null);
+    if (!status || status.linked) return; // Bridge down, or already linked
+    try {
+      await this.linkUser(userId, { email, password, register: false });
+    } catch (e: any) {
+      if (e instanceof BridgeError && e.code === "INVALID_CREDENTIALS" && createIfMissing) {
+        await this.linkUser(userId, { email, password, register: true, fullName: name }).catch(() => undefined);
+      } else {
+        logger.warn(`WorkHub auto-link for ${email} skipped: ${e?.message ?? e}`);
+      }
+    }
+  }
+
   async unlinkUser(userId: string) {
     return bridgeClient.unlinkUser(userId);
   }

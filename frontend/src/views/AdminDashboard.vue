@@ -2413,9 +2413,9 @@ const changePassword = (passwordData) => {
   showChangePasswordModal.value = false
 }
 
-const addUser = (userData) => {
-  console.log('Adding new user:', userData)
+const addUser = async () => {
   showAddUserModal.value = false
+  await refreshUserStats() // số liệu người dùng cập nhật ngay
 }
 
 const addApiKey = (apiKeyData) => {

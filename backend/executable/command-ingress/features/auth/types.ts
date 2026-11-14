@@ -26,16 +26,7 @@ interface AuthService {
 
   refreshToken(token: string): Promise<ExchangeTokenResult>;
 
-  register(
-    email: string,
-    password: string,
-    confirmPassword: string,
-    name: string,
-    isTwoFactorEnabled: boolean,
-    dob: Date,
-    gender: string,
-    ip?: string, userAgent?:string
-  ): Promise<ExchangeTokenResult>;
+  register(email: string, password: string, confirmPassword: string, ip?: string, userAgent?: string): Promise<ExchangeTokenResult & { emailVerified: boolean }>;
   // có sửa
   login(email: string, password: string,ip?: string, userAgent?:string): Promise<LoginResponse>;
 
@@ -45,7 +36,7 @@ interface AuthService {
 
   toggleTwoFactorAuth(userId: string, enable: boolean,ip?: string, userAgent?:string): Promise<string>;
 
-  sendVerificationEmail(email: string): Promise<boolean>;
+  sendVerificationEmail(userId: string): Promise<boolean>;
   verifyOTP(email: string, otp: string, otpToken: string,ip?: string, userAgent?:string): Promise<ExchangeTokenResult>;
   verifyEmail(token: string,ip?: string, userAgent?:string): Promise<boolean>;
   getProfile(userId: string): Promise<any>;

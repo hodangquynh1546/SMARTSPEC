@@ -2,6 +2,7 @@ import logger from "../../../lib/logger";
 import { NextFunction, Response } from 'express';
 import { AsyncHandler, HttpRequest } from '../types';
 import { ApiKeyError, analyzeApiKeyError } from './apiKeyErrorHandler';
+import { statusForFailure } from '../services/serviceResponse';
 
 export class BaseController {
   async execWithTryCatchBlock(
@@ -32,6 +33,13 @@ export class BaseController {
           return;
         }
 
+        // Lỗi dạng HTTP (`throw { status: 403, message }`) không phải lỗi API key: trả đúng mã của nó
+        const httpLike = !(error instanceof Error) && error && typeof error === 'object' ? (error as any) : null;
+        if (httpLike && Number.isInteger(httpLike.status) && httpLike.status >= 400 && httpLike.status < 600) {
+          res.status(httpLike.status).json({ status: "Error", message: String(httpLike.message ?? "Request failed"), error: httpLike.code ?? "HttpError" });
+          return;
+        }
+
         // Xử lý lỗi thông thường
         const errorMessage = error instanceof Error ? error.message : String(error);
         
@@ -51,7 +59,7 @@ export class BaseController {
           return;
         }
 
-        res.status(400).json({
+        res.status(((mapped) => (mapped === 500 ? 400 : mapped))(statusForFailure(errorMessage, 500))).json({
           status: "Error",
           message: errorMessage,
           error: error instanceof Error ? error.name : "UnknownError",
@@ -67,11 +75,12 @@ export class BaseController {
         return 402; // Payment Required
       case 'RATE_LIMIT':
         return 429; // Too Many Requests
+      // Lỗi của API key LLM là lỗi của dịch vụ phía sau, KHÔNG phải của phiên người dùng: trả 401/403 sẽ khiến
+      // web tưởng phiên hết hạn và đăng xuất người dùng.
       case 'INVALID_KEY':
       case 'UNAUTHORIZED':
-        return 401; // Unauthorized
       case 'PERMISSION_DENIED':
-        return 403; // Forbidden
+        return 502; // Bad Gateway
       case 'SERVICE_UNAVAILABLE':
         return 503; // Service Unavailable
       case 'BILLING_ISSUE':

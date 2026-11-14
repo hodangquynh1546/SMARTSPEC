@@ -56,6 +56,15 @@ export class BridgeClient {
     return this.call<any>("POST", "/v1/testcases/report", payload);
   }
 
+  /** Asks WorkHub (through the Bridge) whether this e-mail/password pair is valid there. */
+  verifyIdentity(email: string, password: string) {
+    return this.call<{ status: "ok" | "wrong_password" | "not_found" | "unavailable"; name?: string; emailVerified?: boolean; passwordChangedAt?: string }>("POST", "/v1/identity/workhub/verify", { email, password });
+  }
+
+  setIdentityPassword(email: string, password: string) {
+    return this.call<void>("POST", "/v1/identity/workhub/set-password", { email, password });
+  }
+
   unlinkUser(ssUserId: string) {
     return this.call<{ unlinked: boolean; projects: number }>("DELETE", `/v1/users/${ssUserId}`);
   }

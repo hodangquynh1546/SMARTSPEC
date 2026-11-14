@@ -75,7 +75,7 @@ export const getUserById = (id) => {
  */
 export const createUser = (data) => {
   console.log('Calling createUser API with data:', data);
-  return axiosClient.post(`/api/auth/register`, data);
+  return axiosClient.post(`/api/users`, data);
 };
 
 /**

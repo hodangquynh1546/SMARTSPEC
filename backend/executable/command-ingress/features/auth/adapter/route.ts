@@ -8,7 +8,7 @@ const initAuthRoute: (controller: AuthController) => express.Router = (controlle
 
   router.route('/google/oauth').get(controller.exchangeGoogleToken.bind(controller));
 
-  router.route('/send-verification-email').post(controller.sendVerificationEmail.bind(controller));
+  router.route('/resend-verification').post(requireAuthorizedUser, controller.resendVerification.bind(controller));
   router.route('/verify-email').post(controller.verifyEmail.bind(controller));
   router.route('/register').post(controller.register.bind(controller));
 

@@ -1,5 +1,6 @@
 import logger from "../../../lib/logger";
 import { Request, Response, NextFunction } from 'express';
+import { statusForFailure } from '../services/serviceResponse';
 
 export function recoverMiddleware(
   error: any, // Dùng `any` để bắt được cả những thứ không phải là đối tượng Error
@@ -19,7 +20,15 @@ export function recoverMiddleware(
     return next(error);
   }
 
-  // BƯỚC 3: Gửi một response lỗi 500 chung chung về cho client
+  // BƯỚC 3: lỗi do người dùng (thiếu quyền, không tìm thấy, dữ liệu sai) trả đúng mã 4xx kèm lý do;
+  // chỉ lỗi thật sự của máy chủ mới trả 500 chung chung.
+  const message = error instanceof Error ? error.message : typeof error?.message === "string" ? error.message : "";
+  const declared = Number.isInteger(error?.status) && error.status >= 400 && error.status < 500 ? error.status : null;
+  const status = declared ?? statusForFailure(message, 500);
+  if (status < 500) {
+    res.status(status).json({ success: false, error: status === 403 ? "Forbidden" : status === 404 ? "NotFound" : "BadRequest", message });
+    return;
+  }
   res.status(500).json({
     success: false,
     error: "Internal Server Error",

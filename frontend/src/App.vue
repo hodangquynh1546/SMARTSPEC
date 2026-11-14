@@ -4,6 +4,7 @@ import { onMounted } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import { watch } from 'vue'
 import WorkhubLinkModal from '@/components/workhub/WorkhubLinkModal.vue'
+import EmailVerifyBanner from '@/components/auth/EmailVerifyBanner.vue'
 import { promptLinkIfNeeded } from '@/composables/useWorkhub'
 import { initSocketConnection } from '@/utils/socket'
 const route = useRoute()
@@ -29,6 +30,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <EmailVerifyBanner />
   <RouterView />
   <WorkhubLinkModal />
 </template>

@@ -60,9 +60,8 @@ class UserController extends BaseController {
         }
 
         const { name, dob, gender, avatar_url, status, selectedModel } = req.body;
-        const { day, month, year } = dob;
-        // Sử dụng UTC để tránh timezone issues - tạo Date với UTC time 00:00:00
-        const newDob = new Date(Date.UTC(year, month - 1, day));
+        // dob is optional (accounts created with e-mail + password only have none)
+        const newDob = dob && dob.year ? new Date(Date.UTC(dob.year, dob.month - 1, dob.day)) : undefined;
         const updateProfileRequestBody = new UpdateProfileRequestBody(req.body);
         const validationResult = await updateProfileRequestBody.validate();
 
@@ -246,9 +245,8 @@ class UserController extends BaseController {
 
         const { name, dob, gender, avatar_url, status } = req.body;
 
-        const { day, month, year } = dob;
-        // Sử dụng UTC để tránh timezone issues - tạo Date với UTC time 00:00:00
-        const newDob = new Date(Date.UTC(year, month - 1, day));
+        // dob is optional (accounts created with e-mail + password only have none)
+        const newDob = dob && dob.year ? new Date(Date.UTC(dob.year, dob.month - 1, dob.day)) : undefined;
         const updateProfileRequestBody = new UpdateProfileRequestBody(req.body);
         const validationResult = await updateProfileRequestBody.validate();
 
@@ -263,7 +261,7 @@ class UserController extends BaseController {
           gender,
           avatar_url,
           status,
-        });
+        } as any, true);
 
         res.status(StatusCodes.OK).json({
           status: "Success",
@@ -445,6 +443,40 @@ class UserController extends BaseController {
         });
       }
     );
+  }
+
+  /** Admin: create an account directly. */
+  async createUser(req: HttpRequest, res: Response, next: NextFunction): Promise<void> {
+    await this.execWithTryCatchBlock(req, res, next, async (req, res) => {
+      const created = await this.service.createUserByAdmin(req.body ?? {});
+      res.status(StatusCodes.CREATED).json({ status: "Success", message: "User created successfully", data: created });
+    });
+  }
+
+  /** Admin: activate / deactivate one account. */
+  async setStatus(req: HttpRequest, res: Response, next: NextFunction): Promise<void> {
+    await this.execWithTryCatchBlock(req, res, next, async (req, res) => {
+      const active = req.body?.active;
+      if (typeof active !== "boolean") {
+        res.status(StatusCodes.BAD_REQUEST).json({ status: "Error", message: "active must be true or false" });
+        return;
+      }
+      const message = await this.service.setUserStatus(req.getSubject(), String(req.params.id), active);
+      res.status(StatusCodes.OK).json({ status: "Success", message });
+    });
+  }
+
+  /** Admin: activate / deactivate / delete several accounts. */
+  async bulk(req: HttpRequest, res: Response, next: NextFunction): Promise<void> {
+    await this.execWithTryCatchBlock(req, res, next, async (req, res) => {
+      const { userIds, action } = req.body ?? {};
+      if (!Array.isArray(userIds) || !["activate", "deactivate", "delete"].includes(action)) {
+        res.status(StatusCodes.BAD_REQUEST).json({ status: "Error", message: "userIds (array) and action (activate|deactivate|delete) are required" });
+        return;
+      }
+      const result = await this.service.bulkAction(req.getSubject(), userIds.map(String), action);
+      res.status(StatusCodes.OK).json({ status: "Success", message: `${result.done} done, ${result.skipped} skipped`, data: result });
+    });
   }
 }
 

@@ -105,15 +105,15 @@ class IsValidPasswordConstraint implements ValidatorConstraintInterface {
 }
 
 export class UpdateProfileRequestBody extends RequestDto {
-  @IsNotEmpty({ message: "Email is required" })
+  @IsOptional()
   @IsEmail({}, { message: "Please provide a valid email address" })
   email: string;
 
-  @IsNotEmpty({ message: "Full name is required" })
+  @IsOptional()
   @IsString()
   name: string;
 
-  @IsNotEmpty({ message: "Date of birth is required" })
+  @IsOptional()
   @Validate(IsValidDobConstraint)
   dob: { day: number; month: number; year: number };
 

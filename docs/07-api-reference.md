@@ -12,22 +12,22 @@ Content-Type: application/json
 
 ## 1. Phân hệ Xác thực & Tài khoản (`/api/auth`)
 
+Một tài khoản dùng chung cho SmartSpec và WorkHub (xem CLAUDE.md mục 10).
+
 | Phương thức | Endpoint | Yêu cầu Auth | Mô tả chức năng |
 | :--- | :--- | :---: | :--- |
-| `POST` | `/api/auth/register` | Không | Đăng ký tài khoản người dùng mới |
-| `POST` | `/api/auth/login` | Không | Đăng nhập hệ thống, trả về accessToken và refreshToken |
-| `POST` | `/api/auth/logout` | Có | Đăng xuất, hủy phiên |
-| `POST` | `/api/auth/token` | Không | Cấp lại accessToken mới từ refreshToken |
-| `POST` | `/api/auth/forgot-password` | Không | Gửi email yêu cầu đặt lại mật khẩu |
-| `POST` | `/api/auth/reset-password` | Không | Đặt lại mật khẩu bằng token xác thực |
-| `POST` | `/api/auth/send-verification-email`| Có | Gửi mã kích hoạt email |
-| `POST` | `/api/auth/verify-email` | Có | Xác minh email qua đường dẫn kích hoạt |
-| `POST` | `/api/auth/verify-otp` | Có | Xác minh mã OTP 6 số |
-| `POST` | `/api/auth/toggle-2fa` | Có | Bật/tắt xác thực 2 lớp (2FA) |
-| `GET` | `/api/auth/me` | Có | Lấy thông tin user hiện tại từ token |
-| `GET` | `/api/auth/google/oauth` | Không | Đăng nhập bằng tài khoản Google |
-
----
+| `POST` | `/api/auth/register` | Không | Đăng ký bằng `email`, `password`, `confirmPassword` (mật khẩu 8–72 byte); trả phiên đăng nhập + `emailVerified` |
+| `POST` | `/api/auth/login` | Không | Đăng nhập (`401 INVALID_CREDENTIALS` nếu sai); `isTwoFactorEnabled` → tiếp tục `verify-otp` |
+| `POST` | `/api/auth/logout` | Có | Đăng xuất, hủy phiên (`refresh_token` hoặc `refreshToken`) |
+| `POST` | `/api/auth/token` | Không | Cấp lại accessToken/refreshToken (trả cả camelCase và snake_case) |
+| `POST` | `/api/auth/forgot-password` | Không | Gửi liên kết đặt lại mật khẩu (luôn trả cùng một thông báo) |
+| `POST` | `/api/auth/reset-password?token=` | Không | Đặt lại mật khẩu (`newPassword`, `confirmNewPassword`), đăng xuất mọi phiên |
+| `POST` | `/api/auth/resend-verification` | Có | Gửi lại email xác thực |
+| `POST` | `/api/auth/verify-email` | Không | Xác thực email bằng `token` |
+| `POST` | `/api/auth/verify-otp` | Không | Xác minh mã OTP 6 số (2FA) |
+| `POST` | `/api/auth/toggle-2fa` | Có | Bật/tắt xác thực 2 lớp |
+| `GET` | `/api/auth/me` | Có | Hồ sơ hiện tại (có `email_verified`) |
+| `GET` | `/api/auth/google/oauth` | Không | Đăng nhập bằng Google |
 
 ## 2. Phân hệ Dự án & Phiên bản (`/api/projects` & `/api/versions`)
 
@@ -131,12 +131,6 @@ Content-Type: application/json
 
 ---
 
-## 9. Admin API: khoảng trống đã xác minh
+## 9. Admin API
 
-Backend hiện có user CRUD cơ bản qua `/api/users`, API key CRUD qua `/api/keys` và danh sách project quản trị qua `/api/projects/admin/all`. Tuy nhiên, Frontend còn gọi các route chưa được đăng ký trong backend:
-
-- `GET /api/admin/dashboard/stats` và `GET /api/admin/dashboard/activities`.
-- `GET /api/admin/system/info` và `GET /api/admin/system/logs`.
-- `PATCH /api/users/:id/status` và `POST /api/users/bulk-action`.
-
-Tạo user từ Admin hiện gọi `POST /api/auth/register`, không phải một endpoint admin-only. Trước khi coi Admin Panel hoàn chỉnh, cần quyết định và triển khai các hợp đồng này hoặc loại bỏ các giao diện gọi chúng. Danh sách được đối chiếu với `frontend/src/api/admin.js` và route mounts trong `backend/executable/command-ingress/app.ts`.
+Tất cả cần vai trò `ADMIN`. `GET /api/admin/dashboard/stats`, `GET /api/admin/dashboard/activities`, `GET /api/admin/system/info`, `GET /api/admin/system/logs`; người dùng: `POST /api/users` (tạo tài khoản), `PATCH /api/users/:id/status {active}`, `POST /api/users/bulk-action {userIds, action: activate|deactivate|delete}` (không tự khóa/xóa chính mình), cùng các route cũ (`GET/PATCH/DELETE /api/users/:id`, `search`, `filter`, `reset-password/:id`). Người dùng thường: `PATCH /api/users/update-profile`, `POST /api/users/change-password`, `POST /api/users/change-email` (chuẩn hóa chữ thường, đánh dấu chưa xác thực, hủy liên kết WorkHub cũ).

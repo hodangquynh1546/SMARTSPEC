@@ -232,7 +232,7 @@ export default {
 
       // Đảm bảo giữ nguyên toàn bộ URL, không xử lý gì thêm
       const cleanUrl = avatarUrl.startsWith('/') ? avatarUrl : `/${avatarUrl}`
-      const baseUrl = 'http://localhost:8000'
+      const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
       const fullUrl = `${baseUrl}${cleanUrl}`
 
       console.log('🔗 Constructed avatar URL:', fullUrl)

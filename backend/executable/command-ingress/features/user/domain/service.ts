@@ -1,3 +1,6 @@
+import { assertPasswordPolicy } from "../../auth/domain/password";
+import { workhubIdentity } from "../../auth/domain/identity";
+import { workhubSyncService } from "../../workhub/domain/service";
 import logger from "../../../../../lib/logger";
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
@@ -70,9 +73,12 @@ export class UserServiceImpl implements UserService {
       throw new Error("Old password is incorrect");
     }
 
+    assertPasswordPolicy(body.newPassword);
     const hashedPassword = await bcrypt.hash(body.newPassword, 10);
     user.password = hashedPassword;
+    user.password_changed_at = new Date();
     await user.save();
+    await workhubIdentity.setPassword(user.email, body.newPassword);
     return "Password changed successfully";
   }
   async updateProfile(
@@ -85,12 +91,10 @@ export class UserServiceImpl implements UserService {
       avatar_url?: string;
       status?: string;
       selectedModel?: string; // ✅ MỚI: Model LLM được user chọn
-    }
+    },
+    asAdmin = false
   ): Promise<UserResponse> {
     const user = await User.findOne({ _id: userId });
-    logger.info("User ID:", userId);
-    logger.info("Updating user profile:", body);
-    logger.info("Found user:", user);
     if (!user) {
       throw new Error("User not found");
     }
@@ -106,8 +110,10 @@ export class UserServiceImpl implements UserService {
     if (body.avatar_url) {
       user.avatar_url = body.avatar_url;
     }
-    if (body.status === "ACTIVE" || body.status === "INACTIVE") {
+    // chỉ quản trị viên được khoá/mở tài khoản; người dùng không tự đổi trạng thái của mình qua hồ sơ
+    if (asAdmin && (body.status === "ACTIVE" || body.status === "INACTIVE")) {
       user.status = body.status;
+      if (body.status === "INACTIVE") await Session.deleteMany({ userID: user._id });
     }
     // ✅ MỚI: Cập nhật selectedModel trong setting
     if (body.selectedModel !== undefined) {
@@ -141,20 +147,58 @@ export class UserServiceImpl implements UserService {
     const newPassword = faker.string.alphanumeric(12).toLowerCase();
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
+    user.password_changed_at = new Date();
     await user.save();
+    await workhubIdentity.setPassword(user.email, newPassword);
 
     const subject = "Password Reset Notification";
     const data = `<p>Your password has been reset.</p>
                   <p>Your new password is: <b>${newPassword}</b>.</p>
                   <p>Please change it after logging in.</p>`;
     const mailIsSent = await mailService.sendEmail({
-      emailFrom: "hngvtdat010@gmail.com",
+      emailFrom: mailService.from(),
       emailTo: user.email,
       emailSubject: subject,
       emailText: `${data}`,
     });
 
     return "Password reset successfully. New password has been sent to the user's email.";
+  }
+
+  /** Admin creates an account directly (no verification mail needed: the admin vouches for the address). */
+  async createUserByAdmin(input: { email: string; password: string; name?: string; system_role?: string }): Promise<UserResponse> {
+    const email = String(input.email ?? "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Invalid email address");
+    assertPasswordPolicy(input.password);
+    if (await User.findOne({ email })) throw new Error("Email is already in use");
+    const user = await new User({
+      email, password: await bcrypt.hash(input.password, 10), name: input.name?.trim() || email.split("@")[0],
+      system_role: input.system_role === "ADMIN" ? "ADMIN" : "PARTICIPANT", email_verified: true, password_changed_at: new Date(),
+    }).save();
+    return { id: user.id, email: user.email, avatar_url: user.avatar_url, name: user.name, dob: user.dob, system_role: user.system_role, status: user.status, gender: user.gender, isTwoFactorEnabled: user.isTwoFactorEnabled } as UserResponse;
+  }
+
+  async setUserStatus(actorId: string, id: string, active: boolean): Promise<string> {
+    if (!active && actorId === id) throw new Error("You cannot deactivate your own account");
+    const user = await User.findOne({ _id: id });
+    if (!user) throw new Error("User not found");
+    user.status = active ? "ACTIVE" : "INACTIVE";
+    await user.save();
+    if (!active) await Session.deleteMany({ userID: user._id }); // sign them out everywhere
+    return active ? "User activated" : "User deactivated";
+  }
+
+  async bulkAction(actorId: string, ids: string[], action: "activate" | "deactivate" | "delete"): Promise<{ done: number; skipped: number }> {
+    let done = 0, skipped = 0;
+    for (const id of ids) {
+      if (id === actorId && action !== "activate") { skipped++; continue; } // never lock out or delete yourself
+      try {
+        if (action === "delete") await this.deleteUserById(id);
+        else await this.setUserStatus(actorId, id, action === "activate");
+        done++;
+      } catch { skipped++; }
+    }
+    return { done, skipped };
   }
 
   async deleteUserById(id: string): Promise<string> {
@@ -170,7 +214,7 @@ export class UserServiceImpl implements UserService {
   }
 
   async searchUsersByNameOrEmail(content: string): Promise<UserResponse[]> {
-    const regex = new RegExp(content, "i"); // 'i' makes it case-insensitive
+    const regex = new RegExp(String(content ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"); // tìm theo chữ, không phải biểu thức chính quy
     const users = await User.find({
       $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
     });
@@ -192,18 +236,26 @@ export class UserServiceImpl implements UserService {
     if (!user) {
       throw new Error("User not found");
     }
-    if (user.email === newEmail) {
+    const normalized = String(newEmail ?? "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
+      throw new Error("Invalid email address");
+    }
+    if (user.email === normalized) {
       throw new Error("New email must be different from current email");
     }
 
-    const emailExists = await User.findOne({ email: newEmail });
+    const emailExists = await User.findOne({ email: normalized });
     if (emailExists) {
       throw new Error("Email is already in use");
     }
 
-    user.email = newEmail;
+    user.email = normalized;
+    user.email_verified = false; // the new address has to be confirmed
     await user.save();
-    return "Email changed successfully";
+    // The WorkHub account is tied to the old address: drop that link (nothing is deleted there) so the next sign-in
+    // links the account for the new address.
+    await workhubSyncService.unlinkUser(String(user._id)).catch(() => undefined);
+    return "Email changed successfully. Please verify the new address.";
   }
 
   async filterUsers(

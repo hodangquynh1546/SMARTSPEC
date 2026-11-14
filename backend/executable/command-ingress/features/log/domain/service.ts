@@ -27,9 +27,14 @@ export class LogService {
       };
 
       // ✅ Chỉ convert sang ObjectId nếu có giá trị
-      if (dto.user_id) docData.user_id = new Types.ObjectId(dto.user_id);
-      if (dto.target_id) docData.target_id = new Types.ObjectId(dto.target_id);
-      if (dto.project_id) docData.project_id = new Types.ObjectId(dto.project_id);
+      if (dto.user_id && Types.ObjectId.isValid(String(dto.user_id))) docData.user_id = new Types.ObjectId(String(dto.user_id));
+      if (dto.project_id && Types.ObjectId.isValid(String(dto.project_id))) docData.project_id = new Types.ObjectId(String(dto.project_id));
+      // target_id is an ObjectId in the schema, but some callers pass a name (a table "users", a column…): keep that in
+      // the details instead of losing the whole log entry
+      if (dto.target_id) {
+        if (Types.ObjectId.isValid(String(dto.target_id)) && String(dto.target_id).length === 24) docData.target_id = new Types.ObjectId(String(dto.target_id));
+        else docData.details = { ...(dto.details ?? {}), target_name: String(dto.target_id) };
+      }
 
       logger.info("🟡 [createLog] Final docData:", docData);
 

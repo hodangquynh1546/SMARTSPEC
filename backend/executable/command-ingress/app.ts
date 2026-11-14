@@ -1,3 +1,4 @@
+import initAdminRoute from "./features/admin/adapter/route";
 import initWorkhubRoute, { initWorkhubCallbackRoute } from "./features/workhub/adapter/route";
 import appLogger from "../../lib/logger";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -210,7 +211,7 @@ const createHttpServer = (redisClient: any) => {
       "/api/auth/verify-otp",
       "/api/auth/forgot-password",
       "/api/auth/reset-password",
-      "/api/auth/send-verification-email",
+      "/api/auth/resend-verification",
     ],
     authLimiter
   );
@@ -218,6 +219,7 @@ const createHttpServer = (redisClient: any) => {
   app.use('/api/auth', initAuthRoute(new AuthController(authService)));
   app.use('/api/orchestrate', initOrchestratorRoute(new OrchestratorController(new OrchestratorService())));
   app.use('/api/projects', initProjectRoute(projectController));
+  app.use('/api/admin', initAdminRoute());
   app.use('/api/workhub', initWorkhubRoute());
   app.use('/api/integrations/workhub', initWorkhubCallbackRoute());
   app.use('/api/input', initInputHandleRoute(inputHandleController));

@@ -12,7 +12,7 @@ const build = (windowMs: number, limit: number, message: string) =>
 // Đăng nhập / OTP / quên mật khẩu: chống brute-force.
 export const authLimiter = build(
   15 * 60 * 1000,
-  20,
+  Number(process.env.AUTH_RATE_LIMIT ?? 20), // đặt lớn hơn khi chạy kiểm thử tự động
   "Quá nhiều yêu cầu xác thực, vui lòng thử lại sau 15 phút."
 );
 
