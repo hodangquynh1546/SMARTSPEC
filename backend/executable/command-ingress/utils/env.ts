@@ -14,6 +14,11 @@ const env = cleanEnv(process.env, {
   JWT_OTP_SECRET: str(),
   JWT_EMAIL_SECRET: str(),
   UPLOADS_PATH: str(),
+  PYTHON_PATH: str({ default: 'python' }),
+  // ForgeBridge (đồng bộ sang WorkHub)
+  BRIDGE_URL: str({ default: 'http://localhost:8090' }),
+  BRIDGE_SECRET: str({ default: 'dev-only-bridge-secret-change-me' }),
+  WORKHUB_ENABLED: bool({ default: true }),
 });
 
 export default env;

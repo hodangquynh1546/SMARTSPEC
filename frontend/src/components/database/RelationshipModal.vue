@@ -301,7 +301,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
@@ -315,18 +315,18 @@ export default {
 
 .modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9fafb;
-  border-radius: 12px 12px 0 0;
+  background: var(--bg);
+  border-radius: var(--radius-field) var(--radius-field) 0 0;
 }
 
 .modal-header h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 }
 
@@ -334,9 +334,9 @@ export default {
   padding: 6px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -344,8 +344,8 @@ export default {
 }
 
 .btn-close:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -355,13 +355,13 @@ export default {
 .relationship-form {
   margin-bottom: 32px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .relationship-form h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 16px;
 }
 
@@ -381,19 +381,19 @@ export default {
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .required {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   transition: all 0.2s ease;
   background: white;
@@ -401,14 +401,14 @@ export default {
 
 .form-group select:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .relationship-preview {
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   padding: 12px 16px;
   margin-bottom: 16px;
 }
@@ -422,23 +422,23 @@ export default {
 
 .preview-header .material-symbols-outlined {
   font-size: 16px;
-  color: #0ea5e9;
+  color: var(--ink);
 }
 
 .preview-header strong {
   font-size: 0.875rem;
-  color: #0c4a6e;
+  color: var(--ink);
 }
 
 .preview-content {
   font-size: 0.875rem;
-  color: #0369a1;
+  color: var(--ink);
   margin-bottom: 4px;
 }
 
 .preview-hint {
   font-size: 0.75rem;
-  color: #0ea5e9;
+  color: var(--ink);
   font-style: italic;
 }
 
@@ -446,12 +446,12 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fef2f2;
+  background: var(--sunken);
   border: 1px solid #fecaca;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 12px 16px;
   margin-bottom: 16px;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 0.875rem;
 }
 
@@ -465,10 +465,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -476,7 +476,7 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 .btn-primary:disabled {
@@ -500,7 +500,7 @@ export default {
 .section-header h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 }
 
@@ -515,7 +515,7 @@ export default {
   align-items: center;
   gap: 6px;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .stat-dot {
@@ -525,28 +525,28 @@ export default {
 }
 
 .stat-dot.one-to-one {
-  background: #3b82f6;
+  background: var(--ink);
 }
 
 .stat-dot.one-to-many {
-  background: #10b981;
+  background: var(--success);
 }
 
 .stat-dot.many-to-one {
-  background: #f59e0b;
+  background: var(--warning);
 }
 
 .stat-dot.many-to-many {
-  background: #8b5cf6;
+  background: var(--ink);
 }
 
 .empty-relationships {
   text-align: center;
   padding: 40px 20px;
-  color: #6b7280;
-  background: #f9fafb;
-  border-radius: 8px;
-  border: 2px dashed #e5e7eb;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
 }
 
 .empty-relationships .material-symbols-outlined {
@@ -577,8 +577,8 @@ export default {
   align-items: center;
   padding: 16px;
   background: white;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
   transition: all 0.2s ease;
 }
 
@@ -587,19 +587,19 @@ export default {
 }
 
 .relationship-item.one-to-one {
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--ink);
 }
 
 .relationship-item.one-to-many {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--success);
 }
 
 .relationship-item.many-to-one {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning);
 }
 
 .relationship-item.many-to-many {
-  border-left: 4px solid #8b5cf6;
+  border-left: 4px solid var(--ink);
 }
 
 .relationship-info {
@@ -612,26 +612,26 @@ export default {
 
 .type-badge {
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.7rem;
   font-weight: 600;
   color: white;
 }
 
 .type-badge.one-to-one {
-  background: #3b82f6;
+  background: var(--ink);
 }
 
 .type-badge.one-to-many {
-  background: #10b981;
+  background: var(--success);
 }
 
 .type-badge.many-to-one {
-  background: #f59e0b;
+  background: var(--warning);
 }
 
 .type-badge.many-to-many {
-  background: #8b5cf6;
+  background: var(--ink);
 }
 
 .relationship-tables {
@@ -644,12 +644,12 @@ export default {
 .from-table,
 .to-table {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .relationship-arrow {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .relationship-arrow .material-symbols-outlined {
@@ -666,7 +666,7 @@ export default {
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .meta-item .material-symbols-outlined {
@@ -682,9 +682,9 @@ export default {
   padding: 6px;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -692,37 +692,37 @@ export default {
 }
 
 .btn-icon:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-icon.danger:hover {
-  background: #fef2f2;
-  color: #ef4444;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .modal-footer {
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
-  background: #f9fafb;
-  border-radius: 0 0 12px 12px;
+  background: var(--bg);
+  border-radius: 0 0 var(--radius-field) var(--radius-field);
 }
 
 .btn-secondary {
   padding: 10px 20px;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--sunken);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.875rem;
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 /* Responsive design */

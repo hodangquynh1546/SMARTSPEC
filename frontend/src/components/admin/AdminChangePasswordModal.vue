@@ -268,7 +268,7 @@ const handleChangePassword = async () => {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 600px;
@@ -278,7 +278,7 @@ const handleChangePassword = async () => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -286,7 +286,7 @@ const handleChangePassword = async () => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -297,10 +297,10 @@ const handleChangePassword = async () => {
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -308,8 +308,8 @@ const handleChangePassword = async () => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -329,7 +329,7 @@ const handleChangePassword = async () => {
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 6px;
   font-size: 14px;
 }
@@ -343,15 +343,15 @@ const handleChangePassword = async () => {
 .form-input {
   width: 100%;
   padding: 10px 40px 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -360,21 +360,21 @@ const handleChangePassword = async () => {
   right: 8px;
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-toggle-password:hover {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .error-message {
-  color: #e53e3e;
+  color: var(--danger);
   font-size: 12px;
   margin-top: 4px;
 }
@@ -385,46 +385,46 @@ const handleChangePassword = async () => {
 
 .strength-bar {
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   margin-bottom: 4px;
   transition: all 0.3s ease;
 }
 
 .strength-bar.empty {
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 .strength-bar.weak {
-  background: #e53e3e;
+  background: var(--danger);
   width: 33%;
 }
 
 .strength-bar.medium {
-  background: #ed8936;
+  background: var(--danger);
   width: 66%;
 }
 
 .strength-bar.strong {
-  background: #38a169;
+  background: var(--success);
   width: 100%;
 }
 
 .strength-text {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .password-requirements {
   margin-top: 12px;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .requirements-title {
   font-size: 12px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text);
   margin: 0 0 8px 0;
 }
 
@@ -433,7 +433,7 @@ const handleChangePassword = async () => {
   padding: 0;
   margin: 0;
   font-size: 11px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .requirements-list li {
@@ -449,26 +449,26 @@ const handleChangePassword = async () => {
 }
 
 .requirements-list li.met {
-  color: #38a169;
+  color: var(--success);
 }
 
 .requirements-list li.met::before {
   content: '✓';
-  color: #38a169;
+  color: var(--success);
 }
 
 .security-tips {
   padding: 16px;
-  background: #fffaf0;
-  border: 1px solid #fed7d7;
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   margin-top: 16px;
 }
 
 .security-tips h4 {
   font-size: 14px;
   font-weight: 600;
-  color: #c53030;
+  color: var(--danger);
   margin: 0 0 8px 0;
 }
 
@@ -477,7 +477,7 @@ const handleChangePassword = async () => {
   padding: 0;
   margin: 0;
   font-size: 12px;
-  color: #744210;
+  color: var(--danger);
 }
 
 .security-tips li {
@@ -490,12 +490,12 @@ const handleChangePassword = async () => {
   content: '•';
   position: absolute;
   left: 0;
-  color: #ed8936;
+  color: var(--danger);
 }
 
 .modal-footer {
   padding: 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -504,7 +504,7 @@ const handleChangePassword = async () => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -522,22 +522,22 @@ const handleChangePassword = async () => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .loading-spinner {

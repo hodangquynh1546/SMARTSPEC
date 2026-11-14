@@ -422,16 +422,16 @@ onMounted(async () => {
 
 .back-button-container {
   padding: 12px;
-  border-bottom: 1px solid #3e3e42;
+  border-bottom: 1px solid var(--ink);
 }
 
 .back-btn {
   width: 100%;
   padding: 8px 12px;
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   font-size: 13px;
   display: flex;
@@ -441,8 +441,8 @@ onMounted(async () => {
 }
 
 .back-btn:hover {
-  background: #3e3e42;
-  border-color: #0e639c;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .back-btn .material-symbols-outlined {
@@ -451,7 +451,7 @@ onMounted(async () => {
 
 .statistics {
   padding: 12px;
-  border-bottom: 1px solid #3e3e42;
+  border-bottom: 1px solid var(--ink);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -462,25 +462,25 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 6px 8px;
-  background: #2d2d30;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .stat-label {
   font-size: 12px;
-  color: #858585;
+  color: var(--muted);
 }
 
 .stat-value {
   font-size: 14px;
   font-weight: 600;
-  color: #0e639c;
+  color: var(--ink);
 }
 
 .project-selector {
   padding: 12px;
-  border-bottom: 1px solid #3e3e42;
-  background: #2d2d30;
+  border-bottom: 1px solid var(--ink);
+  background: var(--ink);
 }
 
 .selector-header {
@@ -489,7 +489,7 @@ onMounted(async () => {
   gap: 8px;
   margin-bottom: 8px;
   font-size: 12px;
-  color: #858585;
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -500,22 +500,22 @@ onMounted(async () => {
 .project-select {
   width: 100%;
   padding: 8px 12px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   font-size: 13px;
   cursor: pointer;
 }
 
 .project-select:focus {
   outline: none;
-  border-color: #0e639c;
+  border-color: var(--ink);
 }
 
 .tree-search {
   padding: 12px;
-  border-bottom: 1px solid #3e3e42;
+  border-bottom: 1px solid var(--ink);
   position: relative;
   display: flex;
   align-items: center;
@@ -524,7 +524,7 @@ onMounted(async () => {
 .search-icon {
   position: absolute;
   left: 24px;
-  color: #858585;
+  color: var(--muted);
   font-size: 18px;
   pointer-events: none;
 }
@@ -536,16 +536,16 @@ onMounted(async () => {
 .search-input {
   width: 100%;
   padding: 8px 12px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   font-size: 13px;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #0e639c;
+  border-color: var(--ink);
 }
 
 .tree-container {
@@ -557,21 +557,21 @@ onMounted(async () => {
 .loading {
   padding: 20px;
   text-align: center;
-  color: #858585;
+  color: var(--muted);
 }
 
 .tree-actions {
   padding: 12px;
-  border-top: 1px solid #3e3e42;
+  border-top: 1px solid var(--ink);
   position: relative;
 }
 
 .add-btn {
   width: 100%;
   padding: 8px;
-  background: #0e639c;
+  background: var(--ink);
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   color: white;
   cursor: pointer;
   font-size: 13px;
@@ -586,7 +586,7 @@ onMounted(async () => {
 }
 
 .add-btn:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .add-menu {
@@ -595,9 +595,9 @@ onMounted(async () => {
   left: 12px;
   right: 12px;
   margin-bottom: 8px;
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -608,10 +608,10 @@ onMounted(async () => {
   padding: 8px 12px;
   background: transparent;
   border: none;
-  color: #cccccc;
+  color: var(--muted);
   text-align: left;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 999px;
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -624,6 +624,6 @@ onMounted(async () => {
 }
 
 .add-menu button:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 </style>

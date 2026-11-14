@@ -380,7 +380,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1200px;
   max-height: 90vh;
@@ -395,15 +395,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .header-actions {
@@ -413,13 +413,13 @@ export default {
 }
 
 .select-usecase-btn {
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -428,19 +428,19 @@ export default {
 }
 
 .select-usecase-btn:hover:not(:disabled) {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .select-usecase-btn.selected {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .select-usecase-btn.selected:hover:not(:disabled) {
-  background: #2d5aa0;
-  border-color: #2d5aa0;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .select-usecase-btn:disabled {
@@ -449,13 +449,13 @@ export default {
 }
 
 .skip-conflict-btn {
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--sunken);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -464,8 +464,8 @@ export default {
 }
 
 .skip-conflict-btn:hover:not(:disabled) {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .skip-conflict-btn:disabled {
@@ -476,10 +476,10 @@ export default {
 .close-btn {
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   padding: 6px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -487,8 +487,8 @@ export default {
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -512,10 +512,10 @@ export default {
 }
 
 .detail-section {
-  background: #f8fafc;
+  background: var(--bg);
   padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
   height: 100%;
   min-height: 120px;
   display: flex;
@@ -529,7 +529,7 @@ export default {
 .detail-section h5 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin: 0 0 8px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -537,7 +537,7 @@ export default {
 
 .detail-section p {
   margin: 0;
-  color: #4b5563;
+  color: var(--text);
   line-height: 1.5;
   font-size: 0.875rem;
   flex: 1;
@@ -561,7 +561,7 @@ export default {
 
 .task-list li,
 .condition-list li {
-  color: #4b5563;
+  color: var(--text);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -570,7 +570,7 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  color: #dc2626;
+  color: var(--danger);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -589,34 +589,34 @@ export default {
 
 .tag {
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .tag-input {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .tag-output {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .tag-meta {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .tag-related {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .priority-badge {
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -624,33 +624,33 @@ export default {
 }
 
 .priority-high {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .priority-medium {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .priority-low {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .modal-footer {
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
   display: flex;
   justify-content: flex-end;
 }
 
 .close-button {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   padding: 10px 24px;
   font-size: 14px;
   font-weight: 500;
@@ -659,7 +659,7 @@ export default {
 }
 
 .close-button:hover {
-  background: #2d5aa0;
+  background: var(--ink);
   transform: translateY(-1px);
 }
 
@@ -670,13 +670,13 @@ export default {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .usecase-meta-header .usecase-name {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .meta-badges {
@@ -687,40 +687,40 @@ export default {
 
 .meta-badge {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .type-badge {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .level-badge {
   background: #fef3c7;
-  color: #92400e;
+  color: var(--danger);
 }
 
 .status-badge {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .status-badge.status-inactive {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .status-badge.status-deprecated {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--sunken);
+  color: var(--muted);
 }
 
 .frequency-badge {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 /* Actor Details */
@@ -729,26 +729,26 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #f8fafc;
-  border-radius: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
   margin-bottom: 16px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--ink);
 }
 
 .actor-label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .actor-name {
-  color: #3b82f6;
+  color: var(--ink);
   font-weight: 600;
   font-size: 0.875rem;
 }
 
 .actor-desc {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.8rem;
   font-style: italic;
 }
@@ -764,20 +764,20 @@ export default {
   display: flex;
   gap: 12px;
   padding: 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
 
 .flow-step:hover {
-  border-color: #3b82f6;
+  border-color: var(--ink);
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
 }
 
 .flow-step.system-step {
-  background: #f0f9ff;
-  border-left: 3px solid #0ea5e9;
+  background: var(--bg);
+  border-left: 3px solid var(--ink);
 }
 
 .step-header {
@@ -794,7 +794,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
   border-radius: 50%;
   font-weight: 600;
@@ -806,17 +806,17 @@ export default {
   font-weight: 600;
   text-transform: uppercase;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .actor-user {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .actor-system {
   background: #fef3c7;
-  color: #92400e;
+  color: var(--danger);
 }
 
 .step-content {
@@ -827,7 +827,7 @@ export default {
 }
 
 .step-action {
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -841,15 +841,15 @@ export default {
 
 .step-label {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   font-weight: 500;
 }
 
 .step-input-tag {
   padding: 2px 8px;
-  background: #e0e7ff;
-  color: #3730a3;
-  border-radius: 10px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-field);
   font-size: 0.7rem;
   font-weight: 500;
 }
@@ -857,26 +857,26 @@ export default {
 .step-rule-tag {
   padding: 2px 8px;
   background: #fef3c7;
-  color: #92400e;
-  border-radius: 10px;
+  color: var(--danger);
+  border-radius: var(--radius-field);
   font-size: 0.7rem;
   font-weight: 500;
 }
 
 .rule-id {
   font-weight: 600;
-  color: #92400e;
+  color: var(--danger);
   margin-right: 6px;
 }
 
 .step-result {
-  color: #059669;
+  color: var(--success);
   font-size: 0.85rem;
   font-style: italic;
 }
 
 .result-arrow {
-  color: #10b981;
+  color: var(--success);
   font-weight: 600;
 }
 
@@ -888,9 +888,9 @@ export default {
 }
 
 .alt-flow-item {
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--warning-soft);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -904,13 +904,13 @@ export default {
 
 .alt-flow-id {
   font-weight: 700;
-  color: #92400e;
+  color: var(--danger);
   font-size: 0.85rem;
 }
 
 .alt-flow-step {
   font-size: 0.75rem;
-  color: #b45309;
+  color: var(--danger);
 }
 
 .alt-flow-content {
@@ -922,11 +922,11 @@ export default {
 
 .alt-flow-condition, .alt-flow-response, .alt-flow-end {
   font-size: 0.85rem;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .no-data {
-  color: #9ca3af;
+  color: var(--muted);
   font-style: italic;
   padding: 12px;
   text-align: center;
@@ -956,16 +956,16 @@ export default {
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--sunken);
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 
 /* Responsive Design */

@@ -2424,8 +2424,8 @@ export default {
 .ucd-renderer-final {
   display: flex;
   height: 100%;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius);
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
@@ -2438,11 +2438,11 @@ export default {
 }
 
 .ucd-renderer-final.preview-mode {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 }
 
 .ucd-renderer-final.editable-mode {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--border-strong);
 }
 
 .ucd-renderer-final.fullscreen-mode {
@@ -2491,9 +2491,9 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius-field);
+  border: 1.5px solid var(--border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -2504,9 +2504,9 @@ export default {
   padding: 8px 14px;
   border: none;
   background: transparent;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2530,7 +2530,7 @@ export default {
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
@@ -2550,10 +2550,10 @@ export default {
   text-align: center;
   font-size: 12px;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   padding: 4px 8px;
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(26, 54, 93, 0.1);
 }
 
@@ -2561,7 +2561,7 @@ export default {
 .ucd-container-final {
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 50%, var(--bg) 100%);
   position: relative;
   cursor: grab;
 }
@@ -2589,7 +2589,7 @@ export default {
   backdrop-filter: blur(12px);
   border-top: 2px solid rgba(226, 232, 240, 0.8);
   font-size: 12px;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
 }
@@ -2600,7 +2600,7 @@ export default {
   gap: 6px;
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
 }
 
@@ -2637,21 +2637,21 @@ export default {
 
 .actor-head {
   fill: white;
-  stroke: #1f2937;
+  stroke: var(--text);
   stroke-width: 2;
 }
 
 .actor-body,
 .actor-arms,
 .actor-legs {
-  stroke: #1f2937;
+  stroke: var(--text);
   stroke-width: 2;
 }
 
 .actor-name {
   font-size: 11px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   text-align: center;
   pointer-events: none;
   display: flex;
@@ -2662,14 +2662,14 @@ export default {
 
 .usecase-node {
   fill: white;
-  stroke: #3b82f6;
+  stroke: var(--ink);
   stroke-width: 2;
 }
 
 .usecase-title {
   font-size: 10px;
   font-weight: 500;
-  color: #1e40af;
+  color: var(--ink);
   text-align: center;
   pointer-events: none;
   display: flex;
@@ -2681,7 +2681,7 @@ export default {
 
 /* Relationship Styles */
 .association-line {
-  stroke: #374151;
+  stroke: var(--text);
   stroke-width: 1.5;
   fill: none;
 }
@@ -2692,16 +2692,16 @@ export default {
 }
 
 .relationship-include {
-  stroke: #3b82f6;
+  stroke: var(--ink);
 }
 
 .relationship-extend {
-  stroke: #8b5cf6;
+  stroke: var(--ink);
   stroke-dasharray: 5, 3;
 }
 
 .relationship-generalization {
-  stroke: #10b981;
+  stroke: var(--success);
 }
 
 .relationship-label-container {
@@ -2710,14 +2710,14 @@ export default {
 
 .label-background {
   fill: white;
-  stroke: #e5e7eb;
+  stroke: var(--muted);
   stroke-width: 1;
 }
 
 .relationship-label {
   font-size: 9px;
   font-weight: 500;
-  fill: #374151;
+  fill: var(--text);
   pointer-events: none;
 }
 
@@ -2729,7 +2729,7 @@ export default {
 /* Selection and Drag Styles */
 .selection-highlight-final {
   fill: none;
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 2;
   stroke-dasharray: 4, 4;
   pointer-events: none;
@@ -2750,18 +2750,18 @@ export default {
 .actor-group.selected .actor-body,
 .actor-group.selected .actor-arms,
 .actor-group.selected .actor-legs {
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 2.5;
 }
 
 .usecase-group.selected .usecase-node {
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 3;
 }
 
 .drag-preview-element {
   opacity: 0.7;
-  stroke: #6b7280;
+  stroke: var(--muted);
   stroke-dasharray: 4, 4;
   fill: none;
 }
@@ -2813,7 +2813,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2828,30 +2828,30 @@ export default {
 
 /* Saving State */
 .save-indicator.saving {
-  color: #f59e0b;
+  color: var(--warning);
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .save-indicator.saving .icon {
   animation: spin 1s linear infinite;
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 /* Saved State */
 .save-indicator.saved {
-  color: #10b981;
+  color: var(--success);
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .save-indicator.saved .icon {
-  color: #10b981;
+  color: var(--success);
 }
 
 /* Default State */
 .save-indicator:not(.saving):not(.saved) {
-  color: #64748b;
+  color: var(--muted);
   background: linear-gradient(135deg, rgba(100, 116, 139, 0.1) 0%, rgba(100, 116, 139, 0.05) 100%);
   border: 1px solid rgba(100, 116, 139, 0.15);
 }
@@ -2900,25 +2900,25 @@ export default {
 
 /* CRUD Styles */
 .btn-add {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
   border: none;
 }
 
 .btn-add:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
 }
 
 /* Context Menu */
 .context-menu {
   position: fixed;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 10000;
   min-width: 160px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 }
 
 .context-menu-item {
@@ -2928,22 +2928,22 @@ export default {
   padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: #374151;
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
 }
 
 .context-menu-item:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .context-menu-item.danger {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .context-menu-item.danger:hover {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .context-menu-item .material-symbols-outlined {
@@ -2967,7 +2967,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 500px;
@@ -2992,14 +2992,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .modal-close {
@@ -3007,8 +3007,8 @@ export default {
   border: none;
   cursor: pointer;
   padding: 4px;
-  border-radius: 6px;
-  color: #6b7280;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -3016,8 +3016,8 @@ export default {
 }
 
 .modal-close:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -3033,15 +3033,15 @@ export default {
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .form-input,
 .form-textarea {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -3050,7 +3050,7 @@ export default {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -3065,15 +3065,15 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-secondary {
   padding: 10px 20px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -3081,15 +3081,15 @@ export default {
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-primary {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3098,7 +3098,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
 }
@@ -3120,7 +3120,7 @@ export default {
 
 .management-modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 900px;
@@ -3135,14 +3135,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
 }
 
 .management-modal-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .modal-close-btn {
@@ -3150,8 +3150,8 @@ export default {
   border: none;
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
-  color: #6b7280;
+  border-radius: 999px;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -3159,16 +3159,16 @@ export default {
 }
 
 .modal-close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .management-tabs {
   display: flex;
   gap: 4px;
   padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .tab-btn {
@@ -3178,22 +3178,22 @@ export default {
   padding: 10px 16px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .tab-btn.active {
   background: white;
-  color: #1a365d;
+  color: var(--ink);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -3223,7 +3223,7 @@ export default {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .btn-add-item {
@@ -3232,8 +3232,8 @@ export default {
   gap: 6px;
   padding: 8px 16px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3242,7 +3242,7 @@ export default {
 }
 
 .btn-add-item:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
@@ -3258,16 +3258,16 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   transition: all 0.2s ease;
 }
 
 .item-card:hover {
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-color: #d1d5db;
+  border-color: var(--border-strong);
 }
 
 .item-info {
@@ -3277,21 +3277,21 @@ export default {
 .item-name {
   font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 4px;
 }
 
 .item-description {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
 }
 
 .relationship-type {
   padding: 2px 8px;
-  background: #e0e7ff;
-  color: #6366f1;
-  border-radius: 4px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
   margin: 0 8px;
@@ -3306,7 +3306,7 @@ export default {
 .btn-delete {
   padding: 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -3315,27 +3315,27 @@ export default {
 }
 
 .btn-edit {
-  background: #eff6ff;
-  color: #3b82f6;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-edit:hover {
-  background: #dbeafe;
+  background: var(--sunken);
 }
 
 .btn-delete {
-  background: #fef2f2;
-  color: #ef4444;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .btn-delete:hover {
-  background: #fee2e2;
+  background: var(--sunken);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .empty-state .material-symbols-outlined {
@@ -3366,7 +3366,7 @@ export default {
 
 .form-modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 500px;
@@ -3380,14 +3380,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .form-modal-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .form-modal-body {
@@ -3400,17 +3400,17 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-manage {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
 }
 
 .btn-manage:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 @keyframes fadeIn {

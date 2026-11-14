@@ -198,7 +198,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
@@ -212,29 +212,29 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: bold;
-  color: #111827;
+  color: var(--text);
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   padding: 4px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -253,8 +253,8 @@ export default {
 }
 
 .file-upload-area {
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
   padding: 40px 20px;
   text-align: center;
   cursor: pointer;
@@ -263,31 +263,31 @@ export default {
 }
 
 .file-upload-area:hover {
-  border-color: #1a365d;
-  background: #f8fafc;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .upload-placeholder {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .upload-icon {
   font-size: 48px;
   margin-bottom: 10px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .file-types {
   font-size: 12px;
   margin-top: 8px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .selected-files h5 {
   margin: 0 0 10px 0;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .file-list {
@@ -301,42 +301,42 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px;
-  background: #f9fafb;
-  border-radius: 4px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
   margin-bottom: 4px;
 }
 
 .file-name {
   flex: 1;
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
 }
 
 .file-size {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .remove-file {
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 2px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .remove-file:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .text-input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   resize: vertical;
   transition: border-color 0.2s ease;
@@ -344,17 +344,17 @@ export default {
 
 .text-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .validation-message {
-  color: #dc2626;
+  color: var(--danger);
   font-size: 14px;
   text-align: center;
   padding: 10px;
-  background: #fef2f2;
-  border-radius: 6px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   margin-top: 10px;
 }
 
@@ -363,30 +363,30 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .cancel-btn {
   padding: 10px 20px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .cancel-btn:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .submit-btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
-  background: #1a365d;
+  border-radius: 999px;
+  background: var(--ink);
   color: white;
   font-weight: 500;
   cursor: pointer;
@@ -397,7 +397,7 @@ export default {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: #12337c;
+  background: var(--ink);
 }
 
 .submit-btn:disabled {

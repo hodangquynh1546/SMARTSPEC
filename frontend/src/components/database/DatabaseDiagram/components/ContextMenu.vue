@@ -41,8 +41,8 @@ export default {
 .context-menu {
   position: fixed;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 1000;
   min-width: 160px;
@@ -52,19 +52,19 @@ export default {
   padding: 8px 16px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   transition: background-color 0.2s ease;
 }
 
 .context-menu-item:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .context-menu-item:first-child {
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .context-menu-item:last-child {
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 </style>

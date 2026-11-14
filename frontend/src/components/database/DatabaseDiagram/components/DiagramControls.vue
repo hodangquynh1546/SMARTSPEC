@@ -255,8 +255,8 @@ export default {
   z-index: 1000;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   padding: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
@@ -266,9 +266,9 @@ export default {
   align-items: center;
   gap: 4px;
   padding: 4px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .btn-icon {
@@ -279,25 +279,25 @@ export default {
   height: 32px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .btn-icon:hover {
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
 }
 
 .btn-icon.active {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 .btn-icon.active:hover {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 .btn-icon:disabled {
@@ -306,7 +306,7 @@ export default {
 }
 
 .btn-icon.danger:hover {
-  background: #ef4444;
+  background: var(--danger);
   color: white;
 }
 
@@ -315,12 +315,12 @@ export default {
   text-align: center;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .history-info {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted);
   padding: 0 8px;
 }
 
@@ -329,16 +329,16 @@ export default {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted);
   padding: 4px 8px;
 }
 
 .auto-save-status.saving {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .auto-save-status.saved {
-  color: #10b981;
+  color: var(--success);
 }
 
 .search-box {
@@ -349,8 +349,8 @@ export default {
 .search-input {
   width: 200px;
   padding: 8px 32px 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   background: white;
   transition: all 0.2s ease;
@@ -358,7 +358,7 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -368,7 +368,7 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 /* Sort Dropdown Styles */
@@ -377,8 +377,8 @@ export default {
   top: 100%;
   left: 0;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 1001;
   min-width: 180px;
@@ -392,9 +392,9 @@ export default {
   padding: 8px 12px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   transition: background-color 0.2s ease;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
 }
 
 .sort-option:last-child {
@@ -402,17 +402,17 @@ export default {
 }
 
 .sort-option:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .sort-option .material-symbols-outlined {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .current-sort {
   font-size: 12px;
-  color: #374151;
+  color: var(--text);
   padding: 0 8px;
   min-width: 60px;
   text-align: center;
@@ -434,25 +434,25 @@ export default {
 /* Dark mode support cho sorting */
 @media (prefers-color-scheme: dark) {
   .sort-dropdown {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   .sort-option {
-    color: #f9fafb;
-    border-bottom-color: #374151;
+    color: var(--muted);
+    border-bottom-color: var(--ink);
   }
 
   .sort-option:hover {
-    background: #374151;
+    background: var(--ink);
   }
 
   .sort-option .material-symbols-outlined {
-    color: #d1d5db;
+    color: var(--muted);
   }
 
   .current-sort {
-    color: #d1d5db;
+    color: var(--muted);
   }
 }
 
@@ -460,26 +460,26 @@ export default {
 @media (prefers-color-scheme: dark) {
   .diagram-controls {
     background: rgba(31, 41, 55, 0.95);
-    border-color: #374151;
+    border-color: var(--ink);
   }
 
   .control-group {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   .btn-icon {
-    color: #d1d5db;
+    color: var(--muted);
   }
 
   .search-input {
-    background: #374151;
-    border-color: #4b5563;
-    color: #f9fafb;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--muted);
   }
 
   .search-input:focus {
-    border-color: #3b82f6;
+    border-color: var(--ink);
   }
 }
 </style>

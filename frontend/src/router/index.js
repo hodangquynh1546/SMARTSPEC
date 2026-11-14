@@ -7,16 +7,16 @@ import DatabaseManagement from '../views/DatabaseManagement.vue'
 // import ActivityDiagramManagement from '../views/ActivityDiagramManagement.vue'
 import UmlManagement from '../views/UmlManagement.vue'
 import AICopilotView from '../views/AICopilotView.vue'
-import Login from '../pages/login.vue'
+import Login from '../pages/Login.vue'
 import OauthRedirect from '../pages/OauthRedirect.vue'
-import Register from '../pages/register.vue'
+import Register from '../pages/Register.vue'
 import VerifyEmail from '../pages/VerifyEmail.vue'
 import VerifyOtp from '../pages/VerifyOtp.vue'
 import ForgotPassword from '../pages/ForgotPassword.vue'
 import ResetPassword from '../pages/ResetPassword.vue'
 import ProjectLayout from '../layouts/ProjectLayout.vue'
 import adminRoutes from './admin'
-import { authGuard, adminGuard } from '../utils/authGuard'
+import { authGuard } from '../utils/authGuard'
 
 //import ProjectSharing from '@./components/ProjectSharingManagement.vue'
 const routes = [
@@ -74,6 +74,12 @@ const routes = [
     name: 'UmlManagement',
     component: UmlManagement,
     props: true,
+      },
+      {
+        path: 'tasks',
+        name: 'WorkhubTasks',
+        component: () => import('@/views/WorkhubTasks.vue'),
+        props: true,
       },
       {
         path: 'ai-copilot',

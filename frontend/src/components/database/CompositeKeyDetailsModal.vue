@@ -324,7 +324,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 90%;
   max-width: 900px;
   max-height: 90vh;
@@ -338,18 +338,18 @@ export default {
 
 .modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9fafb;
-  border-radius: 12px 12px 0 0;
+  background: var(--bg);
+  border-radius: var(--radius-field) var(--radius-field) 0 0;
 }
 
 .modal-header h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 }
 
@@ -357,9 +357,9 @@ export default {
   padding: 6px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -367,8 +367,8 @@ export default {
 }
 
 .btn-close:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -382,7 +382,7 @@ export default {
 .info-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 16px;
 }
 
@@ -401,12 +401,12 @@ export default {
 .info-item label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .info-value {
   font-size: 0.875rem;
-  color: #1f2937;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -426,7 +426,7 @@ export default {
 .section-header h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin: 0;
 }
 
@@ -440,7 +440,7 @@ export default {
   align-items: center;
   gap: 6px;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .stat-dot {
@@ -450,12 +450,12 @@ export default {
 }
 
 .stat-dot.primary {
-  background: #3b82f6;
+  background: var(--ink);
 }
 
 .columns-table {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -464,11 +464,11 @@ export default {
   grid-template-columns: 80px 2fr 1.5fr 2fr 1.5fr;
   gap: 16px;
   padding: 12px 16px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
 }
 
 .table-body {
@@ -481,7 +481,7 @@ export default {
   grid-template-columns: 80px 2fr 1.5fr 2fr 1.5fr;
   gap: 16px;
   padding: 12px 16px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
   transition: background-color 0.2s ease;
 }
 
@@ -490,11 +490,11 @@ export default {
 }
 
 .table-row:hover {
-  background: #f9fafb;
+  background: var(--bg);
 }
 
 .table-row.primary-key {
-  background: #f0f9ff;
+  background: var(--bg);
 }
 
 .col-order {
@@ -503,7 +503,7 @@ export default {
 }
 
 .order-badge {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   width: 28px;
   height: 28px;
@@ -523,20 +523,20 @@ export default {
 
 .column-name {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .column-badge {
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 600;
   color: white;
 }
 
 .column-badge.primary {
-  background: #3b82f6;
+  background: var(--ink);
 }
 
 .col-type {
@@ -548,12 +548,12 @@ export default {
 .data-type {
   font-family: 'Courier New', monospace;
   font-size: 0.875rem;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .type-length {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .col-attributes {
@@ -569,22 +569,22 @@ export default {
 
 .attribute {
   padding: 2px 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 600;
   color: white;
 }
 
 .attribute.not-null {
-  background: #ef4444;
+  background: var(--danger);
 }
 
 .attribute.unique {
-  background: #10b981;
+  background: var(--success);
 }
 
 .attribute.default {
-  background: #6b7280;
+  background: var(--muted);
   color: white;
 }
 
@@ -598,7 +598,7 @@ export default {
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: #8b5cf6;
+  color: var(--ink);
 }
 
 .relation-info .material-symbols-outlined {
@@ -606,7 +606,7 @@ export default {
 }
 
 .no-relation {
-  color: #9ca3af;
+  color: var(--muted);
   font-size: 0.875rem;
   font-style: italic;
 }
@@ -618,7 +618,7 @@ export default {
 .performance-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 16px;
 }
 
@@ -630,8 +630,8 @@ export default {
 
 .consideration-card {
   padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   transition: all 0.2s ease;
 }
@@ -641,15 +641,15 @@ export default {
 }
 
 .consideration-card.good {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--success);
 }
 
 .consideration-card.warning {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning);
 }
 
 .consideration-card.critical {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid var(--danger);
 }
 
 .consideration-header {
@@ -661,31 +661,31 @@ export default {
 
 .consideration-header .material-symbols-outlined {
   font-size: 18px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .consideration-card.good .consideration-header .material-symbols-outlined {
-  color: #10b981;
+  color: var(--success);
 }
 
 .consideration-card.warning .consideration-header .material-symbols-outlined {
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .consideration-card.critical .consideration-header .material-symbols-outlined {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .consideration-title {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.9rem;
 }
 
 .consideration-card p {
   margin: 0 0 12px 0;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
 }
 
@@ -704,15 +704,15 @@ export default {
 }
 
 .status-dot.good {
-  background: #10b981;
+  background: var(--success);
 }
 
 .status-dot.warning {
-  background: #f59e0b;
+  background: var(--warning);
 }
 
 .status-dot.critical {
-  background: #ef4444;
+  background: var(--danger);
 }
 
 .relationships-section {
@@ -722,7 +722,7 @@ export default {
 .relationships-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 16px;
 }
 
@@ -734,8 +734,8 @@ export default {
 
 .relationship-card {
   padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   transition: all 0.2s ease;
 }
@@ -754,15 +754,15 @@ export default {
 .relationship-type {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .relationship-direction {
   font-size: 0.75rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
 }
 
 .relationship-tables {
@@ -774,17 +774,17 @@ export default {
 
 .table-name {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .table-name.current-table {
-  color: #1a365d;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .relationship-arrow {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .relationship-arrow .material-symbols-outlined {
@@ -793,7 +793,7 @@ export default {
 
 .relationship-description {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
 }
 
@@ -812,34 +812,34 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--sunken);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.875rem;
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 .modal-footer {
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
-  background: #f9fafb;
-  border-radius: 0 0 12px 12px;
+  background: var(--bg);
+  border-radius: 0 0 var(--radius-field) var(--radius-field);
 }
 
 .btn-primary {
   padding: 10px 20px;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -847,7 +847,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 /* Responsive design */
@@ -878,39 +878,39 @@ export default {
 
   .table-row {
     padding: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
     margin-bottom: 8px;
   }
 
   .col-order::before {
     content: 'Order: ';
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   .col-name::before {
     content: 'Column: ';
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   .col-type::before {
     content: 'Type: ';
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   .col-attributes::before {
     content: 'Attributes: ';
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   .col-relations::before {
     content: 'Relations: ';
     font-weight: 600;
-    color: #374151;
+    color: var(--text);
   }
 
   .considerations-grid {

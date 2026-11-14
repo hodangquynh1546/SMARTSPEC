@@ -35,6 +35,7 @@
 
       <!-- Right Section -->
       <div class="header-right">
+        <WorkhubChip v-if="project && project._id" :project-id="String(project._id)" />
         <!-- Version Control -->
         <div class="version-control">
           <div class="version-selector" ref="versionSelector">
@@ -180,8 +181,10 @@ import {
   isOwner as checkIsOwner,
 } from '@/utils/versionSync'
 import { rollbackVersion, setCurrentVersion } from '@/api/version'
+import WorkhubChip from '@/components/workhub/WorkhubChip.vue'
 export default {
   name: 'ProjectHeaderModern',
+  components: { WorkhubChip },
   props: {
     project: {
       type: Object,
@@ -540,11 +543,11 @@ export default {
 <style scoped>
 .project-header-modern {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f0f2f5;
+  border: 1px solid var(--border);
 }
 
 .header-content {
@@ -568,18 +571,18 @@ export default {
   gap: 8px;
   padding: 10px 16px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 10px;
-  color: #5a6573;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
 }
 
 .back-btn:hover {
-  background: #f8f9fa;
-  border-color: #1a365d;
-  color: #1a365d;
+  background: var(--bg);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .project-info {
@@ -599,7 +602,7 @@ export default {
 .project-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
   line-height: 1.2;
 }
@@ -610,25 +613,25 @@ export default {
 
 .status-badge {
   padding: 4px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .status-badge.active {
-  background: #e6f4ee;
-  color: #137a5a;
+  background: var(--sunken);
+  color: var(--success);
 }
 
 .status-badge.completed {
-  background: #e6f4ee;
-  color: #137a5a;
+  background: var(--sunken);
+  color: var(--success);
 }
 
 .status-badge.pending {
-  background: #fff8e6;
-  color: #b3870f;
+  background: var(--bg);
+  color: var(--danger);
 }
 
 .description-section {
@@ -642,10 +645,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 2px 12px;
-  background: #f8f9fa;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  color: #5a6573;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.6rem;
@@ -654,8 +657,8 @@ export default {
 }
 
 .toggle-description-btn:hover {
-  background: #e9ecef;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .toggle-description-btn .icon {
@@ -664,14 +667,14 @@ export default {
 
 .project-description {
   padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e1e5e9;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .project-description p {
   margin: 0;
-  color: #5a6573;
+  color: var(--text);
   line-height: 1.6;
   font-size: 0.875rem;
 }
@@ -701,8 +704,8 @@ export default {
   gap: 12px;
   padding: 10px 16px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   cursor: pointer;
   transition: all 0.3s ease;
   user-select: none; /* Các trình duyệt hiện đại */
@@ -712,7 +715,7 @@ export default {
 }
 
 .selector-header:hover {
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .selector-icon {
@@ -721,9 +724,9 @@ export default {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #f0f4f8;
-  border-radius: 8px;
-  color: #1a365d;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
 }
 
 .selector-content {
@@ -734,19 +737,19 @@ export default {
 
 .selector-label {
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
   font-weight: 500;
 }
 
 .version-label {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
 }
 
 .dropdown-arrow {
   font-size: 18px;
-  color: #8a94a6;
+  color: var(--muted);
   transition: transform 0.3s ease;
 }
 
@@ -761,8 +764,8 @@ export default {
   right: 0;
   margin-top: 8px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 10;
   overflow: hidden;
@@ -770,11 +773,11 @@ export default {
 
 .dropdown-header {
   padding: 12px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e1e5e9;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .version-list {
@@ -789,7 +792,7 @@ export default {
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--border);
 }
 
 .version-option:last-child {
@@ -798,7 +801,7 @@ export default {
 
 .version-option:hover:not(.disabled),
 .version-option.active {
-  background: #f0f4f8;
+  background: var(--sunken);
 }
 
 .version-option.disabled {
@@ -812,7 +815,7 @@ export default {
 
 .owner-only-hint {
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
   font-weight: normal;
   margin-left: 8px;
 }
@@ -823,9 +826,9 @@ export default {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #f0f4f8;
-  border-radius: 8px;
-  color: #1a365d;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
 }
 
 .version-details {
@@ -836,36 +839,36 @@ export default {
 
 .version-number {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
 }
 
 .version-date {
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
 }
 
 .version-status {
   padding: 4px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .version-status.completed {
-  background: #e6f4ee;
-  color: #137a5a;
+  background: var(--sunken);
+  color: var(--success);
 }
 
 .version-status.failed {
-  background: #fde8e8;
-  color: #c53030;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .version-status.processing {
-  background: #fff8e6;
-  color: #b3870f;
+  background: var(--bg);
+  color: var(--danger);
 }
 
 .retry-btn {
@@ -873,10 +876,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #e53e3e;
+  background: var(--danger);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-weight: 500;
@@ -884,11 +887,11 @@ export default {
 }
 
 .retry-btn:hover:not(:disabled) {
-  background: #c53030;
+  background: var(--danger);
 }
 
 .retry-btn:disabled {
-  background: #a0aec0;
+  background: var(--muted);
   cursor: not-allowed;
 }
 
@@ -904,12 +907,12 @@ export default {
   gap: 12px;
   padding: 12px 16px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
   user-select: none; /* Các trình duyệt hiện đại */
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none; /* Firefox */
@@ -917,8 +920,8 @@ export default {
 }
 
 .active-users-trigger:hover {
-  border-color: #1a365d;
-  background: #f8f9fa;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .active-users-icon {
@@ -927,9 +930,9 @@ export default {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #f0f4f8;
-  border-radius: 8px;
-  color: #1a365d;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
 }
 
 .active-users-count {
@@ -946,13 +949,13 @@ export default {
 
 .label {
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
   font-weight: 500;
 }
 
 .arrow {
   font-size: 18px;
-  color: #8a94a6;
+  color: var(--muted);
   transition: transform 0.3s ease;
 }
 
@@ -966,8 +969,8 @@ export default {
   right: 0;
   margin-top: 8px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 20;
   min-width: 280px;
@@ -990,20 +993,20 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   transition: background-color 0.3s ease;
   position: relative;
 }
 
 .active-user-item:hover {
-  background: #f0f4f8;
+  background: var(--sunken);
 }
 /* Hiệu ứng live pulse cho online status */
 .online-status {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #38a169;
+  background: var(--success);
   flex-shrink: 0;
   position: relative;
 }
@@ -1016,7 +1019,7 @@ export default {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: #38a169;
+  background: var(--success);
   border-radius: 50%;
   animation: pulse 2s infinite;
   opacity: 0.6;
@@ -1039,21 +1042,21 @@ export default {
 
 /* Highlight user hiện tại */
 .active-user-item.current-user {
-  background: #f0f7ff;
-  border: 1px solid #bee3f8;
+  background: var(--sunken);
+  border: 1px solid var(--border-strong);
 }
 
 .active-user-item.current-user .user-name {
-  color: #2b6cb0;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .active-user-item.current-user .online-status {
-  background: #3182ce;
+  background: var(--ink);
 }
 
 .active-user-item.current-user .online-status::before {
-  background: #3182ce;
+  background: var(--ink);
 }
 
 .user-avatar {
@@ -1068,14 +1071,14 @@ export default {
   max-height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #000;
+  border: 1px solid var(--ink);
 }
 
 .avatar-placeholder {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   display: flex;
   align-items: center;
@@ -1092,14 +1095,14 @@ export default {
 
 .user-name {
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
   line-height: 1.2;
 }
 
 .user-email {
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
   line-height: 1.2;
 }
 
@@ -1107,7 +1110,7 @@ export default {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #38a169;
+  background: var(--success);
   flex-shrink: 0;
 }
 
@@ -1117,12 +1120,12 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 24px;
-  color: #8a94a6;
+  color: var(--muted);
 }
 
 .no-active-users .material-symbols-outlined {
   font-size: 48px;
-  color: #cbd5e0;
+  color: var(--muted);
 }
 
 .no-active-users p {
@@ -1132,11 +1135,11 @@ export default {
 
 .active-users-footer {
   padding: 12px 16px;
-  border-top: 1px solid #e1e5e9;
+  border-top: 1px solid var(--border);
   font-size: 0.75rem;
-  color: #8a94a6;
+  color: var(--muted);
   text-align: center;
-  background: #f8f9fa;
+  background: var(--bg);
 }
 
 /* Members Button */
@@ -1146,9 +1149,9 @@ export default {
   gap: 12px;
   padding: 12px 16px;
   background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 10px;
-  color: #1a365d;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--ink);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
@@ -1158,8 +1161,8 @@ export default {
 }
 
 .members-btn:hover {
-  background: #f8f9fa;
-  border-color: #1a365d;
+  background: var(--bg);
+  border-color: var(--ink);
 }
 
 .members-icon {
@@ -1168,9 +1171,9 @@ export default {
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: #f0f4f8;
-  border-radius: 8px;
-  color: #1a365d;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
 }
 
 .members-count {
@@ -1288,7 +1291,7 @@ export default {
 @media (max-width: 768px) {
   .project-header-modern {
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-field);
   }
 
   .header-left {
@@ -1522,7 +1525,7 @@ export default {
   padding: 12px 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--border);
 }
 
 .version-main-content {
@@ -1540,15 +1543,15 @@ export default {
   height: 32px;
   background: transparent;
   border: none;
-  border-radius: 6px;
-  color: #e53e3e;
+  border-radius: var(--radius-sm);
+  color: var(--danger);
   cursor: pointer;
   transition: all 0.3s ease;
   opacity: 0.7;
 }
 
 .rollback-btn:hover {
-  background: #fed7d7;
+  background: var(--border);
   opacity: 1;
 }
 

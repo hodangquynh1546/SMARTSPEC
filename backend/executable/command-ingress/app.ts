@@ -1,3 +1,5 @@
+import initWorkhubRoute, { initWorkhubCallbackRoute } from "./features/workhub/adapter/route";
+import appLogger from "../../lib/logger";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import path from "path";
 import express from "express";
@@ -7,6 +9,8 @@ import morgan from "morgan";
 import fileUpload from "express-fileupload";
 
 import cors from "cors";
+import helmet from "helmet";
+import { authLimiter, orchestrateLimiter } from "./middlewares/rateLimit";
 import { recoverMiddleware } from "./middlewares/recover";
 import { createServer } from "http";
 
@@ -129,18 +133,30 @@ const createHttpServer = (redisClient: any) => {
 
   app.use(express.json({ limit: '10mb' })); // Tăng từ 100KB lên 10MB
   app.use(express.urlencoded({ limit: '10mb', extended: true }));
-  app.use(fileUpload());
+  app.use(
+    helmet({
+      // Avatar được frontend (origin khác) nhúng trực tiếp.
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    })
+  );
+  app.use(
+    fileUpload({
+      limits: { fileSize: 200 * 1024 * 1024 }, // 200MB/file
+      abortOnLimit: true,
+    })
+  );
+  // Chỉ public thư mục avatars; các file upload khác không được phơi ra ngoài.
   const uploadsDir = path.resolve(env.UPLOADS_PATH);
-  app.use("/uploads", express.static(uploadsDir));
+  app.use("/uploads/avatars", express.static(path.join(uploadsDir, "avatars")));
   app.use(
     cors({
-      origin: "http://localhost:5173", // FE URL
+      origin: env.CLIENT_URL,
       credentials: true,
     })
   );
-  console.log("🔍 Debug static file paths:");
-  console.log("Process CWD:", process.cwd());
-  console.log("__dirname:", __dirname);
+  appLogger.info("🔍 Debug static file paths:");
+  appLogger.info("Process CWD:", process.cwd());
+  appLogger.info("__dirname:", __dirname);
 
   // --- 2. CẤU HÌNH CORS ĐÚNG CHUẨN ---
   // const corsOptions = {
@@ -160,22 +176,6 @@ const createHttpServer = (redisClient: any) => {
     redirectURL: env.GOOGLE_OAUTH_REDIRECT_URL,
   });
 
-  // ✨ THÊM ĐOẠN CODE KIỂM TRA NÀY VÀO
-  console.log("--- Đang kiểm tra biến môi trường ---");
-  console.log("JWT_SECRET:", process.env.JWT_SECRET ? "OK" : "!!! THIẾU !!!");
-  console.log(
-    "JWT_REFRESH_SECRET:",
-    process.env.JWT_REFRESH_SECRET ? "OK" : "!!! THIẾU !!!"
-  );
-  console.log(
-    "JWT_OTP_SECRET:",
-    process.env.JWT_OTP_SECRET ? "OK" : "!!! THIẾU !!!"
-  );
-  console.log(
-    "JWT_EMAIL_SECRET:",
-    process.env.JWT_EMAIL_SECRET ? "OK" : "!!! THIẾU !!!"
-  );
-  console.log("-----------------------------------");
   const authService = new AuthServiceImpl(
     googleIdentityBroker,
     env.JWT_SECRET,
@@ -203,9 +203,23 @@ const createHttpServer = (redisClient: any) => {
   const testcaseController = new TestcaseController();
   // Setup route
 
+  app.use(
+    [
+      "/api/auth/login",
+      "/api/auth/register",
+      "/api/auth/verify-otp",
+      "/api/auth/forgot-password",
+      "/api/auth/reset-password",
+      "/api/auth/send-verification-email",
+    ],
+    authLimiter
+  );
+  app.use("/api/orchestrate", orchestrateLimiter);
   app.use('/api/auth', initAuthRoute(new AuthController(authService)));
   app.use('/api/orchestrate', initOrchestratorRoute(new OrchestratorController(new OrchestratorService())));
   app.use('/api/projects', initProjectRoute(projectController));
+  app.use('/api/workhub', initWorkhubRoute());
+  app.use('/api/integrations/workhub', initWorkhubCallbackRoute());
   app.use('/api/input', initInputHandleRoute(inputHandleController));
   app.use('/api/usecaseManagement', initUsecaseRoute(usecaseController));
   app.use('/api/databases', initDatabaseRoute())
@@ -256,11 +270,6 @@ const createHttpServer = (redisClient: any) => {
     initTextRoute(new TextController(new TextService()))
   );
   app.use(
-    "/api/orchestrate",
-    initOrchestratorRoute(new OrchestratorController(new OrchestratorService()))
-  );
-  app.use("/api/projects", initProjectRoute(projectController));
-  app.use(
     "/api/projects",
     initShareProjectRoute(new ShareProjectController(new ShareProjectService()))
   );
@@ -285,13 +294,13 @@ const createHttpServer = (redisClient: any) => {
     // Khởi tạo Presence Redis Service
     const presenceRedisService = new PresenceRedisService(redisClient);
     presenceSocketService.setRedisService(presenceRedisService);
-    console.log('✅ Presence Redis Service initialized');
+    appLogger.info('✅ Presence Redis Service initialized');
 
     // Khởi tạo Stats Cache Service
     const statsCacheService = new StatsCacheService(redisClient);
     const statsService = new StatsService();
     statsService.setCacheService(statsCacheService);
-    console.log('✅ Stats Cache Service initialized');
+    appLogger.info('✅ Stats Cache Service initialized');
 
     app.use(
       "/api/stats",
@@ -305,7 +314,7 @@ const createHttpServer = (redisClient: any) => {
       initStatsRoute(new StatsController(statsService))
   );
     // Không log warning ở đây vì đã log ở main.ts khi kết nối Redis
-    // console.log('⚠️ Stats Service initialized without Redis cache');
+    // appLogger.info('⚠️ Stats Service initialized without Redis cache');
   }
 
   return server;

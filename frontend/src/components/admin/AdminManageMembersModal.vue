@@ -117,7 +117,7 @@ const toggleRole = (member) => {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   width: 100%;
@@ -139,7 +139,7 @@ const toggleRole = (member) => {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
@@ -148,13 +148,13 @@ const toggleRole = (member) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .modal-body {
   padding: 24px;
-  background: #fff;
-  color: #1a202c;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .modal-footer {
@@ -162,13 +162,13 @@ const toggleRole = (member) => {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f9fafb;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .btn {
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -178,54 +178,54 @@ const toggleRole = (member) => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #2c5282;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #edf2f7;
-  color: #2d3748;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 .btn-icon {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .btn-icon:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-icon.danger:hover {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--border);
+  color: var(--danger);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: 999px;
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .form-grid {
@@ -236,7 +236,7 @@ const toggleRole = (member) => {
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -245,8 +245,8 @@ const toggleRole = (member) => {
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
@@ -254,7 +254,7 @@ const toggleRole = (member) => {
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -285,20 +285,20 @@ const toggleRole = (member) => {
 }
 .empty-state {
   text-align: center;
-  color: #718096;
+  color: var(--muted);
   font-size: 14px;
   padding: 16px;
-  background: #f9fafb;
-  border-radius: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 .member-card {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
 }
 .member-card .avatar img {
   width: 40px;
@@ -309,12 +309,12 @@ const toggleRole = (member) => {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 .member-card .info p {
   margin: 0;
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 .add-member-section {
   display: flex;
@@ -324,7 +324,7 @@ const toggleRole = (member) => {
 .add-member-section input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
 }
 </style>

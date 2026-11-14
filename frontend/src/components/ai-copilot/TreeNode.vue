@@ -157,7 +157,7 @@ const handleDelete = () => {
   align-items: center;
   padding: 6px 8px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: background 0.2s;
   gap: 8px;
 }
@@ -173,11 +173,11 @@ const handleDelete = () => {
 }
 
 .node-content:hover {
-  background: #2a2d2e;
+  background: var(--ink);
 }
 
 .node-content.selected {
-  background: #094771;
+  background: var(--ink);
 }
 
 .node-content.draggable {
@@ -191,13 +191,13 @@ const handleDelete = () => {
 .node-icon {
   font-size: 18px;
   flex-shrink: 0;
-  color: #858585;
+  color: var(--muted);
 }
 
 .node-label {
   flex: 1;
   font-size: 13px;
-  color: #cccccc;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -219,17 +219,17 @@ const handleDelete = () => {
   border: none;
   cursor: pointer;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #858585;
+  color: var(--muted);
   transition: all 0.2s;
 }
 
 .delete-btn:hover {
-  background: #5a1d1d;
-  color: #f48771;
+  background: var(--danger);
+  color: var(--danger);
 }
 
 .delete-btn .material-symbols-outlined {

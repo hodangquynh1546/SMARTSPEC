@@ -1,0 +1,114 @@
+/* ==========================================================================
+   Design tokens shared with WORKHUB (WorkHub/frontend/src/index.css).
+   Black and white with one ink colour. Serif headings (Newsreader), sans body
+   (Be Vietnam Pro). Radius by role: 12 fields, 20 surfaces, pill for actions.
+   Component <style> blocks reference these variables (see scripts/apply-workhub-theme.mjs).
+   Light theme only for now.
+   ========================================================================== */
+:root {
+  --bg: #f5f5f4;
+  --surface: #ffffff;
+  --sunken: #efefee;
+  --text: #0a0a0a;
+  --muted: #6b6b6b;
+  --border: #e4e4e2;
+  --border-strong: #cfcfcc;
+  --ink: #0a0a0a;
+  --ink-text: #ffffff;
+  --ink-soft: #ededeb;
+
+  --accent: var(--ink);
+  --accent-text: var(--ink-text);
+  --accent-soft: var(--ink-soft);
+
+  --danger: #b42318;
+  --danger-soft: #fceceb;
+  --success: #166534;
+  --success-soft: #e5f3ea;
+  --warning: #8a5a00;
+  --warning-soft: #fdf3dc;
+
+  --radius-sm: 8px;
+  --radius-field: 12px;
+  --radius: 20px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+  --shadow-pop: 0 4px 12px rgb(0 0 0 / 0.06), 0 24px 48px -16px rgb(0 0 0 / 0.25);
+  --gutter: clamp(16px, 3vw, 48px);
+
+  --font-body: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Newsreader', 'Iowan Old Style', Georgia, serif;
+
+  color-scheme: light;
+  font: 15px/1.55 var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--ink-text);
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+select,
+textarea {
+  border-radius: var(--radius-field);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+/* vue-toastification: monochrome like WorkHub's toasts */
+.Vue-Toastification__toast {
+  border-radius: var(--radius-field);
+  font-family: var(--font-body);
+  box-shadow: var(--shadow-pop);
+}
+.Vue-Toastification__toast--default,
+.Vue-Toastification__toast--info {
+  background: var(--ink);
+  color: var(--ink-text);
+}
+.Vue-Toastification__toast--success {
+  background: var(--success);
+}
+.Vue-Toastification__toast--error {
+  background: var(--danger);
+}
+.Vue-Toastification__toast--warning {
+  background: var(--warning);
+}

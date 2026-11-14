@@ -84,6 +84,8 @@ const projectSchema = new Schema({
     required: true,
     default: 'vi-VN'
   },
+  // Thông tin phản chiếu từ WorkHub (sprint đang chạy...), do ForgeBridge cập nhật
+  workhub: { type: Schema.Types.Mixed, default: null },
   owner_id: {
     type: Schema.Types.ObjectId,
     ref: 'users',

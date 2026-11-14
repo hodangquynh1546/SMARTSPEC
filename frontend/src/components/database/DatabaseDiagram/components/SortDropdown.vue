@@ -70,9 +70,9 @@ export default {
   align-items: center;
   gap: 4px;
   padding: 4px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
   position: relative;
 }
 
@@ -84,14 +84,14 @@ export default {
   height: 32px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .btn-icon:hover {
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
 }
 
@@ -100,8 +100,8 @@ export default {
   top: 100%;
   left: 0;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   z-index: 1001;
   min-width: 180px;
@@ -115,9 +115,9 @@ export default {
   padding: 8px 12px;
   cursor: pointer;
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   transition: background-color 0.2s ease;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
 }
 
 .sort-option:last-child {
@@ -125,17 +125,17 @@ export default {
 }
 
 .sort-option:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .sort-option .material-symbols-outlined {
   font-size: 16px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .current-sort {
   font-size: 12px;
-  color: #374151;
+  color: var(--text);
   padding: 0 8px;
   min-width: 60px;
   text-align: center;
@@ -157,34 +157,34 @@ export default {
 /* Dark mode support cho sorting */
 @media (prefers-color-scheme: dark) {
   .sort-dropdown {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   .sort-option {
-    color: #f9fafb;
-    border-bottom-color: #374151;
+    color: var(--muted);
+    border-bottom-color: var(--ink);
   }
 
   .sort-option:hover {
-    background: #374151;
+    background: var(--ink);
   }
 
   .sort-option .material-symbols-outlined {
-    color: #d1d5db;
+    color: var(--muted);
   }
 
   .current-sort {
-    color: #d1d5db;
+    color: var(--muted);
   }
 
   .control-group {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--ink);
+    border-color: var(--ink);
   }
 
   .btn-icon {
-    color: #d1d5db;
+    color: var(--muted);
   }
 }
 </style>

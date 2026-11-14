@@ -218,7 +218,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   width: 90%;
   max-width: 800px;
@@ -233,13 +233,13 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .modal-header h3 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text);
   font-size: 18px;
   font-weight: 600;
 }
@@ -252,16 +252,16 @@ export default {
 
 /* Relationship Form */
 .relationship-form {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
   margin-bottom: 24px;
 }
 
 .relationship-form h4 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: var(--text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -282,13 +282,13 @@ export default {
 .form-group label {
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .form-group select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   background: white;
   transition: border-color 0.2s ease;
@@ -296,7 +296,7 @@ export default {
 
 .form-group select:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -310,7 +310,7 @@ export default {
 .btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -318,12 +318,12 @@ export default {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--ink);
 }
 
 .btn-primary:disabled {
@@ -332,18 +332,18 @@ export default {
 }
 
 .btn-secondary {
-  background: #6b7280;
+  background: var(--muted);
   color: white;
 }
 
 .btn-secondary:hover {
-  background: #4b5563;
+  background: var(--ink);
 }
 
 /* Relationships List */
 .relationships-list h4 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: var(--text);
   font-size: 16px;
   font-weight: 600;
 }
@@ -351,7 +351,7 @@ export default {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #6b7280;
+  color: var(--muted);
   font-style: italic;
 }
 
@@ -367,19 +367,19 @@ export default {
   justify-content: space-between;
   padding: 12px 16px;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
 
 .relationship-item:hover {
-  border-color: #d1d5db;
+  border-color: var(--border-strong);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .relationship-item.selected {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: var(--ink);
+  background: var(--sunken);
 }
 
 .relationship-info {
@@ -391,7 +391,7 @@ export default {
 
 .relationship-type-badge {
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
   color: white;
@@ -402,20 +402,20 @@ export default {
 .relationship-details {
   flex: 1;
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
 }
 
 .relationship-arrow {
   margin: 0 8px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .relationship-layer {
   font-size: 12px;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .relationship-actions {
@@ -437,36 +437,36 @@ export default {
   height: 32px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .btn-icon:hover {
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
 }
 
 .btn-icon.danger:hover {
-  background: #ef4444;
+  background: var(--danger);
   color: white;
 }
 
 .relationship-type-badge.one-to-one {
-  background: #06eea5;
+  background: var(--success);
 }
 
 .relationship-type-badge.one-to-many {
-  background: #d6ff07;
+  background: var(--success-soft);
 }
 
 .relationship-type-badge.many-to-one {
-  background: #02eaff;
+  background: var(--ink);
 }
 
 .relationship-type-badge.many-to-many {
-  background: #d97706;
+  background: var(--danger);
 }
 
 /* Responsive Design */

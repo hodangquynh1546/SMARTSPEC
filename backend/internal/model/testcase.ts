@@ -15,6 +15,27 @@ const testcaseSchema = new Schema({
         index: true
     },
 
+    // Định danh ổn định qua các version (test case bị clone sang _id mới ở mỗi version)
+    lineage_id: { type: String, default: null, index: true },
+
+    // Bug trong WorkHub được tạo khi test case thất bại (do ForgeBridge cập nhật, chỉ đọc ở SmartSpec)
+    bug: {
+        type: new Schema({
+            issue_key: { type: String, default: "" },
+            issue_id: { type: String, default: "" },
+            url: { type: String, default: "" },
+            status: { type: String, default: "" },
+            priority: { type: String, default: null },
+            assignee: { type: String, default: null },
+            assignee_avatar: { type: String, default: null },
+            sprint: { type: String, default: null },
+            blocked: { type: Boolean, default: false },
+            deleted: { type: Boolean, default: false },
+            updated_at: { type: Date, default: Date.now }
+        }, { _id: false }),
+        default: null
+    },
+
     // === PHÂN LOẠI ===
     test_type: {
         type: String,

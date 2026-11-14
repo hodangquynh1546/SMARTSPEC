@@ -1255,7 +1255,7 @@ export default {
 <style scoped>
 .homepage {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
   background-size: 200% 200%;
   animation: gradientShift 15s ease infinite;
   min-height: 100vh;
@@ -1279,7 +1279,7 @@ export default {
 
 .main-content {
   flex: 1;
-  background-color: #ffffff;
+  background-color: var(--surface);
   margin-left: 250px;
   display: flex;
   flex-direction: column;
@@ -1295,8 +1295,8 @@ export default {
 
 .page-header {
   padding: 24px 32px;
-  border-bottom: 2px solid #e5e7eb;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 2px solid var(--border);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1325,14 +1325,14 @@ export default {
   left: 0;
   width: 100px;
   height: 2px;
-  background: linear-gradient(90deg, #1a365d 0%, #2d4a8a 100%);
-  border-radius: 2px;
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: var(--radius-sm);
 }
 
 .page-header h1 {
   font-size: 1.75rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1351,7 +1351,7 @@ export default {
 
 .selected-count {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   font-weight: 500;
   margin-right: 8px;
 }
@@ -1362,7 +1362,7 @@ export default {
   gap: 6px;
   padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -1370,8 +1370,8 @@ export default {
 }
 
 .btn-bulk-delete {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .btn-bulk-delete:hover {
@@ -1379,21 +1379,21 @@ export default {
 }
 
 .btn-bulk-restore {
-  background: #dcfce7;
-  color: #16a34a;
+  background: var(--sunken);
+  color: var(--success);
 }
 
 .btn-bulk-restore:hover {
-  background: #bbf7d0;
+  background: var(--success-soft);
 }
 
 .btn-bulk-cancel {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-bulk-cancel:hover {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 .header-actions {
@@ -1413,7 +1413,7 @@ export default {
   border: none;
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: 999px;
   transition: background-color 0.3s;
   display: flex;
   align-items: center;
@@ -1422,7 +1422,7 @@ export default {
 
 .notifications-btn:hover,
 .invitations-btn:hover {
-  background-color: #f3f4f6;
+  background-color: var(--sunken);
 }
 
 .notification-badge,
@@ -1430,7 +1430,7 @@ export default {
   position: absolute;
   top: -5px;
   right: -8px;
-  background-color: #ef4444;
+  background-color: var(--danger);
   color: white;
   border-radius: 50%;
   width: 20px;
@@ -1443,7 +1443,7 @@ export default {
 }
 
 .invitation-badge {
-  background-color: #3b82f6;
+  background-color: var(--ink);
 }
 
 .notifications-dropdown {
@@ -1452,16 +1452,16 @@ export default {
   right: 0;
   width: 350px;
   background-color: white;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   z-index: 100;
   overflow: hidden;
 }
 
 .dropdown-header {
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .dropdown-header h3 {
@@ -1483,8 +1483,8 @@ export default {
 }
 
 .invitations-list::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background: var(--muted);
+  border-radius: var(--radius-sm);
 }
 
 .invitation-item {
@@ -1492,7 +1492,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
 }
 
 .invitation-item:last-child {
@@ -1505,7 +1505,7 @@ export default {
 }
 
 .invitation-details small {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .invitation-actions {
@@ -1517,7 +1517,7 @@ export default {
 .empty-invitations {
   padding: 24px;
   text-align: center;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .btn-sm {
@@ -1540,9 +1540,9 @@ export default {
 
 /* Filter Section */
 .filter-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   margin-bottom: 32px;
   box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -1585,39 +1585,39 @@ export default {
 .search-icon {
   position: absolute;
   left: 12px;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 20px;
 }
 
 .search-input {
   padding: 12px 16px 12px 44px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-field);
   font-size: 0.875rem;
   width: 300px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .search-input:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
-  background: #ffffff;
+  background: var(--surface);
   transform: translateY(-1px);
 }
 
 .filter-select {
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   background: white;
   cursor: pointer;
@@ -1627,7 +1627,7 @@ export default {
 
 .filter-select:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 /* Filter Icon Buttons */
@@ -1641,10 +1641,10 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   background: white;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s ease;
   width: 40px;
@@ -1652,9 +1652,9 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: #f9fafb;
-  border-color: #1a365d;
-  color: #1a365d;
+  background: var(--bg);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .filter-icon-btn .material-symbols-outlined {
@@ -1666,8 +1666,8 @@ export default {
   top: calc(100% + 8px);
   right: 0;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   min-width: 180px;
   z-index: 100;
@@ -1682,7 +1682,7 @@ export default {
   padding: 10px 16px;
   border: none;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
@@ -1690,22 +1690,22 @@ export default {
 }
 
 .filter-option:hover {
-  background: #f9fafb;
+  background: var(--bg);
 }
 
 .filter-option.active {
-  background: #e6f2ff;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
   font-weight: 500;
 }
 
 .filter-option .material-symbols-outlined {
   font-size: 18px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .filter-option.active .material-symbols-outlined {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 /* Multi-select Button */
@@ -1714,10 +1714,10 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1725,14 +1725,14 @@ export default {
 }
 
 .btn-multi-select:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-multi-select.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .filter-stats {
@@ -1745,28 +1745,28 @@ export default {
   position: relative;
   top: 100px;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   font-weight: 500;
 }
 
 .language-badge {
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .language-badge.vi-VN {
-  background: #dbeafe;
-  color: #1e40af;
-  border: 1px solid #93c5fd;
+  background: var(--sunken);
+  color: var(--ink);
+  border: 1px solid var(--ink);
 }
 
 .language-badge.en-US {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #86efac;
+  background: var(--sunken);
+  color: var(--success);
+  border: 1px solid var(--success-soft);
 }
 
 /* Section Headers */
@@ -1782,13 +1782,13 @@ export default {
 .section-header h2 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 8px;
 }
 
 .section-header p {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
 }
 
@@ -1821,7 +1821,7 @@ export default {
   text-align: center;
   padding: 60px 20px;
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   margin-top: 20px;
   max-width: 100%;
   box-sizing: border-box;
@@ -1831,7 +1831,7 @@ export default {
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
-  background: #f3f4f6;
+  background: var(--sunken);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1840,19 +1840,19 @@ export default {
 
 .empty-icon .material-symbols-outlined {
   font-size: 40px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .empty-state h3 {
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text);
   font-size: 1.25rem;
   font-weight: 600;
 }
 
 .empty-state p {
   margin: 0 0 24px 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1861,10 +1861,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -1872,7 +1872,7 @@ export default {
 }
 
 .btn-primary:hover {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 /* ===== RESPONSIVE STYLES ===== */

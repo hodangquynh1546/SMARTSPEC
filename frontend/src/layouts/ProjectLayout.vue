@@ -446,6 +446,14 @@
       </button>
       <button
         class="tab-button"
+        :class="{ active: isActiveTab('tasks') }"
+        @click="navigateToTab('tasks')"
+      >
+        <span class="material-symbols-outlined">view_kanban</span>
+        Tasks
+      </button>
+      <button
+        class="tab-button"
         :class="{ active: isActiveTab('output') }"
         @click="navigateToTab('output')"
       >
@@ -676,6 +684,7 @@ export default {
         testcases: `/project/${projectId.value}/testcases`,
         database: `/project/${projectId.value}/database`,
         uml: `/project/${projectId.value}/uml`,
+        tasks: `/project/${projectId.value}/tasks`,
       }
 
       if (tabRoutes[tab] && route.path !== tabRoutes[tab]) {
@@ -692,6 +701,7 @@ export default {
       if (path.includes('/testcases')) return 'testcases'
       if (path.includes('/database')) return 'database'
       if (path.includes('/uml')) return 'uml'
+      if (path.includes('/tasks')) return 'tasks'
       if (path.includes('/output')) return 'output'
       if (path.includes('/editor')) return 'usecase'
       return 'usecase' // default
@@ -1682,7 +1692,7 @@ export default {
 <style scoped>
 .project-layout {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--bg);
   position: relative;
 }
 
@@ -1711,25 +1721,25 @@ export default {
   height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 6px solid #1a365d;
+  border-bottom: 6px solid var(--ink);
   margin-bottom: -1px;
   transition: border-bottom-color 0.2s ease;
 }
 
 .floating-loading-indicator.status-success .indicator-arrow {
-  border-bottom-color: #10b981;
+  border-bottom-color: var(--success);
 }
 
 .floating-loading-indicator.status-failed .indicator-arrow {
-  border-bottom-color: #ef4444;
+  border-bottom-color: var(--danger);
 }
 
 /* Content container */
 .indicator-content {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1739,11 +1749,11 @@ export default {
 }
 
 .floating-loading-indicator.status-success .indicator-content {
-  background: #10b981;
+  background: var(--success);
 }
 
 .floating-loading-indicator.status-failed .indicator-content {
-  background: #ef4444;
+  background: var(--danger);
 }
 
 .floating-loading-indicator:hover .indicator-content {
@@ -1809,7 +1819,7 @@ export default {
 /* LLM Process Progress Section */
 .llm-progress-section {
   background: white;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid var(--border);
   padding: 12px 24px;
   display: flex;
   flex-direction: column;
@@ -1836,7 +1846,7 @@ export default {
   height: 40px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #e1e5e9;
+  border: 2px solid var(--border);
   position: relative;
 }
 
@@ -1849,7 +1859,7 @@ export default {
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -1871,9 +1881,9 @@ export default {
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e1e5e9;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
   min-width: 200px;
   flex: 1;
   transition: all 0.3s ease;
@@ -1896,13 +1906,13 @@ export default {
 }
 
 .llm-progress-item.status-success {
-  background: #f0fdf4;
-  border-color: #10b981;
+  background: var(--bg);
+  border-color: var(--success);
 }
 
 .llm-progress-item.status-failed {
-  background: #fef2f2;
-  border-color: #ef4444;
+  background: var(--sunken);
+  border-color: var(--danger);
 }
 
 @keyframes fadeInUp {
@@ -1938,19 +1948,19 @@ export default {
 
 .process-icon {
   font-size: 18px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .process-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .progress-percentage {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .progress-stages {
@@ -1971,31 +1981,31 @@ export default {
 
 .stage-icon {
   font-size: 16px;
-  color: #1a365d;
+  color: var(--ink);
   transition: all 0.3s ease;
 }
 
 .stage-icon.success {
-  color: #10b981;
+  color: var(--success);
 }
 
 .stage-icon.success-icon {
-  color: #10b981;
+  color: var(--success);
   font-size: 18px;
 }
 
 .stage-icon.failed-icon {
-  color: #ef4444;
+  color: var(--danger);
   font-size: 18px;
 }
 
 .stage-icon.spinning {
-  color: #3b82f6;
+  color: var(--ink);
   animation: spin 1.5s linear infinite;
 }
 
 .stage-icon.pulsing {
-  color: #8b5cf6;
+  color: var(--ink);
   animation: pulseBlink 1.2s ease-in-out infinite;
 }
 
@@ -2045,7 +2055,7 @@ export default {
 
 .stage-text {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -2058,12 +2068,12 @@ export default {
 
 .stage-text.stage-title {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .stage-text.stage-message {
   font-size: 0.7rem;
-  color: #64748b;
+  color: var(--muted);
   opacity: 0.9;
 }
 
@@ -2075,7 +2085,7 @@ export default {
   margin-top: 4px;
   padding: 4px 8px;
   background: rgba(26, 54, 93, 0.05);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(26, 54, 93, 0.1);
 }
 
@@ -2086,7 +2096,7 @@ export default {
   gap: 2px;
   padding: 2px 6px;
   background: rgba(26, 54, 93, 0.08);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(26, 54, 93, 0.15);
   font-size: 0.75rem;
 }
@@ -2094,7 +2104,7 @@ export default {
 .usecase-count-number {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   min-width: 24px;
   text-align: right;
 }
@@ -2107,7 +2117,7 @@ export default {
 .usecase-count-separator {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   margin: 0 2px;
 }
 
@@ -2119,7 +2129,7 @@ export default {
 .usecase-count-total {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--muted);
   min-width: 24px;
   text-align: left;
 }
@@ -2131,18 +2141,18 @@ export default {
 
 .usecase-count-label {
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: var(--muted);
   font-weight: 500;
   margin-left: 2px;
 }
 
 .success-stage .stage-text {
-  color: #059669;
+  color: var(--success);
   font-weight: 600;
 }
 
 .failed-stage .stage-text {
-  color: #dc2626;
+  color: var(--danger);
   font-weight: 500;
 }
 
@@ -2154,16 +2164,16 @@ export default {
   height: 24px;
   border: none;
   background: transparent;
-  color: #8a94a6;
+  color: var(--muted);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s ease;
   padding: 0;
 }
 
 .close-process-btn:hover {
   background: rgba(0, 0, 0, 0.05);
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .close-process-btn .material-symbols-outlined {
@@ -2173,8 +2183,8 @@ export default {
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: #e2e8f0;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   position: relative;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -2182,8 +2192,8 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1a365d 0%, #2c5282 50%, #3d6ba8 100%);
-  border-radius: 4px;
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  border-radius: var(--radius-sm);
   transition: width 0.5s ease-in-out;
   position: relative;
   overflow: hidden;
@@ -2216,7 +2226,7 @@ export default {
   gap: 8px;
   padding: 16px 24px;
   background: white;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
   position: sticky;
   top: 0;
@@ -2235,8 +2245,8 @@ export default {
   padding: 10px 20px;
   background: transparent;
   border: none;
-  border-radius: 8px;
-  color: #64748b;
+  border-radius: 999px;
+  color: var(--muted);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -2244,12 +2254,12 @@ export default {
 }
 
 .tab-button:hover {
-  background: #f1f5f9;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .tab-button.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
@@ -2261,7 +2271,7 @@ export default {
 .committed-testcases-list {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #e1e5e9;
+  border-top: 1px solid var(--border);
 }
 
 .committed-testcases-header {
@@ -2272,7 +2282,7 @@ export default {
   cursor: pointer;
   user-select: none;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s ease;
 }
 
@@ -2283,7 +2293,7 @@ export default {
 .committed-testcases-header .toggle-icon {
   margin-left: auto;
   font-size: 18px;
-  color: #64748b;
+  color: var(--muted);
   transition: transform 0.2s ease;
 }
 
@@ -2294,7 +2304,7 @@ export default {
 .committed-testcases-title {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .committed-testcases-items {
@@ -2311,7 +2321,7 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
 }
 
@@ -2330,12 +2340,12 @@ export default {
 
 /* Trạng thái: Chưa gen (đen) */
 .committed-testcase-item.status-pending .testcase-title {
-  color: #1f2937;
+  color: var(--text);
 }
 
 /* Trạng thái: Đang gen (hiệu ứng loading đơn giản) */
 .committed-testcase-item.status-generating .testcase-title {
-  color: #1f2937;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -2345,14 +2355,14 @@ export default {
 
 /* Trạng thái: Xong (gạch ngang) */
 .committed-testcase-item.status-completed .testcase-title {
-  color: #10b981;
+  color: var(--success);
   text-decoration: line-through;
   opacity: 0.8;
 }
 
 /* Trạng thái: Lỗi (đỏ) */
 .committed-testcase-item.status-error .testcase-title {
-  color: #ef4444;
+  color: var(--danger);
   font-weight: 600;
 }
 
@@ -2366,17 +2376,17 @@ export default {
 }
 
 .committed-testcases-items::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 2px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .committed-testcases-items::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 2px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .committed-testcases-items::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 
 @media (max-width: 768px) {

@@ -990,7 +990,7 @@ const addStepItem = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #858585;
+  color: var(--muted);
 }
 
 .empty-icon {
@@ -1009,31 +1009,31 @@ const addStepItem = () => {
   justify-content: space-between;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #3e3e42;
+  border-bottom: 2px solid var(--ink);
 }
 
 .viz-header h3 {
   margin: 0;
   font-size: 20px;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .badge {
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 12px;
   font-weight: 500;
-  background: #3e3e42;
-  color: #cccccc;
+  background: var(--ink);
+  color: var(--muted);
 }
 
 .badge.primary {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
 }
 
 .badge.foreign {
-  background: #6f42c1;
+  background: var(--ink);
   color: white;
 }
 
@@ -1047,7 +1047,7 @@ const addStepItem = () => {
   gap: 8px;
   margin: 0 0 12px 0;
   font-size: 16px;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .viz-section h4 .material-symbols-outlined {
@@ -1056,7 +1056,7 @@ const addStepItem = () => {
 
 .viz-section p {
   margin: 0;
-  color: #d4d4d4;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -1064,7 +1064,7 @@ const addStepItem = () => {
 .step-list {
   margin: 0;
   padding-left: 24px;
-  color: #d4d4d4;
+  color: var(--muted);
 }
 
 .task-list li,
@@ -1081,23 +1081,23 @@ const addStepItem = () => {
 
 .tag {
   padding: 4px 12px;
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 13px;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .columns-table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e1e1e;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .columns-table thead {
-  background: #2d2d30;
+  background: var(--ink);
 }
 
 .columns-table th {
@@ -1105,33 +1105,33 @@ const addStepItem = () => {
   text-align: left;
   font-size: 13px;
   font-weight: 600;
-  color: #cccccc;
-  border-bottom: 2px solid #3e3e42;
+  color: var(--muted);
+  border-bottom: 2px solid var(--ink);
 }
 
 .columns-table td {
   padding: 12px;
   font-size: 13px;
-  color: #d4d4d4;
-  border-bottom: 1px solid #3e3e42;
+  color: var(--muted);
+  border-bottom: 1px solid var(--ink);
 }
 
 .columns-table code {
-  background: #2d2d30;
+  background: var(--ink);
   padding: 2px 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-family: 'Consolas', 'Monaco', monospace;
 }
 
 .json-preview {
-  background: #1e1e1e;
+  background: var(--ink);
   padding: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow-x: auto;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 13px;
   line-height: 1.5;
-  color: #d4d4d4;
+  color: var(--muted);
 }
 
 .header-actions {
@@ -1142,11 +1142,11 @@ const addStepItem = () => {
 
 .edit-btn,
 .add-btn {
-  background: #0e639c;
+  background: var(--ink);
   border: none;
   color: white;
   padding: 6px 12px;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1156,14 +1156,14 @@ const addStepItem = () => {
 
 .edit-btn:hover,
 .add-btn:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .edit-section {
   margin-bottom: 24px;
   padding: 16px;
-  background: #2d2d30;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .form-group {
@@ -1173,7 +1173,7 @@ const addStepItem = () => {
 .form-group label {
   display: block;
   margin-bottom: 6px;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 13px;
   font-weight: 500;
 }
@@ -1182,17 +1182,17 @@ const addStepItem = () => {
 .form-textarea {
   width: 100%;
   padding: 8px 12px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   font-size: 13px;
 }
 
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #0e639c;
+  border-color: var(--ink);
 }
 
 .section-header {
@@ -1204,10 +1204,10 @@ const addStepItem = () => {
 
 .icon-btn {
   background: transparent;
-  border: 1px solid #3e3e42;
-  color: #cccccc;
+  border: 1px solid var(--ink);
+  color: var(--muted);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1215,7 +1215,7 @@ const addStepItem = () => {
 }
 
 .icon-btn:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 
 .icon-btn.small {
@@ -1231,16 +1231,16 @@ const addStepItem = () => {
 }
 
 .columns-table tr.editable:hover {
-  background: #2d2d30;
+  background: var(--ink);
 }
 
 .inline-input,
 .inline-select {
-  background: #3c3c3c;
-  border: 1px solid #0e639c;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   padding: 4px 8px;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 13px;
   width: 100%;
 }
@@ -1255,7 +1255,7 @@ const addStepItem = () => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .action-buttons {
@@ -1268,7 +1268,7 @@ const addStepItem = () => {
 .cancel-btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1277,21 +1277,21 @@ const addStepItem = () => {
 }
 
 .save-btn {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
 }
 
 .save-btn:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .cancel-btn {
-  background: #5a1d1d;
+  background: var(--danger);
   color: white;
 }
 
 .cancel-btn:hover {
-  background: #7a2d2d;
+  background: var(--danger);
 }
 
 .column-viz .info-grid {
@@ -1307,14 +1307,14 @@ const addStepItem = () => {
 }
 
 .info-item .label {
-  color: #858585;
+  color: var(--muted);
   font-size: 13px;
 }
 
 .info-item code {
-  background: #2d2d30;
+  background: var(--ink);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: 'Consolas', 'Monaco', monospace;
 }
 
@@ -1330,10 +1330,10 @@ const addStepItem = () => {
 .inline-edit-btn {
   background: transparent;
   border: none;
-  color: #858585;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   margin-left: 8px;
@@ -1346,8 +1346,8 @@ const addStepItem = () => {
 }
 
 .inline-edit-btn:hover {
-  background: #3e3e42;
-  color: #cccccc;
+  background: var(--ink);
+  color: var(--muted);
 }
 
 .inline-edit {
@@ -1369,44 +1369,44 @@ const addStepItem = () => {
 .tag-remove {
   background: transparent;
   border: none;
-  color: #f48771;
+  color: var(--danger);
   cursor: pointer;
   padding: 0 4px;
   margin-left: 4px;
   font-size: 16px;
   line-height: 1;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .tag-remove:hover {
-  background: #5a1d1d;
+  background: var(--danger);
 }
 
 .tag-add {
-  background: #0e639c;
+  background: var(--ink);
   border: none;
   color: white;
   cursor: pointer;
   padding: 4px 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   margin-top: 4px;
 }
 
 .tag-add:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .tag-edit {
   background: transparent;
   border: none;
-  color: #0e639c;
+  color: var(--ink);
   cursor: pointer;
   padding: 0 4px;
   margin-left: 4px;
   font-size: 14px;
   line-height: 1;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   opacity: 0;
@@ -1418,16 +1418,16 @@ const addStepItem = () => {
 }
 
 .tag-edit:hover {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
 }
 
 .tag-input {
-  background: #3c3c3c;
-  border: 1px solid #0e639c;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   padding: 2px 6px;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 12px;
   min-width: 100px;
   flex: 1;
@@ -1443,10 +1443,10 @@ const addStepItem = () => {
 .task-edit {
   background: transparent;
   border: none;
-  color: #0e639c;
+  color: var(--ink);
   cursor: pointer;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   opacity: 0;
@@ -1458,7 +1458,7 @@ const addStepItem = () => {
 }
 
 .task-edit:hover {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
 }
 
@@ -1466,10 +1466,10 @@ const addStepItem = () => {
 .step-remove {
   background: transparent;
   border: none;
-  color: #f48771;
+  color: var(--danger);
   cursor: pointer;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   opacity: 0;
@@ -1483,18 +1483,18 @@ const addStepItem = () => {
 
 .task-remove:hover,
 .step-remove:hover {
-  background: #5a1d1d;
-  color: #f48771;
+  background: var(--danger);
+  color: var(--danger);
 }
 
 .task-add,
 .step-add {
-  background: #0e639c;
+  background: var(--ink);
   border: none;
   color: white;
   cursor: pointer;
   padding: 4px 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   margin-top: 8px;
   display: inline-flex;
@@ -1504,7 +1504,7 @@ const addStepItem = () => {
 
 .task-add:hover,
 .step-add:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .step-item {
@@ -1517,10 +1517,10 @@ const addStepItem = () => {
 .step-edit {
   background: transparent;
   border: none;
-  color: #0e639c;
+  color: var(--ink);
   cursor: pointer;
   padding: 2px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   opacity: 0;
@@ -1532,23 +1532,23 @@ const addStepItem = () => {
 }
 
 .step-edit:hover {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
 }
 
 .step-input {
-  background: #3c3c3c;
-  border: 1px solid #0e639c;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   padding: 4px 8px;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 13px;
   flex: 1;
   min-width: 200px;
 }
 
 .empty-list {
-  color: #858585;
+  color: var(--muted);
   font-style: italic;
   padding: 8px 0;
 }
@@ -1558,35 +1558,35 @@ const addStepItem = () => {
 }
 
 .column-row:hover {
-  background: #2d2d30;
+  background: var(--ink);
 }
 
 .text-success {
-  color: #10b981;
+  color: var(--success);
 }
 
 .text-error {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .text-muted {
-  color: #858585;
+  color: var(--muted);
 }
 
 .badge {
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
 }
 
 .badge.primary {
-  background: #3b82f6;
+  background: var(--ink);
   color: white;
 }
 
 .badge.foreign {
-  background: #8b5cf6;
+  background: var(--ink);
   color: white;
 }
 </style>

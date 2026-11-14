@@ -300,7 +300,7 @@
                               placeholder="Paste JSON or use form view"
                               :class="{ error: step.input_data_error }"
                               @blur="validateStepJson(step, 'input_data')"
-                              @paste="handleJsonPaste($event, step, 'input_data')"
+                              @paste="handleJsonPaste($event, step)"
                             ></textarea>
 
                             <div v-if="step.input_data_error" class="error-message">
@@ -1523,13 +1523,13 @@ export default {
     }
 
     const updateTestDataJsonFromForm = (data, type) => {
+      const errorField =
+        type === 'input_payload' ? 'input_payload_error' : 'expected_output_error'
       try {
         const formArray =
           type === 'input_payload' ? data.input_payload_form : data.expected_output_form
         const dataField = type === 'input_payload' ? 'input_payload' : 'expected_output'
         const jsonField = type === 'input_payload' ? 'input_payload_json' : 'expected_output_json'
-        const errorField =
-          type === 'input_payload' ? 'input_payload_error' : 'expected_output_error'
 
         const obj = {}
         formArray.forEach((item) => {
@@ -1546,7 +1546,7 @@ export default {
     }
 
     // JSON Paste Handlers
-    const handleJsonPaste = (event, step, type) => {
+    const handleJsonPaste = (event, step) => {
       const pastedText = event.clipboardData.getData('text')
       try {
         const parsed = JSON.parse(pastedText)
@@ -1561,7 +1561,7 @@ export default {
         step.input_data_error = ''
         event.preventDefault()
         toast.success('JSON pasted successfully and converted to form view')
-      } catch (error) {
+      } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
     }
@@ -1582,7 +1582,7 @@ export default {
         apiLevel.response_schema_error = ''
         event.preventDefault()
         toast.success('JSON pasted successfully and converted to form view')
-      } catch (error) {
+      } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
     }
@@ -1608,7 +1608,7 @@ export default {
         data[errorField] = ''
         event.preventDefault()
         toast.success('JSON pasted successfully and converted to form view')
-      } catch (error) {
+      } catch {
         console.log('Pasted text is not valid JSON, treating as plain text')
       }
     }
@@ -1713,7 +1713,7 @@ export default {
         if (lines.length > 0) {
           toast.info('Clipboard data detected - implement your import logic here')
         }
-      } catch (error) {
+      } catch {
         toast.error('Cannot read clipboard data')
       }
     }
@@ -1847,7 +1847,7 @@ export default {
     }
 
     // JSON Validation
-    const validateStepJson = (step, type) => {
+    const validateStepJson = (step) => {
       const jsonField = 'input_data_json'
       const dataField = 'input_data'
       const errorField = 'input_data_error'
@@ -2093,7 +2093,7 @@ export default {
 
 .modal-content.xlarge {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1000px;
   max-height: 90vh;
@@ -2103,11 +2103,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -2116,7 +2116,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -2124,17 +2124,17 @@ export default {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -2147,7 +2147,7 @@ export default {
   justify-content: space-between;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .step {
@@ -2157,23 +2157,23 @@ export default {
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
   flex: 1;
   max-width: 120px;
 }
 
 .step:hover:not(.active) {
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .step.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .step.completed {
-  color: #10b981;
+  color: var(--success);
 }
 
 .step-number {
@@ -2185,20 +2185,20 @@ export default {
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .step.active .step-number {
   background: white;
-  color: #1a365d;
+  color: var(--ink);
   border-color: white;
 }
 
 .step.completed .step-number {
-  background: #10b981;
+  background: var(--success);
   color: white;
-  border-color: #10b981;
+  border-color: var(--success);
 }
 
 .step-label {
@@ -2232,7 +2232,7 @@ export default {
 .form-section {
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .form-section:last-of-type {
@@ -2246,13 +2246,13 @@ export default {
   gap: 0.5rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 1.5rem;
 }
 
 .section-title .material-symbols-outlined {
   font-size: 1.25rem;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .form-grid {
@@ -2269,13 +2269,13 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .form-label.required::after {
   content: '*';
-  color: #dc2626;
+  color: var(--danger);
   margin-left: 0.25rem;
 }
 
@@ -2284,8 +2284,8 @@ export default {
 .form-textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   transition: all 0.2s;
   background: white;
@@ -2295,14 +2295,14 @@ export default {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .form-input.error,
 .form-textarea.error {
-  border-color: #dc2626;
-  background: #fef2f2;
+  border-color: var(--danger);
+  background: var(--sunken);
 }
 
 .form-textarea {
@@ -2313,13 +2313,13 @@ export default {
 
 .title-format-hint {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   margin-top: 0.25rem;
   font-style: italic;
 }
 
 .error-message {
-  color: #dc2626;
+  color: var(--danger);
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
@@ -2364,18 +2364,18 @@ export default {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: white;
-  border: 1px dashed #d1d5db;
-  border-radius: 6px;
-  color: #64748b;
+  border: 1px dashed var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.875rem;
 }
 
 .btn-add-item:hover {
-  border-color: #1a365d;
-  color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .steps-container {
@@ -2385,10 +2385,10 @@ export default {
 }
 
 .step-item {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .step-header {
@@ -2406,7 +2406,7 @@ export default {
 
 .step-number {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
 }
 
@@ -2424,24 +2424,24 @@ export default {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border: 1px solid var(--border);
 }
 
 .suggestion-btn:hover {
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 .json-input-container {
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .json-input-tabs {
   display: flex;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .tab-btn {
@@ -2451,19 +2451,19 @@ export default {
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
   transition: all 0.2s;
 }
 
 .tab-btn.active {
   background: white;
-  color: #1a365d;
+  color: var(--ink);
   font-weight: 500;
-  border-bottom: 2px solid #1a365d;
+  border-bottom: 2px solid var(--ink);
 }
 
 .tab-btn:hover:not(.active) {
-  background: #f1f5f9;
+  background: var(--sunken);
 }
 
 .key-value-form {
@@ -2489,10 +2489,10 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #f8fafc;
-  border: 1px dashed #d1d5db;
-  border-radius: 4px;
-  color: #64748b;
+  background: var(--bg);
+  border: 1px dashed var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
@@ -2501,9 +2501,9 @@ export default {
 }
 
 .btn-add-kv:hover {
-  border-color: #1a365d;
-  color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .json-textarea {
@@ -2527,9 +2527,9 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: white;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  color: #64748b;
+  border: 2px dashed var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -2537,9 +2537,9 @@ export default {
 }
 
 .btn-add-step:hover {
-  border-color: #1a365d;
-  color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .expected-results-grid {
@@ -2555,9 +2555,9 @@ export default {
 .result-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 1rem;
-  border-left: 3px solid #1a365d;
+  border-left: 3px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -2580,9 +2580,9 @@ export default {
   gap: 0.5rem;
   min-height: 2.5rem;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
 }
 
 .tag {
@@ -2590,9 +2590,9 @@ export default {
   align-items: center;
   gap: 0.25rem;
   padding: 0.375rem 0.75rem;
-  background: #e2e8f0;
-  color: #1a365d;
-  border-radius: 20px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 500;
 }
@@ -2603,15 +2603,15 @@ export default {
   background: transparent;
   border-radius: 50%;
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tag-remove:hover {
-  background: #cbd5e1;
-  color: #475569;
+  background: var(--border);
+  color: var(--text);
 }
 
 .tag-input-group {
@@ -2628,13 +2628,13 @@ export default {
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
   white-space: nowrap;
-  background: #f8fafc;
-  border: 1px solid #d1d5db;
-  color: #374151;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary.small:hover {
-  background: #f1f5f9;
+  background: var(--sunken);
 }
 
 .checkbox-group {
@@ -2649,14 +2649,14 @@ export default {
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
 }
 
 .checkbox-item:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--border-strong);
+  background: var(--bg);
 }
 
 .checkbox-item input[type='checkbox'] {
@@ -2666,8 +2666,8 @@ export default {
 .checkmark {
   width: 1rem;
   height: 1rem;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2675,8 +2675,8 @@ export default {
 }
 
 .checkbox-item input[type='checkbox']:checked + .checkmark {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .checkbox-item input[type='checkbox']:checked + .checkmark::after {
@@ -2688,7 +2688,7 @@ export default {
 
 .checkbox-label {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -2699,10 +2699,10 @@ export default {
 }
 
 .test-data-item {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .data-header {
@@ -2751,9 +2751,9 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: white;
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  color: #64748b;
+  border: 2px dashed var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -2761,9 +2761,9 @@ export default {
 }
 
 .btn-add-data:hover {
-  border-color: #1a365d;
-  color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .automation-section {
@@ -2776,14 +2776,14 @@ export default {
   gap: 1rem;
   cursor: pointer;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
 }
 
 .checkbox-large:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--border-strong);
+  background: var(--bg);
 }
 
 .checkbox-large input[type='checkbox'] {
@@ -2803,18 +2803,18 @@ export default {
 
 .checkbox-title {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .checkbox-description {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .automation-details {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .script-path-group {
@@ -2834,8 +2834,8 @@ export default {
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   max-height: 80px;
   overflow-y: auto;
@@ -2846,14 +2846,14 @@ export default {
 .suggestion-item {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .suggestion-item:hover {
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .suggestion-item:last-child {
@@ -2862,22 +2862,22 @@ export default {
 
 .table-name {
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .table-columns {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .req-id {
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .req-title {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2890,17 +2890,17 @@ export default {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: transparent;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #64748b;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
 }
 
 .btn-text:hover {
-  background: #f8fafc;
-  border-color: #9ca3af;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-outline {
@@ -2909,17 +2909,17 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background: white;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  color: #374151;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text);
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .btn-outline:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 /* Step Navigation */
@@ -2929,7 +2929,7 @@ export default {
   align-items: center;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .nav-right {
@@ -2944,7 +2944,7 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -2952,40 +2952,40 @@ export default {
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background: #9ca3af;
-  border-color: #9ca3af;
+  background: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-icon {
   padding: 0.375rem;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2993,8 +2993,8 @@ export default {
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-icon:disabled {
@@ -3003,13 +3003,13 @@ export default {
 }
 
 .btn-icon.danger:hover:not(:disabled) {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .drag-handle {
   cursor: grab;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .drag-handle:active {

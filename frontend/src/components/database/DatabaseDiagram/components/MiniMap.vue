@@ -54,8 +54,8 @@ export default {
   right: 16px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   z-index: 100;
@@ -63,22 +63,22 @@ export default {
 
 .mini-map-content {
   position: relative;
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .mini-table {
   position: absolute;
-  background: #6b7280;
+  background: var(--muted);
   border-radius: 1px;
   transition: background-color 0.2s ease;
 }
 
 .mini-viewport {
   position: absolute;
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--ink);
   background: rgba(59, 130, 246, 0.1);
   pointer-events: none;
 }

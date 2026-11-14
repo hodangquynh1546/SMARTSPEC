@@ -789,7 +789,7 @@ export default {
 
 .export-modal {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
@@ -802,23 +802,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
 .close-btn {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .close-btn:hover {
-  color: #374151;
-  background: #f3f4f6;
+  color: var(--text);
+  background: var(--sunken);
 }
 
 .modal-content {
@@ -831,7 +831,7 @@ export default {
 }
 
 .export-description p {
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -851,7 +851,7 @@ export default {
 
 .option-label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
@@ -866,30 +866,30 @@ export default {
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .option-card.active {
-  border-color: #1a365d;
-  background: #f8fafc;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .option-card:hover:not(.active) {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
 }
 
 .option-icon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   flex-shrink: 0;
 }
@@ -897,13 +897,13 @@ export default {
 .option-info h4 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 0.25rem 0;
 }
 
 .option-info p {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
   line-height: 1.4;
 }
@@ -919,7 +919,7 @@ export default {
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
@@ -930,8 +930,8 @@ export default {
 .checkmark {
   width: 18px;
   height: 18px;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -940,8 +940,8 @@ export default {
 }
 
 .checkbox-option input:checked + .checkmark {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .checkbox-option input:checked + .checkmark::after {
@@ -956,28 +956,28 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .filter-status {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .btn-text {
   background: none;
   border: none;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.75rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 999px;
 }
 
 .btn-text:hover {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 .modal-actions {
@@ -985,7 +985,7 @@ export default {
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-primary,
@@ -995,7 +995,7 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1003,12 +1003,12 @@ export default {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #27446c;
+  background: var(--ink);
   transform: translateY(-1px);
 }
 
@@ -1019,13 +1019,13 @@ export default {
 
 .btn-secondary {
   background: white;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .export-action {
@@ -1063,16 +1063,16 @@ export default {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .radio-option:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--border-strong);
+  background: var(--bg);
 }
 
 .radio-option input[type="radio"] {
@@ -1082,13 +1082,13 @@ export default {
 }
 
 .radio-option input[type="radio"]:checked + .radio-label .radio-title {
-  color: #1a365d;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .radio-option:has(input[type="radio"]:checked) {
-  border-color: #1a365d;
-  background: #f0f4f8;
+  border-color: var(--ink);
+  background: var(--sunken);
 }
 
 .radio-label {
@@ -1101,18 +1101,18 @@ export default {
 .radio-title {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .radio-desc {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 /* Selected Test Cases */
 .selection-count {
   font-weight: 400;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
@@ -1123,30 +1123,30 @@ export default {
   justify-content: center;
   padding: 2rem;
   text-align: center;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px dashed #d1d5db;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
 }
 
 .empty-selection .material-symbols-outlined {
   font-size: 2rem;
-  color: #9ca3af;
+  color: var(--muted);
   margin-bottom: 0.5rem;
 }
 
 .empty-selection p {
   margin: 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
 .selected-list {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 0.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .selected-item {
@@ -1154,7 +1154,7 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: white;
   margin-bottom: 0.25rem;
 }
@@ -1165,12 +1165,12 @@ export default {
 
 .selected-item .material-symbols-outlined {
   font-size: 1.25rem;
-  color: #10b981;
+  color: var(--success);
 }
 
 .item-name {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
   flex: 1;
 }
 
@@ -1190,38 +1190,38 @@ export default {
 .search-box .material-symbols-outlined {
   position: absolute;
   left: 0.75rem;
-  color: #9ca3af;
+  color: var(--muted);
   font-size: 1.25rem;
 }
 
 .search-box .search-input {
   width: 100%;
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   transition: border-color 0.2s;
 }
 
 .search-box .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .usecase-list {
   max-height: 250px;
   overflow-y: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 0.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .usecase-option-group {
   margin-bottom: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   overflow: hidden;
 }
@@ -1255,7 +1255,7 @@ export default {
   gap: 0.75rem;
   padding: 0.75rem;
   padding-left: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: default;
   transition: all 0.2s;
   flex: 1;
@@ -1268,7 +1268,7 @@ export default {
 }
 
 .usecase-option.clickable:hover {
-  background: #f0f4f8;
+  background: var(--sunken);
 }
 
 .usecase-option input[type="checkbox"] {
@@ -1287,20 +1287,20 @@ export default {
 .usecase-badge {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  background: #dbeafe;
-  color: #1a365d;
-  border-radius: 12px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-field);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .usecase-badge.badge-zero {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--sunken);
+  color: var(--muted);
 }
 
 .expand-icon {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 1.5rem;
   flex-shrink: 0;
   transition: transform 0.2s;
@@ -1312,21 +1312,21 @@ export default {
 
 .usecase-testcases-list {
   padding: 0.5rem 0.75rem 0.75rem 2.5rem;
-  background: #f8fafc;
-  border-top: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
 .testcase-option.nested {
   margin-bottom: 0.5rem;
   padding: 0.5rem;
   background: white;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .testcase-option.nested:hover {
-  background: #f0f4f8;
-  border-color: #cbd5e1;
+  background: var(--sunken);
+  border-color: var(--border-strong);
 }
 
 .empty-testcases-nested {
@@ -1336,7 +1336,7 @@ export default {
   justify-content: center;
   padding: 1rem;
   text-align: center;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .empty-testcases-nested .material-symbols-outlined {
@@ -1359,12 +1359,12 @@ export default {
 .usecase-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .usecase-goal {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
 }
 
@@ -1379,13 +1379,13 @@ export default {
 
 .empty-usecases .material-symbols-outlined {
   font-size: 2rem;
-  color: #9ca3af;
+  color: var(--muted);
   margin-bottom: 0.5rem;
 }
 
 .empty-usecases p {
   margin: 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1394,9 +1394,9 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: #dbeafe;
-  border-radius: 8px;
-  color: #1a365d;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -1411,9 +1411,9 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.75rem;
   padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .field-option {
@@ -1422,7 +1422,7 @@ export default {
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: background-color 0.2s;
 }
 
@@ -1436,7 +1436,7 @@ export default {
 
 .field-label {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
 }
 
 .field-actions {
@@ -1448,15 +1448,15 @@ export default {
 .btn-text-small {
   background: none;
   border: none;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.75rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 999px;
 }
 
 .btn-text-small:hover {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 /* Sheets Management */
@@ -1472,17 +1472,17 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-add-sheet:hover {
-  background: #27446c;
+  background: var(--ink);
 }
 
 .empty-sheets {
@@ -1492,20 +1492,20 @@ export default {
   justify-content: center;
   padding: 2rem;
   text-align: center;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px dashed #d1d5db;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-strong);
 }
 
 .empty-sheets .material-symbols-outlined {
   font-size: 2rem;
-  color: #9ca3af;
+  color: var(--muted);
   margin-bottom: 0.5rem;
 }
 
 .empty-sheets p {
   margin: 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1516,8 +1516,8 @@ export default {
 }
 
 .sheet-item {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1rem;
   background: white;
 }
@@ -1538,8 +1538,8 @@ export default {
 
 .sheet-name-input {
   padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
   width: 100%;
@@ -1548,13 +1548,13 @@ export default {
 
 .sheet-name-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .sheet-testcase-count {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .sheet-actions {
@@ -1569,24 +1569,24 @@ export default {
   width: 2rem;
   height: 2rem;
   border: none;
-  border-radius: 6px;
-  background: #f3f4f6;
-  color: #6b7280;
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-icon-small:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-icon-small.danger {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .btn-icon-small.danger:hover {
-  background: #fee2e2;
+  background: var(--sunken);
 }
 
 .btn-icon-small:disabled {
@@ -1599,15 +1599,15 @@ export default {
   flex-wrap: wrap;
   gap: 0.5rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .preview-item {
   padding: 0.25rem 0.5rem;
-  background: #f3f4f6;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
-  color: #374151;
+  color: var(--text);
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1616,17 +1616,17 @@ export default {
 
 .preview-more {
   padding: 0.25rem 0.5rem;
-  background: #dbeafe;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
-  color: #1a365d;
+  color: var(--ink);
   font-weight: 500;
 }
 
 /* Test Case Selector Modal */
 .testcase-selector-modal {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 90%;
   max-width: 600px;
   max-height: 90vh;
@@ -1651,7 +1651,7 @@ export default {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.2s;
   margin-bottom: 0.25rem;
@@ -1660,8 +1660,8 @@ export default {
 }
 
 .testcase-option:hover {
-  background: #f0f4f8;
-  border-color: #cbd5e1;
+  background: var(--sunken);
+  border-color: var(--border-strong);
 }
 
 .testcase-option input[type="checkbox"] {
@@ -1680,12 +1680,12 @@ export default {
 .testcase-title {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .testcase-desc {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1704,23 +1704,23 @@ export default {
 
 .empty-testcases .material-symbols-outlined {
   font-size: 2rem;
-  color: #9ca3af;
+  color: var(--muted);
   margin-bottom: 0.5rem;
 }
 
 .empty-testcases p {
   margin: 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
 .selected-count {
   padding: 0.75rem 1rem;
-  background: #dbeafe;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
   font-size: 0.875rem;
   font-weight: 500;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 @media (max-width: 768px) {
@@ -1774,7 +1774,7 @@ export default {
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
 }
 
 .tab-button {
@@ -1785,7 +1785,7 @@ export default {
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -1794,13 +1794,13 @@ export default {
 }
 
 .tab-button:hover {
-  color: #1a365d;
-  background: #f8fafc;
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
+  color: var(--ink);
+  border-bottom-color: var(--ink);
 }
 
 .tab-content {

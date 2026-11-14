@@ -194,7 +194,7 @@ export default {
 
 .modal-content.medium {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 800px;
   max-height: 80vh;
@@ -204,11 +204,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -217,7 +217,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -225,17 +225,17 @@ export default {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -253,7 +253,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border);
   padding-right: 1rem;
 }
 
@@ -261,20 +261,20 @@ export default {
   padding: 0.75rem 1rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 999px;
   text-align: left;
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   transition: all 0.2s;
 }
 
 .category-btn:hover {
-  background: #f1f5f9;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .category-btn.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
@@ -286,8 +286,8 @@ export default {
 }
 
 .template-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.25rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -295,7 +295,7 @@ export default {
 }
 
 .template-card:hover {
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -309,20 +309,20 @@ export default {
 .template-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
 .template-steps {
   font-size: 0.75rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
 }
 
 .template-description {
-  color: #64748b;
+  color: var(--muted);
   margin-bottom: 1rem;
   line-height: 1.5;
 }
@@ -338,12 +338,12 @@ export default {
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.5rem;
-  background: #f8fafc;
-  border-radius: 4px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .step-number {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   width: 24px;
   height: 24px;
@@ -358,17 +358,17 @@ export default {
 
 .step-action {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text);
   line-height: 1.4;
 }
 
 .more-steps {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   text-align: center;
   padding: 0.5rem;
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .modal-actions {
@@ -377,7 +377,7 @@ export default {
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .btn {
@@ -386,32 +386,32 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 @media (max-width: 768px) {
@@ -422,7 +422,7 @@ export default {
 
   .template-categories {
     border-right: none;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
     padding-right: 0;
     padding-bottom: 1rem;
     flex-direction: row;

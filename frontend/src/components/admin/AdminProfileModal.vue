@@ -336,7 +336,7 @@ const formatDate = (date) => {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 700px;
@@ -346,7 +346,7 @@ const formatDate = (date) => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -354,7 +354,7 @@ const formatDate = (date) => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -365,10 +365,10 @@ const formatDate = (date) => {
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -376,8 +376,8 @@ const formatDate = (date) => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -401,13 +401,13 @@ const formatDate = (date) => {
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 12px;
-  border: 4px solid #e2e8f0;
+  border: 4px solid var(--border);
   cursor: pointer;
   transition: border-color 0.2s;
 }
 
 .avatar-preview:hover {
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .avatar-preview img {
@@ -444,19 +444,19 @@ const formatDate = (date) => {
 }
 
 .btn-avatar-change {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  color: #4a5568;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-avatar-change:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .form-grid {
@@ -477,45 +477,45 @@ const formatDate = (date) => {
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 6px;
   font-size: 14px;
 }
 
 .form-input {
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .form-input:disabled {
-  background: #f7fafc;
-  color: #718096;
+  background: var(--bg);
+  color: var(--muted);
 }
 
 .error-message {
-  color: #e53e3e;
+  color: var(--danger);
   font-size: 12px;
   margin-top: 4px;
 }
 
 .preferences-section {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   padding-top: 24px;
 }
 
 .preferences-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
 }
 
@@ -532,7 +532,7 @@ const formatDate = (date) => {
 
 .modal-footer {
   padding: 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -541,7 +541,7 @@ const formatDate = (date) => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -559,22 +559,22 @@ const formatDate = (date) => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .loading-spinner {

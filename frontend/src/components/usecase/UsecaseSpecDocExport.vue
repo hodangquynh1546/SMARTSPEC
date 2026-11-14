@@ -283,42 +283,42 @@ export default {
             font-size: 11pt;
             line-height: 1.5; 
             margin: 20px;
-            color: #000;
+            color: var(--text);
           }
           
           h1 {
             font-size: 16pt;
             font-weight: bold;
             margin: 12pt 0 8pt 0;
-            color: #000;
+            color: var(--text);
           }
           
           h2 {
             font-size: 14pt;
             font-weight: bold;
             margin: 10pt 0 6pt 0;
-            color: #000;
+            color: var(--text);
           }
           
           h3 {
             font-size: 12pt;
             font-weight: bold;
             margin: 8pt 0 4pt 0;
-            color: #000;
+            color: var(--text);
           }
           
           .header { 
-            border-bottom: 2px solid #1a365d; 
+            border-bottom: 2px solid var(--ink); 
             padding-bottom: 10px; 
             margin-bottom: 20px;
           }
           
           .project-info { 
-            background: #f8fafc; 
+            background: var(--bg); 
             padding: 12px; 
             border-radius: 5px; 
             margin-bottom: 15px;
-            border-left: 4px solid #1a365d;
+            border-left: 4px solid var(--ink);
             font-size: 11pt;
           }
           
@@ -335,7 +335,7 @@ export default {
           .toc { 
             margin-bottom: 20px; 
             padding: 12px;
-            background: #f9fafb;
+            background: var(--bg);
             border-radius: 5px;
             font-size: 11pt;
           }
@@ -360,17 +360,17 @@ export default {
             margin-bottom: 24pt; 
             page-break-inside: avoid;
             break-inside: avoid;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             padding: 16px;
           }
           
           .usecase-header { 
-            background: #1a365d; 
+            background: var(--ink); 
             color: white; 
             padding: 8px 12px; 
             margin: -16px -16px 12px -16px;
-            border-radius: 8px 8px 0 0;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
             page-break-after: avoid;
             break-after: avoid;
           }
@@ -405,7 +405,7 @@ export default {
           
           .detail-item h4 { 
             margin: 0 0 4px 0; 
-            color: #000;
+            color: var(--text);
             font-size: 11pt;
             font-weight: bold;
             page-break-after: avoid;
@@ -468,9 +468,9 @@ export default {
           
           .tag { 
             display: inline-block; 
-            background: #e5e7eb; 
+            background: var(--sunken); 
             padding: 2px 6px; 
-            border-radius: 3px; 
+            border-radius: var(--radius-sm); 
             font-size: 10pt; 
             margin: 2px;
             line-height: 1.4;
@@ -478,7 +478,7 @@ export default {
           
           .timestamp { 
             text-align: center; 
-            color: #666; 
+            color: var(--muted); 
             font-style: italic; 
             font-size: 10pt;
             margin-top: 20pt;
@@ -490,7 +490,7 @@ export default {
               margin: 20mm 15mm;
               font-size: 11pt;
               line-height: 1.5;
-              color: #000;
+              color: var(--text);
             }
             
             h1 {
@@ -1210,7 +1210,7 @@ export default {
 
 .export-modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 800px;
   height: 700px;
   display: flex;
@@ -1224,13 +1224,13 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .export-modal-header h3 {
   margin: 0;
-  color: #1f2937;
+  color: var(--text);
   font-size: 1.2rem;
   font-weight: 600;
 }
@@ -1250,7 +1250,7 @@ export default {
 
 .export-section h4 {
   margin: 0 0 10px 0;
-  color: #374151;
+  color: var(--text);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -1266,19 +1266,19 @@ export default {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  border: 2px solid #e5e7eb;
-  border-radius: 6px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .format-option:hover {
-  border-color: #9ca3af;
+  border-color: var(--border-strong);
 }
 
 .format-option.active {
-  border-color: #1a365d;
-  background: #f8fafc;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .format-radio {
@@ -1288,17 +1288,17 @@ export default {
 .format-icon {
   width: 36px;
   height: 36px;
-  background: #f3f4f6;
+  background: var(--sunken);
   border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--muted);
   flex-shrink: 0;
 }
 
 .format-option.active .format-icon {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
@@ -1309,7 +1309,7 @@ export default {
 }
 
 .format-info strong {
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.8rem;
   white-space: nowrap;
   overflow: hidden;
@@ -1317,7 +1317,7 @@ export default {
 }
 
 .format-info span {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.7rem;
   white-space: nowrap;
   overflow: hidden;
@@ -1344,7 +1344,7 @@ export default {
 }
 
 .hint {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.7rem;
   font-style: italic;
 }
@@ -1356,7 +1356,7 @@ export default {
 .role-select {
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 5px;
   font-size: 0.8rem;
 }
@@ -1377,16 +1377,16 @@ export default {
 }
 
 .preview-info {
-  background: #f8fafc;
+  background: var(--bg);
   padding: 10px;
   border-radius: 5px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 }
 
 .preview-info p {
   margin: 3px 0;
   font-size: 0.8rem;
-  color: #4b5563;
+  color: var(--text);
 }
 
 .export-modal-actions {
@@ -1394,7 +1394,7 @@ export default {
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -1405,7 +1405,7 @@ export default {
   gap: 6px;
   padding: 8px 14px;
   border: none;
-  border-radius: 5px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1413,27 +1413,27 @@ export default {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 .btn-primary:disabled {
-  background: #9ca3af;
+  background: var(--muted);
   cursor: not-allowed;
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--sunken);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e5e7eb;
+  background: var(--sunken);
 }
 
 .button-spinner {
@@ -1460,7 +1460,7 @@ export default {
   background: transparent;
   border-radius: 5px;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: background 0.2s ease;
   display: flex;
   align-items: center;
@@ -1468,7 +1468,7 @@ export default {
 }
 
 .btn-close:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .material-symbols-outlined {

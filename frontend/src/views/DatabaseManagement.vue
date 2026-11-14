@@ -1654,7 +1654,7 @@ export default {
 <style scoped>
 .database-management-view {
   padding: 24px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1674,7 +1674,7 @@ export default {
   margin-bottom: 24px;
   padding: 24px;
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
@@ -1687,12 +1687,12 @@ export default {
 .header-left h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 8px;
 }
 
 .header-left .description {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 1rem;
   margin: 0 0 16px 0;
 }
@@ -1708,24 +1708,24 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-radius: var(--radius-field);
   font-size: 0.875rem;
   font-weight: 500;
-  color: #475569;
+  color: var(--text);
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
 
 .meta-item:hover {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .meta-item .material-symbols-outlined {
   font-size: 18px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .header-actions {
@@ -1739,10 +1739,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -1768,7 +1768,7 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
 }
@@ -1790,9 +1790,9 @@ export default {
   gap: 8px;
   padding: 10px 20px;
   background: white;
-  color: #475569;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
@@ -1801,8 +1801,8 @@ export default {
 }
 
 .btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--bg);
+  border-color: var(--border-strong);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -1821,7 +1821,7 @@ export default {
 
 .sql-dialect-selector label {
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
 }
 .database-main-content {
@@ -1839,17 +1839,17 @@ export default {
 }
 .dialect-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 0.9rem;
   cursor: pointer;
 }
 
 .dialect-select:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -1864,10 +1864,10 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 8px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   background: white;
-  color: #64748b;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 44px;
@@ -1876,9 +1876,9 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: #1a365d;
-  color: #1a365d;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-color: var(--ink);
+  color: var(--ink);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
@@ -1892,8 +1892,8 @@ export default {
   top: calc(100% + 12px);
   right: 0;
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   min-width: 200px;
   z-index: 100;
@@ -1920,7 +1920,7 @@ export default {
   padding: 12px 20px;
   border: none;
   background: white;
-  color: #475569;
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 500;
   text-align: left;
@@ -1936,13 +1936,13 @@ export default {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #1a365d;
+  background: var(--ink);
   transform: scaleY(0);
   transition: transform 0.2s ease;
 }
 
 .filter-option:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
   padding-left: 24px;
 }
 
@@ -1951,8 +1951,8 @@ export default {
 }
 
 .filter-option.active {
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
-  color: #1a365d;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  color: var(--ink);
   font-weight: 600;
   padding-left: 24px;
 }
@@ -1963,17 +1963,17 @@ export default {
 
 .filter-option .material-symbols-outlined {
   font-size: 18px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .filter-option.active .material-symbols-outlined {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 /* SQL Preview Header */
 .sql-header {
   padding: 16px 24px;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
@@ -1981,10 +1981,10 @@ export default {
 }
 
 .dialect-badge {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   padding: 6px 16px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -2005,7 +2005,7 @@ export default {
 /* Quick Actions Panel */
 .quick-actions-panel {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   margin-bottom: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -2016,26 +2016,26 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 16px 20px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .panel-header h3 {
   margin: 0;
-  color: #374151;
+  color: var(--text);
   font-size: 1.1rem;
   font-weight: 600;
 }
 
 .panel-header .material-symbols-outlined {
-  color: #ea580c;
+  color: var(--danger);
 }
 
 .badge {
-  background: #ea580c;
+  background: var(--danger);
   color: white;
   padding: 4px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -2048,9 +2048,9 @@ export default {
 }
 
 .composite-table-card {
-  background: #fef7ed;
+  background: var(--bg);
   border: 1px solid #fed7aa;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2060,7 +2060,7 @@ export default {
 .composite-table-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #fdba74;
+  border-color: var(--warning-soft);
 }
 
 .card-header {
@@ -2072,15 +2072,15 @@ export default {
 
 .table-name {
   font-weight: 600;
-  color: #9a3412;
+  color: var(--danger);
   font-size: 1rem;
 }
 
 .key-size {
-  background: #ea580c;
+  background: var(--danger);
   color: white;
   padding: 2px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -2098,11 +2098,11 @@ export default {
   gap: 8px;
   padding: 6px 8px;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .column-order {
-  background: #ea580c;
+  background: var(--danger);
   color: white;
   width: 20px;
   height: 20px;
@@ -2117,20 +2117,20 @@ export default {
 .column-name {
   font-weight: 500;
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text);
 }
 
 .column-type {
   font-size: 0.7rem;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 1px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .more-columns {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--muted);
   text-align: center;
   padding: 4px;
 }
@@ -2145,15 +2145,15 @@ export default {
   background: none;
   border: none;
   padding: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .btn-icon:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 /* Loading, Error, Empty States */
@@ -2167,7 +2167,7 @@ export default {
   padding: 100px 40px;
   text-align: center;
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.06);
   animation: fadeInUp 0.5s ease;
@@ -2187,8 +2187,8 @@ export default {
 .loading-state .spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #1a365d;
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--ink);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 24px;
@@ -2221,12 +2221,12 @@ export default {
 }
 
 .error-state .material-symbols-outlined {
-  color: #ef4444;
+  color: var(--danger);
   filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.3));
 }
 
 .empty-state .material-symbols-outlined {
-  color: #64748b;
+  color: var(--muted);
   filter: drop-shadow(0 4px 8px rgba(100, 116, 139, 0.2));
 }
 
@@ -2235,13 +2235,13 @@ export default {
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 12px;
-  color: #1a365d;
+  color: var(--ink);
   letter-spacing: -0.02em;
 }
 
 .error-state p,
 .empty-state p {
-  color: #64748b;
+  color: var(--muted);
   margin-bottom: 32px;
   font-size: 1rem;
   line-height: 1.6;
@@ -2251,7 +2251,7 @@ export default {
 /* Schema Section */
 .schema-section {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   margin-bottom: 24px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -2265,17 +2265,17 @@ export default {
 
 .section-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #fafbfc 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg) 100%);
 }
 
 .section-header h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
   letter-spacing: -0.02em;
 }
@@ -2287,16 +2287,16 @@ export default {
 }
 
 .btn-secondary.active {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 /* SQL Preview */
 .sql-preview-section {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -2309,8 +2309,8 @@ export default {
 
 .sql-preview {
   padding: 0;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-radius: 0 0 16px 16px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: 0 0 var(--radius) var(--radius);
   max-height: 500px;
   overflow-y: auto;
   position: relative;
@@ -2321,21 +2321,21 @@ export default {
 }
 
 .sql-preview::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--ink);
 }
 
 .sql-preview::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .sql-preview::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: var(--muted);
 }
 
 .sql-preview pre {
   margin: 0;
-  color: #e2e8f0;
+  color: var(--muted);
   font-family: 'Fira Code', 'Courier New', monospace;
   font-size: 0.875rem;
   line-height: 1.8;
@@ -2344,7 +2344,7 @@ export default {
 }
 
 .sql-preview code {
-  color: #e2e8f0;
+  color: var(--muted);
   font-family: inherit;
 }
 

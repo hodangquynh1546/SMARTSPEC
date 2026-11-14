@@ -607,7 +607,7 @@ body {
 .signup-container {
   width: 100%;
   max-width: 500px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 20px;
   box-sizing: border-box;
   display: flex;
@@ -618,7 +618,7 @@ body {
 
 .spotify-logo {
   font-size: 48px;
-  color: #0a1a4d;
+  color: var(--ink);
   margin-bottom: 30px;
   border-radius: 50%;
   pointer-events: none;
@@ -633,16 +633,16 @@ body {
 .progress-bar-container {
   width: 100%;
   height: 4px;
-  background-color: #959292;
-  border-radius: 2px;
+  background-color: var(--muted);
+  border-radius: var(--radius-sm);
   margin-bottom: 20px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background-color: #0a1a4d;
-  border-radius: 2px;
+  background-color: var(--ink);
+  border-radius: var(--radius-sm);
   transition: width 0.3s ease-in-out;
 }
 
@@ -682,8 +682,8 @@ body {
 .form-group input[type='text'] {
   width: 100%;
   padding: 14px;
-  border: 1px solid #535353;
-  border-radius: 4px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   box-sizing: border-box;
   transition: border-color 0.2s ease, background-color 0.2s ease;
@@ -692,27 +692,27 @@ body {
 .form-group input[type='email']:focus,
 .form-group input[type='password']:focus,
 .form-group input[type='text']:focus {
-  border-color: #ffffff;
+  border-color: var(--border);
 }
 
 .form-group input::placeholder {
-  color: #737373;
+  color: var(--muted);
 }
 
 .error-message {
-  color: #ff3333;
+  color: var(--danger);
   font-size: 13px;
   margin-top: 5px;
 }
 
 .success-message {
-  color: #1ed760;
+  color: var(--success);
   font-size: 13px;
   margin-top: 5px;
 }
 
 .use-phone-link {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   font-size: 14px;
   font-weight: bold;
@@ -729,13 +729,13 @@ body {
   width: 100%;
   padding: 16px;
   border: none;
-  border-radius: 9999px;
+  border-radius: 999px;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
   margin-top: 10px;
-  color: #ddd;
+  color: var(--muted);
   /* Ensure button keeps its height during loading */
   min-height: 58px;
   display: flex;
@@ -744,11 +744,11 @@ body {
 }
 
 .spotify-button.primary {
-  background-color: #0a1a4d;
+  background-color: var(--ink);
 }
 
 .spotify-button.primary:hover:not(:disabled) {
-  background-color: #434c69;
+  background-color: var(--ink);
   transform: scale(1.01);
   color: #fff;
 }
@@ -763,14 +763,14 @@ body {
   display: flex;
   align-items: center;
   margin: 30px 0;
-  color: #737373;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .divider hr {
   flex-grow: 1;
   border: none;
-  border-top: 1px solid #2e2e2e;
+  border-top: 1px solid var(--ink);
 }
 
 .divider span {
@@ -783,8 +783,8 @@ body {
   padding: 14px;
   margin-bottom: 10px;
   background-color: transparent;
-  border: 1px solid #737373;
-  border-radius: 9999px;
+  border: 1px solid var(--muted);
+  border-radius: 999px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -796,9 +796,9 @@ body {
 }
 
 .social-signup-button:hover {
-  border-color: #ffffff;
+  border-color: var(--border);
   color: #ffffff;
-  background-color: #282828;
+  background-color: var(--ink);
 }
 
 .social-signup-button img,
@@ -817,14 +817,14 @@ body {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #b3b3b3;
+  color: var(--muted);
   cursor: pointer;
   font-size: 18px;
   transition: 0.2s ease;
 }
 
 .password-toggle:hover {
-  color: #000;
+  color: var(--text);
 }
 
 /* Password Strength Checklist */
@@ -836,14 +836,14 @@ body {
 
 .password-strength-checklist h4 {
   font-size: 14px;
-  color: #b3b3b3;
+  color: var(--muted);
   margin-bottom: 10px;
   margin-top: 0;
 }
 
 .checklist-item {
   font-size: 14px;
-  color: #737373;
+  color: var(--muted);
   margin: 8px 0;
   display: flex;
   align-items: center;
@@ -851,16 +851,16 @@ body {
 
 .checklist-item i {
   margin-right: 8px;
-  color: #737373;
+  color: var(--muted);
 }
 
 /* Valid checklist item */
 .checklist-item.valid {
-  color: #1ed760;
+  color: var(--success);
 }
 
 .checklist-item.valid i {
-  color: #1ed760;
+  color: var(--success);
 }
 
 /* Date of Birth Group */
@@ -873,8 +873,8 @@ body {
 .dob-group select {
   flex-grow: 1;
   padding: 14px;
-  border: 1px solid #535353;
-  border-radius: 4px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   box-sizing: border-box;
   -webkit-appearance: none;
@@ -884,7 +884,7 @@ body {
 
 .dob-group input[type='text']:focus,
 .dob-group select:focus {
-  border-color: #000;
+  border-color: var(--ink);
 }
 
 .dob-group input[type='text']#day {
@@ -912,7 +912,7 @@ body {
 }
 
 .info-text a {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -933,7 +933,7 @@ body {
   text-align: center;
   align-items: center;
   font-size: 16px;
-  color: #b3b3b3;
+  color: var(--muted);
   cursor: pointer;
 }
 
@@ -943,7 +943,7 @@ body {
   appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #535353;
+  border: 2px solid var(--ink);
   border-radius: 50%;
   margin-right: 10px;
   outline: none;
@@ -953,7 +953,7 @@ body {
 }
 
 .radio-label input[type='radio']:checked {
-  border-color: #0a1a4d;
+  border-color: var(--ink);
 }
 
 .radio-label input[type='radio']:checked::before {
@@ -964,7 +964,7 @@ body {
   transform: translate(-50%, -50%);
   width: 10px;
   height: 10px;
-  background-color: #0a1a4d;
+  background-color: var(--ink);
   border-radius: 50%;
 }
 
@@ -987,8 +987,8 @@ body {
   appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #535353;
-  border-radius: 4px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-sm);
   margin-right: 10px;
   outline: none;
   cursor: pointer;
@@ -998,14 +998,14 @@ body {
 }
 
 .checkbox-label input[type='checkbox']:checked {
-  background-color: #0a1a4d;
-  border-color: #0a1a4d;
+  background-color: var(--ink);
+  border-color: var(--ink);
 }
 
 .checkbox-label input[type='checkbox']:checked::before {
   content: '\2713';
   font-size: 16px;
-  color: #fffbfb;
+  color: var(--muted);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1014,14 +1014,14 @@ body {
 
 .terms-text {
   font-size: 12px;
-  color: #b3b3b3;
+  color: var(--muted);
   text-align: center;
   margin-bottom: 10px;
   line-height: 1.5;
 }
 
 .terms-text a {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -1057,13 +1057,13 @@ body {
 /* ReCAPTCHA Info */
 .recaptcha-info {
   font-size: 11px;
-  color: #737373;
+  color: var(--muted);
   text-align: center;
   padding: 0 10px;
 }
 
 .recaptcha-info a {
-  color: #b3b3b3;
+  color: var(--muted);
   text-decoration: none;
 }
 
@@ -1076,17 +1076,17 @@ body {
   text-align: center;
   margin-top: 25px;
   padding-top: 15px;
-  border-top: 1px solid #2e2e2e;
+  border-top: 1px solid var(--ink);
 }
 
 .login-redirect p {
-  color: #b3b3b3;
+  color: var(--muted);
   font-size: 14px;
   margin: 0;
 }
 
 .login-redirect a {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   font-weight: bold;
 }
@@ -1108,7 +1108,7 @@ body {
   display: grid;
   border: 3px solid #0000;
   border-radius: 50%;
-  border-right-color: #ffffff; /* Color for spinner */
+  border-right-color: var(--border); /* Color for spinner */
   animation: spinner-a4dj62 1s infinite linear;
 }
 

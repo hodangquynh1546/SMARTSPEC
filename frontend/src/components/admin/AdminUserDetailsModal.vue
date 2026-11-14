@@ -440,7 +440,7 @@ onMounted(() => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -448,7 +448,7 @@ onMounted(() => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -459,10 +459,10 @@ onMounted(() => {
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -470,8 +470,8 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -486,7 +486,7 @@ onMounted(() => {
 
 .profile-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -505,7 +505,7 @@ onMounted(() => {
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #e2e8f0;
+  border: 4px solid var(--border);
   flex-shrink: 0;
 }
 
@@ -519,12 +519,12 @@ onMounted(() => {
   margin: 0 0 4px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .user-email {
   margin: 0 0 12px 0;
-  color: #718096;
+  color: var(--muted);
   font-size: 16px;
 }
 
@@ -535,38 +535,38 @@ onMounted(() => {
 
 .role-badge {
   padding: 6px 12px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .role-badge.admin {
-  background: #ebf8ff;
-  color: #2b6cb0;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .role-badge.participant {
-  background: #f0fff4;
-  color: #276749;
+  background: var(--bg);
+  color: var(--success);
 }
 
 .status-badge {
   padding: 6px 12px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .status-badge.active {
-  background: #f0fff4;
-  color: #276749;
+  background: var(--bg);
+  color: var(--success);
 }
 
 .status-badge.inactive {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--border);
+  color: var(--danger);
 }
 
 .profile-actions {
@@ -577,7 +577,7 @@ onMounted(() => {
 
 .tabs-navigation {
   padding: 0 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   gap: 0;
 }
@@ -593,19 +593,19 @@ onMounted(() => {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #718096;
+  color: var(--muted);
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .tab-button:hover {
-  color: #1a365d;
-  background: #f7fafc;
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
+  color: var(--ink);
+  border-bottom-color: var(--ink);
   background: white;
 }
 
@@ -630,7 +630,7 @@ onMounted(() => {
 .info-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
   display: flex;
   align-items: center;
@@ -641,8 +641,8 @@ onMounted(() => {
   content: '';
   width: 4px;
   height: 16px;
-  background: #1a365d;
-  border-radius: 2px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .info-list {
@@ -656,24 +656,24 @@ onMounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .info-label {
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text);
   min-width: 120px;
 }
 
 .info-value {
-  color: #718096;
+  color: var(--muted);
   text-align: right;
   flex: 1;
 }
 
 .info-value.enabled {
-  color: #38a169;
+  color: var(--success);
   font-weight: 500;
 }
 
@@ -691,8 +691,8 @@ onMounted(() => {
 
 .stat-card {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
   display: flex;
   align-items: center;
@@ -702,8 +702,8 @@ onMounted(() => {
 .stat-icon {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1a365d, #2d3748);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--ink), var(--ink));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -718,19 +718,19 @@ onMounted(() => {
   margin: 0 0 4px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .stat-content p {
   margin: 0;
-  color: #718096;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .recent-activity h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
 }
 
@@ -745,19 +745,19 @@ onMounted(() => {
   align-items: flex-start;
   gap: 12px;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .activity-icon {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background: #e2e8f0;
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #718096;
+  color: var(--muted);
   flex-shrink: 0;
 }
 
@@ -767,19 +767,19 @@ onMounted(() => {
 
 .activity-description {
   margin: 0 0 4px 0;
-  color: #4a5568;
+  color: var(--text);
   font-weight: 500;
 }
 
 .activity-time {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .projects-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
 }
 
@@ -791,8 +791,8 @@ onMounted(() => {
 
 .project-card {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 16px;
 }
 
@@ -807,21 +807,21 @@ onMounted(() => {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .project-role {
   padding: 4px 8px;
-  background: #ebf8ff;
-  color: #2b6cb0;
-  border-radius: 12px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-field);
   font-size: 12px;
   font-weight: 600;
 }
 
 .project-description {
   margin: 0 0 12px 0;
-  color: #718096;
+  color: var(--muted);
   font-size: 14px;
   line-height: 1.4;
 }
@@ -836,7 +836,7 @@ onMounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .meta-item .material-symbols-outlined {
@@ -846,25 +846,25 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .empty-state .material-symbols-outlined {
   font-size: 48px;
-  color: #cbd5e0;
+  color: var(--muted);
   margin-bottom: 12px;
 }
 
 .settings-section {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
 }
 
 .settings-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
 }
 
@@ -879,8 +879,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .setting-info {
@@ -891,25 +891,25 @@ onMounted(() => {
 
 .setting-label {
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text);
 }
 
 .setting-value {
-  color: #718096;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .danger-zone {
-  border: 1px solid #fed7d7;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
-  background: #fff5f5;
+  background: var(--bg);
 }
 
 .danger-zone h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #c53030;
+  color: var(--danger);
   margin: 0 0 16px 0;
 }
 
@@ -922,7 +922,7 @@ onMounted(() => {
 .btn {
   padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -939,31 +939,31 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .btn-danger {
-  background: #e53e3e;
+  background: var(--danger);
   color: white;
 }
 
 .btn-danger:hover {
-  background: #c53030;
+  background: var(--danger);
 }
 
 @media (max-width: 768px) {

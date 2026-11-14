@@ -365,12 +365,12 @@ export default {
 .header-info h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 8px 0;
 }
 
 .header-info p {
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
   font-size: 1rem;
 }
@@ -380,10 +380,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -391,7 +391,7 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2d4a7c 0%, #1a365d 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
 }
@@ -412,7 +412,7 @@ export default {
 .stat-card {
   background: white;
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -446,29 +446,29 @@ export default {
 }
 
 .stat-card.total {
-  border-left: 4px solid #f59e0b;
-  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+  border-left: 4px solid var(--warning);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
 }
 
 .stat-card.resolved {
-  border-left: 4px solid #10b981;
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border-left: 4px solid var(--success);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
 }
 
 .stat-card.pending {
-  border-left: 4px solid #6b7280;
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border-left: 4px solid var(--muted);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
 }
 
 .stat-card.progress {
-  border-left: 4px solid #3b82f6;
-  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  border-left: 4px solid var(--ink);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
 }
 
 .stat-icon {
   width: 56px;
   height: 56px;
-  border-radius: 14px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -498,22 +498,22 @@ export default {
 }
 
 .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
   color: white;
 }
 
 .stat-card.resolved .stat-icon {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
 }
 
 .stat-card.pending .stat-icon {
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
   color: white;
 }
 
 .stat-card.progress .stat-icon {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
 }
 
@@ -521,7 +521,7 @@ export default {
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 4px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -529,7 +529,7 @@ export default {
 }
 
 .stat-info p {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
   margin: 0;
   font-weight: 500;
@@ -538,7 +538,7 @@ export default {
 /* Conflicts Section */
 .conflicts-section {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 30px;
   box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
   transition: box-shadow 0.3s ease;
@@ -564,7 +564,7 @@ export default {
 .section-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -573,7 +573,7 @@ export default {
 }
 
 .section-header p {
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -587,11 +587,11 @@ export default {
   height: 40px;
   min-width: 40px;
   min-height: 40px;
-  border: 2px solid #e5e7eb;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  color: #6b7280;
+  border: 2px solid var(--border);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  color: var(--muted);
   cursor: pointer;
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
   flex-shrink: 0;
@@ -599,9 +599,9 @@ export default {
 }
 
 .section-collapse-toggle:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: #1a365d;
-  color: #1a365d;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-color: var(--ink);
+  color: var(--ink);
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
@@ -621,11 +621,11 @@ export default {
 }
 
 .conflict-item {
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
   position: relative;
@@ -648,7 +648,7 @@ export default {
 }
 
 .conflict-item:hover {
-  border-color: #f59e0b;
+  border-color: var(--warning);
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
   transform: translateX(2px);
 }
@@ -659,7 +659,7 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .conflict-title {
@@ -679,17 +679,17 @@ export default {
   min-height: 36px;
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
   padding: 0;
   flex-shrink: 0;
 }
 
 .collapse-toggle:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .collapse-toggle:active {
@@ -710,14 +710,14 @@ export default {
 
 .conflict-title h4 {
   margin: 0;
-  color: #374151;
+  color: var(--text);
   font-size: 1.125rem;
   font-weight: 600;
 }
 
 .conflict-id {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--muted);
   font-family: 'Courier New', monospace;
 }
 
@@ -726,10 +726,10 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  background: var(--sunken);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -737,8 +737,8 @@ export default {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e5e7eb;
-  border-color: #9ca3af;
+  background: var(--sunken);
+  border-color: var(--border-strong);
 }
 
 .btn-secondary:disabled {
@@ -754,9 +754,9 @@ export default {
 
 .conflict-option {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   padding: 20px;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -780,14 +780,14 @@ export default {
 }
 
 .conflict-option:hover {
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.15);
   transform: translateX(4px) translateY(-2px);
 }
 
 .conflict-option.selected {
-  border-color: #1a365d;
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  border-color: var(--ink);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   transform: translateX(4px) translateY(-2px);
   box-shadow: 0 6px 20px rgba(26, 54, 93, 0.2);
 }
@@ -805,11 +805,11 @@ export default {
 
 .option-badge {
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
   font-family: 'Courier New', monospace;
 }
 
@@ -818,10 +818,10 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -829,18 +829,18 @@ export default {
 }
 
 .select-btn:hover {
-  background: #f9fafb;
+  background: var(--bg);
 }
 
 .select-btn.selected {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .use-case-preview h5 {
   margin: 0 0 12px 0;
-  color: #1f2937;
+  color: var(--text);
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.4;
@@ -848,7 +848,7 @@ export default {
 
 .use-case-description {
   margin: 0 0 16px 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -864,9 +864,9 @@ export default {
   gap: 6px;
   padding: 6px 12px;
   background: transparent;
-  color: #1a365d;
-  border: 1px solid #1a365d;
-  border-radius: 6px;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
@@ -874,7 +874,7 @@ export default {
 }
 
 .btn-outline:hover {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
@@ -885,7 +885,7 @@ export default {
   align-items: center;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .footer-info {
@@ -895,12 +895,12 @@ export default {
 }
 
 .resolved-count {
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .completion-text {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
@@ -909,10 +909,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -920,13 +920,13 @@ export default {
 }
 
 .btn-resolve:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
 
 .btn-resolve:disabled {
-  background: #9ca3af;
+  background: var(--muted);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -937,7 +937,7 @@ export default {
   text-align: center;
   padding: 60px 20px;
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -945,7 +945,7 @@ export default {
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
-  background: #d1fae5;
+  background: var(--success-soft);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -954,19 +954,19 @@ export default {
 
 .empty-icon .material-symbols-outlined {
   font-size: 40px;
-  color: #10b981;
+  color: var(--success);
 }
 
 .empty-state h3 {
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text);
   font-size: 1.25rem;
   font-weight: 600;
 }
 
 .empty-state p {
   margin: 0 0 24px 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 

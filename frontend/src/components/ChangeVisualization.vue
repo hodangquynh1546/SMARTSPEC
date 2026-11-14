@@ -97,8 +97,8 @@ export default {
 .comparison-panel {
   display: flex;
   flex-direction: column;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -107,25 +107,25 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .before-panel .panel-header {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .after-panel .panel-header {
-  color: #16a34a;
+  color: var(--success);
 }
 
 .panel-content {
   flex: 1;
   overflow: auto;
   padding: 16px;
-  background: #fafafa;
+  background: var(--bg);
 }
 
 .visualized-content {
@@ -140,7 +140,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #6b7280;
+  color: var(--muted);
   text-align: center;
   gap: 8px;
   min-height: 200px;

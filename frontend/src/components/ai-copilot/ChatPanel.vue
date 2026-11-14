@@ -145,6 +145,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
+import { escapeHtml, sanitizeHtml } from '@/utils/sanitize'
 import { chatWithAI, chatWithAIStream, applyAIAction } from '@/api/ai-copilot'
 
 const props = defineProps({
@@ -424,11 +425,11 @@ const sendMessage = async () => {
 // Format message (markdown support)
 const formatMessage = (content) => {
   // Simple markdown formatting
-  return content
+  return sanitizeHtml(escapeHtml(content)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>')
+    .replace(/\n/g, '<br>'))
 }
 
 // Apply action
@@ -519,7 +520,7 @@ watch(() => activeChat.value.messages, () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #1e1e1e;
+  background: var(--ink);
 }
 
 .chat-header {
@@ -527,15 +528,15 @@ watch(() => activeChat.value.messages, () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #2d2d30;
-  border-bottom: 1px solid #3e3e42;
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink);
 }
 
 .chat-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #cccccc;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -553,10 +554,10 @@ watch(() => activeChat.value.messages, () => {
 .new-chat-btn,
 .clear-btn {
   background: transparent;
-  border: 1px solid #3e3e42;
-  color: #cccccc;
+  border: 1px solid var(--ink);
+  color: var(--muted);
   padding: 6px;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -566,7 +567,7 @@ watch(() => activeChat.value.messages, () => {
 
 .new-chat-btn:hover,
 .clear-btn:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 
 .new-chat-btn .material-symbols-outlined,
@@ -578,8 +579,8 @@ watch(() => activeChat.value.messages, () => {
   display: flex;
   gap: 4px;
   padding: 8px;
-  background: #252526;
-  border-bottom: 1px solid #3e3e42;
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink);
   overflow-x: auto;
 }
 
@@ -588,24 +589,24 @@ watch(() => activeChat.value.messages, () => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: #2d2d30;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 13px;
-  color: #858585;
+  color: var(--muted);
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .chat-tab:hover {
-  background: #3e3e42;
-  color: #cccccc;
+  background: var(--ink);
+  color: var(--muted);
 }
 
 .chat-tab.active {
-  background: #0e639c;
-  border-color: #0e639c;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
@@ -624,7 +625,7 @@ watch(() => activeChat.value.messages, () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2px;
+  border-radius: 999px;
   opacity: 0.7;
   transition: opacity 0.2s;
 }
@@ -640,13 +641,13 @@ watch(() => activeChat.value.messages, () => {
 
 .context-section {
   padding: 12px 16px;
-  background: #252526;
-  border-bottom: 1px solid #3e3e42;
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink);
 }
 
 .context-header {
   font-size: 12px;
-  color: #858585;
+  color: var(--muted);
   margin-bottom: 8px;
 }
 
@@ -661,30 +662,30 @@ watch(() => activeChat.value.messages, () => {
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  background: #094771;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 12px;
 }
 
 .context-label {
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .remove-context {
   background: transparent;
   border: none;
-  color: #cccccc;
+  color: var(--muted);
   cursor: pointer;
   padding: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
 }
 
 .remove-context:hover {
-  color: #f48771;
+  color: var(--danger);
   background: rgba(244, 135, 113, 0.1);
 }
 
@@ -719,27 +720,27 @@ watch(() => activeChat.value.messages, () => {
 }
 
 .user-message {
-  background: #0e639c;
+  background: var(--ink);
   color: white;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   line-height: 1.5;
 }
 
 .assistant-message {
-  background: #2d2d30;
-  color: #cccccc;
+  background: var(--ink);
+  color: var(--muted);
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   line-height: 1.5;
 }
 
 .assistant-message code {
-  background: #1e1e1e;
+  background: var(--ink);
   padding: 2px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-family: monospace;
 }
 
@@ -752,7 +753,7 @@ watch(() => activeChat.value.messages, () => {
 .action-btn {
   padding: 6px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 12px;
   display: flex;
@@ -765,12 +766,12 @@ watch(() => activeChat.value.messages, () => {
 }
 
 .action-btn.apply {
-  background: #0e7c0e;
+  background: var(--success);
   color: white;
 }
 
 .action-btn.reject {
-  background: #5a1d1d;
+  background: var(--danger);
   color: white;
 }
 
@@ -790,7 +791,7 @@ watch(() => activeChat.value.messages, () => {
 .typing-dots span {
   width: 8px;
   height: 8px;
-  background: #858585;
+  background: var(--muted);
   border-radius: 50%;
   animation: typing 1.4s infinite;
 }
@@ -813,31 +814,31 @@ watch(() => activeChat.value.messages, () => {
 }
 
 .action-review-panel {
-  border-top: 1px solid #3e3e42;
-  background: #2d2d30;
+  border-top: 1px solid var(--ink);
+  background: var(--ink);
   padding: 16px;
 }
 
 .review-header h4 {
   margin: 0 0 12px 0;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .action-preview {
-  background: #1e1e1e;
+  background: var(--ink);
   padding: 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-bottom: 12px;
   font-size: 12px;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .action-preview pre {
   margin: 8px 0 0 0;
   padding: 8px;
-  background: #252526;
-  border-radius: 4px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
   overflow-x: auto;
 }
 
@@ -851,7 +852,7 @@ watch(() => activeChat.value.messages, () => {
   flex: 1;
   padding: 8px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 13px;
   display: flex;
@@ -866,12 +867,12 @@ watch(() => activeChat.value.messages, () => {
 }
 
 .confirm-btn {
-  background: #0e7c0e;
+  background: var(--success);
   color: white;
 }
 
 .cancel-btn {
-  background: #5a1d1d;
+  background: var(--danger);
   color: white;
 }
 
@@ -879,17 +880,17 @@ watch(() => activeChat.value.messages, () => {
   display: flex;
   gap: 8px;
   padding: 12px 16px;
-  background: #2d2d30;
-  border-top: 1px solid #3e3e42;
+  background: var(--ink);
+  border-top: 1px solid var(--ink);
 }
 
 .chat-input {
   flex: 1;
   padding: 10px 12px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   font-size: 14px;
   resize: none;
   max-height: 150px;
@@ -898,14 +899,14 @@ watch(() => activeChat.value.messages, () => {
 
 .chat-input:focus {
   outline: none;
-  border-color: #0e639c;
+  border-color: var(--ink);
 }
 
 .send-btn {
   padding: 10px;
-  background: #0e639c;
+  background: var(--ink);
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   color: white;
   cursor: pointer;
   display: flex;
@@ -919,7 +920,7 @@ watch(() => activeChat.value.messages, () => {
 }
 
 .send-btn:hover:not(:disabled) {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 .send-btn:disabled {

@@ -514,7 +514,7 @@ onMounted(() => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -523,7 +523,7 @@ onMounted(() => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -551,32 +551,32 @@ onMounted(() => {
 .search-box .material-symbols-outlined {
   position: absolute;
   left: 12px;
-  color: #718096;
+  color: var(--muted);
   font-size: 20px;
 }
 
 .search-input {
   width: 100%;
   padding: 10px 12px 10px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 8px;
-  border-radius: 6px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -584,8 +584,8 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -597,12 +597,12 @@ onMounted(() => {
 
 .filters-section {
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .filter-group {
@@ -613,15 +613,15 @@ onMounted(() => {
 
 .filter-group label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   background: white;
   min-width: 120px;
@@ -639,8 +639,8 @@ onMounted(() => {
 
 .api-key-card {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   overflow: hidden;
   transition: all 0.2s;
   min-height: 250px;
@@ -653,12 +653,12 @@ onMounted(() => {
 
 .api-key-card.inactive {
   opacity: 0.7;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .card-header {
   padding: 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -675,7 +675,7 @@ onMounted(() => {
 .provider-logo {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -683,17 +683,17 @@ onMounted(() => {
 }
 
 .provider-logo.gemini {
-  background: linear-gradient(135deg, #1a73e8, #34a853);
+  background: linear-gradient(135deg, var(--ink), var(--success));
   color: white;
 }
 
 .provider-logo.openai {
-  background: linear-gradient(135deg, #412e89, #8b5cf6);
+  background: linear-gradient(135deg, var(--ink), var(--ink));
   color: white;
 }
 
 .provider-logo.claude {
-  background: linear-gradient(135deg, #ff6b35, #ff8e53);
+  background: linear-gradient(135deg, var(--danger), var(--danger));
   color: white;
 }
 
@@ -701,13 +701,13 @@ onMounted(() => {
   margin: 0 0 4px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .key-name {
   margin: 0;
   font-size: 14px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .card-actions {
@@ -718,10 +718,10 @@ onMounted(() => {
 .btn-icon {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -729,17 +729,17 @@ onMounted(() => {
 }
 
 .btn-icon:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-icon.danger:hover {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--border);
+  color: var(--danger);
 }
 
 .btn-icon .material-symbols-outlined.active {
-  color: #38a169;
+  color: var(--success);
 }
 
 .card-body {
@@ -752,26 +752,26 @@ onMounted(() => {
   gap: 8px;
   margin-bottom: 16px;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .key-value {
   flex: 1;
   font-family: 'Courier New', monospace;
   font-size: 12px;
-  color: #4a5568;
+  color: var(--text);
   word-break: break-all;
 }
 
 .btn-copy {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -779,8 +779,8 @@ onMounted(() => {
 }
 
 .btn-copy:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .key-stats {
@@ -799,7 +799,7 @@ onMounted(() => {
 
 .stat-label {
   font-size: 11px;
-  color: #718096;
+  color: var(--muted);
   margin-bottom: 2px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -808,19 +808,19 @@ onMounted(() => {
 .stat-value {
   font-size: 14px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .stat-value.priority.high {
-  color: #e53e3e;
+  color: var(--danger);
 }
 
 .stat-value.priority.medium {
-  color: #ed8936;
+  color: var(--danger);
 }
 
 .stat-value.priority.low {
-  color: #38a169;
+  color: var(--success);
 }
 
 .key-meta {
@@ -829,8 +829,8 @@ onMounted(() => {
   gap: 8px;
   margin-bottom: 16px;
   padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
 }
 
 .meta-item {
@@ -838,7 +838,7 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .meta-item .material-symbols-outlined {
@@ -861,33 +861,33 @@ onMounted(() => {
 }
 
 .limit-label {
-  color: #718096;
+  color: var(--muted);
 }
 
 .limit-value {
-  color: #4a5568;
+  color: var(--text);
   font-weight: 500;
 }
 
 .key-description {
   padding: 12px;
-  background: #fffaf0;
-  border: 1px solid #fed7d7;
-  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   margin-top: 12px;
 }
 
 .key-description p {
   margin: 0;
   font-size: 13px;
-  color: #744210;
+  color: var(--danger);
   line-height: 1.4;
 }
 
 .card-footer {
   padding: 12px 16px;
-  border-top: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -903,16 +903,16 @@ onMounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e53e3e;
+  background: var(--danger);
 }
 
 .status-indicator.active .status-dot {
-  background: #38a169;
+  background: var(--success);
 }
 
 .status-text {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -925,32 +925,32 @@ onMounted(() => {
 .usage-bar {
   width: 60px;
   height: 6px;
-  background: #e2e8f0;
-  border-radius: 3px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
 .usage-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   transition: width 0.3s ease;
 }
 
 .usage-fill.low {
-  background: #38a169;
+  background: var(--success);
 }
 
 .usage-fill.medium {
-  background: #ed8936;
+  background: var(--danger);
 }
 
 .usage-fill.high {
-  background: #e53e3e;
+  background: var(--danger);
 }
 
 .usage-text {
   font-size: 11px;
-  color: #718096;
+  color: var(--muted);
   font-weight: 600;
   min-width: 30px;
 }
@@ -958,20 +958,20 @@ onMounted(() => {
 .empty-state {
   padding: 60px 20px;
   text-align: center;
-  color: #718096;
+  color: var(--muted);
   grid-column: 1 / -1;
 }
 
 .empty-state .material-symbols-outlined {
   font-size: 64px;
-  color: #cbd5e0;
+  color: var(--muted);
   margin-bottom: 16px;
 }
 
 .empty-state h4 {
   font-size: 18px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text);
   margin: 0 0 8px 0;
 }
 
@@ -981,20 +981,20 @@ onMounted(() => {
 
 .pagination-section {
   padding: 20px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .pagination-info {
   font-size: 14px;
-  color: #718096;
+  color: var(--muted);
   text-align: center;
 }
 
 .btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -1006,22 +1006,22 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 @media (max-width: 768px) {

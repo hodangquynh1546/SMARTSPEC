@@ -276,7 +276,7 @@ export default {
 
 .modal-content.large {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1000px;
   max-height: 80vh;
@@ -286,11 +286,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -299,7 +299,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -307,17 +307,17 @@ export default {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -346,8 +346,8 @@ export default {
 }
 
 .template-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.25rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -355,13 +355,13 @@ export default {
 }
 
 .template-card:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--border-strong);
+  background: var(--bg);
 }
 
 .template-card:active {
-  border-color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .template-header {
@@ -374,20 +374,20 @@ export default {
 .template-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
 .template-scenarios {
   font-size: 0.75rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
 }
 
 .template-description {
-  color: #64748b;
+  color: var(--muted);
   margin-bottom: 1rem;
   line-height: 1.5;
 }
@@ -401,15 +401,15 @@ export default {
 
 .scenario-preview {
   padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border-left: 3px solid #1a365d;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--ink);
 }
 
 .scenario-name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 0.5rem 0;
 }
 
@@ -428,26 +428,26 @@ export default {
 
 .data-label {
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   min-width: 50px;
 }
 
 .data-code {
-  background: #f1f5f9;
+  background: var(--sunken);
   padding: 0.125rem 0.375rem;
-  border-radius: 4px;
-  color: #475569;
+  border-radius: var(--radius-sm);
+  color: var(--text);
   font-family: 'Monaco', 'Menlo', monospace;
   flex: 1;
 }
 
 .more-scenarios {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   text-align: center;
   padding: 0.5rem;
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .template-tags {
@@ -458,14 +458,14 @@ export default {
 
 .template-tag {
   font-size: 0.7rem;
-  color: #475569;
-  background: #e2e8f0;
+  color: var(--text);
+  background: var(--sunken);
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
 }
 
 .template-preview {
-  border-left: 1px solid #e2e8f0;
+  border-left: 1px solid var(--border);
   padding-left: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -476,12 +476,12 @@ export default {
 .preview-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
 .preview-description {
-  color: #64748b;
+  color: var(--muted);
   line-height: 1.5;
   margin: 0;
 }
@@ -494,18 +494,18 @@ export default {
 
 .scenario-detail {
   padding: 1.25rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .scenario-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .scenario-data-grid {
@@ -524,15 +524,15 @@ export default {
 .data-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
 .data-json {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--ink);
+  color: var(--muted);
   padding: 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow-x: auto;
   font-size: 0.75rem;
   line-height: 1.4;
@@ -547,7 +547,7 @@ export default {
 .rules-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 0.5rem 0;
 }
 
@@ -558,7 +558,7 @@ export default {
 
 .rule-item {
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--text);
   line-height: 1.5;
   margin-bottom: 0.25rem;
 }
@@ -569,7 +569,7 @@ export default {
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .btn {
@@ -578,38 +578,38 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background: #9ca3af;
-  border-color: #9ca3af;
+  background: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .template-categories {
@@ -622,21 +622,21 @@ export default {
 .category-btn {
   padding: 0.75rem 1rem;
   border: none;
-  background: #f1f5f9;
-  border-radius: 6px;
+  background: var(--sunken);
+  border-radius: 999px;
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .category-btn:hover {
-  background: #e2e8f0;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .category-btn.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
@@ -647,7 +647,7 @@ export default {
 
   .template-preview {
     border-left: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     padding-left: 0;
     padding-top: 1.5rem;
   }

@@ -66,20 +66,20 @@ onMounted(async () => {
 .message {
   text-align: center;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .success {
-  color: #1db954;
+  color: var(--success);
 }
 .error {
-  color: #e22134;
+  color: var(--danger);
 }
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border-left-color: #09f;
+  border-left-color: var(--ink);
   animation: spin 1s ease infinite;
 }
 @keyframes spin {

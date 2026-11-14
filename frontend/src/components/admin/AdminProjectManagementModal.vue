@@ -529,7 +529,7 @@ onMounted(() => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -538,7 +538,7 @@ onMounted(() => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -566,32 +566,32 @@ onMounted(() => {
 .search-box .material-symbols-outlined {
   position: absolute;
   left: 12px;
-  color: #718096;
+  color: var(--muted);
   font-size: 20px;
 }
 
 .search-input {
   width: 100%;
   padding: 10px 12px 10px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 8px;
-  border-radius: 6px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -599,8 +599,8 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -612,12 +612,12 @@ onMounted(() => {
 
 .filters-section {
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .filter-group {
@@ -628,15 +628,15 @@ onMounted(() => {
 
 .filter-group label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   background: white;
   min-width: 120px;
@@ -655,12 +655,12 @@ onMounted(() => {
 }
 
 .projects-table th {
-  background: #f7fafc;
+  background: var(--bg);
   padding: 12px 16px;
   text-align: left;
   font-weight: 600;
-  color: #374151;
-  border-bottom: 1px solid #e2e8f0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -668,12 +668,12 @@ onMounted(() => {
 
 .projects-table td {
   padding: 16px;
-  border-bottom: 1px solid #f7fafc;
+  border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
 .projects-table tr:hover {
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .project-info {
@@ -685,8 +685,8 @@ onMounted(() => {
 .project-icon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1a365d, #2d3748);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--ink), var(--ink));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -701,13 +701,13 @@ onMounted(() => {
 
 .project-name {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 4px;
 }
 
 .project-description {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
   line-height: 1.3;
 }
 
@@ -722,7 +722,7 @@ onMounted(() => {
   height: 32px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--border);
 }
 
 .user-avatar.small img {
@@ -733,7 +733,7 @@ onMounted(() => {
 
 .owner-name {
   font-size: 14px;
-  color: #4a5568;
+  color: var(--text);
 }
 
 .members-info {
@@ -753,7 +753,7 @@ onMounted(() => {
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid white;
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 .member-avatar img {
@@ -766,26 +766,26 @@ onMounted(() => {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #e2e8f0;
+  background: var(--sunken);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  color: #718096;
+  color: var(--muted);
   font-weight: 600;
   border: 2px solid white;
 }
 
 .member-count {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .language-badge {
   padding: 4px 8px;
-  background: #ebf8ff;
-  color: #2b6cb0;
-  border-radius: 12px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-field);
   font-size: 12px;
   font-weight: 600;
 }
@@ -798,36 +798,36 @@ onMounted(() => {
 
 .version-number {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 14px;
 }
 
 .version-date {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .last-accessed {
   font-size: 13px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .status-badge {
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .status-badge.active {
-  background: #f0fff4;
-  color: #276749;
+  background: var(--bg);
+  color: var(--success);
 }
 
 .status-badge.archived {
-  background: #fffaf0;
-  color: #d69e2e;
+  background: var(--bg);
+  color: var(--warning);
 }
 
 .action-buttons {
@@ -838,10 +838,10 @@ onMounted(() => {
 .btn-icon {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -849,31 +849,31 @@ onMounted(() => {
 }
 
 .btn-icon:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-icon.danger:hover {
-  background: #fed7d7;
-  color: #c53030;
+  background: var(--border);
+  color: var(--danger);
 }
 
 .empty-state {
   padding: 60px 20px;
   text-align: center;
-  color: #718096;
+  color: var(--muted);
 }
 
 .empty-state .material-symbols-outlined {
   font-size: 64px;
-  color: #cbd5e0;
+  color: var(--muted);
   margin-bottom: 16px;
 }
 
 .empty-state h4 {
   font-size: 18px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text);
   margin: 0 0 8px 0;
 }
 
@@ -883,16 +883,16 @@ onMounted(() => {
 
 .pagination-section {
   padding: 20px 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .pagination-info {
   font-size: 14px;
-  color: #718096;
+  color: var(--muted);
 }
 
 .pagination-controls {
@@ -904,25 +904,25 @@ onMounted(() => {
 
 .btn-pagination {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   background: white;
-  color: #374151;
+  color: var(--text);
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   transition: all 0.2s;
   min-width: 40px;
 }
 
 .btn-pagination:hover:not(:disabled) {
-  background: #edf2f7;
-  border-color: #a0aec0;
+  background: var(--sunken);
+  border-color: var(--border-strong);
 }
 
 .btn-pagination.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .btn-pagination:disabled {
@@ -938,13 +938,13 @@ onMounted(() => {
 
 .page-size label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
 }
 
 .page-size-select {
   padding: 6px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   background: white;
 }
@@ -952,7 +952,7 @@ onMounted(() => {
 .btn {
   padding: 8px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -964,22 +964,22 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 @media (max-width: 768px) {

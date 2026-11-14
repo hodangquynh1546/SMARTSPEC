@@ -6,7 +6,7 @@ import App from './App.vue';
 import router from './router';
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css'; // Đảm bảo import CSS của toast
-import './assets/main.css'; // Đảm bảo import CSS của toast
+import './assets/theme.css'; // token WorkHub (đặt sau CSS toast để ghi đè)
 
 
 const app = createApp(App);

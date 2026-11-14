@@ -2793,8 +2793,8 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius);
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
@@ -2804,11 +2804,11 @@ export default {
 }
 
 .activity-diagram-renderer.preview-mode {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
 }
 
 .activity-diagram-renderer.editable-mode {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed var(--border-strong);
 }
 
 .activity-diagram-renderer.fullscreen-mode {
@@ -2857,9 +2857,9 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius-field);
+  border: 1.5px solid var(--border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
@@ -2870,9 +2870,9 @@ export default {
   padding: 8px 14px;
   border: none;
   background: transparent;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2896,7 +2896,7 @@ export default {
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
@@ -2907,13 +2907,13 @@ export default {
 }
 
 .toolbar-btn.active {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
 }
 
 .toolbar-btn.active:hover {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-1px);
 }
 
@@ -2927,10 +2927,10 @@ export default {
   text-align: center;
   font-size: 12px;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   padding: 4px 8px;
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(26, 54, 93, 0.1);
 }
 
@@ -2938,7 +2938,7 @@ export default {
 .activity-container {
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 50%, var(--bg) 100%);
   position: relative;
   cursor: grab;
 }
@@ -2966,7 +2966,7 @@ export default {
   backdrop-filter: blur(12px);
   border-top: 2px solid rgba(226, 232, 240, 0.8);
   font-size: 12px;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
   box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
 }
@@ -2977,7 +2977,7 @@ export default {
   gap: 6px;
   padding: 4px 10px;
   background: rgba(255, 255, 255, 0.6);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
 }
 
@@ -3012,40 +3012,40 @@ export default {
 /* .activity-node - Removed pointer-events: none to allow drag events */
 
 .node-start {
-  fill: #10b981;
-  stroke: #047857;
+  fill: var(--success);
+  stroke: var(--success);
   stroke-width: 2;
 }
 
 .node-end {
-  fill: #ef4444;
-  stroke: #dc2626;
+  fill: var(--danger);
+  stroke: var(--danger);
   stroke-width: 2;
 }
 
 .node-action {
   fill: white;
-  stroke: #3b82f6;
+  stroke: var(--ink);
   stroke-width: 2;
 }
 
 .node-decision,
 .node-merge {
   fill: white;
-  stroke: #8b5cf6;
+  stroke: var(--ink);
   stroke-width: 2;
 }
 
 .node-fork,
 .node-join {
-  fill: #6b7280;
-  stroke: #374151;
+  fill: var(--muted);
+  stroke: var(--text);
   stroke-width: 2;
 }
 
 .node-object {
   fill: white;
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 2;
 }
 
@@ -3081,7 +3081,7 @@ export default {
 }
 
 .activity-edge {
-  stroke: #374151;
+  stroke: var(--text);
   stroke-width: 2;
   fill: none;
   pointer-events: none;
@@ -3089,7 +3089,7 @@ export default {
 
 .edge-label {
   font-size: 10px;
-  fill: #6b7280;
+  fill: var(--muted);
   pointer-events: none;
 }
 
@@ -3113,13 +3113,13 @@ export default {
 .swimlane-label {
   font-size: 14px;
   font-weight: 600;
-  fill: #6b7280;
+  fill: var(--muted);
   text-anchor: middle;
   dominant-baseline: middle;
 }
 
 .swimlane-separator {
-  stroke: #d1d5db;
+  stroke: var(--muted);
   stroke-width: 2;
 }
 
@@ -3135,7 +3135,7 @@ export default {
 /* Selection and Drag Styles */
 .selection-highlight {
   fill: none;
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 2;
   stroke-dasharray: 4, 4;
   pointer-events: none;
@@ -3153,13 +3153,13 @@ export default {
 }
 
 .node-group.selected .activity-node {
-  stroke: #f59e0b;
+  stroke: var(--warning);
   stroke-width: 3;
 }
 
 .drag-preview-element {
   opacity: 0.7;
-  stroke: #6b7280;
+  stroke: var(--muted);
   stroke-dasharray: 4, 4;
   fill: none;
 }
@@ -3176,7 +3176,7 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -3189,26 +3189,26 @@ export default {
 }
 
 .save-indicator.saving {
-  color: #f59e0b;
+  color: var(--warning);
   background: rgba(245, 158, 11, 0.1);
 }
 
 .save-indicator.saving .icon {
   animation: spin 1s linear infinite;
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .save-indicator.saved {
-  color: #10b981;
+  color: var(--success);
   background: rgba(16, 185, 129, 0.1);
 }
 
 .save-indicator.saved .icon {
-  color: #10b981;
+  color: var(--success);
 }
 
 .save-indicator:not(.saving):not(.saved) {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .save-text {
@@ -3242,8 +3242,8 @@ export default {
   transform: translateX(-50%);
   z-index: 200;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 2px solid #f59e0b;
-  border-radius: 12px;
+  border: 2px solid var(--warning);
+  border-radius: var(--radius-field);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
   padding: 12px 20px;
   min-width: 500px;
@@ -3270,14 +3270,14 @@ export default {
 
 .auto-fix-content .material-symbols-outlined {
   font-size: 24px;
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .auto-fix-text {
   flex: 1;
   font-size: 14px;
   font-weight: 500;
-  color: #92400e;
+  color: var(--danger);
 }
 
 .auto-fix-btn {
@@ -3285,10 +3285,10 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: #f59e0b;
+  background: var(--warning);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -3296,7 +3296,7 @@ export default {
 }
 
 .auto-fix-btn:hover {
-  background: #d97706;
+  background: var(--danger);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
 }
@@ -3313,9 +3313,9 @@ export default {
   height: 28px;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #92400e;
+  color: var(--danger);
   transition: all 0.2s ease;
 }
 
@@ -3404,7 +3404,7 @@ export default {
 
 .management-modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 900px;
@@ -3419,14 +3419,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 24px;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border);
 }
 
 .management-modal-header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .modal-close-btn {
@@ -3434,8 +3434,8 @@ export default {
   border: none;
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
-  color: #6b7280;
+  border-radius: 999px;
+  color: var(--muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -3443,16 +3443,16 @@ export default {
 }
 
 .modal-close-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .management-tabs {
   display: flex;
   gap: 4px;
   padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .tab-btn {
@@ -3462,22 +3462,22 @@ export default {
   padding: 10px 16px;
   border: none;
   background: transparent;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .tab-btn.active {
   background: white;
-  color: #1a365d;
+  color: var(--ink);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -3507,7 +3507,7 @@ export default {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .btn-add-item {
@@ -3516,8 +3516,8 @@ export default {
   gap: 6px;
   padding: 8px 16px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3526,7 +3526,7 @@ export default {
 }
 
 .btn-add-item:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
@@ -3542,16 +3542,16 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   transition: all 0.2s ease;
 }
 
 .item-card:hover {
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-color: #d1d5db;
+  border-color: var(--border-strong);
 }
 
 .item-info {
@@ -3561,13 +3561,13 @@ export default {
 .item-name {
   font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 4px;
 }
 
 .item-description {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.4;
 }
 
@@ -3580,9 +3580,9 @@ export default {
 
 .node-type-badge {
   padding: 2px 8px;
-  background: #e0e7ff;
-  color: #6366f1;
-  border-radius: 4px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
 }
@@ -3590,8 +3590,8 @@ export default {
 .lane-badge {
   padding: 2px 8px;
   background: #fef3c7;
-  color: #92400e;
-  border-radius: 4px;
+  color: var(--danger);
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 500;
 }
@@ -3605,7 +3605,7 @@ export default {
 .btn-delete {
   padding: 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -3614,27 +3614,27 @@ export default {
 }
 
 .btn-edit {
-  background: #eff6ff;
-  color: #3b82f6;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-edit:hover {
-  background: #dbeafe;
+  background: var(--sunken);
 }
 
 .btn-delete {
-  background: #fef2f2;
-  color: #ef4444;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .btn-delete:hover {
-  background: #fee2e2;
+  background: var(--sunken);
 }
 
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .empty-state .material-symbols-outlined {
@@ -3665,7 +3665,7 @@ export default {
 
 .form-modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 500px;
@@ -3679,14 +3679,14 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .form-modal-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .form-modal-body {
@@ -3702,15 +3702,15 @@ export default {
   margin-bottom: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
 }
 
 .form-input,
 .form-textarea {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -3719,7 +3719,7 @@ export default {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -3734,15 +3734,15 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-secondary {
   padding: 10px 20px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -3750,15 +3750,15 @@ export default {
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-primary {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3767,7 +3767,7 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
 }
@@ -3796,13 +3796,13 @@ export default {
 }
 
 .btn-manage {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
 }
 
 .btn-manage:hover {
-  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 @keyframes modalSlideIn {

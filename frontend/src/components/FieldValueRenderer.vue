@@ -114,7 +114,7 @@ export default {
 
 .value-number {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .value-boolean {
@@ -123,19 +123,19 @@ export default {
 
 .boolean-badge {
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-weight: 500;
   font-size: 0.875rem;
 }
 
 .boolean-badge.true {
-  background: #d1fae5;
-  color: #166534;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .boolean-badge.false {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .value-array {
@@ -148,14 +148,14 @@ export default {
   display: flex;
   gap: 8px;
   padding: 8px;
-  background: #f9fafb;
-  border-radius: 4px;
-  border-left: 3px solid #1a365d;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--ink);
 }
 
 .array-index {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--muted);
   min-width: 24px;
 }
 
@@ -164,9 +164,9 @@ export default {
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  background: #f9fafb;
-  border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .object-item {
@@ -177,7 +177,7 @@ export default {
 
 .object-key {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   min-width: 120px;
 }
 
@@ -187,15 +187,15 @@ export default {
 
 .null-badge {
   padding: 4px 8px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border-radius: 4px;
+  background: var(--sunken);
+  color: var(--muted);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-style: italic;
 }
 
 .empty-array {
-  color: #9ca3af;
+  color: var(--muted);
   font-style: italic;
   padding: 8px;
   text-align: center;

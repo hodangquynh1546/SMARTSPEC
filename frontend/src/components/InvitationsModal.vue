@@ -335,8 +335,8 @@ export default {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 20px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius);
   width: 100%;
   max-width: 600px;
   max-height: 90vh;
@@ -367,7 +367,7 @@ export default {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
   z-index: 1;
@@ -389,7 +389,7 @@ export default {
   padding: 24px 28px;
   border-bottom: 2px solid rgba(229, 231, 235, 0.3);
   flex-shrink: 0;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
   position: relative;
   overflow: visible;
 }
@@ -401,7 +401,7 @@ export default {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -418,7 +418,7 @@ export default {
 .modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #1f2937;
+  color: var(--text);
   font-weight: 700;
   letter-spacing: -0.02em;
   position: relative;
@@ -426,12 +426,12 @@ export default {
 }
 
 .close-btn {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--sunken);
+  border: 1px solid var(--border);
   cursor: pointer;
   padding: 8px;
-  border-radius: 8px;
-  color: #6b7280;
+  border-radius: 999px;
+  color: var(--muted);
   transition: all 0.3s;
   display: flex;
   align-items: center;
@@ -441,10 +441,10 @@ export default {
 }
 
 .close-btn:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
   transform: scale(1.05);
-  border-color: #d1d5db;
+  border-color: var(--border-strong);
 }
 
 .close-btn:active {
@@ -457,13 +457,13 @@ export default {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 /* Search Styles */
 .search-container {
   padding: 20px 24px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   background: white;
 }
@@ -478,7 +478,7 @@ export default {
 .search-icon {
   position: absolute;
   left: 12px;
-  color: #718096;
+  color: var(--muted);
   font-size: 20px;
   pointer-events: none;
 }
@@ -486,23 +486,23 @@ export default {
 .search-input {
   width: 100%;
   padding: 12px 40px 12px 40px;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.3s;
-  background: #f7fafc;
-  color: #2d3748;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   background: white;
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .search-input::placeholder {
-  color: #a0aec0;
+  color: var(--muted);
 }
 
 .clear-search-btn {
@@ -512,8 +512,8 @@ export default {
   border: none;
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
-  color: #718096;
+  border-radius: 999px;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,13 +521,13 @@ export default {
 }
 
 .clear-search-btn:hover {
-  color: #1a365d;
-  background: #edf2f7;
+  color: var(--ink);
+  background: var(--sunken);
 }
 
 .tabs {
   display: flex;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   padding: 0 24px;
   flex-shrink: 0;
   background: white;
@@ -539,7 +539,7 @@ export default {
   padding: 16px 20px;
   cursor: pointer;
   font-weight: 500;
-  color: #718096;
+  color: var(--muted);
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
   white-space: nowrap;
@@ -549,21 +549,21 @@ export default {
 }
 
 .tab-button.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  background: linear-gradient(to bottom, #f7fafc, white);
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  background: linear-gradient(to bottom, var(--bg), white);
 }
 
 .tab-button:hover:not(.active) {
-  color: #667eea;
-  background: #f7fafc;
+  color: var(--ink);
+  background: var(--bg);
 }
 
 .invitations-section {
   padding: 24px;
   flex: 1;
   overflow-y: auto;
-  background: #f7fafc;
+  background: var(--bg);
 }
 
 .invitations-list {
@@ -576,9 +576,9 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 20px;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   gap: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.12);
@@ -616,7 +616,7 @@ export default {
 .invitation-item:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   transform: translateY(-4px) scale(1.01);
-  border-color: #667eea;
+  border-color: var(--ink);
 }
 
 .invitation-avatar {
@@ -625,8 +625,8 @@ export default {
   min-width: 48px;
   min-height: 48px;
   border-radius: 50%;
-  border: 2px solid #e2e8f0;
-  background: #ffffff;
+  border: 2px solid var(--border);
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -647,7 +647,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   font-size: 14px;
   font-weight: 600;
@@ -660,7 +660,7 @@ export default {
 
 .invitation-info h4 {
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text);
   font-size: 1.1rem;
   font-weight: 600;
   word-break: break-word;
@@ -669,23 +669,23 @@ export default {
 .inviter-info,
 .invitee-info {
   margin: 0 0 12px 0;
-  color: #4a5568;
+  color: var(--text);
   word-break: break-word;
   line-height: 1.5;
 }
 
 .invitation-info small {
-  color: #718096;
+  color: var(--muted);
   display: block;
   margin-bottom: 4px;
   font-size: 0.875rem;
 }
 
 .role-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -694,11 +694,11 @@ export default {
 }
 
 .status-pending {
-  color: #d69e2e;
+  color: var(--warning);
   font-weight: 600;
   background: #fefcbf;
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
 }
 
@@ -713,7 +713,7 @@ export default {
 .btn {
   padding: 10px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.875rem;
@@ -730,50 +730,50 @@ export default {
 }
 
 .btn-accept {
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   color: white;
   box-shadow: 0 2px 4px rgba(56, 161, 105, 0.3);
 }
 
 .btn-accept:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(56, 161, 105, 0.4);
 }
 
 .btn-reject {
-  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
   color: white;
   box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
 }
 
 .btn-reject:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(229, 62, 62, 0.4);
 }
 
 .btn-cancel {
-  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
   color: white;
   box-shadow: 0 2px 4px rgba(113, 128, 150, 0.3);
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 128, 150, 0.4);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
   color: white;
   margin-top: 12px;
   box-shadow: 0 2px 4px rgba(113, 128, 150, 0.3);
 }
 
 .btn-secondary:hover {
-  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 128, 150, 0.4);
 }
@@ -781,28 +781,28 @@ export default {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #718096;
+  color: var(--muted);
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background: white;
-  border-radius: 12px;
-  border: 2px dashed #e2e8f0;
+  border-radius: var(--radius-field);
+  border: 2px dashed var(--border);
 }
 
 .empty-state .material-symbols-outlined {
   font-size: 64px;
   margin-bottom: 20px;
-  color: #cbd5e0;
+  color: var(--muted);
   opacity: 0.7;
 }
 
 .empty-state p {
   margin: 0 0 20px 0;
   font-size: 1.1rem;
-  color: #4a5568;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -815,7 +815,7 @@ export default {
 
   .modal-content {
     max-height: 85vh;
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 
   .modal-header {
@@ -1010,16 +1010,16 @@ export default {
 }
 
 .invitations-section::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .invitations-section::-webkit-scrollbar-thumb {
-  background: #1a365d;
-  border-radius: 3px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .invitations-section::-webkit-scrollbar-thumb:hover {
-  background: #2d3748;
+  background: var(--ink);
 }
 </style>

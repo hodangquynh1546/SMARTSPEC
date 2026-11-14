@@ -1,23 +1,73 @@
 <template>
-  <div class="container-center">
-    <div class="login-card">
-      <div class="card-content">
-        <router-link style="pointer-events: none" to="/"
-          ><i class="fa-brands fa-slack"></i
-        ></router-link>
-        <h1 class="card-title">Log in to SmartSpec</h1>
+  <div class="auth-layout">
+    <aside class="auth-story">
+      <router-link class="brand-lockup" to="/login" aria-label="SmartSpec home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span>SmartSpec</span>
+      </router-link>
+
+      <div class="story-content">
+        <p class="story-kicker">REQUIREMENTS WORKSPACE</p>
+        <h2>From source material to a specification your team can use.</h2>
+        <p class="story-description">
+          Bring documents, conversations, and ideas into one place. Shape them into clear,
+          connected engineering artifacts.
+        </p>
+
+        <div class="workflow-preview" aria-label="SmartSpec workflow: inputs, use cases, and delivery artifacts">
+          <div class="workflow-heading">
+            <span>PROJECT FLOW</span>
+            <span class="workflow-status"><i></i> READY</span>
+          </div>
+          <div class="workflow-steps">
+            <div class="workflow-step">
+              <span class="workflow-number">01</span>
+              <span class="workflow-label">Inputs</span>
+              <span class="workflow-detail">Documents & notes</span>
+            </div>
+            <div class="workflow-step">
+              <span class="workflow-number">02</span>
+              <span class="workflow-label">Use cases</span>
+              <span class="workflow-detail">Actors & flows</span>
+            </div>
+            <div class="workflow-step">
+              <span class="workflow-number">03</span>
+              <span class="workflow-label">Artifacts</span>
+              <span class="workflow-detail">Data, UML, tests</span>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <span>One source of truth</span>
+            <span class="workflow-indicator"><i></i><i></i><i></i></span>
+          </div>
+        </div>
+      </div>
+
+      <p class="story-footer">Make every requirement easier to follow through.</p>
+    </aside>
+
+    <main class="auth-main">
+      <section class="login-card" aria-labelledby="login-title">
+        <router-link class="mobile-brand" to="/login" aria-label="SmartSpec home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span>SmartSpec</span>
+        </router-link>
+        <p class="auth-kicker">YOUR PROJECT WORKSPACE</p>
+        <h1 id="login-title" class="card-title">Log in to SmartSpec</h1>
+        <p class="auth-description">Sign in to continue to your requirements workspace.</p>
 
         <div class="form-group">
           <form @submit.prevent="handleSubmit">
             <div class="form-group-input">
-              <label for="emailOrUsername" class="form-label">Email or username</label>
+              <label for="emailOrUsername" class="form-label">Email address</label>
               <input
                 type="text"
                 v-model="email"
                 class="form-control"
                 :class="{ error: emailError }"
                 id="emailOrUsername"
-                placeholder="Email or username"
+                placeholder="you@example.com"
+                autocomplete="username"
                 @input="clearErrors"
               />
               <p v-if="emailError" class="field-error">{{ emailError }}</p>
@@ -31,11 +81,17 @@
                 :class="{ error: passwordError }"
                 id="password"
                 placeholder="Password"
+                autocomplete="current-password"
                 @input="clearErrors"
               />
-              <span class="password-toggle" @click="togglePasswordVisibility">
+              <button
+                type="button"
+                class="password-toggle"
+                :aria-label="passwordVisible ? 'Hide password' : 'Show password'"
+                @click="togglePasswordVisibility"
+              >
                 <i :class="passwordVisible ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
-              </span>
+              </button>
               <p v-if="passwordError" class="field-error">{{ passwordError }}</p>
             </div>
             <div class="divider">
@@ -74,8 +130,8 @@
           Don't have an account?
           <router-link to="/register" class="signup-link">Sign up for SmartSpec</router-link>
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
     <AppModal
       v-model="modalOpen"
       :title="modalTitle"
@@ -86,9 +142,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import axiosClient from '../utils/axiosClient'
 import AppModal from '../components/AppModal.vue'
 import { useToast } from 'vue-toastification'
 export default {
@@ -132,15 +188,22 @@ export default {
     }
 
     // Google OAuth config
-    const GOOGLE_CLIENT_ID =
-      '1030258814420-rra11eqd5vhcriar7sgclokotfrgmp9k.apps.googleusercontent.com'
-    const GOOGLE_REDIRECT_URI = 'http://localhost:5173/login' // FE domain
+    const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    const GOOGLE_REDIRECT_URI = new URL(
+      '/api/auth/google/oauth',
+      axiosClient.defaults.baseURL || 'http://localhost:8000',
+    ).toString()
     const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 
     function loginWithGoogle() {
+      if (!GOOGLE_CLIENT_ID) {
+        toast.error('Google sign-in is not configured')
+        return
+      }
+
       const params = new URLSearchParams({
         client_id: GOOGLE_CLIENT_ID,
-        redirect_uri: 'http://localhost:8000/api/auth/google/oauth',
+        redirect_uri: GOOGLE_REDIRECT_URI,
         response_type: 'code',
         scope: 'openid email profile',
         access_type: 'offline',
@@ -195,7 +258,7 @@ export default {
 
       loading.value = true
       try {
-        const response = await axios.post('http://localhost:8000/api/auth/login', {
+        const response = await axiosClient.post('/api/auth/login', {
           email: email.value,
           password: password.value,
         })
@@ -277,7 +340,7 @@ export default {
 
 .login-card {
   /* background-color: white; */
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   /* box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); */
   padding: 30px;
   text-align: center;
@@ -285,7 +348,7 @@ export default {
 
 .fa-slack {
   font-size: 50px;
-  color: #0a1a4d;
+  color: var(--ink);
   margin-bottom: 24px;
   display: block;
   justify-self: center;
@@ -295,7 +358,7 @@ export default {
   font-size: 24px;
   margin-bottom: 24px;
   font-weight: bold;
-  color: #0a1a4d;
+  color: var(--ink);
 }
 
 .form-group {
@@ -307,31 +370,31 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   font-weight: 500;
 }
 
 .form-control {
   width: 100%;
   padding: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   transition: border-color 0.3s;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #0a1a4d;
-  box-shadow: 0 0 0 2px rgba(10, 26, 77, 0.2);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.2);
 }
 
 .form-control::placeholder {
-  color: #b3b3b3;
+  color: var(--muted);
 }
 
 .form-control.error {
-  border-color: #e74c3c;
+  border-color: var(--danger);
 }
 
 #password-input {
@@ -343,19 +406,19 @@ export default {
   position: absolute;
   right: 15px;
   transform: translateY(40%);
-  color: #b3b3b3;
+  color: var(--muted);
   cursor: pointer;
   font-size: 18px;
   transition: 0.2s ease;
 }
 
 .password-toggle:hover {
-  color: #000;
+  color: var(--text);
 }
 
 .divider {
   border: none;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--border);
   margin: 20px 0;
   position: relative;
 }
@@ -367,7 +430,7 @@ export default {
   transform: translateX(-50%);
   background: white;
   padding: 0 15px;
-  color: #b3b3b3;
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -384,8 +447,8 @@ export default {
   justify-content: center;
   width: 100%;
   padding: 14px 20px;
-  border: 1px solid #ddd;
-  border-radius: 9999px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
   background-color: white;
   font-size: 16px;
   cursor: pointer;
@@ -397,12 +460,12 @@ export default {
 
 .btn-social {
   background-color: white;
-  color: #333;
+  color: var(--text);
 }
 
 .btn-social:hover {
-  background-color: #f9f9f9;
-  border-color: #ccc;
+  background-color: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-social .brand {
@@ -411,8 +474,8 @@ export default {
 }
 
 .btn-primary {
-  background-color: #0a1a4d;
-  border-color: #0a1a4d;
+  background-color: var(--ink);
+  border-color: var(--ink);
   color: white;
   font-weight: bold;
   font-size: 16px;
@@ -420,13 +483,13 @@ export default {
 }
 
 .btn-primary:hover {
-  background-color: #1a2a7a;
-  border-color: #1a2a7a;
+  background-color: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background-color: #b3b3b3;
-  border-color: #b3b3b3;
+  background-color: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
@@ -440,20 +503,20 @@ export default {
 }
 
 .error-message {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
 }
 
 .field-error {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 13px;
   margin-top: 5px;
 }
 
 .forgot-password-link {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   display: block;
   margin-bottom: 24px;
@@ -465,13 +528,13 @@ export default {
 }
 
 .signup-text {
-  color: #b3b3b3;
+  color: var(--muted);
   font-size: 14px;
   margin-top: 16px;
 }
 
 .signup-link {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   font-weight: 500;
 }
@@ -494,7 +557,7 @@ export default {
   display: grid;
   border: 3px solid #0000;
   border-radius: 50%;
-  border-right-color: #ffffff; /* Color for spinner */
+  border-right-color: var(--border); /* Color for spinner */
   animation: spinner-a4dj62 1s infinite linear;
 }
 
@@ -532,6 +595,447 @@ export default {
   .btn {
     padding: 12px 16px;
     font-size: 14px;
+  }
+}
+
+.auth-layout {
+  --auth-ink: var(--text);
+  --auth-muted: var(--muted);
+  --auth-green: var(--ink);
+  --auth-orange: var(--muted);
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--auth-ink);
+  font-family: var(--font-body);
+}
+
+.auth-story {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 40px 56px 32px;
+  background: var(--ink);
+  color: var(--muted);
+}
+
+.auth-story::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(242, 246, 232, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 246, 232, 0.055) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: '';
+  mask-image: linear-gradient(to bottom, black, transparent 90%);
+}
+
+.brand-lockup,
+.mobile-brand {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.brand-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  transform: rotate(-8deg);
+}
+
+.brand-mark i {
+  display: block;
+  border-radius: var(--radius-sm) 7px var(--radius-sm) 7px;
+  background: #ffffff;
+}
+
+.brand-mark i:nth-child(2),
+.brand-mark i:nth-child(3) {
+  background: var(--danger);
+}
+
+.story-content {
+  width: min(100%, 570px);
+  margin: 56px 0;
+}
+
+.story-kicker,
+.auth-kicker {
+  margin: 0 0 17px;
+  color: var(--auth-orange);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.story-kicker {
+  color: #ffffff;
+}
+
+.story-content h2 {
+  max-width: 540px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.story-description {
+  max-width: 460px;
+  margin: 18px 0 32px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.workflow-preview {
+  max-width: 550px;
+  padding: 20px 22px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 24, 20, 0.24);
+}
+
+.workflow-heading,
+.workflow-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.workflow-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #ffffff;
+}
+
+.workflow-status i,
+.workflow-indicator i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 22px 0 19px;
+}
+
+.workflow-step {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 14px;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.workflow-step:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.workflow-number {
+  color: var(--danger);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.workflow-label {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.workflow-detail {
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-footer {
+  padding-top: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.workflow-indicator {
+  display: flex;
+  gap: 5px;
+}
+
+.workflow-indicator i:nth-child(2) {
+  background: var(--danger);
+}
+
+.workflow-indicator i:nth-child(3) {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.story-footer {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+}
+
+.auth-main {
+  display: grid;
+  min-width: 0;
+  min-height: 100vh;
+  place-items: center;
+  padding: 48px 56px;
+}
+
+.login-card {
+  width: min(100%, 430px);
+  max-width: none;
+  padding: 0;
+  border-radius: 0;
+  text-align: left;
+}
+
+.mobile-brand {
+  display: none;
+  margin-bottom: 44px;
+  color: var(--auth-green);
+}
+
+.mobile-brand .brand-mark i {
+  background: var(--auth-green);
+}
+
+.mobile-brand .brand-mark i:nth-child(2),
+.mobile-brand .brand-mark i:nth-child(3) {
+  background: var(--auth-orange);
+}
+
+.auth-kicker {
+  margin-bottom: 11px;
+}
+
+.card-title {
+  margin: 0;
+  color: var(--auth-ink);
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.auth-description {
+  margin: 11px 0 31px;
+  color: var(--auth-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-label {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-control {
+  min-height: 50px;
+  padding: 13px 15px;
+  border-color: var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--auth-ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.form-control:focus {
+  border-color: var(--auth-green);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.12);
+}
+
+.form-control::placeholder {
+  color: var(--muted);
+}
+
+.form-group-input {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 34px;
+  right: 9px;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  padding: 0;
+  transform: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.divider {
+  margin: 21px 0;
+  border-color: var(--border);
+}
+
+.divider-text {
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.social-buttons-grid {
+  margin-bottom: 13px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-social {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-social:hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+.btn-primary {
+  border-color: var(--auth-green);
+  background: var(--auth-green);
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn-primary:hover {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.continue-button-wrapper {
+  margin: 16px 0 13px;
+}
+
+.forgot-password-link,
+.signup-link {
+  color: var(--auth-green);
+}
+
+.forgot-password-link {
+  margin: 0 0 26px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.signup-text {
+  margin-top: 0;
+  color: var(--auth-muted);
+  font-size: 13px;
+}
+
+.signup-link {
+  font-weight: 700;
+}
+
+@media (min-width: 1024px) {
+  .auth-layout {
+    width: calc(100% + 1.2rem);
+    margin-left: -0.6rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .auth-layout {
+    display: block;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .auth-story {
+    display: none;
+  }
+
+  .auth-main {
+    min-height: 100vh;
+    padding: 36px 24px;
+  }
+
+  .login-card {
+    max-width: 430px;
+  }
+
+  .mobile-brand {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-main {
+    padding: 27px 22px;
+  }
+
+  .mobile-brand {
+    margin-bottom: 52px;
+  }
+
+  .card-title {
+    font-size: 29px;
+  }
+
+  .auth-description {
+    margin-bottom: 27px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-layout *,
+  .auth-layout *::before,
+  .auth-layout *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>

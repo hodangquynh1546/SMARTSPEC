@@ -105,8 +105,8 @@ export default {
 }
 
 .incremental-banner {
-  background: linear-gradient(135deg, #24518f 0%, #30435f 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: var(--radius-field);
   padding: 20px;
   display: flex;
   justify-content: space-between;
@@ -143,7 +143,7 @@ export default {
 .incremental-btn {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 999px;
   padding: 10px 20px;
   color: white;
   font-weight: 500;
@@ -165,8 +165,8 @@ export default {
 }
 
 .processing-banner {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;
   color: white;
@@ -223,8 +223,8 @@ export default {
   }
 }
 .error-banner {
-  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;
   color: white;
@@ -259,7 +259,7 @@ export default {
 .retry-btn-small {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 999px;
   padding: 8px 16px;
   color: white;
   font-weight: 500;
@@ -278,8 +278,8 @@ export default {
 
 /* Update processing banner for consistency */
 .processing-banner {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;
   color: white;

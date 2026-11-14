@@ -22,7 +22,7 @@
         <!-- Header Section -->
         <div class="detail-header">
           <div class="title-section">
-            <h1>{{ testcase.title || 'Untitled Test Case' }}</h1>
+            <h1>{{ testcase.title || 'Untitled Test Case' }}<WorkhubBugBadge :testcase="testcase" /></h1>
             <div class="meta-tags">
               <span class="badge type" :class="testcase.test_type">
                 {{ testcase.test_type }}
@@ -505,9 +505,11 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
+import WorkhubBugBadge from '@/components/workhub/WorkhubBugBadge.vue'
 
 export default {
   name: 'TestcaseDetailModal',
+  components: { WorkhubBugBadge },
   props: {
     testcase: {
       type: Object,
@@ -662,7 +664,7 @@ export default {
 
 .modal-content.xlarge {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1000px;
   max-height: 90vh;
@@ -672,11 +674,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -685,7 +687,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   margin: 0;
 }
 
@@ -701,7 +703,7 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -710,42 +712,42 @@ export default {
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-close {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -755,13 +757,13 @@ export default {
 .detail-header {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .title-section h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 1rem;
   line-height: 1.3;
 }
@@ -778,14 +780,14 @@ export default {
 }
 
 .description-section p {
-  color: #64748b;
+  color: var(--muted);
   line-height: 1.6;
   margin: 0;
 }
 
 .detail-tabs {
   display: flex;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   margin-bottom: 2rem;
   gap: 0.5rem;
   overflow-x: auto;
@@ -799,7 +801,7 @@ export default {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -808,14 +810,14 @@ export default {
 }
 
 .tab-btn:hover {
-  color: #374151;
-  background: #f8fafc;
+  color: var(--text);
+  background: var(--bg);
 }
 
 .tab-btn.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
-  background: #f0f4f8;
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  background: var(--sunken);
 }
 
 .tab-content {
@@ -848,9 +850,9 @@ export default {
 .panel-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -865,22 +867,22 @@ export default {
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
   transition: all 0.3s ease;
   margin-bottom: 1rem;
 }
 
 .step-item:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .step-number {
   width: 2.5rem;
   height: 2.5rem;
-  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -906,7 +908,7 @@ export default {
 }
 
 .step-action {
-  color: #2d3748;
+  color: var(--text);
   line-height: 1.6;
   font-size: 1rem;
   font-weight: 500;
@@ -915,16 +917,16 @@ export default {
 /* Data Section Styling */
 .step-data-section {
   background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
 }
 
 .data-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
@@ -950,43 +952,43 @@ export default {
   align-items: flex-start;
   gap: 0.5rem;
   padding: 0.5rem;
-  background: #f7fafc;
-  border-radius: 4px;
-  border-left: 2px solid #2d3748;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--ink);
 }
 
 .data-key {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
   min-width: 80px;
   text-transform: capitalize;
 }
 
 .data-value {
-  color: #4a5568;
+  color: var(--text);
   font-size: 0.875rem;
   flex: 1;
   word-break: break-all;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  background: #edf2f7;
+  background: var(--sunken);
   padding: 0.25rem 0.5rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 /* Result Section Styling */
 .step-result-section {
-  background: #f0fff4;
-  border: 1px solid #9ae6b4;
-  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--success-soft);
+  border-radius: var(--radius-sm);
   padding: 1rem;
-  border-left: 4px solid #38a169;
+  border-left: 4px solid var(--success);
 }
 
 .result-title {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #276749;
+  color: var(--success);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
@@ -1002,7 +1004,7 @@ export default {
 }
 
 .result-text {
-  color: #2d3748;
+  color: var(--text);
   line-height: 1.5;
   font-size: 0.875rem;
   margin: 0;
@@ -1010,9 +1012,9 @@ export default {
 
 .expected-result {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
-  border-radius: 8px;
-  border-left: 4px solid #2b6cb0;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--ink);
   color: white;
 }
 
@@ -1030,18 +1032,18 @@ export default {
 }
 
 .data-scenario {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .scenario-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1054,17 +1056,17 @@ export default {
 .data-column h5 {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
 }
 
 .json-data {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: var(--ink);
+  color: var(--muted);
   padding: 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   overflow-x: auto;
   max-height: 200px;
@@ -1074,9 +1076,9 @@ export default {
 }
 
 .json-data.actual {
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fcd34d;
+  background: var(--bg);
+  color: var(--danger);
+  border: 1px solid var(--warning-soft);
 }
 
 .database-info {
@@ -1094,9 +1096,9 @@ export default {
 .info-item h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1109,33 +1111,33 @@ export default {
 
 .table-tag {
   padding: 0.5rem 1rem;
-  background: #e2e8f0;
-  color: #475569;
-  border-radius: 6px;
+  background: var(--sunken);
+  color: var(--text);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .operation-tag {
   padding: 0.5rem 0.75rem;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 6px;
+  background: var(--sunken);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .requirements-section {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   padding-top: 1.5rem;
 }
 
 .requirements-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1150,19 +1152,19 @@ export default {
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .req-id {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 0.875rem;
 }
 
 .req-name {
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1185,7 +1187,7 @@ export default {
 }
 
 .meta-item {
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1193,14 +1195,14 @@ export default {
 .execution-logs h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 0.75rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
 .execution-result p {
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
   margin: 0;
 }
@@ -1212,18 +1214,18 @@ export default {
   max-height: 200px;
   overflow-y: auto;
   padding: 1rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .log-entry {
   padding: 0.75rem;
   background: white;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   line-height: 1.4;
 }
 
@@ -1235,9 +1237,9 @@ export default {
 
 .exception-item {
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #fef2f2;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
 }
 
 .exception-header {
@@ -1250,8 +1252,8 @@ export default {
 .exception-type {
   padding: 0.25rem 0.75rem;
   background: #fef3c7;
-  color: #92400e;
-  border-radius: 4px;
+  color: var(--danger);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -1260,26 +1262,26 @@ export default {
 .exception-status {
   padding: 0.25rem 0.75rem;
   background: #fecaca;
-  color: #991b1b;
-  border-radius: 4px;
+  color: var(--danger);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .exception-status.resolved {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .exception-message {
-  color: #374151;
+  color: var(--text);
   margin-bottom: 0.5rem;
   line-height: 1.4;
 }
 
 .exception-meta {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .environment-automation {
@@ -1291,9 +1293,9 @@ export default {
 .info-section h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1308,43 +1310,43 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .info-item label {
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
 .info-item span {
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .status-automated {
-  color: #059669;
+  color: var(--success);
   font-weight: 600;
 }
 
 .status-manual {
-  color: #d97706;
+  color: var(--danger);
   font-weight: 600;
 }
 
 .metadata-section {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   padding-top: 1.5rem;
 }
 
 .metadata-section h3 {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1359,28 +1361,28 @@ export default {
   flex-direction: column;
   gap: 0.25rem;
   padding: 1rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .metadata-item label {
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .metadata-item span {
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem 2rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .empty-state.large {
@@ -1398,7 +1400,7 @@ export default {
 }
 
 .empty-state h4 {
-  color: #475569;
+  color: var(--text);
   margin-bottom: 0.5rem;
 }
 
@@ -1409,75 +1411,75 @@ export default {
 .badge {
   display: inline-block;
   padding: 0.5rem 1rem;
-  border-radius: 20px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .badge.type.unit {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .badge.type.integration {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .badge.type.api {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .badge.type.ui {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .badge.priority.critical {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .badge.priority.high {
   background: #fed7aa;
-  color: #ea580c;
+  color: var(--danger);
 }
 
 .badge.priority.medium {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .badge.priority.low {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .badge.status.passed {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .badge.status.failed {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .badge.status.blocked {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .badge.status.not_executed {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--sunken);
+  color: var(--muted);
 }
 
 .badge.status.in_progress {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 @media (max-width: 768px) {
@@ -1558,9 +1560,9 @@ export default {
 .condition-section h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 0.75rem;
-  border-left: 4px solid #1a365d;
+  border-left: 4px solid var(--ink);
   padding-left: 0.75rem;
 }
 
@@ -1572,8 +1574,8 @@ export default {
 
 .condition-list li {
   padding: 0.5rem 0;
-  color: #64748b;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
   line-height: 1.5;
 }
 
@@ -1589,9 +1591,9 @@ export default {
 
 .result-level {
   padding: 1.5rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .result-level-title {
@@ -1600,7 +1602,7 @@ export default {
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 1rem;
 }
 
@@ -1611,7 +1613,7 @@ export default {
 }
 
 .result-list li {
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
@@ -1623,12 +1625,12 @@ export default {
 }
 
 .api-item {
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
 }
 
 .business-result {
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
   margin: 0;
   font-style: italic;
@@ -1641,7 +1643,7 @@ export default {
 }
 
 .validation-rules li {
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
@@ -1654,18 +1656,18 @@ export default {
 
 .tag {
   padding: 0.25rem 0.75rem;
-  background: #e2e8f0;
-  color: #475569;
-  border-radius: 4px;
+  background: var(--sunken);
+  color: var(--text);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .command-text {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: var(--ink);
+  color: var(--muted);
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   font-size: 0.75rem;
 }

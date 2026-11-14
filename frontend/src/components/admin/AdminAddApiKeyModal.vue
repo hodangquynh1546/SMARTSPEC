@@ -348,7 +348,7 @@ const handleAddApiKey = async () => {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 90%;
   max-width: 700px;
@@ -358,7 +358,7 @@ const handleAddApiKey = async () => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -366,7 +366,7 @@ const handleAddApiKey = async () => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -377,10 +377,10 @@ const handleAddApiKey = async () => {
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -388,8 +388,8 @@ const handleAddApiKey = async () => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
@@ -403,15 +403,15 @@ const handleAddApiKey = async () => {
 }
 
 .form-section {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
 }
 
 .form-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
   display: flex;
   align-items: center;
@@ -422,8 +422,8 @@ const handleAddApiKey = async () => {
   content: '';
   width: 4px;
   height: 16px;
-  background: #1a365d;
-  border-radius: 2px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .form-grid {
@@ -449,22 +449,22 @@ const handleAddApiKey = async () => {
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 6px;
   font-size: 14px;
 }
 
 .form-input {
   padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -483,28 +483,28 @@ const handleAddApiKey = async () => {
   right: 8px;
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-action:hover {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .error-message {
-  color: #e53e3e;
+  color: var(--danger);
   font-size: 12px;
   margin-top: 4px;
 }
 
 .help-text {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
   margin-top: 4px;
 }
 
@@ -526,8 +526,8 @@ const handleAddApiKey = async () => {
 .toggle-slider {
   width: 44px;
   height: 24px;
-  background: #e2e8f0;
-  border-radius: 12px;
+  background: var(--sunken);
+  border-radius: var(--radius-field);
   position: relative;
   transition: all 0.3s ease;
 }
@@ -546,7 +546,7 @@ const handleAddApiKey = async () => {
 }
 
 .toggle-label input[type='checkbox']:checked + .toggle-slider {
-  background: #1a365d;
+  background: var(--ink);
 }
 
 .toggle-label input[type='checkbox']:checked + .toggle-slider::before {
@@ -555,7 +555,7 @@ const handleAddApiKey = async () => {
 
 .toggle-text {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -568,7 +568,7 @@ const handleAddApiKey = async () => {
 .permission-category h5 {
   font-size: 14px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text);
   margin: 0 0 12px 0;
 }
 
@@ -592,8 +592,8 @@ const handleAddApiKey = async () => {
 .checkmark {
   width: 18px;
   height: 18px;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -602,8 +602,8 @@ const handleAddApiKey = async () => {
 }
 
 .checkbox-label input[type='checkbox']:checked + .checkmark {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .checkbox-label input[type='checkbox']:checked + .checkmark::after {
@@ -615,12 +615,12 @@ const handleAddApiKey = async () => {
 
 .permission-text {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
 }
 
 .char-counter {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
   text-align: right;
   margin-top: 4px;
 }
@@ -629,34 +629,34 @@ const handleAddApiKey = async () => {
   display: flex;
   gap: 12px;
   padding: 16px;
-  background: #fffaf0;
-  border: 1px solid #fed7d7;
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   margin-top: 16px;
 }
 
 .security-icon {
-  color: #ed8936;
+  color: var(--danger);
   flex-shrink: 0;
 }
 
 .security-content h5 {
   font-size: 14px;
   font-weight: 600;
-  color: #c53030;
+  color: var(--danger);
   margin: 0 0 4px 0;
 }
 
 .security-content p {
   font-size: 13px;
-  color: #744210;
+  color: var(--danger);
   margin: 0;
   line-height: 1.4;
 }
 
 .modal-footer {
   padding: 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -665,7 +665,7 @@ const handleAddApiKey = async () => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -683,22 +683,22 @@ const handleAddApiKey = async () => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .loading-spinner {

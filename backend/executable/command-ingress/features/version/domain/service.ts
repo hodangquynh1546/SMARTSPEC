@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import mongoose, { Types } from 'mongoose';
 import Version from "../../../../../internal/model/version";
 import User from '../../../../../internal/model/user';
@@ -239,7 +240,7 @@ export class VersionService {
 
       return new ServiceResponse(ResponseStatus.Success, "Preview created successfully", { preview, versionId: version._id.toString() }, 200);
     } catch (error: any) {
-      console.error("Error creating/updating preview:", error);
+      logger.error("Error creating/updating preview:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message, null, 500);
     }
   }
@@ -355,7 +356,7 @@ export class VersionService {
           }
         });
       } catch (logError) {
-        console.error("❌ Error logging version update:", logError);
+        logger.error("❌ Error logging version update:", logError);
       }
 
       // ✅ Kết thúc
@@ -383,7 +384,7 @@ export class VersionService {
         parent_version_id: baseVersionId
       });
       if (existingVersion) {
-        console.log("⚠️ Version đã tồn tại. Tiến hành xóa version cũ:", existingVersion._id);
+        logger.info("⚠️ Version đã tồn tại. Tiến hành xóa version cũ:", existingVersion._id);
 
         await this.deleteVersion(existingVersion._id.toString(), userId);
       }
@@ -473,6 +474,7 @@ export class VersionService {
           [{
             ...tc,
             _id: newId,
+            lineage_id: (tc as any).lineage_id || tc._id.toString(),
             version_id: newVersion._id,
             created_at: new Date(),
             updated_at: new Date(),
@@ -534,6 +536,8 @@ export class VersionService {
         await Usecase.create([{
           project_id: uc.project_id,
           version_id: newVersion._id,
+          lineage_id: (uc as any).lineage_id || String(uc._id),
+          implementation: (uc as any).implementation || null,
           type: (uc as any).type || 'use_case',
           level: (uc as any).level || 'system',
           status: (uc as any).status || 'active',
@@ -724,7 +728,7 @@ export class VersionService {
           }
         });
       } catch (logError) {
-        console.error("❌ Error logging version creation:", logError);
+        logger.error("❌ Error logging version creation:", logError);
       }
 
       return new ServiceResponse(
@@ -882,7 +886,7 @@ export class VersionService {
           }
         });
       } catch (logError) {
-        console.error("❌ Error logging version deletion:", logError);
+        logger.error("❌ Error logging version deletion:", logError);
       }
 
       return new ServiceResponse(ResponseStatus.Success, "Version deleted successfully", { deleted: versionId }, 200);
@@ -907,7 +911,7 @@ export class VersionService {
 
       const { entity_type, change_type, entity_id, before_snapshot, after_snapshot } = change;
 
-      console.log(`\n=== [REVERT] ${entity_type} | ${change_type} | ${entity_id} ===`);
+      logger.info(`\n=== [REVERT] ${entity_type} | ${change_type} | ${entity_id} ===`);
 
       // ======================================================
       // 1️⃣ Helpers
@@ -1069,7 +1073,7 @@ export class VersionService {
       // ======================================================
       // 3️⃣ Commit changes
       // ======================================================
-      console.log("Số change trước khi xóa", preview.changes.length);
+      logger.info("Số change trước khi xóa", preview.changes.length);
       preview.changes.pull({ change_id: changeId });
       await preview.save({ session });
       await baseVersion.save({ session });
@@ -1077,7 +1081,7 @@ export class VersionService {
       await session.commitTransaction();
       preview = await Preview.findOne({ base_version_id: versionId });
       baseVersion = await Version.findById(versionId);
-      console.log("Số change sau khi xóa: ",preview.changes.length);
+      logger.info("Số change sau khi xóa: ",preview.changes.length);
       if(baseVersion.version_temporary==true && preview.changes.length==0 && baseVersion.parent_version_id){
         await this.deleteVersion(versionId,userId);
       }
@@ -1089,7 +1093,7 @@ export class VersionService {
       );
     } catch (err) {
       await session.abortTransaction();
-      console.error("❌ revertChange error:", err);
+      logger.error("❌ revertChange error:", err);
       throw err;
     } finally {
       session.endSession();
@@ -1284,12 +1288,12 @@ export class VersionService {
           }
         });
       } catch (logError) {
-        console.error("❌ Error logging version rollback:", logError);
+        logger.error("❌ Error logging version rollback:", logError);
       }
 
       return new ServiceResponse(ResponseStatus.Success, "Rollback completed by all approvers", null, 200);
     } catch (error: any) {
-      console.error("Error in rollbackVersion:", error);
+      logger.error("Error in rollbackVersion:", error);
       return new ServiceResponse(ResponseStatus.Failed, error.message || "Rollback failed", null, 500);
     }
   }

@@ -430,7 +430,7 @@ export default {
 
 .modal-content.large {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1000px;
   max-height: 80vh;
@@ -440,11 +440,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -453,7 +453,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -461,17 +461,17 @@ export default {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -501,20 +501,20 @@ export default {
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748b;
+  color: var(--muted);
 }
 
 .search-input {
   width: 100%;
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -526,24 +526,24 @@ export default {
 
 .filter-btn {
   padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   background: white;
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
   transition: all 0.2s;
   white-space: nowrap;
 }
 
 .filter-btn:hover {
-  background: #f8fafc;
-  border-color: #9ca3af;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .filter-btn.active {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
@@ -562,7 +562,7 @@ export default {
 .section-subtitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -571,7 +571,7 @@ export default {
 
 .selected-count {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
   font-weight: normal;
 }
 
@@ -584,8 +584,8 @@ export default {
 }
 
 .table-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -593,13 +593,13 @@ export default {
 }
 
 .table-card:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: var(--border-strong);
+  background: var(--bg);
 }
 
 .table-card.selected {
-  border-color: #1a365d;
-  background: #f7fafc;
+  border-color: var(--ink);
+  background: var(--bg);
 }
 
 .table-header {
@@ -616,16 +616,16 @@ export default {
 .table-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 0.25rem 0;
 }
 
 .table-row-count {
   font-size: 0.75rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 0.125rem 0.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 
 .table-checkbox {
@@ -641,8 +641,8 @@ export default {
 .table-checkbox .checkmark {
   width: 20px;
   height: 20px;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -650,8 +650,8 @@ export default {
 }
 
 .table-checkbox input:checked + .checkmark {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .table-checkbox input:checked + .checkmark::after {
@@ -673,37 +673,37 @@ export default {
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   position: relative;
 }
 
 .column-name {
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .column-type {
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.7rem;
 }
 
 .pk-badge {
-  background: #dc2626;
+  background: var(--danger);
   color: white;
   font-size: 0.6rem;
   padding: 0.125rem 0.25rem;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   font-weight: bold;
 }
 
 .more-columns {
   font-size: 0.75rem;
-  color: #64748b;
-  background: #f1f5f9;
+  color: var(--muted);
+  background: var(--sunken);
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .table-relationships {
@@ -715,7 +715,7 @@ export default {
 
 .relationships-label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
 }
 
@@ -727,15 +727,15 @@ export default {
 
 .relationship-tag {
   font-size: 0.7rem;
-  color: #475569;
-  background: #e2e8f0;
+  color: var(--text);
+  background: var(--sunken);
   padding: 0.125rem 0.375rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .more-relationships {
   font-size: 0.7rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .table-meta {
@@ -749,7 +749,7 @@ export default {
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .meta-icon {
@@ -759,7 +759,7 @@ export default {
 .selected-section {
   display: flex;
   flex-direction: column;
-  border-left: 1px solid #e2e8f0;
+  border-left: 1px solid var(--border);
   padding-left: 1.5rem;
 }
 
@@ -777,15 +777,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .selected-table-item .table-name {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .empty-state {
@@ -794,14 +794,14 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  color: #64748b;
+  color: var(--muted);
   text-align: center;
   flex: 1;
 }
 
 .empty-icon {
   font-size: 3rem;
-  color: #cbd5e1;
+  color: var(--muted);
   margin-bottom: 1rem;
 }
 
@@ -811,16 +811,16 @@ export default {
 }
 
 .selection-stats {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.25rem;
 }
 
 .selection-stats h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 1rem 0;
 }
 
@@ -840,13 +840,13 @@ export default {
 .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1a365d;
+  color: var(--ink);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   margin-top: 0.25rem;
 }
 
@@ -856,7 +856,7 @@ export default {
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .btn {
@@ -865,47 +865,47 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background: #9ca3af;
-  border-color: #9ca3af;
+  background: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-icon {
   padding: 0.375rem;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -913,13 +913,13 @@ export default {
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-icon.danger:hover:not(:disabled) {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 /* Loading and Error States */
@@ -929,14 +929,14 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e2e8f0;
-  border-left: 4px solid #1a365d;
+  border: 4px solid var(--border);
+  border-left: 4px solid var(--ink);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -957,7 +957,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #dc2626;
+  color: var(--danger);
   text-align: center;
 }
 
@@ -973,7 +973,7 @@ export default {
 
   .selected-section {
     border-left: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
     padding-left: 0;
     padding-top: 1.5rem;
   }

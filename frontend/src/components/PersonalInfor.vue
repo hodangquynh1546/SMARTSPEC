@@ -588,10 +588,10 @@ export default {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   width: 90%;
   max-width: 800px;
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 28px 32px;
   box-shadow: 0 20px 60px rgba(26, 54, 93, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
@@ -618,7 +618,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #1a365d 0%, #2d4a8a 50%, #1a365d 100%);
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -649,7 +649,7 @@ export default {
   display: flex;
   align-items: flex-start;
   padding: 14px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   min-width: 300px;
   max-width: 350px;
@@ -660,16 +660,16 @@ export default {
 }
 
 .toast-notification.success {
-  background-color: #2f855a;
-  border-color: #276749;
+  background-color: var(--success);
+  border-color: var(--success);
 }
 .toast-notification.error {
-  background-color: #c53030;
-  border-color: #9b2c2c;
+  background-color: var(--danger);
+  border-color: var(--danger);
 }
 .toast-notification.warning {
-  background-color: #dd6b20;
-  border-color: #b75618;
+  background-color: var(--danger);
+  border-color: var(--danger);
 }
 
 .toast-icon {
@@ -746,10 +746,10 @@ export default {
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  border: 3px solid #fff;
+  border: 3px solid var(--border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   object-fit: cover;
-  background: #e2e8f0;
+  background: var(--sunken);
   font-size: 42px;
   font-weight: 600;
   color: #fff;
@@ -796,16 +796,16 @@ export default {
 .form-control {
   padding: 12px 16px;
   font-size: 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   border: 2px solid var(--border-color);
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .form-control:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
 }
 
@@ -813,7 +813,7 @@ export default {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
-  background: #ffffff;
+  background: var(--surface);
   transform: translateY(-1px);
 }
 .security-section {
@@ -833,7 +833,7 @@ export default {
   padding: 12px 0;
 }
 .security-item + .security-item {
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
 }
 .security-info h4 {
   font-size: 15px;
@@ -858,15 +858,15 @@ export default {
   text-transform: uppercase;
 }
 .status-tag.enabled {
-  background-color: #d1fae5;
-  color: #076d50;
+  background-color: var(--success-soft);
+  color: var(--success);
 }
 .status-tag.disabled {
-  background-color: #e5e7eb;
-  color: #565f6b;
+  background-color: var(--sunken);
+  color: var(--text);
 }
 .password-form {
-  background-color: #f9fafb;
+  background-color: var(--bg);
   padding: 12px;
   border-radius: var(--border-radius-md);
   margin-top: -4px;
@@ -884,7 +884,7 @@ export default {
   font-size: 14px;
   font-weight: 500;
   padding: 8px 14px;
-  border-radius: var(--border-radius-md);
+  border-radius: 999px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -894,7 +894,7 @@ export default {
   font-size: 18px;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--ink) 100%);
   color: #fff;
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.25);
   position: relative;
@@ -920,13 +920,13 @@ export default {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #2d4a8a 0%, var(--primary-color) 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--primary-color) 100%);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
 }
 .btn-secondary {
   background-color: var(--secondary-color);
-  color: #374151;
+  color: var(--text);
   border: 1px solid var(--border-color);
 }
 .btn-secondary:hover {

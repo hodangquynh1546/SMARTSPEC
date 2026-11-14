@@ -115,7 +115,7 @@ const formatLanguage = (lang) => {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   width: 100%;
@@ -133,7 +133,7 @@ const formatLanguage = (lang) => {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
@@ -142,13 +142,13 @@ const formatLanguage = (lang) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .modal-body {
   padding: 24px;
-  background: #fff;
-  color: #1a202c;
+  background: var(--surface);
+  color: var(--text);
 }
 
 .detail-grid {
@@ -159,28 +159,28 @@ const formatLanguage = (lang) => {
 
 .detail-item label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .detail-item p {
   margin: 4px 0 0;
-  color: #4a5568;
+  color: var(--text);
 }
 
 .status-badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
 }
 .status-badge.active {
-  background: #def7ec;
-  color: #046c4e;
+  background: var(--sunken);
+  color: var(--success);
 }
 .status-badge.archived {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .modal-footer {
@@ -188,25 +188,25 @@ const formatLanguage = (lang) => {
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
-  background: #f9fafb;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .btn {
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .btn-secondary {
-  background: #edf2f7;
-  color: #2d3748;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 @keyframes fadeIn {

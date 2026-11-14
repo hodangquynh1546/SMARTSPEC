@@ -529,8 +529,8 @@ export default {
 /* Giữ nguyên tất cả CSS hiện có và thêm style mới */
 
 .project-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border-radius: var(--radius);
   padding: 20px 24px;
   margin-bottom: 64px;
   margin-right: 36px;
@@ -574,12 +574,12 @@ export default {
 .project-card:hover:not(.trashed) {
   box-shadow: 0 8px 32px rgba(26, 54, 93, 0.2), 0 0 0 1px rgba(26, 54, 93, 0.1);
   transform: translateY(-4px) scale(1.02);
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
 }
 
 .project-card.selected {
-  border: 3px solid #1a365d;
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  border: 3px solid var(--ink);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   box-shadow: 0 8px 24px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
   animation: selectedPulse 2s ease-in-out infinite;
 }
@@ -594,12 +594,12 @@ export default {
 }
 
 .project-card.trashed.selected {
-  background-color: #e8f4ff;
-  border-color: #0056b3;
+  background-color: var(--sunken);
+  border-color: var(--ink);
 }
 
 .project-card.trashed:not(.selected):hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -633,7 +633,7 @@ export default {
 .project-header h3 {
   font-size: 18px;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -654,23 +654,23 @@ export default {
 
 .project-type {
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 8px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 .project-type.my {
-  background-color: #e8f3ff;
-  color: #0066cc;
+  background-color: var(--sunken);
+  color: var(--ink);
 }
 .project-type.shared {
-  background-color: #f3f8f6;
-  color: #198754;
+  background-color: var(--bg);
+  color: var(--success);
 }
 
 .project-description {
-  color: #555;
+  color: var(--text);
   font-size: 13px;
   margin: 6px 0 12px;
   line-height: 1.5;
@@ -687,7 +687,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  color: #777;
+  color: var(--muted);
 }
 
 .meta-left {
@@ -703,15 +703,15 @@ export default {
 }
 
 .version-label {
-  color: #666;
+  color: var(--muted);
 }
 
 .version-number {
   font-weight: 600;
-  color: #1a365d;
-  background: #e8f3ff;
+  color: var(--ink);
+  background: var(--sunken);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
 }
 
@@ -729,7 +729,7 @@ export default {
 
 .project-members .material-symbols-outlined {
   font-size: 18px;
-  color: #555;
+  color: var(--text);
 }
 
 /* Changes Indicator */
@@ -738,9 +738,9 @@ export default {
   align-items: center;
   gap: 4px;
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #92400e;
+  color: var(--danger);
   padding: 6px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -767,7 +767,7 @@ export default {
 }
 
 .changes-indicator:hover {
-  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+  background: linear-gradient(135deg, #fde68a 0%, var(--warning-soft) 100%);
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
   border-color: rgba(245, 158, 11, 0.5);
@@ -782,14 +782,14 @@ export default {
 }
 
 .project-card.trashed {
-  background-color: #fdfdfd;
-  border: 1px dashed #ccc;
+  background-color: var(--bg);
+  border: 1px dashed var(--border-strong);
   opacity: 0.85;
   cursor: pointer;
 }
 
 .project-card.trashed h3 {
-  color: #888;
+  color: var(--muted);
 }
 
 .project-card.trashed .fab-container {
@@ -818,7 +818,7 @@ export default {
 }
 
 .fab-main:hover {
-  color: #222;
+  color: var(--text);
 }
 
 .fab-options {
@@ -836,7 +836,7 @@ export default {
 .fab-options.open {
   pointer-events: auto;
   background: transparent;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6px);
   z-index: 1;
@@ -875,55 +875,55 @@ export default {
 
 .fab-btn.fab-delete {
   background: #dc35452a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-delete:hover {
-  background: #dc3545;
+  background: var(--danger);
   color: #fff;
 }
 
 .fab-btn.fab-edit {
   background: #ffc1072a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-edit:hover {
-  background: #ffc107;
-  color: #000;
+  background: var(--warning-soft);
+  color: var(--text);
 }
 
 .fab-btn.fab-restore {
   background: #28a7452a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-restore:hover {
-  background: #28a745;
+  background: var(--success);
   color: #fff;
 }
 
 .fab-btn.fab-share {
   background: #0d6efd2a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-share:hover {
-  background: #0d6efd;
+  background: var(--ink);
   color: #fff;
 }
 
 .fab-btn.fab-palette {
   background: #6f42c12a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-palette:hover {
-  background: #6f42c1;
+  background: var(--ink);
   color: #fff;
 }
 
 .fab-btn.fab-leave {
   background: #fd7e142a;
-  color: #000000;
+  color: var(--text);
 }
 .fab-btn.fab-leave:hover {
-  background: #fd7e14;
+  background: var(--danger);
   color: #fff;
 }
 
@@ -989,7 +989,7 @@ export default {
     width: 90%;
     max-width: 300px;
     height: auto;
-    border-radius: 12px;
+    border-radius: var(--radius-field);
     background: transparent;
     margin: 0;
   }
@@ -999,7 +999,7 @@ export default {
     transform: none !important;
     width: 100%;
     height: 44px;
-    border-radius: 8px;
+    border-radius: 999px;
     margin: 2px 0;
     opacity: 1;
     display: flex;

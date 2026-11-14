@@ -223,3 +223,15 @@ npm run test
 3. **Bảo toàn cơ chế Realtime**: Khi chỉnh sửa logic Use Case hoặc Version, nhớ phát sóng Socket event tương ứng để giao diện người dùng không bị lệch trạng thái.
 4. **Kiểm tra tương thích Python**: Khi chỉnh sửa các script Python trong `pythonScript/`, đảm bảo script in kết quả ra `stdout` dạng JSON sạch để Node.js parse được và in log lỗi ra `stderr`.
 5. **Kiểm tra Token & Interceptors**: Khi viết API mới ở frontend, luôn dùng `axiosClient` từ `@/utils/axiosClient`.
+
+---
+
+## 9. Tích hợp WorkHub (ForgeBridge)
+
+- `features/workhub/`: `domain/service.ts` (`workhubSyncService.schedule()` debounce 8s, build snapshot từ version `completed` mới nhất), `bridge.client.ts`, `adapter/route.ts` (`/api/workhub/*`, callback `/api/integrations/workhub/progress` do Bridge gọi, bảo vệ bằng `X-Bridge-Key`).
+- Mọi thay đổi use case/version đi qua `UsecaseSocketService` / `VersionSocketService.broadcastToProject` → tự đồng bộ. Thêm đường ghi use case mới thì phải đi qua hai chỗ đó.
+- Use case bị clone sang `_id` mới ở mỗi version, nên định danh ổn định là `lineage_id` (clone phải giữ `lineage_id || _id`). `implementation` là tiến độ do WorkHub báo về, chỉ đọc.
+- Frontend: `composables/useWorkhub.js`, `components/workhub/*` (modal liên kết tự bật sau đăng nhập nếu chưa liên kết, chip "Mở WorkHub" trong `ProjectHeader`, badge trong danh sách use case).
+- **Giao diện theo WorkHub**: token ở `src/assets/theme.css`; màu/bo góc trong `<style>` đã chuyển sang `var(--…)` bằng `frontend/scripts/apply-workhub-theme.mjs` (idempotent). Component mới phải dùng token, không hex. Frontend chạy cổng **5174** (5173 là WorkHub); `CLIENT_URL` backend phải khớp.
+- Tiến độ từ WorkHub lưu ở `usecase.implementation` (issue_key, status, assignee, sprint, due_date, story_points, blocked, done_at, deleted…) và `project.workhub.active_sprint`; ForgeBridge gọi `POST /api/integrations/workhub/progress` theo lô. Tab **Tasks** (`views/WorkhubTasks.vue`, API `/api/workhub/projects/:id/board`) hiển thị bảng/tiến độ theo module và cho đổi trạng thái (`PUT .../usecases/:key/status` → WorkHub → phản chiếu lại). **Không** thêm chức năng giao việc ở SmartSpec: chỉ làm ở WorkHub.
+- Test case: `executeTestCase` (cũng là đường của bulk execute) gọi `workhubSyncService.reportTestcase` (best-effort, không bao giờ làm hỏng việc chạy test); thất bại → Bug ở WorkHub, trạng thái bug lưu ở `testcase.bug` (đọc-chỉ) và hiện bằng `WorkhubBugBadge`. Test case cũng bị clone sang `_id` mới ở mỗi version nên dùng `lineage_id` (clone phải giữ `lineage_id || _id`). Đổi thành viên dự án (`share/domain/service.ts`) gọi `schedule()` để Bridge cập nhật thành viên bên WorkHub. Route chạy test thật sự là `PUT /api/testcases/testcases/:id/execute` (router lồng tiền tố, tài liệu API cũ ghi sai).

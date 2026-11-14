@@ -1828,7 +1828,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
@@ -1854,7 +1854,7 @@ export default {
   background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-family: monospace;
   z-index: 100;
@@ -1881,7 +1881,7 @@ export default {
   left: 20px;
   right: 20px;
   background: rgba(255, 255, 255, 0.98);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
 }
 
 .schema-diagram:-webkit-full-screen .diagram-controls {
@@ -1889,7 +1889,7 @@ export default {
   left: 20px;
   right: 20px;
   background: rgba(255, 255, 255, 0.98);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
 }
 
 .schema-diagram:-ms-fullscreen .diagram-controls {
@@ -1897,7 +1897,7 @@ export default {
   left: 20px;
   right: 20px;
   background: rgba(255, 255, 255, 0.98);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border);
 }
 
 .schema-diagram:fullscreen .diagram-container {

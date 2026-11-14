@@ -295,20 +295,20 @@ export default {
 <style scoped>
 .fa-slack {
   font-size: 28px;
-  color: #0a1a4d;
+  color: var(--ink);
 }
 
 .sidebar {
   position: fixed;
   height: 100vh;
   width: 250px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
   display: flex;
   flex-direction: column;
   padding: 20px 16px 0 0;
-  border-radius: 0 0px 16px 0;
+  border-radius: 0 0px var(--radius) 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-right: 2px solid #e5e7eb;
+  border-right: 2px solid var(--border);
   z-index: 30;
   box-shadow: 4px 0 20px rgba(26, 54, 93, 0.08);
   animation: slideInLeft 0.4s ease-out;
@@ -338,13 +338,13 @@ export default {
   gap: 10px;
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: var(--text);
   margin-bottom: 5px;
 }
 
 .brand p {
   font-size: 12px;
-  color: #666;
+  color: var(--muted);
   line-height: 1.4;
   margin-bottom: 20px;
   margin-left: 4px;
@@ -355,11 +355,11 @@ export default {
   gap: 8px;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: 999px;
   font-size: 14px;
   cursor: pointer;
   margin-bottom: 30px;
@@ -404,7 +404,7 @@ export default {
 
 .new-project-btn:hover {
   transform: translateY(-3px);
-  background: linear-gradient(135deg, #2d4a8a 0%, #1a365d 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
 }
 
@@ -422,10 +422,10 @@ export default {
 .navigation a {
   display: block;
   padding: 10px 14px;
-  color: #6b7280;
+  color: var(--muted);
   text-decoration: none;
   font-size: 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -449,7 +449,7 @@ export default {
 }
 
 .navigation a:hover {
-  color: #1a365d;
+  color: var(--ink);
   transform: translateX(4px);
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
 }
@@ -478,17 +478,17 @@ export default {
   width: 100%;
   display: flex;
   padding: 12px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border);
   align-items: center;
   justify-content: flex-start;
   transition: 0.1s ease;
   cursor: pointer;
-  background: #fff;
+  background: var(--surface);
   margin-top: auto;
 }
 
 .user-account:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg);
 }
 
 .avatar {
@@ -497,8 +497,8 @@ export default {
   min-width: 40px;
   min-height: 40px;
   border-radius: 50%;
-  border: 1px solid #e0e0e0;
-  background-color: #f8f9fa;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -520,7 +520,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   font-size: 14px;
   font-weight: 600;
@@ -531,9 +531,9 @@ export default {
   bottom: 80px;
   left: 10px;
   right: 10px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   padding: 8px 0;
@@ -553,7 +553,7 @@ export default {
   padding: 10px 16px;
   cursor: pointer;
   transition: background 0.2s ease;
-  color: #333;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -561,16 +561,16 @@ export default {
   font-size: 18px;
   width: 20px;
   text-align: center;
-  color: #666;
+  color: var(--muted);
 }
 
 .menu-list li:hover {
-  background-color: #f5f5f5;
+  background-color: var(--sunken);
 }
 
 .menu-list hr {
   border: none;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
   margin: 6px 0;
 }
 
@@ -586,7 +586,7 @@ export default {
 .user-name {
   font-weight: 600;
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   margin-bottom: 2px;
   pointer-events: none;
   user-select: none;
@@ -598,7 +598,7 @@ export default {
 
 .user-email {
   font-size: 12px;
-  color: #666;
+  color: var(--muted);
   pointer-events: none;
   user-select: none;
   overflow: hidden;
@@ -639,7 +639,7 @@ export default {
     padding: 0;
     border-radius: 0;
     border-right: none;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border);
   }
 
   .mobile-header {
@@ -649,7 +649,7 @@ export default {
     padding: 0 16px;
     height: 60px;
     background: white;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border);
   }
 
   .mobile-toggle {
@@ -658,13 +658,13 @@ export default {
     font-size: 24px;
     cursor: pointer;
     padding: 8px;
-    color: #333;
+    color: var(--text);
   }
 
   .mobile-brand h2 {
     margin: 0;
     font-size: 18px;
-    color: #333;
+    color: var(--text);
   }
 
   .sidebar-content {
@@ -677,7 +677,7 @@ export default {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     padding: 20px 16px;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid var(--border);
     overflow-y: auto;
   }
 

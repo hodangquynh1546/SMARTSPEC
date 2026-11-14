@@ -39,7 +39,7 @@ export default {
 .diagram-container {
   position: relative;
   overflow: auto;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
   background-size: 100% 100%;
   cursor: grab;
 }
@@ -83,17 +83,17 @@ export default {
 }
 
 .diagram-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 6px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .diagram-container::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 6px;
-  border: 2px solid #f1f5f9;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
 }
 
 .diagram-container::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 </style>

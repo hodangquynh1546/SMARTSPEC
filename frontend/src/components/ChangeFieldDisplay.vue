@@ -121,13 +121,13 @@ export default {
 .field-item {
   padding: 12px;
   background: white;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .field-item.field-important {
-  border-left: 4px solid #1a365d;
-  background: #f8fafc;
+  border-left: 4px solid var(--ink);
+  background: var(--bg);
 }
 
 .field-label {
@@ -139,21 +139,21 @@ export default {
 
 .field-name {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .important-badge {
   padding: 2px 6px;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 500;
 }
 
 .field-value {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.5;
 }

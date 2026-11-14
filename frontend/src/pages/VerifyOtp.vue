@@ -198,14 +198,14 @@ export default {
 }
 
 .login-card {
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   padding: 30px;
   text-align: center;
 }
 
 .fa-slack {
   font-size: 50px;
-  color: #0a1a4d;
+  color: var(--ink);
   margin-bottom: 24px;
   display: block;
 }
@@ -214,7 +214,7 @@ export default {
   font-size: 24px;
   margin-bottom: 24px;
   font-weight: bold;
-  color: #0a1a4d;
+  color: var(--ink);
 }
 
 .form-group {
@@ -226,21 +226,21 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   font-weight: 500;
 }
 
 .form-control {
   width: 100%;
   padding: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   transition: border-color 0.3s;
 }
 
 .form-control.error {
-  border-color: #e74c3c;
+  border-color: var(--danger);
 }
 
 .otp-inputs {
@@ -255,14 +255,14 @@ export default {
   height: 56px;
   text-align: center;
   font-size: 22px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   outline: none;
   transition: border-color 0.3s;
 }
 
 .otp-box:focus {
-  border-color: #0a1a4d;
+  border-color: var(--ink);
 }
 
 .continue-button-wrapper {
@@ -271,21 +271,21 @@ export default {
 }
 
 .error-message {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
 }
 
 .success-message {
-  color: #27ae60;
+  color: var(--success);
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
 }
 
 .forgot-password-link {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   display: block;
   margin-bottom: 24px;
@@ -297,7 +297,7 @@ export default {
 }
 
 .field-error {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 13px;
   margin-top: 5px;
 }
@@ -306,13 +306,13 @@ export default {
   width: 100%;
   padding: 16px;
   border: none;
-  border-radius: 9999px;
+  border-radius: 999px;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
   margin-top: 10px;
-  color: #ddd;
+  color: var(--muted);
   /* Ensure button keeps its height during loading */
   min-height: 58px;
   display: flex;
@@ -321,23 +321,23 @@ export default {
 }
 
 .spotify-button.primary {
-  background-color: #0a1a4d;
+  background-color: var(--ink);
 }
 
 /* Thêm style cho trạng thái disabled */
 .otp-box:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--sunken);
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .spotify-button:disabled {
-  background-color: #b3b3b3;
+  background-color: var(--muted);
   cursor: not-allowed;
 }
 
 .spotify-button:disabled:hover {
-  background-color: #b3b3b3;
+  background-color: var(--muted);
   transform: none;
 }
 
@@ -354,7 +354,7 @@ export default {
   display: grid;
   border: 3px solid #0000;
   border-radius: 50%;
-  border-right-color: #ffffff; /* Color for spinner */
+  border-right-color: var(--border); /* Color for spinner */
   animation: spinner-a4dj62 1s infinite linear;
 }
 

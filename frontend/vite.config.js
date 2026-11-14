@@ -15,12 +15,12 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: '0.0.0.0', // cho phép truy cập từ các thiết bị khác
-      port: 5173,
+      port: Number(env.VITE_PORT || 5174), // 5173 thuộc WorkHub khi chạy cùng máy
       strictPort: true,
       allowedHosts: ['localhost', '192.168.1.15'],
       proxy: {
         '/api': {
-          target: 'http://192.168.1.15:8000', // backend nội bộ
+          target: env.VITE_API_TARGET || 'http://localhost:8000', // backend SmartSpec
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, ''),
         },

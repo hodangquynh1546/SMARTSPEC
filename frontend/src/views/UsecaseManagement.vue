@@ -2356,7 +2356,7 @@ export default {
 /* Modern UI Styles */
 .project-detail-view {
   padding: 20px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;

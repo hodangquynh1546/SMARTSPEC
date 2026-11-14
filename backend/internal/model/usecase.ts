@@ -96,6 +96,38 @@ const usecaseSchema = new Schema({
         index: true
     },
 
+    // === ĐỊNH DANH ỔN ĐỊNH QUA CÁC VERSION (dùng cho đồng bộ WorkHub) ===
+    // Use case bị clone sang _id mới ở mỗi version; lineage_id giữ nguyên để nhận ra "cùng một use case".
+    lineage_id: { type: String, default: null, index: true },
+
+    // === TIẾN ĐỘ TRIỂN KHAI (do WorkHub báo về, chỉ đọc ở SmartSpec) ===
+    implementation: {
+        type: new Schema({
+            issue_key: { type: String, default: "" },
+            issue_id: { type: String, default: "" },
+            url: { type: String, default: "" },
+            status: { type: String, default: "" },          // TO_DO | IN_PROGRESS | CODE_REVIEW | TESTING | DONE
+            priority: { type: String, default: null },
+            assignee: { type: String, default: null },       // tên người được giao (giao việc chỉ làm ở WorkHub)
+            assignee_id: { type: String, default: null },
+            assignee_avatar: { type: String, default: null },
+            sprint: { type: String, default: null },
+            sprint_status: { type: String, default: null },
+            start_date: { type: String, default: null },
+            due_date: { type: String, default: null },
+            story_points: { type: Number, default: null },
+            blocked: { type: Boolean, default: false },
+            blocked_reason: { type: String, default: null },
+            started_at: { type: String, default: null },
+            done_at: { type: String, default: null },
+            child_count: { type: Number, default: 0 },
+            child_done_count: { type: Number, default: 0 },
+            deleted: { type: Boolean, default: false },      // task đã bị xoá ở WorkHub
+            updated_at: { type: Date, default: Date.now }
+        }, { _id: false }),
+        default: null
+    },
+
     // === METADATA ===
     type: {
         type: String,

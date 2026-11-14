@@ -115,9 +115,9 @@ onMounted(() => {
   top: 20px;
   right: 20px;
   width: 400px;
-  background: #1a1a1a;
+  background: var(--ink);
   color: #fff;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 9999;
   font-family: 'Courier New', monospace;
@@ -129,8 +129,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #2d2d2d;
-  border-radius: 8px 8px 0 0;
+  background: var(--ink);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .debug-header h3 {
@@ -159,7 +159,7 @@ onMounted(() => {
 .debug-section {
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--ink);
 }
 
 .debug-section:last-child {
@@ -170,7 +170,7 @@ onMounted(() => {
 .debug-section h4 {
   margin: 0 0 8px 0;
   font-size: 12px;
-  color: #4CAF50;
+  color: var(--success);
 }
 
 .debug-section p {
@@ -188,48 +188,48 @@ onMounted(() => {
 .debug-actions button {
   padding: 6px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-test {
-  background: #4CAF50;
+  background: var(--success);
   color: white;
 }
 
 .btn-test:hover {
-  background: #45a049;
+  background: var(--success);
 }
 
 .btn-clear {
-  background: #f44336;
+  background: var(--danger);
   color: white;
 }
 
 .btn-clear:hover {
-  background: #da190b;
+  background: var(--danger);
 }
 
 .btn-refresh {
-  background: #2196F3;
+  background: var(--ink);
   color: white;
 }
 
 .btn-refresh:hover {
-  background: #1976D2;
+  background: var(--ink);
 }
 
 .debug-toggle {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: #1a1a1a;
+  background: var(--ink);
   color: #fff;
   border: none;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 12px;
   z-index: 9999;
@@ -237,6 +237,6 @@ onMounted(() => {
 }
 
 .debug-toggle:hover {
-  background: #2d2d2d;
+  background: var(--ink);
 }
 </style>

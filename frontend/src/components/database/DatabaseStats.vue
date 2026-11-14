@@ -68,7 +68,7 @@ export default {
 .stat-card {
   background: white;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -82,59 +82,59 @@ export default {
 }
 
 .stat-card.tables {
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--ink);
 }
 
 .stat-card.relationships {
-  border-left: 4px solid #8b5cf6;
+  border-left: 4px solid var(--ink);
 }
 
 .stat-card.columns {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid var(--success);
 }
 
 .stat-card.usecases {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning);
 }
 
 .stat-icon {
   width: 50px;
   height: 50px;
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .stat-card.tables .stat-icon {
-  background: #dbeafe;
-  color: #3b82f6;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .stat-card.relationships .stat-icon {
-  background: #ede9fe;
-  color: #8b5cf6;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .stat-card.columns .stat-icon {
-  background: #d1fae5;
-  color: #10b981;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .stat-card.usecases .stat-icon {
   background: #fef3c7;
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .stat-info h3 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 4px;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .stat-info p {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.875rem;
   margin: 0;
 }

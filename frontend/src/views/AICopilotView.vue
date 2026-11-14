@@ -244,8 +244,8 @@ onUnmounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--ink);
+  color: var(--muted);
 }
 
 .ai-copilot-layout {
@@ -260,8 +260,8 @@ onUnmounted(() => {
 .lane-right {
   display: flex;
   flex-direction: column;
-  background: #252526;
-  border-right: 1px solid #3e3e42;
+  background: var(--ink);
+  border-right: 1px solid var(--ink);
   overflow: hidden;
   transition: width 0.2s;
 }
@@ -293,15 +293,15 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #2d2d30;
-  border-bottom: 1px solid #3e3e42;
+  background: var(--ink);
+  border-bottom: 1px solid var(--ink);
 }
 
 .lane-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #cccccc;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -318,10 +318,10 @@ onUnmounted(() => {
 
 .collapse-btn {
   background: transparent;
-  border: 1px solid #3e3e42;
-  color: #cccccc;
+  border: 1px solid var(--ink);
+  color: var(--muted);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -334,28 +334,28 @@ onUnmounted(() => {
 
 .collapse-btn:hover,
 .save-btn:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 
 .save-btn {
-  background: #0e639c;
-  border-color: #0e639c;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .save-btn:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 
 /* Resizer */
 .resizer {
   width: 4px;
-  background: #1e1e1e;
+  background: var(--ink);
   cursor: col-resize;
   position: relative;
 }
 
 .resizer:hover {
-  background: #0e639c;
+  background: var(--ink);
 }
 
 .resizer::after {

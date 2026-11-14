@@ -64,13 +64,13 @@ const logout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   padding: 20px;
 }
 
 .access-denied-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 40px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -80,7 +80,7 @@ const logout = () => {
 
 .icon {
   font-size: 64px;
-  color: #e53e3e;
+  color: var(--danger);
   margin-bottom: 20px;
 }
 
@@ -95,22 +95,22 @@ const logout = () => {
 }
 
 h1 {
-  color: #2d3748;
+  color: var(--text);
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 16px;
 }
 
 .message {
-  color: #4a5568;
+  color: var(--text);
   font-size: 16px;
   line-height: 1.6;
   margin-bottom: 24px;
 }
 
 .user-info {
-  background: #f7fafc;
-  border-radius: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
   padding: 16px;
   margin-bottom: 24px;
   text-align: left;
@@ -118,7 +118,7 @@ h1 {
 
 .user-info p {
   margin: 8px 0;
-  color: #2d3748;
+  color: var(--text);
   font-size: 14px;
 }
 
@@ -133,7 +133,7 @@ h1 {
 .btn-primary,
 .btn-secondary {
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -145,32 +145,32 @@ h1 {
 }
 
 .btn-primary {
-  background: #3182ce;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #2c5aa0;
+  background: var(--ink);
   transform: translateY(-2px);
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #4a5568;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #cbd5e0;
+  background: var(--border);
   transform: translateY(-2px);
 }
 
 .help-text {
-  color: #718096;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .help-text i {
-  color: #3182ce;
+  color: var(--ink);
   margin-right: 8px;
 }
 

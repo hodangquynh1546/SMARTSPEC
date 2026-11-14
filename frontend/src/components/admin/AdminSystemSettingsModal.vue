@@ -565,7 +565,7 @@ const restoreBackup = async () => {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -573,7 +573,7 @@ const restoreBackup = async () => {
 
 .modal-header h3 {
   margin: 0;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 20px;
   font-weight: 600;
   display: flex;
@@ -584,10 +584,10 @@ const restoreBackup = async () => {
 .close-btn {
   background: none;
   border: none;
-  color: #718096;
+  color: var(--muted);
   cursor: pointer;
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 999px;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -595,13 +595,13 @@ const restoreBackup = async () => {
 }
 
 .close-btn:hover {
-  background: #f7fafc;
-  color: #1a365d;
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .modal-body {
   padding: 0;
-  background: #e2e8f0;
+  background: var(--sunken);
 }
 
 .settings-tabs {
@@ -612,8 +612,8 @@ const restoreBackup = async () => {
 
 .tabs-header {
   display: flex;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .tab-button {
@@ -627,18 +627,18 @@ const restoreBackup = async () => {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #718096;
+  color: var(--muted);
   transition: all 0.2s;
 }
 
 .tab-button:hover {
-  color: #1a365d;
-  background: #edf2f7;
+  color: var(--ink);
+  background: var(--sunken);
 }
 
 .tab-button.active {
-  color: #1a365d;
-  border-bottom-color: #1a365d;
+  color: var(--ink);
+  border-bottom-color: var(--ink);
   background: white;
 }
 
@@ -656,15 +656,15 @@ const restoreBackup = async () => {
 }
 
 .settings-section {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
 }
 
 .settings-section h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
   display: flex;
   align-items: center;
@@ -675,8 +675,8 @@ const restoreBackup = async () => {
   content: '';
   width: 4px;
   height: 16px;
-  background: #1a365d;
-  border-radius: 2px;
+  background: var(--ink);
+  border-radius: var(--radius-sm);
 }
 
 .form-grid {
@@ -692,15 +692,15 @@ const restoreBackup = async () => {
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 6px;
   font-size: 14px;
 }
 
 .form-input {
   padding: 6px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   transition: all 0.2s;
   max-height: 7vh;
@@ -708,19 +708,19 @@ const restoreBackup = async () => {
 
 .form-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
 .error-message {
-  color: #e53e3e;
+  color: var(--danger);
   font-size: 12px;
   margin-top: 4px;
 }
 
 .help-text {
   font-size: 12px;
-  color: #718096;
+  color: var(--muted);
   margin-top: 4px;
 }
 
@@ -744,8 +744,8 @@ const restoreBackup = async () => {
 .toggle-slider {
   width: 44px;
   height: 24px;
-  background: #e2e8f0;
-  border-radius: 12px;
+  background: var(--sunken);
+  border-radius: var(--radius-field);
   position: relative;
   transition: all 0.3s ease;
 }
@@ -764,7 +764,7 @@ const restoreBackup = async () => {
 }
 
 .toggle-label input[type='checkbox']:checked + .toggle-slider {
-  background: #1a365d;
+  background: var(--ink);
 }
 
 .toggle-label input[type='checkbox']:checked + .toggle-slider::before {
@@ -773,7 +773,7 @@ const restoreBackup = async () => {
 
 .toggle-text {
   font-size: 14px;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -787,8 +787,8 @@ const restoreBackup = async () => {
 .logo-preview {
   width: 120px;
   height: 60px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -804,8 +804,8 @@ const restoreBackup = async () => {
 .favicon-preview {
   width: 32px;
   height: 32px;
-  border: 2px solid #e2e8f0;
-  border-radius: 6px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -823,31 +823,31 @@ const restoreBackup = async () => {
 }
 
 .btn-logo-change {
-  background: #f7fafc;
-  border: 1px solid #e2e8f0;
-  color: #4a5568;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-logo-change:hover {
-  background: #edf2f7;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .backup-actions {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 20px;
 }
 
 .backup-actions h4 {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   margin: 0 0 16px 0;
 }
 
@@ -862,7 +862,7 @@ const restoreBackup = async () => {
   gap: 8px;
   padding: 12px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -870,27 +870,27 @@ const restoreBackup = async () => {
 }
 
 .btn-action.primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-action.primary:hover {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-action.secondary {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-action.secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .modal-footer {
   padding: 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -899,7 +899,7 @@ const restoreBackup = async () => {
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -917,22 +917,22 @@ const restoreBackup = async () => {
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
+  background: var(--ink);
 }
 
 .btn-secondary {
-  background: #f7fafc;
-  color: #374151;
-  border: 1px solid #e2e8f0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 .btn-secondary:hover {
-  background: #edf2f7;
+  background: var(--sunken);
 }
 
 .loading-spinner {

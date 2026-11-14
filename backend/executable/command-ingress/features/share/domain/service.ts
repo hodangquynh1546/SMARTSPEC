@@ -1,3 +1,4 @@
+import logger from "../../../../../lib/logger";
 import Project from "../../../../../internal/model/project";
 import User from "../../../../../internal/model/user";
 import {
@@ -9,6 +10,7 @@ import mailService from "../../../services/sendMail.service";
 import jwt from "jsonwebtoken";
 import { notificationService } from "../../../services/notification.service";
 import { NotificationServiceImpl } from "../../notification/domain/service";
+import { workhubSyncService } from "../../workhub/domain/service";
 import { LogService } from "../../../../command-ingress/features/log/domain/service";
 import { io } from "../../../socket";
 
@@ -330,7 +332,7 @@ export class ShareProjectService {
 
       return mailIsSent;
     } catch (ex) {
-      console.error("Error sending email:", (ex as Error).message);
+      logger.error("Error sending email:", (ex as Error).message);
       return false;
     }
   }
@@ -484,7 +486,7 @@ export class ShareProjectService {
       },
     ]);
 
-    //console.log('🔍 getUserInvites result:', JSON.stringify(invites, null, 2));
+    //logger.info('🔍 getUserInvites result:', JSON.stringify(invites, null, 2));
 
     return new ServiceResponse(ResponseStatus.Success, "OK", invites, 200);
   }
@@ -515,7 +517,7 @@ export class ShareProjectService {
         null,
         404
       );
-    console.log("sender: ", member.invited_by);
+    logger.info("sender: ", member.invited_by);
     if (member.invite_token !== token) {
       return new ServiceResponse(
         ResponseStatus.Failed,
@@ -550,6 +552,7 @@ export class ShareProjectService {
       at: new Date(),
     });
     await project.save();
+    workhubSyncService.schedule(String(project._id)); // thành viên đổi → đồng bộ sang WorkHub
     const sender = await User.findOne({ _id: member.invited_by });
     const recipient = await User.findOne({ _id: userId });
     await this.logService.createLog({
@@ -594,9 +597,9 @@ export class ShareProjectService {
         },
         timestamp: new Date()
       });
-      console.log(`📢 Broadcast member accepted event to project ${projectId}`);
+      logger.info(`📢 Broadcast member accepted event to project ${projectId}`);
     } catch (socketError) {
-      console.error('❌ Error emitting member accepted socket event:', socketError);
+      logger.error('❌ Error emitting member accepted socket event:', socketError);
       // Không throw error, chỉ log vì đây không phải lỗi critical
     }
 
@@ -865,6 +868,7 @@ export class ShareProjectService {
       // xoá hẳn member
       project.members.splice(memberIndex, 1);
       await project.save();
+      workhubSyncService.schedule(String(project._id)); // thành viên đổi → đồng bộ sang WorkHub
 
       const sender = await User.findOne({ _id: userId });
       const recipient = await User.findOne({ _id: memberId });
@@ -974,6 +978,7 @@ export class ShareProjectService {
       // xoá thành viên
       project.members.splice(memberIndex, 1);
       await project.save();
+      workhubSyncService.schedule(String(project._id)); // thành viên đổi → đồng bộ sang WorkHub
 
       const sender = await User.findOne({ _id: member.invited_by });
       const recipient = await User.findOne({ _id: userId });
@@ -1070,7 +1075,7 @@ export class ShareProjectService {
       );
 
     } catch (err: any) {
-      console.error("Error searching users:", err);
+      logger.error("Error searching users:", err);
       return new ServiceResponse(
         ResponseStatus.Failed,
         "Internal Server Error",

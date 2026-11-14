@@ -2965,7 +2965,7 @@ export default {
 <style scoped>
 .uml-management-view {
   padding: 30px;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -3012,7 +3012,7 @@ export default {
 .header-left h2 {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3020,7 +3020,7 @@ export default {
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--muted);
   margin: 0;
 }
 
@@ -3035,10 +3035,10 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -3064,7 +3064,7 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
 }
@@ -3091,9 +3091,9 @@ export default {
   gap: 8px;
   padding: 10px 20px;
   background: white;
-  color: #475569;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
@@ -3102,8 +3102,8 @@ export default {
 }
 
 .btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--bg);
+  border-color: var(--border-strong);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -3117,9 +3117,9 @@ export default {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   cursor: pointer;
-  color: #374151;
+  color: var(--text);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   position: relative;
@@ -3148,8 +3148,8 @@ export default {
 }
 
 .btn-icon.danger:hover {
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-  color: #dc2626;
+  background: linear-gradient(135deg, var(--sunken) 0%, #fecaca 100%);
+  color: var(--danger);
   border-color: rgba(220, 38, 38, 0.3);
 }
 
@@ -3157,15 +3157,15 @@ export default {
   padding: 8px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #6b7280;
+  color: var(--muted);
   transition: background 0.3s ease;
 }
 
 .btn-close:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 /* Navigation Tabs */
@@ -3179,7 +3179,7 @@ export default {
 
 .diagram-section {
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius);
   padding: 32px;
   box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
   margin-bottom: 32px;
@@ -3197,7 +3197,7 @@ export default {
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--border);
   position: relative;
   gap: 16px;
 }
@@ -3211,7 +3211,7 @@ export default {
 .section-title h3 {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3228,17 +3228,17 @@ export default {
   transform: translateY(-50%);
   width: 4px;
   height: 24px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
-  border-radius: 2px;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: var(--radius-sm);
 }
 
 .diagram-count {
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
   font-weight: 600;
   padding: 4px 10px;
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  border-radius: var(--radius-field);
   margin-left: 8px;
 }
 
@@ -3257,9 +3257,9 @@ export default {
   height: 36px;
   padding: 0;
   background: white;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  color: #64748b;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -3283,9 +3283,9 @@ export default {
 }
 
 .btn-refresh-section:hover:not(:disabled) {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: #1a365d;
-  color: #1a365d;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-color: var(--ink);
+  color: var(--ink);
   transform: translateY(-2px) rotate(180deg);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
@@ -3315,10 +3315,10 @@ export default {
   justify-content: center;
   gap: 6px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -3344,7 +3344,7 @@ export default {
 }
 
 .btn-generate-section:hover {
-  background: linear-gradient(135deg, #2d4a8a 0%, #3d5a9a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
 }
@@ -3367,20 +3367,20 @@ export default {
 .search-icon {
   position: absolute;
   left: 14px;
-  color: #94a3b8;
+  color: var(--muted);
   font-size: 18px;
   z-index: 1;
   transition: color 0.3s ease;
 }
 
 .search-box:focus-within .search-icon {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .search-input {
   padding: 10px 12px 10px 40px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-field);
   font-size: 0.875rem;
   width: 280px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -3390,7 +3390,7 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
   transform: translateY(-1px);
 }
@@ -3424,18 +3424,18 @@ export default {
 }
 
 .diagrams-scroll-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+  background: var(--sunken);
+  border-radius: var(--radius-field);
 }
 
 .diagrams-scroll-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
-  border-radius: 10px;
-  border: 2px solid #f1f5f9;
+  background: linear-gradient(180deg, var(--border) 0%, var(--muted) 100%);
+  border-radius: var(--radius-field);
+  border: 2px solid var(--border);
 }
 
 .diagrams-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+  background: linear-gradient(180deg, var(--muted) 0%, var(--muted) 100%);
 }
 
 .diagrams-scroll-content {
@@ -3449,12 +3449,12 @@ export default {
 /* Diagram Cards */
 .diagram-card {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   min-width: 300px;
   max-width: 300px;
   flex-shrink: 0;
@@ -3465,7 +3465,7 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 2px;
   background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -3482,7 +3482,7 @@ export default {
 .diagram-card:hover {
   transform: translateY(-6px) scale(1.02);
   box-shadow: 0 12px 32px rgba(26, 54, 93, 0.2);
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
 }
 
 /* Diagram Preview với ảnh */
@@ -3490,9 +3490,9 @@ export default {
   position: relative;
   width: 100%;
   height: 180px;
-  background: #fff;
+  background: var(--surface);
   overflow: hidden;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .preview-image {
@@ -3528,18 +3528,18 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
   font-weight: 500;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
   animation: fadeIn 0.3s ease;
 }
 
 .generating-preview .loading-spinner-small {
   width: 24px;
   height: 24px;
-  border: 3px solid #e2e8f0;
-  border-top: 3px solid #1a365d;
+  border: 3px solid var(--border);
+  border-top: 3px solid var(--ink);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
@@ -3567,14 +3567,14 @@ export default {
 
 .diagram-info {
   padding: 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
 }
 
 .diagram-info h4 {
   margin: 0 0 10px 0;
   font-size: 1.1rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3585,7 +3585,7 @@ export default {
 
 .diagram-description {
   margin: 0 0 16px 0;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.5;
   display: -webkit-box;
@@ -3601,7 +3601,7 @@ export default {
   margin-bottom: 16px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.6);
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
@@ -3611,10 +3611,10 @@ export default {
   gap: 6px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   padding: 4px 8px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   transition: all 0.3s ease;
 }
 
@@ -3632,7 +3632,7 @@ export default {
 .diagram-type-badge,
 .type-badge {
   padding: 6px 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -3640,18 +3640,18 @@ export default {
 }
 
 .type-usecase {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  color: var(--ink);
 }
 
 .type-activity {
-  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-  color: #166534;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--success-soft) 100%);
+  color: var(--success);
 }
 
 .type-sequence {
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #92400e;
+  color: var(--danger);
 }
 
 .diagram-type-badge:hover {
@@ -3670,18 +3670,18 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 600;
-  color: #475569;
+  color: var(--text);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .stat-badge:hover {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -3699,7 +3699,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: var(--muted);
   animation: fadeInUp 0.6s ease;
 }
 
@@ -3707,7 +3707,7 @@ export default {
   width: 100px;
   height: 100px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -3722,7 +3722,7 @@ export default {
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1a365d, #2d4a8a);
+  background: linear-gradient(135deg, var(--ink), var(--ink));
   opacity: 0.1;
   z-index: -1;
   animation: pulse 2s ease-in-out infinite;
@@ -3750,16 +3750,16 @@ export default {
 
 .empty-icon .material-symbols-outlined {
   font-size: 48px;
-  color: #64748b;
+  color: var(--muted);
   animation: spin 20s linear infinite;
 }
 
 .empty-section h4 {
   margin: 0 0 12px 0;
-  color: #1e293b;
+  color: var(--text);
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3768,15 +3768,15 @@ export default {
 .empty-section p {
   margin: 0 0 24px 0;
   font-size: 0.9rem;
-  color: #64748b;
+  color: var(--muted);
   max-width: 300px;
   line-height: 1.6;
 }
 
 .empty-section.loading-section {
   background: rgba(59, 130, 246, 0.05);
-  border: 2px dashed #3b82f6;
-  border-radius: 12px;
+  border: 2px dashed var(--ink);
+  border-radius: var(--radius-field);
   margin: 20px;
   min-height: 300px;
 }
@@ -3784,20 +3784,20 @@ export default {
 .empty-section.loading-section .loading-spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #3b82f6;
+  border: 4px solid var(--border);
+  border-top-color: var(--ink);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
 }
 
 .empty-section.loading-section h4 {
-  color: #3b82f6;
+  color: var(--ink);
   font-weight: 600;
 }
 
 .empty-section.loading-section p {
-  color: #6b7280;
+  color: var(--muted);
 }
 
 /* Modal Styles */
@@ -3832,7 +3832,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
@@ -3862,17 +3862,17 @@ export default {
 
 .modal-header {
   padding: 24px;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
 }
 
 .modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3902,7 +3902,7 @@ export default {
 
 .editor-main {
   flex: 1;
-  background: #f8fafc;
+  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3917,13 +3917,13 @@ export default {
   display: block;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .form-group label.required:after {
   content: '*';
-  color: #ef4444;
+  color: var(--danger);
   margin-left: 4px;
 }
 
@@ -3932,8 +3932,8 @@ export default {
 .form-group textarea {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-field);
   font-size: 0.875rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
@@ -3944,7 +3944,7 @@ export default {
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
   transform: translateY(-1px);
 }
@@ -3968,9 +3968,9 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 100px 40px;
-  color: #64748b;
+  color: var(--muted);
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius);
   box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
   animation: fadeInUp 0.5s ease;
 }
@@ -3978,8 +3978,8 @@ export default {
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #1a365d;
+  border: 4px solid var(--border);
+  border-top: 4px solid var(--ink);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
@@ -3989,7 +3989,7 @@ export default {
 .loading-spinner-small {
   width: 16px;
   height: 16px;
-  border: 2px solid #f3f4f6;
+  border: 2px solid var(--border);
   border-top: 2px solid currentColor;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -4020,8 +4020,8 @@ export default {
   top: calc(100% + 8px);
   left: 0;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   z-index: 10;
   min-width: 160px;
@@ -4040,7 +4040,7 @@ export default {
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -4061,17 +4061,17 @@ export default {
 }
 
 .export-option:hover {
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
   padding-left: 18px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .export-option:first-child {
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
 .export-option:last-child {
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 .export-option .material-symbols-outlined {
@@ -4080,7 +4080,7 @@ export default {
 
 /* Field Help */
 .field-help {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.75rem;
   margin-top: 4px;
   font-style: italic;
@@ -4088,10 +4088,10 @@ export default {
 
 .diagram-type-label {
   padding: 4px 8px;
-  background: #f3f4f6;
-  border-radius: 6px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   margin-right: 12px;
 }
 
@@ -4103,8 +4103,8 @@ export default {
   z-index: 100;
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border: 1.5px solid #e2e8f0;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  border: 1.5px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -4132,8 +4132,8 @@ export default {
 }
 
 .scroll-arrow:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
-  border-color: #1a365d;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  border-color: var(--ink);
   box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
   transform: translateY(-50%) scale(1.1);
 }
@@ -4157,7 +4157,7 @@ export default {
 
 .scroll-arrow .material-symbols-outlined {
   font-size: 24px;
-  color: #64748b;
+  color: var(--muted);
   transition: color 0.3s ease;
   position: relative;
   z-index: 1;
@@ -4176,7 +4176,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   animation: fadeInOverlay 0.3s ease-in;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   border: 2px solid rgba(59, 130, 246, 0.3);
@@ -4198,7 +4198,7 @@ export default {
   width: 50px;
   height: 50px;
   border: 4px solid rgba(59, 130, 246, 0.2);
-  border-top-color: #3b82f6;
+  border-top-color: var(--ink);
   border-radius: 50%;
   animation: spinLarge 1s linear infinite;
 }
@@ -4206,7 +4206,7 @@ export default {
 .generating-content h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1e40af;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -4373,10 +4373,10 @@ export default {
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
   background: white;
-  color: #64748b;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -4400,9 +4400,9 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: #1a365d;
-  color: #1a365d;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-color: var(--ink);
+  color: var(--ink);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }
@@ -4420,8 +4420,8 @@ export default {
   max-height: 400px;
   overflow-y: auto;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -4433,17 +4433,17 @@ export default {
 }
 
 .filter-dropdown-menu::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
 }
 
 .filter-dropdown-menu::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .filter-dropdown-menu::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted);
 }
 
 @keyframes slideDown {
@@ -4465,7 +4465,7 @@ export default {
   padding: 12px 18px;
   border: none;
   background: white;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
   text-align: left;
   cursor: pointer;
@@ -4481,12 +4481,12 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   transition: width 0.3s ease;
 }
 
 .filter-option:hover {
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
   padding-left: 20px;
 }
 
@@ -4495,10 +4495,10 @@ export default {
 }
 
 .filter-option.active {
-  background: linear-gradient(90deg, #e6f2ff 0%, #dbeafe 100%);
-  color: #1a365d;
+  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  color: var(--ink);
   font-weight: 600;
-  border-left-color: #1a365d;
+  border-left-color: var(--ink);
   padding-left: 20px;
 }
 

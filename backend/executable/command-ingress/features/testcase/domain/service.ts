@@ -1,3 +1,5 @@
+import { workhubSyncService } from "../../workhub/domain/service";
+import logger from "../../../../../lib/logger";
 // TestcaseService.ts
 import { Types } from "mongoose";
 import Testcase from "../../../../../internal/model/testcase";
@@ -28,7 +30,7 @@ export class TestcaseService {
         language: string = 'vi-VN',
         testType: string = 'all'
     ) {
-        console.log(`🎯 Generating ENTERPRISE test cases for ${selectedRequirementIds.length} selected requirements`);
+        logger.info(`🎯 Generating ENTERPRISE test cases for ${selectedRequirementIds.length} selected requirements`);
 
         // Get version and requirements
         const version = await Version.findOne({
@@ -74,7 +76,7 @@ export class TestcaseService {
             })
             .filter(id => id && id !== ''); // Final filter to ensure no empty strings
 
-        console.log('🔍 Testcase Generation Debug:', {
+        logger.info('🔍 Testcase Generation Debug:', {
             selectedRequirementIds,
             normalizedSelectedIds,
             totalUsecases: allUsecases.length,
@@ -102,7 +104,7 @@ export class TestcaseService {
         });
 
         if (normalizedSelectedIds.length === 0) {
-            console.error('❌ No valid requirement IDs provided:', {
+            logger.error('❌ No valid requirement IDs provided:', {
                 originalSelectedRequirementIds: selectedRequirementIds,
                 filteredCount: normalizedSelectedIds.length
             });
@@ -110,7 +112,7 @@ export class TestcaseService {
         }
 
         if (requirementsToProcess.length === 0) {
-            console.error('❌ No matching requirements found:', {
+            logger.error('❌ No matching requirements found:', {
                 selectedRequirementIds,
                 normalizedSelectedIds,
                 availableUsecaseIds: allUsecases.map(req => ({
@@ -121,7 +123,7 @@ export class TestcaseService {
             throw new Error(`No matching requirements found. Selected IDs: ${normalizedSelectedIds.join(', ')}. Available usecases: ${allUsecases.length}`);
         }
 
-        console.log(`✅ Found ${requirementsToProcess.length} matching requirements out of ${selectedRequirementIds.length} selected`);
+        logger.info(`✅ Found ${requirementsToProcess.length} matching requirements out of ${selectedRequirementIds.length} selected`);
 
         // Get database schema (optional)
         const database = await Database.findOne({
@@ -134,10 +136,10 @@ export class TestcaseService {
             relationships: []
         };
 
-        console.log(`📊 Processing ${requirementsToProcess.length} requirements with ${databaseSchema.tables?.length || 0} tables`);
+        logger.info(`📊 Processing ${requirementsToProcess.length} requirements with ${databaseSchema.tables?.length || 0} tables`);
 
         // ✅ SỬ DỤNG TESTCASE GENERATION AGENT
-        console.log(`🤖 [TESTCASE_SERVICE] Using TestcaseGenerationAgent for generation...`);
+        logger.info(`🤖 [TESTCASE_SERVICE] Using TestcaseGenerationAgent for generation...`);
 
         // ✅ Lấy modelName từ user selection (sử dụng phương thức chung getRecommendedModel)
         // getRecommendedModel đã tự động ưu tiên user selected model nếu có userId
@@ -149,15 +151,15 @@ export class TestcaseService {
             // ✅ Chuẩn hóa: Dùng getRecommendedModel giống như orchestrator
             // getRecommendedModel đã có logic ưu tiên user selected model bên trong
             modelName = await llmService.getRecommendedModel(undefined, userId);
-            console.log(`✅ [TESTCASE_SERVICE] Using model: ${modelName}${userId ? ` (for user: ${userId})` : ''}`);
+            logger.info(`✅ [TESTCASE_SERVICE] Using model: ${modelName}${userId ? ` (for user: ${userId})` : ''}`);
         } catch (error: any) {
-            console.warn(`⚠️ [TESTCASE_SERVICE] Failed to get model preference: ${error.message}. Will use default.`);
+            logger.warn(`⚠️ [TESTCASE_SERVICE] Failed to get model preference: ${error.message}. Will use default.`);
             // Fallback: thử lại không có userId
             try {
                 modelName = await llmService.getRecommendedModel();
-                console.log(`✅ [TESTCASE_SERVICE] Using fallback model: ${modelName}`);
+                logger.info(`✅ [TESTCASE_SERVICE] Using fallback model: ${modelName}`);
             } catch (fallbackError: any) {
-                console.error(`❌ [TESTCASE_SERVICE] Failed to get recommended model: ${fallbackError.message}`);
+                logger.error(`❌ [TESTCASE_SERVICE] Failed to get recommended model: ${fallbackError.message}`);
                 // modelName sẽ là undefined, agent sẽ tự xử lý
             }
         }
@@ -193,7 +195,7 @@ export class TestcaseService {
             // ✅ Kiểm tra nếu agent có resumeState (lỗi retryable)
             const agentResumeState = agent.getResumeState();
             if (agentResumeState) {
-                console.log(`⚠️ [TESTCASE_SERVICE] Agent paused due to retryable error. Saving resume state...`);
+                logger.info(`⚠️ [TESTCASE_SERVICE] Agent paused due to retryable error. Saving resume state...`);
 
                 // Lưu resumeState vào Version
                 await Version.findByIdAndUpdate(version._id, {
@@ -264,7 +266,7 @@ export class TestcaseService {
                     }
                 });
             } catch (logError) {
-                console.error("❌ Error logging testcase generation:", logError);
+                logger.error("❌ Error logging testcase generation:", logError);
             }
 
             // ✅ Broadcast completion
@@ -292,7 +294,7 @@ export class TestcaseService {
 
             return result.testcases;
         } catch (error: any) {
-            console.error(`❌ [TESTCASE_SERVICE] Error in agent:`, error.message);
+            logger.error(`❌ [TESTCASE_SERVICE] Error in agent:`, error.message);
 
             // Broadcast failed event
             if (testcaseSocketService && projectId && versionId && userId) {
@@ -362,7 +364,7 @@ export class TestcaseService {
                 // Delay giữa các test types
                 await new Promise(resolve => setTimeout(resolve, 300));
             } catch (error) {
-                console.error(`❌ Error generating ${testType} tests in batch ${batchNumber}:`, error);
+                logger.error(`❌ Error generating ${testType} tests in batch ${batchNumber}:`, error);
                 // Tiếp tục với test type tiếp theo
                 continue;
             }
@@ -418,14 +420,14 @@ export class TestcaseService {
 
             if (errors.length > 0) {
                 invalidTestCases.push({ index, errors });
-                console.warn(`⚠️ Skipping invalid test case ${index + 1} ("${tc.title || 'unnamed'}"): ${errors.join(', ')}`);
+                logger.warn(`⚠️ Skipping invalid test case ${index + 1} ("${tc.title || 'unnamed'}"): ${errors.join(', ')}`);
             } else {
                 validTestCases.push(tc);
             }
         });
 
         if (invalidTestCases.length > 0) {
-            console.warn(`⚠️ Skipped ${invalidTestCases.length} invalid test case(s), proceeding with ${validTestCases.length} valid test case(s)`);
+            logger.warn(`⚠️ Skipped ${invalidTestCases.length} invalid test case(s), proceeding with ${validTestCases.length} valid test case(s)`);
         }
 
         return validTestCases;
@@ -470,8 +472,8 @@ export class TestcaseService {
                 if (bulkError.name === 'BulkWriteError' && bulkError.result) {
                     insertedCount = bulkError.result.insertedCount || 0;
                     const writeErrors = bulkError.result.writeErrors || [];
-                    console.error(`❌ BulkWriteError: ${insertedCount}/${testCasesToSave.length} inserted`);
-                    console.error(`❌ Write errors:`, writeErrors.map((e: any) => ({
+                    logger.error(`❌ BulkWriteError: ${insertedCount}/${testCasesToSave.length} inserted`);
+                    logger.error(`❌ Write errors:`, writeErrors.map((e: any) => ({
                         index: e.index,
                         code: e.code,
                         errmsg: e.errmsg
@@ -497,7 +499,7 @@ export class TestcaseService {
 
             // Verify số lượng đã insert
             if (insertedCount === 0) {
-                console.error(`❌ CRITICAL: insertMany returned 0 documents!`);
+                logger.error(`❌ CRITICAL: insertMany returned 0 documents!`);
                 // Thử insert từng document để xem document nào fail
                 const individualResults: any[] = [];
                 const individualErrors: any[] = [];
@@ -510,38 +512,38 @@ export class TestcaseService {
                         individualResults.push(saved);
                     } catch (individualError: any) {
                         individualErrors.push({ index: i, title: testCasesToSave[i].title, error: individualError.message });
-                        console.error(`❌ Document ${i + 1} ("${testCasesToSave[i].title}") failed:`, individualError.message);
+                        logger.error(`❌ Document ${i + 1} ("${testCasesToSave[i].title}") failed:`, individualError.message);
                     }
                 }
 
                 if (individualResults.length > 0) {
                     insertedCount = individualResults.length;
                     result = individualResults;
-                    console.log(`✅ Successfully inserted ${insertedCount} test cases individually (${individualErrors.length} failed)`);
+                    logger.info(`✅ Successfully inserted ${insertedCount} test cases individually (${individualErrors.length} failed)`);
                 } else {
                     throw new Error(`All ${testCasesToSave.length} test cases failed validation. Errors: ${individualErrors.map(e => `${e.title}: ${e.error}`).join('; ')}`);
                 }
             }
 
-            console.log(`✅ Successfully inserted ${insertedCount} test cases into database`);
+            logger.info(`✅ Successfully inserted ${insertedCount} test cases into database`);
 
             // Verify bằng cách query lại
             const verifyCount = await Testcase.countDocuments({ version_id: versionId });
-            console.log(`✅ Total test cases in database for version ${versionId}: ${verifyCount}`);
+            logger.info(`✅ Total test cases in database for version ${versionId}: ${verifyCount}`);
 
             if (insertedCount < testCasesToSave.length) {
-                console.warn(`⚠️ Only inserted ${insertedCount}/${testCasesToSave.length} test cases. Some may have been skipped.`);
+                logger.warn(`⚠️ Only inserted ${insertedCount}/${testCasesToSave.length} test cases. Some may have been skipped.`);
             }
 
             return result;
         } catch (error: any) {
-            console.error(`❌ Error saving test cases batch:`, error.message);
+            logger.error(`❌ Error saving test cases batch:`, error.message);
             throw error;
         }
     }
 
     private async generateAllTestTypes(requirements: any[], databaseSchema: any, language: string): Promise<any[]> {
-        console.log(`🔄 Generating all test types for ${requirements.length} requirements`);
+        logger.info(`🔄 Generating all test types for ${requirements.length} requirements`);
 
         const allTestCases: any[] = [];
         const testTypes = ['integration', 'api', 'ui', 'performance', 'security']; // Các loại test chính
@@ -550,7 +552,7 @@ export class TestcaseService {
             try {
                 // Tạo test cases cho từng loại test
                 for (const testType of testTypes) {
-                    console.log(`🧪 Generating ${testType} tests for requirement: ${requirement.name}`);
+                    logger.info(`🧪 Generating ${testType} tests for requirement: ${requirement.name}`);
 
                     const testCases = await this.testcaseGeminiService.generateTestCases(
                         [requirement], // Chỉ 1 requirement
@@ -566,13 +568,13 @@ export class TestcaseService {
                     await new Promise(resolve => setTimeout(resolve, 500));
                 }
             } catch (error) {
-                console.error(`❌ Error generating tests for requirement ${requirement.name}:`, error);
+                logger.error(`❌ Error generating tests for requirement ${requirement.name}:`, error);
                 // Tiếp tục với requirement tiếp theo
                 continue;
             }
         }
 
-        console.log(`🎉 Generated total ${allTestCases.length} test cases across all types`);
+        logger.info(`🎉 Generated total ${allTestCases.length} test cases across all types`);
         return allTestCases;
     }
 
@@ -581,7 +583,7 @@ export class TestcaseService {
      */
     // Sửa hàm saveTestCases
     // async saveTestCases(projectId: string, versionId: string, testCases: any[], createdBy?: string) {
-    //     console.log('💾 Saving test cases:', {
+    //     logger.info('💾 Saving test cases:', {
     //         projectId,
     //         versionId,
     //         testCasesCount: testCases.length,
@@ -603,27 +605,27 @@ export class TestcaseService {
     //             };
     //         });
 
-    //         console.log('📦 Test cases ready for save:', testCasesToSave.length);
+    //         logger.info('📦 Test cases ready for save:', testCasesToSave.length);
 
     //         const savedTestCases = await Testcase.insertMany(testCasesToSave, {
     //             ordered: false
     //         }).catch(error => {
-    //             console.warn('⚠️ Some test cases failed, but continuing...', error);
+    //             logger.warn('⚠️ Some test cases failed, but continuing...', error);
 
     //             if (error.insertedDocs && error.insertedDocs.length > 0) {
     //                 return error.insertedDocs;
     //             }
 
-    //             console.log('🔄 No insertedDocs found, returning original test cases');
+    //             logger.info('🔄 No insertedDocs found, returning original test cases');
     //             return testCasesToSave;
     //         });
 
-    //         console.log(`✅ Successfully processed ${savedTestCases.length} test cases`);
+    //         logger.info(`✅ Successfully processed ${savedTestCases.length} test cases`);
     //         return savedTestCases;
 
     //     } catch (error: any) {
-    //         console.warn('⚠️ Error caught but ignoring:', error);
-    //         console.log('🔄 Returning original test cases as success');
+    //         logger.warn('⚠️ Error caught but ignoring:', error);
+    //         logger.info('🔄 Returning original test cases as success');
 
     //         const safeTestCases = testCases.map(testCase => {
     //             const { id, ...cleanTestCase } = testCase;
@@ -648,7 +650,7 @@ export class TestcaseService {
  * Lưu ENTERPRISE test cases vào database
  */
     async saveTestCases(projectId: string, versionId: string, testCases: any[], createdBy?: string) {
-        console.log('💾 Saving test cases:', {
+        logger.info('💾 Saving test cases:', {
             projectId,
             versionId,
             testCasesCount: testCases.length,
@@ -670,22 +672,22 @@ export class TestcaseService {
                 };
             });
 
-            console.log('📦 Test cases ready for save:', testCasesToSave.length);
+            logger.info('📦 Test cases ready for save:', testCasesToSave.length);
 
             const savedTestCases = await Testcase.insertMany(testCasesToSave, {
                 ordered: false
             }).catch(error => {
-                console.warn('⚠️ Some test cases failed, but continuing...', error);
+                logger.warn('⚠️ Some test cases failed, but continuing...', error);
 
                 if (error.insertedDocs && error.insertedDocs.length > 0) {
                     return error.insertedDocs;
                 }
 
-                console.log('🔄 No insertedDocs found, returning original test cases');
+                logger.info('🔄 No insertedDocs found, returning original test cases');
                 return testCasesToSave;
             });
 
-            console.log(`✅ Successfully processed ${savedTestCases.length} test cases`);
+            logger.info(`✅ Successfully processed ${savedTestCases.length} test cases`);
 
             // ✅ Ghi log cho save testcase
             try {
@@ -713,15 +715,15 @@ export class TestcaseService {
                     });
                 }
             } catch (logError) {
-                console.error("❌ Error logging testcase save:", logError);
+                logger.error("❌ Error logging testcase save:", logError);
                 // Không throw error để không ảnh hưởng đến flow chính
             }
 
             return savedTestCases;
 
         } catch (error: any) {
-            console.warn('⚠️ Error caught but ignoring:', error);
-            console.log('🔄 Returning original test cases as success');
+            logger.warn('⚠️ Error caught but ignoring:', error);
+            logger.info('🔄 Returning original test cases as success');
 
             const safeTestCases = testCases.map(testCase => {
                 const { id, ...cleanTestCase } = testCase;
@@ -939,11 +941,14 @@ export class TestcaseService {
             }
         }
 
-        return await Testcase.findByIdAndUpdate(
+        const executed = await Testcase.findByIdAndUpdate(
             id,
             { $set: updateData },
             { new: true, runValidators: true }
         ).populate('executed_by', 'name email');
+        // Kết quả chạy → WorkHub (thất bại tạo Bug, chạy lại đạt thì ghi chú). Không bao giờ làm hỏng việc chạy test.
+        workhubSyncService.reportTestcase(id, executedBy).catch(() => undefined);
+        return executed;
     }
 
     /**

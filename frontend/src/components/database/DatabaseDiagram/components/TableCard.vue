@@ -126,8 +126,8 @@ export default {
   min-height: 200px;
   max-height: 500px;
   background: white;
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: grab;
@@ -154,21 +154,21 @@ export default {
 }
 
 .table-card::-webkit-scrollbar-thumb {
-  background-color: #a0aec0;
-  border-radius: 10px;
+  background-color: var(--muted);
+  border-radius: var(--radius-field);
 }
 
 .table-card::-webkit-scrollbar-thumb:hover {
-  background-color: #718096;
+  background-color: var(--muted);
 }
 
 .table-card::-webkit-scrollbar-track {
-  background: #edf2f7;
-  border-radius: 10px;
+  background: var(--sunken);
+  border-radius: var(--radius-field);
 }
 
 .table-card:hover {
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 12px 40px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-6px) scale(1.03);
   z-index: 100;
@@ -189,13 +189,13 @@ export default {
 }
 
 .table-card.table-highlighted {
-  border-color: #3b82f6;
+  border-color: var(--ink);
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.8), 0 6px 20px -6px rgba(59, 130, 246, 0.3);
   z-index: 80;
 }
 
 .table-card.table-selected {
-  border-color: #2563eb;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4), 0 8px 25px -8px rgba(37, 99, 235, 0.2);
   z-index: 85;
 }
@@ -212,9 +212,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px 14px 0 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   position: relative;
   overflow: hidden;
 }
@@ -275,7 +275,7 @@ export default {
   justify-content: center;
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -300,9 +300,9 @@ export default {
 .table-description {
   padding: 10px 18px;
   font-size: 12px;
-  color: #64748b;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
   font-style: italic;
   line-height: 1.5;
 }
@@ -316,7 +316,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 10px 18px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -333,30 +333,30 @@ export default {
 }
 
 .table-column:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
   padding-left: 22px;
 }
 
 .table-column:hover::before {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 .table-column.column-highlighted {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border-left: 3px solid #3b82f6;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  border-left: 3px solid var(--ink);
   padding-left: 22px;
 }
 
 .column-name {
   font-size: 13px;
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text);
   flex: 1;
 }
 
 .column-type {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted);
   margin-right: 8px;
 }
 
@@ -369,7 +369,7 @@ export default {
   font-size: 9px;
   font-weight: 700;
   padding: 3px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: white;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -383,19 +383,19 @@ export default {
 }
 
 .column-badge.pk {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
 }
 
 .column-badge.fk {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 .column-badge.nn {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
 }
 
 .column-badge.uq {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
 }
 
 /* Connection Points */
@@ -412,7 +412,7 @@ export default {
   position: absolute;
   width: 12px;
   height: 12px;
-  background: #3b82f6;
+  background: var(--ink);
   border: 2px solid white;
   border-radius: 50%;
   opacity: 0;
@@ -452,48 +452,48 @@ export default {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .table-card {
-    background: #1f2937;
-    border-color: #374151;
-    color: #f9fafb;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--muted);
   }
 
   .table-header {
-    background: #111827;
-    border-color: #374151;
-    color: #f9fafb;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--muted);
   }
 
   .table-header h4 {
-    color: #f9fafb;
+    color: var(--muted);
   }
 
   .table-description {
-    background: #111827;
-    border-color: #374151;
-    color: #d1d5db;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--muted);
   }
 
   .table-column {
-    border-color: #374151;
-    color: #f9fafb;
+    border-color: var(--ink);
+    color: var(--muted);
   }
 
   .table-column:hover {
-    background: #374151;
+    background: var(--ink);
   }
 
   .column-name {
-    color: #f9fafb;
+    color: var(--muted);
   }
 
   .column-type {
-    color: #9ca3af;
+    color: var(--muted);
   }
 }
 
 /* Thêm style cho table được highlight */
 .table-card.table-highlighted {
-  border-color: #3b82f6 !important;
+  border-color: var(--ink) !important;
   box-shadow: 0 0 0 12px rgba(244, 11, 3, 0.4), 0 8px 25px -8px rgba(64, 102, 163, 0.3) !important;
   z-index: 80;
   transform: scale(1.08);
@@ -502,17 +502,17 @@ export default {
 
 /* Column highlight */
 .table-column.column-highlighted {
-  background: #dbeafe !important;
-  border-left: 3px solid #3b82f6;
+  background: var(--sunken) !important;
+  border-left: 3px solid var(--ink);
 }
 
 .table-column.primary.column-highlighted {
-  background: #fef2f2;
-  border-left: 3px solid #ef4444;
+  background: var(--sunken);
+  border-left: 3px solid var(--danger);
 }
 
 .table-column.foreign.column-highlighted {
-  background: #eff6ff;
-  border-left: 3px solid #3b82f6;
+  background: var(--sunken);
+  border-left: 3px solid var(--ink);
 }
 </style>

@@ -270,7 +270,7 @@ export default {
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   width: 90%;
   max-width: 700px;
   max-height: 90vh;
@@ -296,14 +296,14 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .btn-close {
@@ -311,14 +311,14 @@ export default {
   border: none;
   cursor: pointer;
   padding: 4px;
-  color: #6b7280;
+  color: var(--muted);
   display: flex;
   align-items: center;
   transition: color 0.2s;
 }
 
 .btn-close:hover {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .modal-body {
@@ -340,8 +340,8 @@ export default {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #1a365d;
+  border: 4px solid var(--border);
+  border-top-color: var(--ink);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 16px;
@@ -355,28 +355,28 @@ export default {
 
 .error-icon {
   font-size: 48px;
-  color: #ef4444;
+  color: var(--danger);
   margin-bottom: 16px;
 }
 
 .error-container p {
-  color: #6b7280;
+  color: var(--muted);
   margin-bottom: 16px;
 }
 
 .btn-retry {
   padding: 8px 16px;
-  background: #1a365d;
+  background: var(--ink);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 500;
   transition: background 0.2s;
 }
 
 .btn-retry:hover {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 .category-filter {
@@ -388,25 +388,25 @@ export default {
 
 .filter-btn {
   padding: 8px 16px;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: var(--sunken);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   transition: all 0.2s;
 }
 
 .filter-btn:hover {
-  background: #e5e7eb;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .filter-btn.active {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
-  border-color: #1a365d;
+  border-color: var(--ink);
 }
 
 .models-list {
@@ -420,23 +420,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-field);
   cursor: pointer;
   transition: all 0.2s;
   background: white;
 }
 
 .model-item:hover {
-  border-color: #1a365d;
-  background: #f8fafc;
+  border-color: var(--ink);
+  background: var(--bg);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
 }
 
 .model-item.selected {
-  border-color: #1a365d;
-  background: #f0f4ff;
+  border-color: var(--ink);
+  background: var(--sunken);
 }
 
 .model-info {
@@ -453,32 +453,32 @@ export default {
 .model-name {
   font-size: 16px;
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .badge {
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .badge.free {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .badge.warning {
   background: #fef3c7;
-  color: #92400e;
+  color: var(--danger);
 }
 
 .model-details {
   display: flex;
   gap: 12px;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .model-provider {
@@ -486,11 +486,11 @@ export default {
 }
 
 .model-context {
-  color: #9ca3af;
+  color: var(--muted);
 }
 
 .model-pricing {
-  color: #dc2626;
+  color: var(--danger);
   font-weight: 500;
   font-size: 12px;
 }
@@ -502,7 +502,7 @@ export default {
 
 .check-icon {
   font-size: 24px;
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .empty-state {
@@ -511,7 +511,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .empty-state .material-symbols-outlined {
@@ -525,13 +525,13 @@ export default {
   justify-content: flex-end;
   gap: 12px;
   padding: 20px 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border);
 }
 
 .btn-secondary,
 .btn-primary {
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -539,22 +539,22 @@ export default {
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--sunken);
+  color: var(--muted);
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
-  color: #1a365d;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .btn-primary {
-  background: #1a365d;
+  background: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d4a8a;
+  background: var(--ink);
 }
 
 .btn-primary:disabled {

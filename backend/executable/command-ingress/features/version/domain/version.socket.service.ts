@@ -1,4 +1,5 @@
 import { io } from '../../../socket';
+import { workhubSyncService } from '../../workhub/domain/service';
 import {
   VersionEvent,
   VersionCreatedEvent,
@@ -14,7 +15,9 @@ export class VersionSocketService {
    */
   broadcastToProject(projectId: string, event: VersionEvent): void {
     io.to(`project_${projectId}`).emit('version_event', event);
-    //console.log(`📢 Broadcast version event to project ${projectId}:`, event.type);
+    // Version hoàn tất / đổi → đồng bộ đặc tả sang WorkHub (debounce)
+    if (event.type !== 'VERSION_SWITCHED') workhubSyncService.schedule(projectId, event.userId);
+    //logger.info(`📢 Broadcast version event to project ${projectId}:`, event.type);
   }
 
   /**
@@ -22,7 +25,7 @@ export class VersionSocketService {
    */
   joinProjectRoom(socket: any, projectId: string): void {
     socket.join(`project_${projectId}`);
-    //console.log(`✅ User ${socket.id} joined project room: project_${projectId}`);
+    //logger.info(`✅ User ${socket.id} joined project room: project_${projectId}`);
   }
 
   /**
@@ -30,7 +33,7 @@ export class VersionSocketService {
    */
   leaveProjectRoom(socket: any, projectId: string): void {
     socket.leave(`project_${projectId}`);
-    //console.log(`🚪 User ${socket.id} left project room: project_${projectId}`);
+    //logger.info(`🚪 User ${socket.id} left project room: project_${projectId}`);
   }
 
   /**

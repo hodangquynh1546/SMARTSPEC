@@ -310,7 +310,7 @@ export default {
 
 .relationship-path {
   fill: none;
-  stroke: #64748b;
+  stroke: var(--muted);
   stroke-width: 2.5;
   pointer-events: stroke;
   cursor: pointer;
@@ -328,86 +328,86 @@ export default {
 }
 
 .relationship-path.relationship-highlighted.one-to-one {
-  stroke: #10b981;
+  stroke: var(--success);
   filter: drop-shadow(0 2px 6px rgba(16, 185, 129, 0.4));
 }
 
 .relationship-path.relationship-highlighted.one-to-many {
-  stroke: #3b82f6;
+  stroke: var(--ink);
   filter: drop-shadow(0 2px 6px rgba(59, 130, 246, 0.4));
 }
 
 .relationship-path.relationship-highlighted.many-to-one {
-  stroke: #8b5cf6;
+  stroke: var(--ink);
   filter: drop-shadow(0 2px 6px rgba(139, 92, 246, 0.4));
 }
 
 .relationship-path.relationship-highlighted.many-to-many {
-  stroke: #f59e0b;
+  stroke: var(--warning);
   filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.4));
 }
 
 /* Arrowhead styles */
 .arrowhead {
-  fill: #64748b;
+  fill: var(--muted);
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
 .arrowhead-highlighted {
-  fill: #475569;
+  fill: var(--text);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .arrowhead-one-to-one {
-  fill: #06eea5;
+  fill: var(--success);
 }
 
 .arrowhead-one-to-many {
-  fill: #d6ff07;
+  fill: var(--success-soft);
 }
 
 .arrowhead-many-to-one {
-  fill: #02eaff;
+  fill: var(--ink);
 }
 
 .arrowhead-many-to-many {
-  fill: #d97706;
+  fill: var(--danger);
 }
 
 .relationship-type-badge.one-to-one {
-  background: #06eea5;
+  background: var(--success);
 }
 
 .relationship-type-badge.one-to-many {
-  background: #d6ff07;
+  background: var(--success-soft);
 }
 
 .relationship-type-badge.many-to-one {
-  background: #02eaff;
+  background: var(--ink);
 }
 
 .relationship-type-badge.many-to-many {
-  background: #d97706;
+  background: var(--danger);
 }
 
 /* Relationship coloring when enabled */
 .relationship-path.relationship-colored.one-to-one {
-  stroke: #10b981;
+  stroke: var(--success);
   opacity: 0.8;
 }
 
 .relationship-path.relationship-colored.one-to-many {
-  stroke: #3b82f6;
+  stroke: var(--ink);
   opacity: 0.8;
 }
 
 .relationship-path.relationship-colored.many-to-one {
-  stroke: #8b5cf6;
+  stroke: var(--ink);
   opacity: 0.8;
 }
 
 .relationship-path.relationship-colored.many-to-many {
-  stroke: #f59e0b;
+  stroke: var(--warning);
   opacity: 0.8;
 }
 
@@ -446,7 +446,7 @@ export default {
 
 .relationship-path:hover .arrowhead,
 .relationship-path.relationship-highlighted .arrowhead {
-  fill: #3b82f6;
+  fill: var(--ink);
 }
 
 .relationship-path:not(.relationship-related) {

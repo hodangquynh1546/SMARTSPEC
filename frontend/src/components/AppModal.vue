@@ -63,7 +63,7 @@ export default {
   max-width: 420px;
   background: transparent;
   color: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   box-shadow: none;
   overflow: hidden;
   text-align: center;
@@ -96,7 +96,7 @@ export default {
 .btn {
   display: inline-block;
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 999px;
   cursor: pointer;
   border: none;
   font-weight: 600;
@@ -112,7 +112,7 @@ export default {
 }
 
 .btn-primary {
-  background: #4caf50;
+  background: var(--success);
   color: white;
 }
 

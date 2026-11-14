@@ -777,7 +777,7 @@ export default {
 
 .modal-content.xlarge {
   background: white;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   width: 100%;
   max-width: 1000px;
   max-height: 95vh;
@@ -787,11 +787,11 @@ export default {
 
 .modal-header {
   padding: 1.5rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -800,7 +800,7 @@ export default {
 .modal-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   margin: 0;
 }
 
@@ -808,17 +808,17 @@ export default {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-close:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .modal-body {
@@ -828,15 +828,15 @@ export default {
 .testcase-info {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
 }
 
 .testcase-info h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 1rem;
   line-height: 1.4;
 }
@@ -851,12 +851,12 @@ export default {
 
 .current-status {
   font-size: 0.875rem;
-  color: #64748b;
+  color: var(--muted);
   font-weight: 500;
 }
 
 .testcase-description {
-  color: #64748b;
+  color: var(--muted);
   line-height: 1.5;
   margin: 0;
 }
@@ -870,7 +870,7 @@ export default {
 .form-section {
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .form-section:last-of-type {
@@ -884,13 +884,13 @@ export default {
   gap: 0.5rem;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   margin-bottom: 1.5rem;
 }
 
 .section-title .material-symbols-outlined {
   font-size: 1.25rem;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .status-options {
@@ -921,20 +921,20 @@ export default {
   align-items: center;
   gap: 0.75rem;
   padding: 1.5rem 1rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
   transition: all 0.3s ease;
 }
 
 .status-option:hover .status-content {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
   transform: translateY(-2px);
 }
 
 .status-option.selected .status-content {
-  border-color: #1a365d;
-  background: #f0f4f8;
+  border-color: var(--ink);
+  background: var(--sunken);
   box-shadow: 0 4px 6px -1px rgba(26, 54, 93, 0.1);
 }
 
@@ -949,33 +949,33 @@ export default {
 }
 
 .status-icon.passed {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .status-icon.failed {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .status-icon.blocked {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .status-icon.in_progress {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .status-label {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
 .status-option.selected .status-label {
-  color: #1a365d;
+  color: var(--ink);
 }
 
 .steps-execution {
@@ -985,10 +985,10 @@ export default {
 }
 
 .execution-step {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .step-header {
@@ -1000,7 +1000,7 @@ export default {
 
 .step-number {
   font-weight: 600;
-  color: #1a365d;
+  color: var(--ink);
   font-size: 1rem;
 }
 
@@ -1017,7 +1017,7 @@ export default {
 }
 
 .step-action {
-  color: #374151;
+  color: var(--text);
   line-height: 1.5;
 }
 
@@ -1026,7 +1026,7 @@ export default {
 }
 
 .step-input-data strong {
-  color: #374151;
+  color: var(--text);
   display: block;
   margin-bottom: 0.5rem;
 }
@@ -1037,18 +1037,18 @@ export default {
 
 .step-expected {
   padding: 0.75rem;
-  background: #f0fff4;
-  border: 1px solid #9ae6b4;
-  border-radius: 6px;
-  color: #276749;
+  background: var(--bg);
+  border: 1px solid var(--success-soft);
+  border-radius: var(--radius-sm);
+  color: var(--success);
   font-size: 0.875rem;
 }
 
 .json-data {
-  background: #1f2937;
-  color: #e5e7eb;
+  background: var(--ink);
+  color: var(--muted);
   padding: 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.75rem;
   overflow-x: auto;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
@@ -1081,7 +1081,7 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text);
   font-size: 0.875rem;
 }
 
@@ -1090,8 +1090,8 @@ export default {
 .form-textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   transition: all 0.2s;
   background: white;
@@ -1101,7 +1101,7 @@ export default {
 .form-select:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #1a365d;
+  border-color: var(--ink);
   box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
 }
 
@@ -1116,8 +1116,8 @@ export default {
 }
 
 .form-textarea.error {
-  border-color: #dc2626;
-  background: #fef2f2;
+  border-color: var(--danger);
+  background: var(--sunken);
 }
 
 .json-textarea {
@@ -1128,7 +1128,7 @@ export default {
 }
 
 .error-message {
-  color: #dc2626;
+  color: var(--danger);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   display: flex;
@@ -1149,10 +1149,10 @@ export default {
 }
 
 .test-data-result {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg);
 }
 
 .data-header {
@@ -1164,7 +1164,7 @@ export default {
 
 .data-header h5 {
   margin: 0;
-  color: #374151;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -1198,7 +1198,7 @@ export default {
 
 .log-timestamp {
   font-size: 0.75rem;
-  color: #64748b;
+  color: var(--muted);
   min-width: 80px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
@@ -1216,9 +1216,9 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: white;
-  border: 2px dashed #d1d5db;
-  border-radius: 6px;
-  color: #64748b;
+  border: 2px dashed var(--border-strong);
+  border-radius: 999px;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
@@ -1228,9 +1228,9 @@ export default {
 .btn-add-log:hover,
 .btn-add-exception:hover,
 .btn-add-attachment:hover {
-  border-color: #1a365d;
-  color: #1a365d;
-  background: #f0f4f8;
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--sunken);
 }
 
 .exceptions-container {
@@ -1244,9 +1244,9 @@ export default {
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
   position: relative;
 }
 
@@ -1290,20 +1290,20 @@ export default {
   gap: 1rem;
   align-items: center;
   padding: 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: white;
 }
 
 .attachment-preview {
   width: 3rem;
   height: 3rem;
-  background: #f1f5f9;
-  border-radius: 6px;
+  background: var(--sunken);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: var(--muted);
 }
 
 .attachment-info {
@@ -1314,8 +1314,8 @@ export default {
 }
 
 .summary-section {
-  background: #f8fafc;
-  border-radius: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
   padding: 1.5rem;
 }
 
@@ -1331,27 +1331,27 @@ export default {
   align-items: center;
   padding: 0.75rem;
   background: white;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .summary-item label {
   font-weight: 500;
-  color: #64748b;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
 .summary-item span {
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
 }
 
 .summary-item .passed {
-  color: #059669;
+  color: var(--success);
 }
 
 .summary-item .failed {
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .checkbox-item {
@@ -1368,8 +1368,8 @@ export default {
 .checkmark {
   width: 1rem;
   height: 1rem;
-  border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1377,8 +1377,8 @@ export default {
 }
 
 .checkbox-item input[type='checkbox']:checked + .checkmark {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .checkbox-item input[type='checkbox']:checked + .checkmark::after {
@@ -1390,7 +1390,7 @@ export default {
 
 .checkbox-label {
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text);
 }
 
 .btn {
@@ -1399,7 +1399,7 @@ export default {
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: 1px solid;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -1407,40 +1407,40 @@ export default {
 }
 
 .btn-primary {
-  background: #1a365d;
-  border-color: #1a365d;
+  background: var(--ink);
+  border-color: var(--ink);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2d3748;
-  border-color: #2d3748;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background: #9ca3af;
-  border-color: #9ca3af;
+  background: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
 .btn-secondary {
   background: white;
-  border-color: #d1d5db;
-  color: #374151;
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
 .btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3b8;
+  background: var(--bg);
+  border-color: var(--border-strong);
 }
 
 .btn-icon {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  color: #64748b;
+  color: var(--muted);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1448,8 +1448,8 @@ export default {
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--sunken);
+  color: var(--text);
 }
 
 .btn-icon:disabled {
@@ -1458,8 +1458,8 @@ export default {
 }
 
 .btn-icon.danger:hover:not(:disabled) {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .form-actions {
@@ -1468,7 +1468,7 @@ export default {
   gap: 1rem;
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .spinner {
@@ -1492,50 +1492,50 @@ export default {
 .badge {
   display: inline-block;
   padding: 0.375rem 0.75rem;
-  border-radius: 20px;
+  border-radius: var(--radius);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .badge.type.unit {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .badge.type.integration {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 .badge.type.api {
-  background: #f3e8ff;
-  color: #7c3aed;
+  background: var(--sunken);
+  color: var(--ink);
 }
 
 .badge.type.ui {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .badge.priority.critical {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--sunken);
+  color: var(--danger);
 }
 
 .badge.priority.high {
   background: #fed7aa;
-  color: #ea580c;
+  color: var(--danger);
 }
 
 .badge.priority.medium {
   background: #fef3c7;
-  color: #d97706;
+  color: var(--danger);
 }
 
 .badge.priority.low {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--success-soft);
+  color: var(--success);
 }
 
 @media (max-width: 768px) {

@@ -84,6 +84,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { marked } from 'marked'
+import { sanitizeHtml } from '@/utils/sanitize'
 
 const props = defineProps({
   item: {
@@ -107,7 +108,7 @@ const formData = ref({})
 
 // Computed
 const renderedMarkdown = computed(() => {
-  return marked(markdownContent.value || '')
+  return sanitizeHtml(marked(markdownContent.value || ''))
 })
 
 const formFields = computed(() => {
@@ -227,7 +228,7 @@ defineExpose({
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #858585;
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -241,27 +242,27 @@ defineExpose({
   display: flex;
   gap: 4px;
   padding: 8px;
-  border-bottom: 1px solid #3e3e42;
-  background: #2d2d30;
+  border-bottom: 1px solid var(--ink);
+  background: var(--ink);
 }
 
 .mode-btn {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid #3e3e42;
-  color: #cccccc;
-  border-radius: 4px;
+  border: 1px solid var(--ink);
+  color: var(--muted);
+  border-radius: 999px;
   cursor: pointer;
   font-size: 12px;
 }
 
 .mode-btn:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 
 .mode-btn.active {
-  background: #0e639c;
-  border-color: #0e639c;
+  background: var(--ink);
+  border-color: var(--ink);
 }
 
 .json-editor,
@@ -276,8 +277,8 @@ defineExpose({
 .markdown-textarea {
   flex: 1;
   padding: 16px;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--ink);
+  color: var(--muted);
   border: none;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 13px;
@@ -293,10 +294,10 @@ defineExpose({
 
 .markdown-preview {
   padding: 16px;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--ink);
+  color: var(--muted);
   overflow-y: auto;
-  border-left: 1px solid #3e3e42;
+  border-left: 1px solid var(--ink);
 }
 
 .form-editor {
@@ -312,7 +313,7 @@ defineExpose({
 .form-field label {
   display: block;
   margin-bottom: 6px;
-  color: #cccccc;
+  color: var(--muted);
   font-size: 13px;
   font-weight: 500;
 }
@@ -322,10 +323,10 @@ defineExpose({
 .form-field select {
   width: 100%;
   padding: 8px 12px;
-  background: #3c3c3c;
-  border: 1px solid #3e3e42;
-  border-radius: 4px;
-  color: #cccccc;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   font-size: 13px;
 }
 
@@ -333,15 +334,15 @@ defineExpose({
 .form-field textarea:focus,
 .form-field select:focus {
   outline: none;
-  border-color: #0e639c;
+  border-color: var(--ink);
 }
 
 .item-info {
   display: flex;
   gap: 12px;
   padding: 12px 16px;
-  border-top: 1px solid #3e3e42;
-  background: #2d2d30;
+  border-top: 1px solid var(--ink);
+  background: var(--ink);
 }
 
 .info-badge {
@@ -351,11 +352,11 @@ defineExpose({
 }
 
 .info-label {
-  color: #858585;
+  color: var(--muted);
 }
 
 .info-value {
-  color: #cccccc;
+  color: var(--muted);
   font-family: monospace;
 }
 </style>

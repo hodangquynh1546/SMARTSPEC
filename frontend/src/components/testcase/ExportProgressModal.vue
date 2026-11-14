@@ -175,7 +175,7 @@ export default {
 
 .export-progress-modal {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius);
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
@@ -200,8 +200,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.75rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -211,7 +211,7 @@ export default {
 .modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -230,8 +230,8 @@ export default {
 .progress-bar {
   width: 100%;
   height: 10px;
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   margin-bottom: 0.5rem;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -239,8 +239,8 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1a365d 0%, #2d4a7c 100%);
-  border-radius: 8px;
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  border-radius: var(--radius-sm);
   transition: width 0.3s ease;
   box-shadow: 0 1px 3px rgba(26, 54, 93, 0.3);
   position: relative;
@@ -268,20 +268,20 @@ export default {
 }
 
 .progress-fill.preparing {
-  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(90deg, var(--warning) 0%, var(--danger) 100%);
 }
 
 .progress-fill.exporting {
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
   animation: pulse 2s infinite;
 }
 
 .progress-fill.completed {
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(90deg, var(--success) 0%, var(--success) 100%);
 }
 
 .progress-fill.error {
-  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(90deg, var(--danger) 0%, var(--danger) 100%);
 }
 
 @keyframes pulse {
@@ -321,9 +321,9 @@ export default {
   align-items: flex-start;
   gap: 1rem;
   padding: 1.25rem;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-field);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -346,8 +346,8 @@ export default {
 }
 
 .status-item.active {
-  border-color: #1a365d;
-  background: linear-gradient(135deg, #e6f2ff 0%, #dbeafe 100%);
+  border-color: var(--ink);
+  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
   transform: translateY(-2px);
 }
@@ -355,11 +355,11 @@ export default {
 .status-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
@@ -387,19 +387,19 @@ export default {
 }
 
 .status-item.preparing .status-icon {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
 }
 
 .status-item.exporting .status-icon {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
 }
 
 .status-item.completed .status-icon {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
 }
 
 .status-item.error .status-icon {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
 }
 
 .status-info {
@@ -409,7 +409,7 @@ export default {
 .status-title {
   display: block;
   font-weight: 700;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a8a 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -420,7 +420,7 @@ export default {
 .status-description {
   display: block;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -435,14 +435,14 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 999px;
   font-weight: 500;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .action-section .btn-primary {
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
 }
@@ -454,13 +454,13 @@ export default {
 
 .action-section .btn-secondary {
   background: white;
-  border: 1.5px solid #e2e8f0;
-  color: #1a365d;
+  border: 1.5px solid var(--border);
+  color: var(--ink);
 }
 
 .action-section .btn-secondary:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-color: #1a365d;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  border-color: var(--ink);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
 }

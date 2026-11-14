@@ -705,18 +705,18 @@ watch(searchQuery, (newValue) => {
 <style scoped>
 .status-badge {
   padding: 3px 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: capitalize;
 }
 .status-accepted {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: var(--success-soft);
+  color: var(--success);
 }
 .status-pending {
   background-color: #feefc3;
-  color: #92400e;
+  color: var(--danger);
 }
 
 .loading-spinner {
@@ -724,7 +724,7 @@ watch(searchQuery, (newValue) => {
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
-  border-top: 2px solid #ffffff;
+  border-top: 2px solid var(--border);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-right: 8px;
@@ -735,7 +735,7 @@ watch(searchQuery, (newValue) => {
   width: 12px;
   height: 12px;
   border: 2px solid transparent;
-  border-top: 2px solid #6b7280;
+  border-top: 2px solid var(--muted);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -781,8 +781,8 @@ watch(searchQuery, (newValue) => {
   min-width: 36px;
   min-height: 36px;
   border-radius: 50%;
-  border: 1px solid #e0e0e0;
-  background-color: #f8f9fa;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -803,7 +803,7 @@ watch(searchQuery, (newValue) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
   color: white;
   font-size: 12px;
   font-weight: 600;
@@ -848,7 +848,7 @@ watch(searchQuery, (newValue) => {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .suggestions-dropdown {
@@ -857,8 +857,8 @@ watch(searchQuery, (newValue) => {
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   max-height: 200px;
   overflow-y: auto;
@@ -872,7 +872,7 @@ watch(searchQuery, (newValue) => {
   padding: 8px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border);
 }
 
 .suggestion-item:last-child {
@@ -880,14 +880,14 @@ watch(searchQuery, (newValue) => {
 }
 
 .suggestion-item:hover {
-  background-color: #f9fafb;
+  background-color: var(--bg);
 }
 
 .suggestion-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  /* background: #4f46e5; */
+  /* background: var(--ink); */
   color: white;
   display: flex;
   align-items: center;
@@ -906,14 +906,14 @@ watch(searchQuery, (newValue) => {
 
 .suggestion-name {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text);
   margin-bottom: 2px;
   font-size: 14px;
 }
 
 .suggestion-email {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -923,7 +923,7 @@ watch(searchQuery, (newValue) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6b7280;
+  color: var(--muted);
   justify-content: center;
   padding: 16px;
 }
@@ -933,7 +933,7 @@ watch(searchQuery, (newValue) => {
 }
 
 .hint-text {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.75rem;
   margin-top: 4px;
   display: block;
@@ -1010,25 +1010,25 @@ watch(searchQuery, (newValue) => {
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: var(--surface);
+  border-radius: var(--radius-sm);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border-left: 5px solid;
   margin-bottom: 1rem;
   position: relative;
   overflow: hidden;
-  color: #374151;
+  color: var(--text);
   font-weight: 500;
 }
 
 .toast[data-toast-type='success'] {
-  border-color: #22c55e;
+  border-color: var(--success);
 }
 .toast[data-toast-type='error'] {
-  border-color: #ef4444;
+  border-color: var(--danger);
 }
 .toast[data-toast-type='info'] {
-  border-color: #3b82f6;
+  border-color: var(--ink);
 }
 
 .toast-icon {
@@ -1038,13 +1038,13 @@ watch(searchQuery, (newValue) => {
   height: 1.5rem;
 }
 .toast[data-toast-type='success'] .toast-icon {
-  color: #22c55e;
+  color: var(--success);
 }
 .toast[data-toast-type='error'] .toast-icon {
-  color: #ef4444;
+  color: var(--danger);
 }
 .toast[data-toast-type='info'] .toast-icon {
-  color: #3b82f6;
+  color: var(--ink);
 }
 
 .toast-message {
@@ -1125,14 +1125,14 @@ watch(searchQuery, (newValue) => {
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
   flex: 2;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   min-width: 150px;
 }
 
 .form-input {
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   width: 100%;
 }
 
@@ -1233,7 +1233,7 @@ watch(searchQuery, (newValue) => {
 }
 
 .data-table tbody tr:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .user-cell {
@@ -1254,7 +1254,7 @@ watch(searchQuery, (newValue) => {
 /* ===== Nút ===== */
 .btn {
   padding: 0.5rem 1rem;
-  border-radius: var(--border-radius);
+  border-radius: 999px;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
@@ -1288,7 +1288,7 @@ watch(searchQuery, (newValue) => {
 }
 
 .btn-secondary:hover {
-  background: #f3f4f6;
+  background: var(--sunken);
 }
 
 .btn-text-danger {
@@ -1296,7 +1296,7 @@ watch(searchQuery, (newValue) => {
   color: #fff;
   border: none;
   padding: 0.4rem 0.8rem;
-  border-radius: 6px;
+  border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -1314,21 +1314,21 @@ watch(searchQuery, (newValue) => {
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 8px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--muted);
 }
 
 .btn-icon {
-  background: #efefef;
+  background: var(--sunken);
   border: 1px solid rgb(198, 198, 198);
   padding: 0.5rem;
-  border-radius: 10px;
+  border-radius: var(--radius-field);
   cursor: pointer;
-  color: #060606;
+  color: var(--text);
   font-size: 1.25rem;
   display: flex;
   align-items: center;
@@ -1341,9 +1341,9 @@ watch(searchQuery, (newValue) => {
 
 .btn-icon:hover {
   transform: scale(1.1);
-  background: #dcdcdc;
-  color: #be2727;
-  border-color: #c0c0c0;
+  background: var(--border);
+  color: var(--danger);
+  border-color: var(--border-strong);
 }
 
 .btn-icon:active {
@@ -1418,7 +1418,7 @@ watch(searchQuery, (newValue) => {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 1rem;
   color: var(--text-color-dark);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -1451,7 +1451,7 @@ watch(searchQuery, (newValue) => {
   .modal-container {
     width: 98%;
     max-height: 98vh;
-    border-radius: 12px;
+    border-radius: var(--radius-field);
   }
 
   .modal-header {
@@ -1701,7 +1701,7 @@ watch(searchQuery, (newValue) => {
     background: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.7rem;
     opacity: 0.7;
     pointer-events: none;

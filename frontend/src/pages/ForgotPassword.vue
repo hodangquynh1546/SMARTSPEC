@@ -119,14 +119,14 @@ export default {
 }
 
 .login-card {
-  border-radius: 12px;
+  border-radius: var(--radius-field);
   padding: 30px;
   text-align: center;
 }
 
 .fa-slack {
   font-size: 50px;
-  color: #0a1a4d;
+  color: var(--ink);
   margin-bottom: 24px;
   display: block;
 }
@@ -135,7 +135,7 @@ export default {
   font-size: 24px;
   margin-bottom: 24px;
   font-weight: bold;
-  color: #0a1a4d;
+  color: var(--ink);
 }
 
 .form-group {
@@ -147,27 +147,27 @@ export default {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #333;
+  color: var(--text);
   font-weight: 500;
 }
 
 .form-control {
   width: 100%;
   padding: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 16px;
   transition: border-color 0.3s;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #0a1a4d;
-  box-shadow: 0 0 0 2px rgba(10, 26, 77, 0.2);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.2);
 }
 
 .form-control.error {
-  border-color: #e74c3c;
+  border-color: var(--danger);
 }
 
 .continue-button-wrapper {
@@ -181,8 +181,8 @@ export default {
   justify-content: center;
   width: 100%;
   padding: 14px 20px;
-  border: 1px solid #ddd;
-  border-radius: 9999px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
   background-color: white;
   font-size: 16px;
   cursor: pointer;
@@ -191,8 +191,8 @@ export default {
 }
 
 .btn-primary {
-  background-color: #0a1a4d;
-  border-color: #0a1a4d;
+  background-color: var(--ink);
+  border-color: var(--ink);
   color: white;
   font-weight: bold;
   font-size: 16px;
@@ -200,38 +200,38 @@ export default {
 }
 
 .btn-primary:hover {
-  background-color: #1a2a7a;
-  border-color: #1a2a7a;
+  background-color: var(--ink);
+  border-color: var(--ink);
 }
 
 .btn-primary:disabled {
-  background-color: #b3b3b3;
-  border-color: #b3b3b3;
+  background-color: var(--muted);
+  border-color: var(--border-strong);
   cursor: not-allowed;
 }
 
 .error-message {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
 }
 
 .success-message {
-  color: #2ecc71;
+  color: var(--success);
   font-size: 14px;
   margin-top: 8px;
   text-align: center;
 }
 
 .field-error {
-  color: #e74c3c;
+  color: var(--danger);
   font-size: 13px;
   margin-top: 5px;
 }
 
 .forgot-password-link {
-  color: #0a1a4d;
+  color: var(--ink);
   text-decoration: none;
   display: block;
   margin-top: 24px;
@@ -261,7 +261,7 @@ export default {
   display: grid;
   border: 3px solid #0000;
   border-radius: 50%;
-  border-right-color: #ffffff; /* Color for spinner */
+  border-right-color: var(--border); /* Color for spinner */
   animation: spinner-a4dj62 1s infinite linear;
 }
 

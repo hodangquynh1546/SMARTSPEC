@@ -104,12 +104,12 @@ const handleAdd = () => {
   padding: 8px;
   cursor: pointer;
   user-select: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   transition: background 0.2s;
 }
 
 .section-header:hover {
-  background: #2a2d2e;
+  background: var(--ink);
 }
 
 .icon {
@@ -121,18 +121,18 @@ const handleAdd = () => {
   flex: 1;
   font-size: 13px;
   font-weight: 500;
-  color: #cccccc;
+  color: var(--muted);
 }
 
 .count {
   font-size: 11px;
-  color: #858585;
+  color: var(--muted);
   margin-right: 8px;
 }
 
 .expand-icon {
   font-size: 10px;
-  color: #858585;
+  color: var(--muted);
 }
 
 .section-items {
@@ -145,14 +145,14 @@ const handleAdd = () => {
   align-items: center;
   padding: 6px 8px;
   margin-bottom: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 0.2s;
   position: relative;
 }
 
 .tree-item:hover {
-  background: #2a2d2e;
+  background: var(--ink);
 }
 
 .tree-item:hover .item-actions {
@@ -160,7 +160,7 @@ const handleAdd = () => {
 }
 
 .tree-item.selected {
-  background: #094771;
+  background: var(--ink);
 }
 
 .item-icon {
@@ -171,7 +171,7 @@ const handleAdd = () => {
 .item-name {
   flex: 1;
   font-size: 12px;
-  color: #d4d4d4;
+  color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -190,21 +190,21 @@ const handleAdd = () => {
   cursor: pointer;
   padding: 2px 4px;
   font-size: 12px;
-  border-radius: 2px;
+  border-radius: 999px;
   transition: background 0.2s;
 }
 
 .action-btn:hover {
-  background: #3e3e42;
+  background: var(--ink);
 }
 
 .add-item-btn {
   width: 100%;
   padding: 6px;
   margin-top: 4px;
-  background: #0e639c;
+  background: var(--ink);
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   color: #ffffff;
   font-size: 11px;
   cursor: pointer;
@@ -212,7 +212,7 @@ const handleAdd = () => {
 }
 
 .add-item-btn:hover {
-  background: #1177bb;
+  background: var(--ink);
 }
 </style>
 
