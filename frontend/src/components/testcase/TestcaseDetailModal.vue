@@ -22,7 +22,7 @@
         <!-- Header Section -->
         <div class="detail-header">
           <div class="title-section">
-            <h1>{{ testcase.title || 'Untitled Test Case' }}<WorkhubBugBadge :testcase="testcase" /></h1>
+            <h1>{{ testcase.title || 'Untitled Test Case' }}<WorkhubBugBadge :testcase="testcase" editable /></h1>
             <div class="meta-tags">
               <span class="badge type" :class="testcase.test_type">
                 {{ testcase.test_type }}

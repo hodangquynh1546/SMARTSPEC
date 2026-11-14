@@ -1,8 +1,30 @@
 <script setup>
-import { computed } from 'vue'
-import { workhub } from '@/composables/useWorkhub'
+import { computed, ref } from 'vue'
+import { useToast } from 'vue-toastification'
+import axiosClient from '@/utils/axiosClient'
+import { workhub, workhubErrorMessage } from '@/composables/useWorkhub'
 
-const props = defineProps({ testcase: { type: Object, required: true } })
+const props = defineProps({
+  testcase: { type: Object, required: true },
+  /** Show a status selector (test case detail): QA can move the bug without leaving SmartSpec. */
+  editable: { type: Boolean, default: false },
+})
+const toast = useToast()
+const busy = ref(false)
+const OPTIONS = Object.entries({ TO_DO: 'Chờ sửa', IN_PROGRESS: 'Đang sửa', CODE_REVIEW: 'Review', TESTING: 'Chờ chạy lại', DONE: 'Đã sửa' })
+async function change(status) {
+  if (busy.value || !bug.value || status === bug.value.status) return
+  busy.value = true
+  const key = props.testcase.lineage_id || props.testcase._id
+  try {
+    const { data } = await axiosClient.put(`/api/workhub/projects/${props.testcase.project_id}/testcases/${encodeURIComponent(key)}/bug-status`, { status })
+    workhub.bugs[key] = data.data
+  } catch (e) {
+    toast.error(workhubErrorMessage(e))
+  } finally {
+    busy.value = false
+  }
+}
 const NAMES = { TO_DO: 'Chờ sửa', IN_PROGRESS: 'Đang sửa', CODE_REVIEW: 'Review', TESTING: 'Chờ chạy lại', DONE: 'Đã sửa' }
 const bug = computed(() => workhub.bugs[props.testcase.lineage_id || props.testcase._id] || props.testcase.bug)
 const tone = computed(() => (bug.value?.deleted ? 'idle' : bug.value?.status === 'DONE' ? 'ok' : 'bad'))
@@ -15,6 +37,9 @@ const hint = computed(() => (bug.value?.status === 'DONE' && props.testcase.stat
     <b>{{ bug.issue_key }}</b>
     <span>{{ bug.deleted ? 'Đã xoá' : NAMES[bug.status] || bug.status }}</span>
   </a>
+  <select v-if="editable && bug && bug.issue_key && !bug.deleted" class="bug-status" :value="bug.status" :disabled="busy" aria-label="Đổi trạng thái bug" @change="change($event.target.value)">
+    <option v-for="[v, n] in OPTIONS" :key="v" :value="v">{{ n }}</option>
+  </select>
 </template>
 
 <style scoped>
@@ -24,4 +49,5 @@ const hint = computed(() => (bug.value?.status === 'DONE' && props.testcase.stat
 .bug.bad { background: var(--danger-soft); color: var(--danger); }
 .bug.ok { background: var(--success-soft); color: var(--success); }
 .bug.idle { background: var(--surface); color: var(--muted); border-color: var(--border-strong); }
+.bug-status { margin-left: 8px; font: inherit; font-size: 0.75rem; padding: 3px 8px; border: 1px solid var(--border-strong); border-radius: var(--radius-field); background: var(--surface); color: var(--text); }
 </style>

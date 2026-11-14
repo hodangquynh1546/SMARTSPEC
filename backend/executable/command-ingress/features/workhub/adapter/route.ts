@@ -56,6 +56,15 @@ export default function initWorkhubRoute(): Router {
     res.json({ success: true, data: await workhubSyncService.changeStatus(String(req.params.projectId), String(req.params.key), status, req.getSubject()) });
   }));
 
+  // Change the status of the bug linked to a test case
+  router.put("/projects/:projectId/testcases/:key/bug-status", wrap(async (req, res) => {
+    const status = String(req.body?.status ?? "");
+    if (!["TO_DO", "IN_PROGRESS", "CODE_REVIEW", "TESTING", "DONE"].includes(status)) {
+      return void res.status(400).json({ success: false, code: "BAD_STATUS", message: "Trạng thái không hợp lệ" });
+    }
+    res.json({ success: true, data: await workhubSyncService.changeBugStatus(String(req.params.projectId), String(req.params.key), status, req.getSubject()) });
+  }));
+
   // Recreate a task that was deleted in WorkHub
   router.post("/projects/:projectId/usecases/:key/recreate", wrap(async (req, res) => {
     res.json({ success: true, data: await workhubSyncService.recreate(String(req.params.projectId), String(req.params.key)) });

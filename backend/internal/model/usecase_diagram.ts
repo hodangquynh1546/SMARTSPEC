@@ -1,3 +1,4 @@
+import { attachDesignHooks } from "../hooks/design-changed";
 import { Schema, model, InferSchemaType } from "mongoose";
 
 const actorSchema = new Schema(
@@ -76,6 +77,7 @@ const usecaseDiagramSchema = new Schema(
 );
 
 type UsecaseDiagramInferType = InferSchemaType<typeof usecaseDiagramSchema>;
+attachDesignHooks(usecaseDiagramSchema); // đồng bộ tài liệu thiết kế sang WorkHub khi đổi
 export default model<UsecaseDiagramInferType>(
   "usecase_diagrams",
   usecaseDiagramSchema

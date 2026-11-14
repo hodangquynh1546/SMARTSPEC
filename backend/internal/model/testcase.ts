@@ -1,3 +1,4 @@
+import { attachDesignHooks } from "../hooks/design-changed";
 import mongoose, { Schema, model, InferSchemaType } from "mongoose";
 
 const testcaseSchema = new Schema({
@@ -249,4 +250,5 @@ testcaseSchema.index({
 });
 
 type TestcaseSchemaInferType = InferSchemaType<typeof testcaseSchema>;
+attachDesignHooks(testcaseSchema); // đồng bộ tài liệu thiết kế sang WorkHub khi đổi
 export default model<TestcaseSchemaInferType>("testcases", testcaseSchema);

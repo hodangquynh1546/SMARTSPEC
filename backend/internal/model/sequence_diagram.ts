@@ -1,3 +1,4 @@
+import { attachDesignHooks } from "../hooks/design-changed";
 // models/sequenceDiagram.model.ts
 import { Schema, model, InferSchemaType } from "mongoose";
 
@@ -116,6 +117,7 @@ const sequenceDiagramSchema = new Schema(
 );
 
 type SequenceDiagramInferType = InferSchemaType<typeof sequenceDiagramSchema>;
+attachDesignHooks(sequenceDiagramSchema); // đồng bộ tài liệu thiết kế sang WorkHub khi đổi
 export default model<SequenceDiagramInferType>(
   "sequence_diagrams",
   sequenceDiagramSchema

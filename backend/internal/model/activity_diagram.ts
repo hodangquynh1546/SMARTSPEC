@@ -1,3 +1,4 @@
+import { attachDesignHooks } from "../hooks/design-changed";
 import { Schema, model, InferSchemaType } from "mongoose";
 
 /* ----------------- NODE SCHEMA ------------------ */
@@ -64,4 +65,5 @@ const activityDiagramSchema = new Schema({
 }, { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } });
 
 type ActivityDiagramInferType = InferSchemaType<typeof activityDiagramSchema>;
+attachDesignHooks(activityDiagramSchema); // đồng bộ tài liệu thiết kế sang WorkHub khi đổi
 export default model<ActivityDiagramInferType>("activity_diagrams", activityDiagramSchema);

@@ -1,3 +1,4 @@
+import { attachDesignHooks } from "../hooks/design-changed";
 import { Schema, model, InferSchemaType } from "mongoose";
 
 // Cấu trúc cột trong bảng
@@ -72,4 +73,5 @@ const databaseSchema = new Schema(
 );
 
 type DatabaseSchemaInferType = InferSchemaType<typeof databaseSchema>;
+attachDesignHooks(databaseSchema); // đồng bộ tài liệu thiết kế sang WorkHub khi đổi
 export default model<DatabaseSchemaInferType>("databases", databaseSchema);

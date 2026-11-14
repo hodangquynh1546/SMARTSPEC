@@ -44,6 +44,10 @@ export class BridgeClient {
     return this.call<any>("POST", `/v1/projects/${ssProjectId}/items/${encodeURIComponent(key)}/status`, { status, actorSsUserId });
   }
 
+  changeBugStatus(ssProjectId: string, key: string, status: string, actorSsUserId: string) {
+    return this.call<any>("POST", `/v1/projects/${ssProjectId}/testcases/${encodeURIComponent(key)}/status`, { status, actorSsUserId });
+  }
+
   recreate(ssProjectId: string, key: string) {
     return this.call<any>("POST", `/v1/projects/${ssProjectId}/items/${encodeURIComponent(key)}/recreate`);
   }

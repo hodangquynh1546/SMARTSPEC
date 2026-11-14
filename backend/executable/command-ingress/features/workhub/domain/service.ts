@@ -2,6 +2,12 @@ import logger from "../../../../../lib/logger";
 import Project from "../../../../../internal/model/project";
 import Usecase from "../../../../../internal/model/usecase";
 import Testcase from "../../../../../internal/model/testcase";
+import UsecaseDiagram from "../../../../../internal/model/usecase_diagram";
+import ActivityDiagram from "../../../../../internal/model/activity_diagram";
+import SequenceDiagram from "../../../../../internal/model/sequence_diagram";
+import DatabaseDesign from "../../../../../internal/model/database";
+import { setDesignChangedListener } from "../../../../../internal/hooks/design-changed";
+import { ROOT_FOLDER, activityDiagram, databaseDocument, diagramDocument, sequenceDiagram, slug, srsDocument, testPlanDocument, useCaseDiagram, type DesignDoc } from "./design.export";
 import Version from "../../../../../internal/model/version";
 import User from "../../../../../internal/model/user";
 import env from "../../../utils/env";
@@ -77,6 +83,41 @@ export class WorkhubSyncService {
     return versions[0] ?? null;
   }
 
+  /** Every design artifact of the version as a WorkHub document (SRS, diagrams, ERD + DDL, test plan). */
+  async buildDesignDocs(project: any, version: any, usecases: any[]): Promise<DesignDoc[]> {
+    const keyOf = (u: any) => u.lineage_id || String(u._id);
+    const keyById = new Map<string, string>(usecases.map((u) => [String(u._id), keyOf(u)]));
+    const nameById = new Map<string, string>(usecases.map((u) => [String(u._id), u.name]));
+    const keyByName = new Map<string, string>(usecases.map((u) => [String(u.name).trim().toLowerCase(), keyOf(u)]));
+    const byNameIn = (text: string) => usecases.filter((u) => text.toLowerCase().includes(String(u.name).trim().toLowerCase())).map(keyOf);
+    const vid = version._id;
+    const [ucds, acts, seqs, dbs, tcs]: any[][] = await Promise.all([
+      UsecaseDiagram.find({ version_id: vid }).lean(), ActivityDiagram.find({ version_id: vid }).lean(), SequenceDiagram.find({ version_id: vid }).lean(),
+      DatabaseDesign.find({ version_id: vid }).lean(), Testcase.find({ version_id: vid }).lean(),
+    ]);
+    const docs: DesignDoc[] = [];
+    const vnum = version.version_number ?? `${version.version_major}.${version.version_minor}`;
+    docs.push({ key: "srs", title: "Đặc tả yêu cầu (SRS)", type: "SRS", folder: [ROOT_FOLDER], markdown: srsDocument(project.name, vnum, usecases), useCaseKeys: [] });
+    for (const d of ucds) {
+      const keys = (d.usecases ?? []).map((u: any) => keyByName.get(String(u.title).trim().toLowerCase())).filter(Boolean) as string[];
+      docs.push({ key: `ucd:${slug(d.name)}`, title: `Use case diagram: ${d.name}`.slice(0, 200), type: "TECHNICAL_DESIGN", folder: [ROOT_FOLDER, "Sơ đồ", "Use case"], markdown: diagramDocument(`Use case diagram: ${d.name}`, d.description, useCaseDiagram(d)), useCaseKeys: Array.from(new Set(keys)) });
+    }
+    for (const d of acts) {
+      docs.push({ key: `act:${slug(d.name)}`, title: `Activity diagram: ${d.name}`.slice(0, 200), type: "TECHNICAL_DESIGN", folder: [ROOT_FOLDER, "Sơ đồ", "Activity"], markdown: diagramDocument(`Activity diagram: ${d.name}`, d.description, activityDiagram(d)), useCaseKeys: byNameIn(String(d.name)) });
+    }
+    for (const d of seqs) {
+      const ref = d.usecase_ref_id ? keyById.get(String(d.usecase_ref_id)) : undefined;
+      docs.push({ key: `seq:${slug(d.name)}`, title: `Sequence diagram: ${d.name}`.slice(0, 200), type: "TECHNICAL_DESIGN", folder: [ROOT_FOLDER, "Sơ đồ", "Sequence"], markdown: diagramDocument(`Sequence diagram: ${d.name}`, d.description, sequenceDiagram(d)), useCaseKeys: ref ? [ref] : byNameIn(String(d.name)) });
+    }
+    for (const d of dbs) {
+      const keys = new Set<string>();
+      for (const t of d.tables ?? []) for (const c of t.columns ?? []) for (const u of c.related_usecase_ids ?? []) { const k = keyById.get(String(u)); if (k) keys.add(k); }
+      docs.push({ key: `erd:${slug(d.name)}`, title: `Thiết kế CSDL: ${d.name}`.slice(0, 200), type: "TECHNICAL_DESIGN", folder: [ROOT_FOLDER, "Cơ sở dữ liệu"], markdown: databaseDocument(d, nameById), useCaseKeys: Array.from(keys) });
+    }
+    if (tcs.length) docs.push({ key: "testplan", title: "Kế hoạch & kết quả kiểm thử", type: "TEST_PLAN", folder: [ROOT_FOLDER, "Kiểm thử"], markdown: testPlanDocument(project.name, tcs, nameById), useCaseKeys: [] });
+    return docs;
+  }
+
   async buildPayload(projectId: string) {
     const project: any = await Project.findById(projectId).lean();
     if (!project || project.status?.is_trashed) return null;
@@ -86,7 +127,9 @@ export class WorkhubSyncService {
     const memberRows = [{ user_id: project.owner_id, role: "owner" }, ...(project.members ?? []).filter((m: any) => m.status === "accepted")];
     const users: any[] = await User.find({ _id: { $in: memberRows.map((m: any) => m.user_id) } }).select("email").lean();
     const emailOf = new Map(users.map((u) => [String(u._id), u.email as string]));
+    const design = await this.buildDesignDocs(project, version, usecases).catch((e) => { logger.warn(`design export failed: ${e?.message ?? e}`); return null; });
     return {
+      design,
       members: memberRows.map((m: any) => ({ ssUserId: String(m.user_id), email: emailOf.get(String(m.user_id)) ?? "", role: m.role })).filter((m) => m.email),
       project: { id: String(project._id), name: project.name, description: project.description },
       version: { id: String(version._id), number: version.version_number ?? `${version.version_major}.${version.version_minor}` },
@@ -181,6 +224,14 @@ export class WorkhubSyncService {
     await this.writeImplementation(projectId, key, impl);
     workhubSocketService.emitProgress(projectId, key, impl);
     return impl;
+  }
+
+  /** Change the status of the bug of a failed test case from SmartSpec (e.g. QA closes it after a passing re-run). */
+  async changeBugStatus(projectId: string, key: string, status: string, actorUserId: string) {
+    const progress: BridgeProgress = await bridgeClient.changeBugStatus(projectId, key, status, actorUserId);
+    const bug = toBug(progress);
+    await this.writeBug(projectId, key, bug);
+    return bug;
   }
 
   async recreate(projectId: string, key: string) {
@@ -301,3 +352,5 @@ export class WorkhubSyncService {
 }
 
 export const workhubSyncService = new WorkhubSyncService();
+// Diagrams, database design or test cases changed (any code path) → debounced re-sync of the design documents
+setDesignChangedListener((projectId) => workhubSyncService.schedule(projectId));
