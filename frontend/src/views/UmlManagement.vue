@@ -2965,7 +2965,7 @@ export default {
 <style scoped>
 .uml-management-view {
   padding: 30px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
+  background: var(--sunken);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -3012,7 +3012,7 @@ export default {
 .header-left h2 {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3035,7 +3035,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
@@ -3043,7 +3043,7 @@ export default {
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -3064,14 +3064,14 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 .btn-primary:disabled {
@@ -3148,7 +3148,7 @@ export default {
 }
 
 .btn-icon.danger:hover {
-  background: linear-gradient(135deg, var(--sunken) 0%, #fecaca 100%);
+  background: var(--sunken);
   color: var(--danger);
   border-color: rgba(220, 38, 38, 0.3);
 }
@@ -3181,14 +3181,14 @@ export default {
   background: white;
   border-radius: var(--radius);
   padding: 32px;
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   margin-bottom: 32px;
   border: 1px solid rgba(226, 232, 240, 0.8);
   transition: all 0.3s ease;
 }
 
 .diagram-section:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .section-header {
@@ -3211,7 +3211,7 @@ export default {
 .section-title h3 {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3228,7 +3228,7 @@ export default {
   transform: translateY(-50%);
   width: 4px;
   height: 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
 }
 
@@ -3237,7 +3237,7 @@ export default {
   font-size: 0.875rem;
   font-weight: 600;
   padding: 4px 10px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   border-radius: var(--radius-field);
   margin-left: 8px;
 }
@@ -3274,7 +3274,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -3283,11 +3283,11 @@ export default {
 }
 
 .btn-refresh-section:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px) rotate(180deg);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .btn-refresh-section:active:not(:disabled) {
@@ -3315,7 +3315,7 @@ export default {
   justify-content: center;
   gap: 6px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
@@ -3323,7 +3323,7 @@ export default {
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -3344,14 +3344,14 @@ export default {
 }
 
 .btn-generate-section:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .btn-generate-section:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 .btn-generate-section .material-symbols-outlined {
@@ -3391,7 +3391,7 @@ export default {
 .search-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -3429,13 +3429,13 @@ export default {
 }
 
 .diagrams-scroll-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--border) 0%, var(--muted) 100%);
+  background: var(--border);
   border-radius: var(--radius-field);
   border: 2px solid var(--border);
 }
 
 .diagrams-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--muted) 0%, var(--muted) 100%);
+  background: var(--muted);
 }
 
 .diagrams-scroll-content {
@@ -3467,8 +3467,8 @@ export default {
   inset: 0;
   border-radius: var(--radius);
   padding: 2px;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  background: rgba(10, 10, 10, 0.06);
+  -webkit-mask: #fff 0 0 content-box, #fff 0 0;
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -3481,7 +3481,7 @@ export default {
 
 .diagram-card:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 12px 32px rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
   border-color: var(--border-strong);
 }
 
@@ -3531,7 +3531,7 @@ export default {
   color: var(--muted);
   font-size: 0.875rem;
   font-weight: 500;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   animation: fadeIn 0.3s ease;
 }
 
@@ -3542,7 +3542,7 @@ export default {
   border-top: 3px solid var(--ink);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 .diagram-overlay {
@@ -3551,7 +3551,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.85) 0%, rgba(45, 74, 138, 0.9) 100%);
+  background: rgba(10, 10, 10, 0.06);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -3567,14 +3567,14 @@ export default {
 
 .diagram-info {
   padding: 20px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .diagram-info h4 {
   margin: 0 0 10px 0;
   font-size: 1.1rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3640,17 +3640,17 @@ export default {
 }
 
 .type-usecase {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  background: var(--sunken);
   color: var(--ink);
 }
 
 .type-activity {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--success-soft) 100%);
+  background: var(--sunken);
   color: var(--success);
 }
 
 .type-sequence {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: var(--warning-soft);
   color: var(--danger);
 }
 
@@ -3670,7 +3670,7 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-radius: var(--radius-field);
   font-size: 0.75rem;
   font-weight: 600;
@@ -3681,7 +3681,7 @@ export default {
 }
 
 .stat-badge:hover {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -3707,7 +3707,7 @@ export default {
   width: 100px;
   height: 100px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -3722,7 +3722,7 @@ export default {
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
   opacity: 0.1;
   z-index: -1;
   animation: pulse 2s ease-in-out infinite;
@@ -3759,7 +3759,7 @@ export default {
   color: var(--text);
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3866,13 +3866,13 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
 }
 
 .modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3945,7 +3945,7 @@ export default {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -3971,7 +3971,7 @@ export default {
   color: var(--muted);
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   animation: fadeInUp 0.5s ease;
 }
 
@@ -3983,7 +3983,7 @@ export default {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 .loading-spinner-small {
@@ -4052,7 +4052,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -4061,7 +4061,7 @@ export default {
 }
 
 .export-option:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 18px;
   color: var(--ink);
 }
@@ -4103,7 +4103,7 @@ export default {
   z-index: 100;
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 50%;
   display: flex;
@@ -4123,7 +4123,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -4132,9 +4132,9 @@ export default {
 }
 
 .scroll-arrow:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-color: var(--ink);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -4391,7 +4391,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -4400,11 +4400,11 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn .material-symbols-outlined {
@@ -4481,12 +4481,12 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transition: width 0.3s ease;
 }
 
 .filter-option:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 20px;
 }
 
@@ -4495,7 +4495,7 @@ export default {
 }
 
 .filter-option.active {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
   border-left-color: var(--ink);

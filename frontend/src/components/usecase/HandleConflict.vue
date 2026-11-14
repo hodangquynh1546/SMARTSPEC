@@ -380,20 +380,20 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .btn-primary:disabled {
@@ -416,7 +416,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
   border: 2px solid transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -430,7 +430,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.3), transparent);
   transform: translateX(-100%);
   transition: transform 0.5s ease;
 }
@@ -441,28 +441,28 @@ export default {
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(26, 54, 93, 0.2);
-  border-color: rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
+  border-color: rgba(10, 10, 10, 0.2);
 }
 
 .stat-card.total {
   border-left: 4px solid var(--warning);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.resolved {
   border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.pending {
   border-left: 4px solid var(--muted);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.progress {
   border-left: 4px solid var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .stat-icon {
@@ -498,22 +498,22 @@ export default {
 }
 
 .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
   color: white;
 }
 
 .stat-card.resolved .stat-icon {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
 }
 
 .stat-card.pending .stat-icon {
-  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
+  background: var(--muted);
   color: white;
 }
 
 .stat-card.progress .stat-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
@@ -521,7 +521,7 @@ export default {
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 4px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -540,12 +540,12 @@ export default {
   background: white;
   border-radius: var(--radius);
   padding: 30px;
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   transition: box-shadow 0.3s ease;
 }
 
 .conflicts-section:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .section-header {
@@ -564,7 +564,7 @@ export default {
 .section-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -588,7 +588,7 @@ export default {
   min-width: 40px;
   min-height: 40px;
   border: 2px solid var(--border);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   border-radius: var(--radius-field);
@@ -599,11 +599,11 @@ export default {
 }
 
 .section-collapse-toggle:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .section-collapse-toggle:active {
@@ -625,9 +625,9 @@ export default {
   border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
   position: relative;
   overflow: hidden;
 }
@@ -639,7 +639,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+  background: rgba(245, 158, 11, 0.1);
   transition: width 0.3s ease;
 }
 
@@ -771,7 +771,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -781,15 +781,15 @@ export default {
 
 .conflict-option:hover {
   border-color: var(--ink);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
   transform: translateX(4px) translateY(-2px);
 }
 
 .conflict-option.selected {
   border-color: var(--ink);
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
 }
 
 .conflict-option.selected::before {
@@ -909,7 +909,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
   border: none;
   border-radius: 999px;
@@ -920,7 +920,7 @@ export default {
 }
 
 .btn-resolve:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }

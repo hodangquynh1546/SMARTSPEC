@@ -457,7 +457,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -514,7 +514,7 @@ export default {
   content: '';
   width: 4px;
   height: 1.25rem;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
 }
 
@@ -810,14 +810,14 @@ export default {
   border: 2px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   background: white;
 }
 
 .selection-container:hover {
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.15);
-  border-color: rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
+  border-color: rgba(10, 10, 10, 0.2);
 }
 
 .selection-header {
@@ -825,7 +825,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -900,7 +900,7 @@ export default {
   outline: none;
   border-color: var(--ink);
   background: white;
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -952,14 +952,14 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
 .selection-item:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 .selection-item:hover::before {
@@ -967,9 +967,9 @@ export default {
 }
 
 .selection-item.selected {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   border-left: 4px solid var(--ink);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
 }
 
 .selection-item.selected::before {
@@ -977,9 +977,9 @@ export default {
 }
 
 .selection-item.selected:hover {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
 }
 
 .selection-item:last-child {
@@ -1128,7 +1128,7 @@ export default {
 .form-select:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 /* Action Section */
@@ -1164,23 +1164,23 @@ export default {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-color: var(--ink);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
   border-radius: var(--radius-field);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-color: var(--ink);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
   transform: translateY(-2px);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 4px rgba(10, 10, 10, 0.2);
 }
 
 .btn-primary:disabled {
@@ -1258,10 +1258,10 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transition: width 0.3s ease;
   border-radius: var(--radius-sm);
-  box-shadow: 0 1px 3px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.3);
 }
 
 .progress-text {

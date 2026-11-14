@@ -803,7 +803,7 @@ watch(searchQuery, (newValue) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   font-size: 12px;
   font-weight: 600;

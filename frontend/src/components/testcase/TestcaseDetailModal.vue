@@ -882,7 +882,7 @@ export default {
 .step-number {
   width: 2.5rem;
   height: 2.5rem;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -891,7 +891,7 @@ export default {
   font-weight: 600;
   flex-shrink: 0;
   font-size: 0.875rem;
-  box-shadow: 0 2px 4px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 4px rgba(10, 10, 10, 0.2);
 }
 
 .step-content {
@@ -1012,7 +1012,7 @@ export default {
 
 .expected-result {
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
   border-left: 4px solid var(--ink);
   color: white;

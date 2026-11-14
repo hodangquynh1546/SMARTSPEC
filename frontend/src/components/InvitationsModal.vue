@@ -335,7 +335,7 @@ export default {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius);
   width: 100%;
   max-width: 600px;
@@ -367,7 +367,7 @@ export default {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  background: var(--ink);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
   z-index: 1;
@@ -389,7 +389,7 @@ export default {
   padding: 24px 28px;
   border-bottom: 2px solid rgba(229, 231, 235, 0.3);
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   position: relative;
   overflow: visible;
 }
@@ -401,7 +401,7 @@ export default {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  background: var(--ink);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -498,7 +498,7 @@ export default {
   outline: none;
   border-color: var(--ink);
   background: white;
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .search-input::placeholder {
@@ -551,7 +551,7 @@ export default {
 .tab-button.active {
   color: var(--ink);
   border-bottom-color: var(--ink);
-  background: linear-gradient(to bottom, var(--bg), white);
+  background: var(--bg);
 }
 
 .tab-button:hover:not(.active) {
@@ -578,10 +578,10 @@ export default {
   padding: 20px;
   border: 2px solid var(--border);
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   gap: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
   animation: fadeInUp 0.5s ease-out;
@@ -605,7 +605,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  background: rgba(102, 126, 234, 0.2);
   transition: width 0.3s ease;
 }
 
@@ -647,7 +647,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   font-size: 14px;
   font-weight: 600;
@@ -682,7 +682,7 @@ export default {
 }
 
 .role-badge {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
@@ -730,50 +730,50 @@ export default {
 }
 
 .btn-accept {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
   box-shadow: 0 2px 4px rgba(56, 161, 105, 0.3);
 }
 
 .btn-accept:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(56, 161, 105, 0.4);
 }
 
 .btn-reject {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
   box-shadow: 0 2px 4px rgba(229, 62, 62, 0.3);
 }
 
 .btn-reject:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(229, 62, 62, 0.4);
 }
 
 .btn-cancel {
-  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
+  background: var(--muted);
   color: white;
   box-shadow: 0 2px 4px rgba(113, 128, 150, 0.3);
 }
 
 .btn-cancel:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 128, 150, 0.4);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, var(--muted) 0%, var(--ink) 100%);
+  background: var(--muted);
   color: white;
   margin-top: 12px;
   box-shadow: 0 2px 4px rgba(113, 128, 150, 0.3);
 }
 
 .btn-secondary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(113, 128, 150, 0.4);
 }

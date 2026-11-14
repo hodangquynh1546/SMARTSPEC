@@ -194,19 +194,19 @@ const handleConfirm = () => {
 
 /* default neutral look, overridden by type class */
 .modal-header.info .header-icon {
-  background: linear-gradient(180deg, rgba(238, 249, 255, 0.9), rgba(232, 245, 255, 0.9));
+  background: rgba(238, 249, 255, 0.9);
   color: var(--ink);
 }
 .modal-header.warning .header-icon {
-  background: linear-gradient(180deg, rgba(255, 250, 240, 0.9), rgba(255, 245, 230, 0.9));
+  background: rgba(255, 250, 240, 0.9);
   color: var(--danger);
 }
 .modal-header.danger .header-icon {
-  background: linear-gradient(180deg, rgba(255, 242, 242, 0.95), rgba(255, 235, 235, 0.95));
+  background: rgba(255, 242, 242, 0.95);
   color: var(--danger);
 }
 .modal-header.success .header-icon {
-  background: linear-gradient(180deg, rgba(245, 255, 250, 0.95), rgba(235, 255, 240, 0.95));
+  background: rgba(245, 255, 250, 0.95);
   color: var(--success);
 }
 
@@ -279,7 +279,7 @@ const handleConfirm = () => {
   border-radius: var(--radius-sm);
   font-weight: 600;
   color: var(--danger);
-  background: linear-gradient(180deg, rgba(254, 226, 226, 0.8), rgba(255, 245, 245, 0.8));
+  background: rgba(254, 226, 226, 0.8);
   border: 1px solid rgba(235, 87, 87, 0.12);
   box-shadow: inset 0 -1px 0 rgba(255,255,255,0.4);
 }
@@ -330,7 +330,7 @@ const handleConfirm = () => {
   display: flex;
   gap: 10px;
   padding: 16px 20px;
-  background: linear-gradient(180deg,var(--surface),var(--bg));
+  background: var(--surface);
   border-top: 1px solid rgba(15, 23, 36, 0.04);
   justify-content: flex-end;
 }
@@ -371,7 +371,7 @@ const handleConfirm = () => {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg,var(--ink),var(--ink));
+  background: var(--ink);
   color: #fff;
   border-color: rgba(0,0,0,0.06);
 }
@@ -382,19 +382,19 @@ const handleConfirm = () => {
 
 /* Type-based confirm button classes mapping in component: btn-danger, btn-warning, btn-success, btn-info */
 .btn-danger {
-  background: linear-gradient(180deg,var(--danger),var(--danger));
+  background: var(--danger);
   color: #fff;
 }
 .btn-warning {
-  background: linear-gradient(180deg,var(--danger),var(--danger));
+  background: var(--danger);
   color: #fff;
 }
 .btn-success {
-  background: linear-gradient(180deg,var(--success),var(--success));
+  background: var(--success);
   color: #fff;
 }
 .btn-info {
-  background: linear-gradient(180deg,var(--ink),var(--ink));
+  background: var(--ink);
   color: #fff;
 }
 

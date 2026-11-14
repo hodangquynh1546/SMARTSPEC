@@ -169,7 +169,7 @@ export default {
 
 .table-card:hover {
   border-color: var(--ink);
-  box-shadow: 0 12px 40px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px rgba(10, 10, 10, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-6px) scale(1.03);
   z-index: 100;
 }
@@ -212,7 +212,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius) var(--radius) 0 0;
   position: relative;
@@ -302,7 +302,7 @@ export default {
   font-size: 12px;
   color: var(--muted);
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   font-style: italic;
   line-height: 1.5;
 }
@@ -333,16 +333,16 @@ export default {
 }
 
 .table-column:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 22px;
 }
 
 .table-column:hover::before {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .table-column.column-highlighted {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  background: var(--sunken);
   border-left: 3px solid var(--ink);
   padding-left: 22px;
 }
@@ -383,19 +383,19 @@ export default {
 }
 
 .column-badge.pk {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
 }
 
 .column-badge.fk {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .column-badge.nn {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
 }
 
 .column-badge.uq {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
 }
 
 /* Connection Points */

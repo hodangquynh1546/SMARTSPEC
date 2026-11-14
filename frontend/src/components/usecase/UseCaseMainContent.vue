@@ -2316,12 +2316,12 @@ export default {
 .main-content {
   flex: 3;
   min-width: 0;
-  background: white;
+  background: transparent;
   padding: 0;
-  overflow-y: auto;
+  overflow-y: visible;
   overflow-x: hidden;
-  border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  border-radius: 0;
+  box-shadow: none;
   margin: 0;
 }
 
@@ -2329,7 +2329,7 @@ export default {
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
-  padding: 24px;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -2338,7 +2338,7 @@ export default {
 .header-info h2 {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2357,14 +2357,14 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
 }
 
 .header-actions {
@@ -2375,7 +2375,7 @@ export default {
   padding: 1.5rem;
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   transition: box-shadow 0.3s ease;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -2385,13 +2385,13 @@ export default {
 }
 
 .header-actions:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -2412,7 +2412,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
   border: 2px solid transparent;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -2426,7 +2426,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.3), transparent);
   transform: translateX(-100%);
   transition: transform 0.5s ease;
 }
@@ -2437,28 +2437,28 @@ export default {
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(26, 54, 93, 0.2);
-  border-color: rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
+  border-color: rgba(10, 10, 10, 0.2);
 }
 
 .stat-card.total {
   border-left: 4px solid var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .stat-card.roles {
   border-left: 4px solid var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.high-priority {
   border-left: 4px solid var(--danger);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .stat-card.completed {
   border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-icon {
@@ -2494,22 +2494,22 @@ export default {
 }
 
 .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .stat-card.roles .stat-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .stat-card.high-priority .stat-icon {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
 }
 
 .stat-card.completed .stat-icon {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
 }
 
@@ -2517,7 +2517,7 @@ export default {
   font-size: 1.75rem;
   font-weight: 700;
   margin: 0 0 4px 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2541,12 +2541,12 @@ export default {
   padding: 1.5rem;
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   transition: box-shadow 0.3s ease;
 }
 
 .toolbar:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .search-box {
@@ -2583,7 +2583,7 @@ export default {
 .search-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -2675,7 +2675,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -2684,11 +2684,11 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn .material-symbols-outlined {
@@ -2746,7 +2746,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -2755,12 +2755,12 @@ export default {
 }
 
 .filter-option:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 20px;
 }
 
 .filter-option.active {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
   border-left-color: var(--ink);
@@ -2786,18 +2786,18 @@ export default {
 .usecase-group-card {
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
 }
 
 .usecase-group-card:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .group-header {
   padding: 20px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   display: flex;
@@ -2814,7 +2814,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -2823,7 +2823,7 @@ export default {
 }
 
 .group-header:hover {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--bg) 100%);
+  background: var(--sunken);
   transform: translateX(2px);
 }
 
@@ -2882,7 +2882,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -2892,14 +2892,14 @@ export default {
 
 .usecase-card:hover {
   border-color: var(--ink);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
   transform: translateX(4px) translateY(-2px);
 }
 
 .usecase-card.expanded {
   border-color: var(--ink);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.2);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  box-shadow: var(--shadow);
+  background: var(--surface);
 }
 
 .usecase-header {
@@ -3157,10 +3157,10 @@ export default {
 }
 
 .btn-secondary:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .btn-danger {
@@ -3369,7 +3369,7 @@ export default {
 /* Responsive Design */
 @media (max-width: 768px) {
   .usecase-area {
-    padding: 16px;
+    padding: 0;
   }
 
   .header-actions {
@@ -3913,25 +3913,25 @@ td {
 
 /* Highlight for newly added usecases */
 .usecase-row.new-usecase {
-  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
+  background: var(--warning-soft);
   animation: highlightPulse 2s ease-in-out;
   border-left: 4px solid var(--warning);
 }
 
 .usecase-list-item.new-usecase {
-  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
+  background: var(--warning-soft);
   animation: highlightPulse 2s ease-in-out;
   border-left: 4px solid var(--warning);
 }
 
 .usecase-compact-item.new-usecase {
-  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
+  background: var(--warning-soft);
   animation: highlightPulse 2s ease-in-out;
   border-left: 4px solid var(--warning);
 }
 
 .usecase-card.new-usecase {
-  background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
+  background: var(--warning-soft);
   animation: highlightPulse 2s ease-in-out;
   border-left: 4px solid var(--warning);
 }
@@ -3939,10 +3939,10 @@ td {
 @keyframes highlightPulse {
   0%,
   100% {
-    background: linear-gradient(90deg, #fef3c7 0%, #fde68a 50%, #fef3c7 100%);
+    background: var(--warning-soft);
   }
   50% {
-    background: linear-gradient(90deg, #fde68a 0%, var(--warning-soft) 50%, #fde68a 100%);
+    background: #fde68a;
   }
 }
 
@@ -4521,7 +4521,7 @@ td {
 .form-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .form-group input[type='checkbox'] {

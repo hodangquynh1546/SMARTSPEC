@@ -431,7 +431,7 @@ export default {
   border-color: var(--ink);
   background: var(--bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.1);
 }
 
 .model-item.selected {

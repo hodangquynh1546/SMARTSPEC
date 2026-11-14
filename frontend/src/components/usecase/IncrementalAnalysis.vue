@@ -105,7 +105,7 @@ export default {
 }
 
 .incremental-banner {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-field);
   padding: 20px;
   display: flex;
@@ -165,7 +165,7 @@ export default {
 }
 
 .processing-banner {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;
@@ -223,7 +223,7 @@ export default {
   }
 }
 .error-banner {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;
@@ -278,7 +278,7 @@ export default {
 
 /* Update processing banner for consistency */
 .processing-banner {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   border-radius: var(--radius-field);
   padding: 16px 20px;
   margin-bottom: 24px;

@@ -588,12 +588,12 @@ export default {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   width: 90%;
   max-width: 800px;
   border-radius: var(--radius);
   padding: 28px 32px;
-  box-shadow: 0 20px 60px rgba(26, 54, 93, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(10, 10, 10, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
   position: relative;
   max-height: 95vh;
@@ -618,7 +618,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  background: var(--ink);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -798,7 +798,7 @@ export default {
   font-size: 14px;
   border-radius: var(--radius-field);
   border: 2px solid var(--border-color);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -806,13 +806,13 @@ export default {
 
 .form-control:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.1);
 }
 
 .form-control:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.15), 0 4px 16px rgba(10, 10, 10, 0.2);
   background: var(--surface);
   transform: translateY(-1px);
 }
@@ -894,9 +894,9 @@ export default {
   font-size: 18px;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--ink) 100%);
+  background: var(--primary-color);
   color: #fff;
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.25);
+  box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
 }
@@ -920,9 +920,9 @@ export default {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--primary-color) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 .btn-secondary {
   background-color: var(--secondary-color);

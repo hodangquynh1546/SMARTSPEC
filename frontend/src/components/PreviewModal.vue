@@ -1204,7 +1204,7 @@ export default {
   overflow-y: auto;
   padding: 12px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(26, 54, 93, 0.2) transparent;
+  scrollbar-color: rgba(10, 10, 10, 0.2) transparent;
 }
 
 .changes-list::-webkit-scrollbar {
@@ -1216,12 +1216,12 @@ export default {
 }
 
 .changes-list::-webkit-scrollbar-thumb {
-  background: rgba(26, 54, 93, 0.2);
+  background: rgba(10, 10, 10, 0.2);
   border-radius: var(--radius-sm);
 }
 
 .changes-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(26, 54, 93, 0.3);
+  background: rgba(10, 10, 10, 0.3);
 }
 
 .change-item {
@@ -1287,19 +1287,19 @@ export default {
 }
 
 .change-type.added {
-  background: linear-gradient(135deg, var(--success-soft) 0%, var(--success-soft) 100%);
+  background: var(--success-soft);
   color: var(--success);
   border: 1px solid rgba(5, 95, 70, 0.2);
 }
 
 .change-type.updated {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: var(--warning-soft);
   color: var(--danger);
   border: 1px solid rgba(146, 64, 14, 0.2);
 }
 
 .change-type.deleted {
-  background: linear-gradient(135deg, var(--sunken) 0%, #fecaca 100%);
+  background: var(--sunken);
   color: var(--danger);
   border: 1px solid rgba(153, 27, 27, 0.2);
 }
@@ -1418,7 +1418,7 @@ export default {
   right: 0 !important;
   bottom: 0 !important;
   z-index: 3000 !important;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: 0 !important;
   box-shadow: none !important;
   animation: fullscreenEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1504,7 +1504,7 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 8px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border: 2px solid var(--border);
   border-radius: 999px;
   color: var(--muted);
@@ -1519,11 +1519,11 @@ export default {
 }
 
 .btn-fullscreen:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .btn-fullscreen .material-symbols-outlined {
@@ -1857,7 +1857,7 @@ export default {
   padding: 8px;
   border: 2px solid var(--border);
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1867,11 +1867,11 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn .material-symbols-outlined {
@@ -1885,7 +1885,7 @@ export default {
   background: white;
   border: 2px solid var(--border);
   border-radius: var(--radius-field);
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
   min-width: 200px;
   z-index: 100;
   overflow: hidden;
@@ -1926,7 +1926,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -1935,11 +1935,11 @@ export default {
 }
 
 .filter-option:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
 }
 
 .filter-option.active {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
 }

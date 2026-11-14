@@ -1182,7 +1182,7 @@ export default {
   align-items: flex-start;
   padding: 24px 32px;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
@@ -1261,7 +1261,7 @@ export default {
 .step.active .step-number {
   background: var(--ink);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.4);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.4);
 }
 
 .step.completed .step-number {
@@ -1378,7 +1378,7 @@ export default {
 }
 
 .btn-text:hover {
-  background: rgba(26, 54, 93, 0.1);
+  background: rgba(10, 10, 10, 0.1);
 }
 
 .selection-count {
@@ -1407,7 +1407,7 @@ export default {
 }
 
 .requirement-item.selected {
-  background: rgba(26, 54, 93, 0.05);
+  background: rgba(10, 10, 10, 0.05);
   border-left: 3px solid var(--ink);
 }
 
@@ -1673,7 +1673,7 @@ export default {
   align-items: center;
   gap: 16px;
   padding: 24px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg) 100%);
+  background: var(--bg);
   border: 1px solid var(--success-soft);
   border-radius: var(--radius-sm);
 }
@@ -1712,7 +1712,7 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--success), var(--success));
+  background: var(--success);
   border-radius: var(--radius-sm);
   transition: width 0.3s ease;
 }
@@ -1761,7 +1761,7 @@ export default {
 }
 
 .tab-button:hover:not(.active) {
-  background: rgba(26, 54, 93, 0.05);
+  background: rgba(10, 10, 10, 0.05);
 }
 
 .tab-content {
@@ -2006,7 +2006,7 @@ export default {
 }
 
 .after-column {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg) 100%);
+  background: var(--bg);
 }
 
 .column-header {

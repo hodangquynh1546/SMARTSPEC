@@ -262,3 +262,11 @@ npm run test
 - **API nhập** `/api/import/versions/:versionId/{usecases,database,usecase-diagram,sequence-diagram,activity-diagram}` (`features/import/`): dữ liệu theo **tên** (không id), trùng tên = thay thế (idempotent), lỗi trả `400 {errors: []}` để Claude tự sửa; ghi vào bản nháp (bản đã chốt tự bump), có preview change + log `performed_by_ai`. Hợp lệ hoá bằng các validator sẵn có (ví dụ `TableValidationService`).
 - MCP server ở ForgeBridge: `src/smartspec-mcp.ts` (công cụ), HTTP `/mcp/smartspec` (token trong header Authorization, không trạng thái), stdio `src/smartspec-mcp-stdio.ts`. Hướng dẫn: `ForgeBridge/docs/claude-mcp.md`. Frontend: `views/ConnectClaude.vue` (`/connect-claude`, `VITE_BRIDGE_URL`).
 - Kiểm thử: `backend/scripts/api-smoke-import.cjs`, `ForgeBridge/scripts/e2e-claude-mcp.cjs`.
+
+## 13. Quy ước giao diện (đừng phá vỡ)
+
+- **Một lề chung cho các tab dự án**: `layouts/ProjectLayout.vue` đặt padding/max-width cho `.router-view-container` và ép các view con (`:deep(...)`) về padding 0; view mới không được tự đặt lề ngoài. Header + thanh tab là một thanh phẳng liền nhau.
+- `assets/main.css` chỉ có **một vùng cuộn** (html). Đừng thêm `overflow`/`display:flex` vào `body`/`#app` (mã mẫu Vue từng làm lệch cả trang và hỏng header `sticky`).
+- `assets/polish.css` (nạp cuối) chuẩn hoá thẻ thống kê/thẻ trắng dùng chung bằng `!important` có chủ ý. `frontend/scripts/flatten-gradients.py` làm phẳng gradient (giao diện phẳng đen-trắng; giữ gradient có `transparent` cho hiệu ứng loading) — chạy lại sau khi thêm style mới nếu cần. Chữ trên nền đen phải dùng `var(--ink-text)`, không dùng `color: var(--ink)`.
+- Chữ giao diện là tiếng Việt (thanh bên, header, tab, trang chủ, thẻ dự án đã dịch); phần còn lại của các view đang tiếng Anh.
+- Lỗi API bị nuốt bởi `.catch(() => ({data:{data:[]}}))` che mất đường dẫn sai (từng làm danh sách sơ đồ tuần tự luôn rỗng): khi thêm API frontend hãy kiểm tra đường dẫn với route backend.

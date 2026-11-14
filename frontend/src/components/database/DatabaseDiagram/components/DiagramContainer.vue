@@ -39,7 +39,7 @@ export default {
 .diagram-container {
   position: relative;
   overflow: auto;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
+  background: var(--sunken);
   background-size: 100% 100%;
   cursor: grab;
 }

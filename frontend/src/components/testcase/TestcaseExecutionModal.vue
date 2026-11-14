@@ -935,7 +935,7 @@ export default {
 .status-option.selected .status-content {
   border-color: var(--ink);
   background: var(--sunken);
-  box-shadow: 0 4px 6px -1px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(10, 10, 10, 0.1);
 }
 
 .status-icon {
@@ -1102,7 +1102,7 @@ export default {
 .form-textarea:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .form-textarea {

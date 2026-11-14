@@ -291,13 +291,13 @@ export default {
 }
 
 .btn-icon.active {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 .btn-icon.active:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .btn-icon:disabled {

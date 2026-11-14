@@ -201,7 +201,7 @@ export default {
   align-items: center;
   padding: 1.75rem 2rem;
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -211,7 +211,7 @@ export default {
 .modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -230,7 +230,7 @@ export default {
 .progress-bar {
   width: 100%;
   height: 10px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   border-radius: var(--radius-sm);
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -239,10 +239,10 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
   transition: width 0.3s ease;
-  box-shadow: 0 1px 3px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -268,20 +268,20 @@ export default {
 }
 
 .progress-fill.preparing {
-  background: linear-gradient(90deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
 }
 
 .progress-fill.exporting {
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   animation: pulse 2s infinite;
 }
 
 .progress-fill.completed {
-  background: linear-gradient(90deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
 }
 
 .progress-fill.error {
-  background: linear-gradient(90deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
 }
 
 @keyframes pulse {
@@ -323,7 +323,7 @@ export default {
   padding: 1.25rem;
   border: 2px solid var(--border);
   border-radius: var(--radius-field);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -336,7 +336,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.3), transparent);
   transform: translateX(-100%);
   transition: transform 0.5s ease;
 }
@@ -347,8 +347,8 @@ export default {
 
 .status-item.active {
   border-color: var(--ink);
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  background: var(--sunken);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-2px);
 }
 
@@ -359,10 +359,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -379,7 +379,7 @@ export default {
 
 .status-item:hover .status-icon {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .status-item:hover .status-icon::before {
@@ -387,19 +387,19 @@ export default {
 }
 
 .status-item.preparing .status-icon {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
 }
 
 .status-item.exporting .status-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .status-item.completed .status-icon {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
 }
 
 .status-item.error .status-icon {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
 }
 
 .status-info {
@@ -409,7 +409,7 @@ export default {
 .status-title {
   display: block;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -442,14 +442,14 @@ export default {
 }
 
 .action-section .btn-primary {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
 }
 
 .action-section .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .action-section .btn-secondary {
@@ -459,10 +459,10 @@ export default {
 }
 
 .action-section .btn-secondary:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 @media (max-width: 768px) {

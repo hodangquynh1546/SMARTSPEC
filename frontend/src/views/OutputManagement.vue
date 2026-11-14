@@ -1303,7 +1303,7 @@ export default {
 <style scoped>
 .output-management-view {
   padding: 30px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
+  background: var(--sunken);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1349,7 +1349,7 @@ export default {
 .output-header h2 {
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1376,7 +1376,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
   border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1384,7 +1384,7 @@ export default {
 
 .log-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
   border-color: var(--ink);
 }
 
@@ -1399,15 +1399,15 @@ export default {
 }
 
 .card-icon.testcase {
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
 }
 
 .card-icon.database {
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
 }
 
 .card-icon.uml {
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
 }
 
 .card-icon .material-symbols-outlined {
@@ -1447,7 +1447,7 @@ export default {
   background: white;
   border-radius: var(--radius);
   padding: 32px;
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   margin-bottom: 40px;
   width: 100%;
   max-width: 100%;
@@ -1458,7 +1458,7 @@ export default {
 }
 
 .activity-logs-section:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .section-header {
@@ -1477,7 +1477,7 @@ export default {
 .section-header h3 {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1495,7 +1495,7 @@ export default {
   transform: translateY(-50%);
   width: 4px;
   height: 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
 }
 
@@ -1539,7 +1539,7 @@ export default {
 .filter-select:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.1);
 }
 
 /* Filter Icon Buttons */
@@ -1589,7 +1589,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -1598,11 +1598,11 @@ export default {
 }
 
 .filter-icon-btn-compact:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn-compact .material-symbols-outlined {
@@ -1679,12 +1679,12 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transition: width 0.3s ease;
 }
 
 .filter-option:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 20px;
 }
 
@@ -1693,7 +1693,7 @@ export default {
 }
 
 .filter-option.active {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
   border-left-color: var(--ink);
@@ -1754,7 +1754,7 @@ export default {
 .search-input.compact input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -1783,7 +1783,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -1794,9 +1794,9 @@ export default {
 .refresh-button.compact:hover:not(:disabled) {
   border-color: var(--ink);
   color: var(--ink);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   transform: translateY(-2px) rotate(180deg);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .refresh-button.compact:disabled {
@@ -1840,7 +1840,7 @@ export default {
 .clear-filters-button:hover {
   border-color: var(--danger);
   color: var(--danger);
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
@@ -1895,7 +1895,7 @@ export default {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 /* Logs Container */
@@ -1905,7 +1905,7 @@ export default {
   overflow-x: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   width: 100%;
   box-sizing: border-box;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -1921,12 +1921,12 @@ export default {
 }
 
 .logs-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--border) 0%, var(--muted) 100%);
+  background: var(--border);
   border-radius: var(--radius-sm);
 }
 
 .logs-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--muted) 0%, var(--muted) 100%);
+  background: var(--muted);
 }
 
 .empty-logs {
@@ -1944,7 +1944,7 @@ export default {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1959,7 +1959,7 @@ export default {
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
   opacity: 0.1;
   z-index: -1;
   animation: pulse 2s ease-in-out infinite;
@@ -2040,7 +2040,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -2054,48 +2054,48 @@ export default {
 
 /* Màu nền theo action type */
 .log-item.action-create {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-left-color: var(--success);
 }
 
 .log-item.action-create:hover {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--success-soft) 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
   border-left-width: 6px;
 }
 
 .log-item.action-delete {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   border-left-color: var(--danger);
 }
 
 .log-item.action-delete:hover {
-  background: linear-gradient(90deg, var(--sunken) 0%, #fecaca 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
   border-left-width: 6px;
 }
 
 .log-item.action-update {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   border-left-color: var(--ink);
 }
 
 .log-item.action-update:hover {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
   border-left-width: 6px;
 }
 
 .log-item.action-default {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-left-color: var(--border-strong);
 }
 
 .log-item.action-default:hover {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   transform: translateX(4px) translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border-left-width: 6px;
@@ -2221,7 +2221,7 @@ export default {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2255,7 +2255,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 2px 8px;
   border-radius: var(--radius-field);
@@ -2278,24 +2278,24 @@ export default {
 }
 
 .log-action-badge {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 6px rgba(10, 10, 10, 0.2);
   transition: all 0.3s ease;
 }
 
 .log-action-badge:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.3);
 }
 
 .log-target-badge {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   color: var(--text);
   padding: 6px 12px;
   border-radius: var(--radius-sm);
@@ -2307,7 +2307,7 @@ export default {
 }
 
 .log-target-badge:hover {
-  background: linear-gradient(135deg, var(--border) 0%, var(--muted) 100%);
+  background: var(--border);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -2316,7 +2316,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: var(--warning-soft);
   color: var(--danger);
   padding: 6px 10px;
   border-radius: var(--radius-sm);
@@ -2328,7 +2328,7 @@ export default {
 }
 
 .log-version-badge:hover {
-  background: linear-gradient(135deg, #fde68a 0%, var(--warning-soft) 100%);
+  background: #fde68a;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
 }
@@ -2492,7 +2492,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -2503,9 +2503,9 @@ export default {
 .pagination-btn:hover:not(:disabled) {
   border-color: var(--ink);
   color: var(--ink);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .pagination-btn:disabled {
@@ -2539,7 +2539,7 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -2552,14 +2552,14 @@ export default {
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .page-btn.active {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-color: var(--ink);
   color: white;
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -2593,13 +2593,13 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.875rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
   position: relative;
   overflow: hidden;
   display: inline-flex;
@@ -2623,14 +2623,14 @@ export default {
 }
 
 .retry-button:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .retry-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 /* Animations */

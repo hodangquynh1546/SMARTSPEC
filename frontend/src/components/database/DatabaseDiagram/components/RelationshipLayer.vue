@@ -414,7 +414,7 @@ export default {
 .relationship-path.relationship-selected {
   stroke-width: 4;
   opacity: 1;
-  filter: drop-shadow(0 4px 8px rgba(26, 54, 93, 0.4));
+  filter: drop-shadow(0 4px 8px rgba(10, 10, 10, 0.4));
   animation: pulse-relationship 2s ease-in-out infinite;
 }
 

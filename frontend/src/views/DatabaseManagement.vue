@@ -1654,7 +1654,7 @@ export default {
 <style scoped>
 .database-management-view {
   padding: 24px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1708,7 +1708,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-radius: var(--radius-field);
   font-size: 0.875rem;
   font-weight: 500;
@@ -1718,7 +1718,7 @@ export default {
 }
 
 .meta-item:hover {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
@@ -1739,7 +1739,7 @@ export default {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
@@ -1747,7 +1747,7 @@ export default {
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -1768,14 +1768,14 @@ export default {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 .btn-primary:disabled {
@@ -1850,7 +1850,7 @@ export default {
 .dialect-select:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 /* Filter Icon Buttons */
@@ -1876,11 +1876,11 @@ export default {
 }
 
 .filter-icon-btn:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn .material-symbols-outlined {
@@ -1942,7 +1942,7 @@ export default {
 }
 
 .filter-option:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 24px;
 }
 
@@ -1951,7 +1951,7 @@ export default {
 }
 
 .filter-option.active {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
   padding-left: 24px;
@@ -1973,7 +1973,7 @@ export default {
 /* SQL Preview Header */
 .sql-header {
   padding: 16px 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
@@ -1981,7 +1981,7 @@ export default {
 }
 
 .dialect-badge {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 6px 16px;
   border-radius: var(--radius);
@@ -1989,7 +1989,7 @@ export default {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.3);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -2192,7 +2192,7 @@ export default {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.2);
 }
 
 @keyframes spin {
@@ -2269,7 +2269,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg) 100%);
+  background: var(--bg);
 }
 
 .section-header h3 {
@@ -2287,10 +2287,10 @@ export default {
 }
 
 .btn-secondary.active {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border-color: var(--ink);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
 }
 
 /* SQL Preview */
@@ -2309,7 +2309,7 @@ export default {
 
 .sql-preview {
   padding: 0;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: 0 0 var(--radius) var(--radius);
   max-height: 500px;
   overflow-y: auto;

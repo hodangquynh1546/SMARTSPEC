@@ -8,7 +8,7 @@
           <span
             class="btn-text"
             style="-webkit-user-select: none; -moz-user-select: none; -ms-user-select: none"
-            >Back to Projects</span
+            >Danh sách dự án</span
           >
         </button>
 
@@ -23,7 +23,7 @@
                 {{ showDescription ? 'expand_less' : 'expand_more' }}
               </span>
               <span class="btn-text">{{
-                showDescription ? 'Hide Description' : 'Show Description'
+                showDescription ? 'Ẩn mô tả' : 'Xem mô tả'
               }}</span>
             </button>
             <div v-if="showDescription" class="project-description">
@@ -44,7 +44,7 @@
                 <span class="material-symbols-outlined">history</span>
               </div>
               <div class="selector-content">
-                <span class="selector-label">Version</span>
+                <span class="selector-label">Phiên bản</span>
                 <span class="version-label">{{ selectedLabel }}</span>
               </div>
               <span class="material-symbols-outlined dropdown-arrow" :class="{ open: isOpen }">
@@ -110,7 +110,7 @@
             </div>
             <div class="active-users-count">
               <span class="count">{{ activeUsers.length }}</span>
-              <span class="label">Active</span>
+              <span class="label">Đang online</span>
             </div>
             <span class="material-symbols-outlined arrow" :class="{ open: showActiveUsers }">
               expand_more
@@ -165,7 +165,7 @@
           </div>
           <div class="members-count">
             <span class="count">{{ totalMembersCount }}</span>
-            <span class="label">Members</span>
+            <span class="label">Thành viên</span>
           </div>
         </button>
       </div>
@@ -542,27 +542,28 @@ export default {
 </script>
 <style scoped>
 .project-header-modern {
-  background: white;
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 16px var(--gutter);
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 24px;
+  flex-wrap: wrap;
 }
 
 /* Left Section */
 .header-left {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
   flex: 1;
+  min-width: 0;
 }
 
 .back-btn {
@@ -588,7 +589,7 @@ export default {
 .project-info {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
   gap: 12px;
 }
@@ -600,7 +601,8 @@ export default {
 }
 
 .project-title {
-  font-size: 1.75rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--ink);
   margin: 0;
@@ -682,8 +684,9 @@ export default {
 /* Right Section */
 .header-right {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 /* Version Control */

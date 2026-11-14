@@ -1827,10 +1827,28 @@ export default {
 .schema-diagram {
   position: relative;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  height: clamp(520px, 74vh, 880px);
+  display: flex;
+  flex-direction: column;
+  background: var(--sunken);
   overflow: hidden;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Thanh công cụ nằm trên đầu (không đè lên bảng), khung vẽ chiếm phần còn lại và tự cuộn/kéo */
+.schema-diagram :deep(.diagram-controls) {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  margin: 12px;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+.schema-diagram :deep(.diagram-container) {
+  flex: 1;
+  min-height: 0;
+  height: auto !important;
 }
 
 .tables-container {

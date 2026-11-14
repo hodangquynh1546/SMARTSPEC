@@ -2424,7 +2424,7 @@ export default {
 .ucd-renderer-final {
   display: flex;
   height: 100%;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
   position: relative;
@@ -2473,7 +2473,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   border-bottom: 2px solid rgba(226, 232, 240, 0.8);
   z-index: 100;
@@ -2491,7 +2491,7 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 6px;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius-field);
   border: 1.5px solid var(--border);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -2521,7 +2521,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -2530,10 +2530,10 @@ export default {
 }
 
 .toolbar-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.2);
 }
 
 .toolbar-btn:active:not(:disabled) {
@@ -2552,16 +2552,16 @@ export default {
   font-weight: 700;
   color: var(--ink);
   padding: 4px 8px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(26, 54, 93, 0.1);
+  border: 1px solid rgba(10, 10, 10, 0.1);
 }
 
 /* Main Container */
 .ucd-container-final {
   flex: 1;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 50%, var(--bg) 100%);
+  background: var(--bg);
   position: relative;
   cursor: grab;
 }
@@ -2585,7 +2585,7 @@ export default {
   align-items: center;
   gap: 16px;
   padding: 10px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   border-top: 2px solid rgba(226, 232, 240, 0.8);
   font-size: 12px;
@@ -2829,7 +2829,7 @@ export default {
 /* Saving State */
 .save-indicator.saving {
   color: var(--warning);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+  background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
@@ -2841,7 +2841,7 @@ export default {
 /* Saved State */
 .save-indicator.saved {
   color: var(--success);
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+  background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
@@ -2852,7 +2852,7 @@ export default {
 /* Default State */
 .save-indicator:not(.saving):not(.saved) {
   color: var(--muted);
-  background: linear-gradient(135deg, rgba(100, 116, 139, 0.1) 0%, rgba(100, 116, 139, 0.05) 100%);
+  background: rgba(100, 116, 139, 0.1);
   border: 1px solid rgba(100, 116, 139, 0.15);
 }
 
@@ -2900,13 +2900,13 @@ export default {
 
 /* CRUD Styles */
 .btn-add {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
   border: none;
 }
 
 .btn-add:hover {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
 }
 
 /* Context Menu */
@@ -3051,7 +3051,7 @@ export default {
 .form-textarea:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .form-textarea {
@@ -3089,7 +3089,7 @@ export default {
   padding: 10px 20px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3098,9 +3098,9 @@ export default {
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.2);
 }
 
 /* Management Modal Styles */
@@ -3233,7 +3233,7 @@ export default {
   padding: 8px 16px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
   font-size: 14px;
   font-weight: 500;
@@ -3242,7 +3242,7 @@ export default {
 }
 
 .btn-add-item:hover {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
@@ -3404,13 +3404,13 @@ export default {
 }
 
 .btn-manage {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
 }
 
 .btn-manage:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 @keyframes fadeIn {

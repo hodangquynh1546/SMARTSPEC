@@ -1703,7 +1703,7 @@ const loadChartData = async () => {
                 label: 'Requests',
                 data: timelineRes.data.data.map(d => d.requests),
                 borderColor: '#0a0a0a',
-                backgroundColor: 'rgba(26, 54, 93, 0.1)',
+                backgroundColor: 'rgba(10, 10, 10, 0.1)',
                 tension: 0.4,
                 fill: true,
                 borderWidth: 3,
@@ -1797,7 +1797,7 @@ const loadChartData = async () => {
                 ctx.moveTo(x, chartArea.top)
                 ctx.lineTo(x, chartArea.bottom)
                 ctx.lineWidth = 1
-                ctx.strokeStyle = 'rgba(26, 54, 93, 0.6)'
+                ctx.strokeStyle = 'rgba(10, 10, 10, 0.6)'
                 ctx.setLineDash([4, 4])
                 ctx.stroke()
                 ctx.restore()
@@ -2649,7 +2649,7 @@ async function loadDashboardStatsFromAPI() {
 /* Giữ nguyên toàn bộ CSS từ file gốc */
 .admin-dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -2929,7 +2929,7 @@ async function loadDashboardStatsFromAPI() {
   width: 60px;
   height: 60px;
   border-radius: var(--radius-field);
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3011,7 +3011,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .card-header-modern {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   padding: 24px;
   color: white;
   display: flex;
@@ -3092,7 +3092,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .user-counter-card {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius);
   padding: 14px 16px;
   display: flex;
@@ -3112,19 +3112,19 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .counter-icon.total {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .counter-icon.active {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
 }
 
 .counter-icon.new {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
 }
 
 .counter-icon.online {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
 }
 
 .counter-icon .material-symbols-outlined {
@@ -3199,9 +3199,9 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .legend-item-modern.active {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 .legend-indicator {
@@ -3253,7 +3253,7 @@ async function loadDashboardStatsFromAPI() {
 
 /* Filters Modern */
 .filters-modern {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding: 20px 24px;
   border-bottom: 1px solid var(--border);
 }
@@ -3317,7 +3317,7 @@ async function loadDashboardStatsFromAPI() {
 .filter-select-modern:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1);
   transform: translateY(-1px);
 }
 
@@ -3410,7 +3410,7 @@ async function loadDashboardStatsFromAPI() {
 
 .btn-reset-modern {
   padding: 10px 18px;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   color: var(--text);
   border: none;
   border-radius: 999px;
@@ -3425,7 +3425,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .btn-reset-modern:hover {
-  background: linear-gradient(135deg, var(--border) 0%, var(--muted) 100%);
+  background: var(--border);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -3468,22 +3468,22 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .summary-icon.requests {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .summary-icon.tokens {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .summary-icon.success {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
 }
 
 .summary-icon.error {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
 }
 
@@ -3527,7 +3527,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .provider-item-modern {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius);
   padding: 20px;
   border: 2px solid var(--border);
@@ -3536,7 +3536,7 @@ async function loadDashboardStatsFromAPI() {
 
 .provider-item-modern:hover {
   border-color: var(--ink);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.1);
+  box-shadow: var(--shadow);
   transform: translateX(4px);
 }
 
@@ -3557,7 +3557,7 @@ async function loadDashboardStatsFromAPI() {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1);
 }
 
 .provider-name-modern {
@@ -3982,7 +3982,7 @@ async function loadDashboardStatsFromAPI() {
 .filter-select:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .btn-filter-reset {
@@ -4102,7 +4102,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .card-header {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 16px 20px;
   display: flex;
@@ -4461,7 +4461,7 @@ async function loadDashboardStatsFromAPI() {
 
 .metric-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--success), var(--success));
+  background: var(--success);
   border-radius: var(--radius-sm);
   transition: width 0.3s ease;
 }
@@ -4585,17 +4585,17 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .log-icon-wrapper.info {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .log-icon-wrapper.warning {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
   color: white;
 }
 
 .log-icon-wrapper.error {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
 }
 
@@ -4658,7 +4658,7 @@ async function loadDashboardStatsFromAPI() {
 }
 
 .log-type-badge {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   padding: 4px 10px;
   border-radius: var(--radius-sm);

@@ -718,9 +718,10 @@ export default {
   display: flex;
   flex-direction: column;
   border-radius: var(--radius);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
+  background: var(--surface);
   padding: 20px;
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 280px;
   max-width: 380px;
@@ -731,8 +732,8 @@ export default {
 }
 
 .input-sidebar:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
-  border-color: rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
+  border-color: rgba(10, 10, 10, 0.2);
 }
 
 .input-sidebar.collapsed {
@@ -869,7 +870,7 @@ export default {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   border-radius: 999px;
@@ -879,25 +880,25 @@ export default {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.2);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.3);
 }
 
 .btn-primary.active {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
 }
 
 .btn-primary.active:hover {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
@@ -909,16 +910,16 @@ export default {
   gap: 4px;
   margin-bottom: 0;
   padding: 10px;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   border-radius: var(--radius-field);
   border: 2px solid var(--border);
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.08);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.08);
   transition: box-shadow 0.3s ease;
 }
 
 .filter-tabs:hover {
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.12);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.12);
 }
 
 .filter-tabs.compact {
@@ -1041,7 +1042,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -1051,13 +1052,13 @@ export default {
 
 .input-card:hover {
   border-color: var(--ink);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .input-card.expanded {
   border-color: var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.2);
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .input-card.processed {
@@ -1457,7 +1458,7 @@ export default {
 }
 
 .stat-item.processing {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
 }
 
@@ -1466,7 +1467,7 @@ export default {
 }
 
 .stat-item.error {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
 }
 
@@ -1479,7 +1480,7 @@ export default {
 }
 
 .stat-item.pending {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
   color: white;
 }
 
@@ -1507,7 +1508,7 @@ export default {
 }
 
 .incremental-banner {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-field);
   padding: 14px 16px;
   display: flex;
@@ -1515,7 +1516,7 @@ export default {
   align-items: center;
   gap: 12px;
   color: white;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
 }
 
 .banner-content {
@@ -1579,7 +1580,7 @@ export default {
 
 
 .error-banner {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   border-radius: var(--radius-field);
   padding: 12px 16px;
   color: white;
@@ -1588,11 +1589,11 @@ export default {
 }
 
 .processing-banner {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-field);
   padding: 16px;
   color: white;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
   margin-bottom: 12px;
 }
 
@@ -1643,7 +1644,7 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
   transition: width 0.3s ease;
   animation: pulse 2s ease-in-out infinite;
@@ -1778,7 +1779,7 @@ export default {
 
 /* Add Input Form Styles */
 .add-input-form {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
   border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
@@ -1787,12 +1788,12 @@ export default {
   max-height: 450px;
   overflow-y: auto;
   overflow-x: hidden;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.1);
   transition: box-shadow 0.3s ease;
 }
 
 .add-input-form:hover {
-  box-shadow: 0 8px 20px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .form-section {
@@ -1817,7 +1818,7 @@ export default {
   text-align: center;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   position: relative;
   overflow: hidden;
 }
@@ -1826,7 +1827,7 @@ export default {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.05) 0%, transparent 100%);
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.05) 0%, transparent 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1837,9 +1838,9 @@ export default {
 
 .file-upload-area:hover {
   border-color: var(--ink);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .upload-placeholder {
@@ -1954,7 +1955,7 @@ export default {
 .text-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
   transition: border-color 0.2s ease;
   font-family: inherit;
@@ -1967,7 +1968,7 @@ export default {
 .text-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 .validation-message {
@@ -2016,7 +2017,7 @@ export default {
   padding: 10px 16px;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
@@ -2025,7 +2026,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -2034,9 +2035,9 @@ export default {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .submit-btn:disabled {

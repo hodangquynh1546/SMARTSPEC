@@ -1922,7 +1922,7 @@ export default {
 .testcase-management-view {
   padding: 30px;
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
+  background: var(--sunken);
   animation: fadeIn 0.5s ease;
 }
 
@@ -1999,16 +1999,16 @@ export default {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .btn-secondary {
@@ -2132,7 +2132,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   position: relative;
@@ -2146,7 +2146,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.3), transparent);
   transform: translateX(-100%);
   transition: transform 0.5s ease;
 }
@@ -2157,33 +2157,33 @@ export default {
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(26, 54, 93, 0.2);
-  border-color: rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
+  border-color: rgba(10, 10, 10, 0.2);
 }
 
 .stat-card.total {
   border-left: 4px solid var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .stat-card.passed {
   border-left: 4px solid var(--success);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.failed {
   border-left: 4px solid var(--danger);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .stat-card.pending {
   border-left: 4px solid var(--warning);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-card.coverage {
   border-left: 4px solid var(--ink);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
 }
 
 .stat-icon {
@@ -2219,27 +2219,27 @@ export default {
 }
 
 .stat-card.total .stat-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .stat-card.passed .stat-icon {
-  background: linear-gradient(135deg, var(--success) 0%, var(--success) 100%);
+  background: var(--success);
   color: white;
 }
 
 .stat-card.failed .stat-icon {
-  background: linear-gradient(135deg, var(--danger) 0%, var(--danger) 100%);
+  background: var(--danger);
   color: white;
 }
 
 .stat-card.pending .stat-icon {
-  background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+  background: var(--warning);
   color: white;
 }
 
 .stat-card.coverage .stat-icon {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
@@ -2247,7 +2247,7 @@ export default {
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 4px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2271,12 +2271,12 @@ export default {
   padding: 1.5rem;
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   transition: box-shadow 0.3s ease;
 }
 
 .filters-section:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .filter-group {
@@ -2314,7 +2314,7 @@ export default {
 .search-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.1), 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.1), 0 4px 12px rgba(10, 10, 10, 0.15);
   transform: translateY(-1px);
 }
 
@@ -2365,7 +2365,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   transition: left 0.5s;
 }
 
@@ -2374,11 +2374,11 @@ export default {
 }
 
 .filter-icon-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .filter-icon-btn:disabled {
@@ -2441,7 +2441,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -2450,12 +2450,12 @@ export default {
 }
 
 .filter-option:hover {
-  background: linear-gradient(90deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   padding-left: 20px;
 }
 
 .filter-option.active {
-  background: linear-gradient(90deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   color: var(--ink);
   font-weight: 600;
   border-left-color: var(--ink);
@@ -2539,14 +2539,14 @@ export default {
 .testcases-table {
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
   width: 100%;
 }
 
 .testcases-table:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .table-container {
@@ -2895,7 +2895,7 @@ td {
   font-size: 4rem;
   color: var(--text-tertiary);
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--border) 100%);
+  background: var(--sunken);
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -2912,7 +2912,7 @@ td {
   position: absolute;
   inset: -10px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--ink), var(--ink));
+  background: var(--ink);
   opacity: 0.1;
   z-index: -1;
   animation: pulse 2s ease-in-out infinite;
@@ -2940,7 +2940,7 @@ td {
 
 .empty-state h3 {
   font-size: 1.25rem;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2973,10 +2973,10 @@ td {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   padding: 1rem 1.5rem;
   border-radius: var(--radius);
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.25);
+  box-shadow: var(--shadow);
   border: 2px solid var(--ink);
   width: 80%;
   max-width: 900px;
@@ -3026,7 +3026,7 @@ td {
   align-items: center;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  background: var(--bg);
 }
 
 .pagination-info {
@@ -3061,14 +3061,14 @@ td {
   border-color: var(--ink);
   color: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.15);
 }
 
 .page-number.active {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-color: var(--ink);
   color: white;
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.25);
 }
 
 .page-number:disabled {
@@ -3185,12 +3185,12 @@ td {
   padding: 1.5rem;
   background: white;
   border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12);
+  box-shadow: var(--shadow);
   transition: box-shadow 0.3s ease;
 }
 
 .export-section:hover {
-  box-shadow: 0 8px 30px rgba(26, 54, 93, 0.15);
+  box-shadow: var(--shadow);
 }
 
 .action-buttons-group {
@@ -3214,14 +3214,14 @@ td {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.15);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
 }
 
 .export-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
+  box-shadow: var(--shadow);
 }
 
 .export-btn:disabled {

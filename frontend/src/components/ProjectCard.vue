@@ -18,7 +18,7 @@
         <h3>{{ project.name }}</h3>
 
         <span v-if="!isTrashed" class="project-type fab-container" :class="projectType">
-          {{ projectType === 'my' ? 'My Project' : 'Shared Project' }}
+          {{ projectType === 'my' ? 'Của tôi' : 'Được chia sẻ' }}
         </span>
       </div>
 
@@ -27,13 +27,13 @@
       <div class="project-meta">
         <div class="meta-left">
           <span class="update-time">
-            {{ isTrashed ? 'Trashed' : 'Updated' }}
+            {{ isTrashed ? 'Đã xoá' : 'Cập nhật' }}
             {{ formatDate(isTrashed ? project.status.trashed_at : project.updatedAt) }}
           </span>
 
           <!-- Hiển thị version hiện tại -->
           <div v-if="!isTrashed && currentVersion" class="version-info">
-            <span class="version-label">Version:</span>
+            <span class="version-label">Phiên bản:</span>
             <span class="version-number">{{
               currentVersion.version_number ||
               `${currentVersion.version_major}.${currentVersion.version_minor}`
@@ -55,7 +55,7 @@
           >
             <span class="material-symbols-outlined">sync_alt</span>
             <span class="changes-count"
-              >{{ pendingChangesCount }} change{{ pendingChangesCount > 1 ? 's' : '' }}</span
+              >{{ pendingChangesCount }} thay đổi</span
             >
           </div>
 
@@ -90,7 +90,7 @@
         <input
           v-model="editForm.name"
           type="text"
-          placeholder="Project name"
+          placeholder="Tên dự án"
           class="form-input inline-input"
           ref="nameInput"
           @keyup.enter="saveProject"
@@ -102,7 +102,7 @@
       <div class="form-group">
         <textarea
           v-model="editForm.description"
-          placeholder="Project description"
+          placeholder="Mô tả dự án"
           class="form-textarea inline-textarea"
           rows="2"
           @keyup.esc="cancelEdit"
@@ -529,12 +529,12 @@ export default {
 /* Giữ nguyên tất cả CSS hiện có và thêm style mới */
 
 .project-card {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border-radius: var(--radius);
   padding: 20px 24px;
   margin-bottom: 64px;
   margin-right: 36px;
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px rgba(10, 10, 10, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   position: relative;
@@ -563,7 +563,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -572,24 +572,24 @@ export default {
 }
 
 .project-card:hover:not(.trashed) {
-  box-shadow: 0 8px 32px rgba(26, 54, 93, 0.2), 0 0 0 1px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 8px 32px rgba(10, 10, 10, 0.2), 0 0 0 1px rgba(10, 10, 10, 0.1);
   transform: translateY(-4px) scale(1.02);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--sunken) 100%);
+  background: var(--surface);
 }
 
 .project-card.selected {
   border: 3px solid var(--ink);
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
+  background: var(--sunken);
+  box-shadow: 0 8px 24px rgba(10, 10, 10, 0.25), 0 0 0 3px rgba(10, 10, 10, 0.1);
   animation: selectedPulse 2s ease-in-out infinite;
 }
 
 @keyframes selectedPulse {
   0%, 100% {
-    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
+    box-shadow: 0 8px 24px rgba(10, 10, 10, 0.25), 0 0 0 3px rgba(10, 10, 10, 0.1);
   }
   50% {
-    box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35), 0 0 0 3px rgba(26, 54, 93, 0.2);
+    box-shadow: 0 8px 24px rgba(10, 10, 10, 0.35), 0 0 0 3px rgba(10, 10, 10, 0.2);
   }
 }
 
@@ -633,7 +633,7 @@ export default {
 .project-header h3 {
   font-size: 18px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -737,7 +737,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: var(--warning-soft);
   color: var(--danger);
   padding: 6px 12px;
   border-radius: var(--radius-field);
@@ -767,7 +767,7 @@ export default {
 }
 
 .changes-indicator:hover {
-  background: linear-gradient(135deg, #fde68a 0%, var(--warning-soft) 100%);
+  background: #fde68a;
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
   border-color: rgba(245, 158, 11, 0.5);

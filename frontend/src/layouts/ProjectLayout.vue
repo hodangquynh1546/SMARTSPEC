@@ -417,7 +417,7 @@
         @click="navigateToTab('usecase')"
       >
         <span class="material-symbols-outlined">list_alt</span>
-        Use Cases
+        Use case
       </button>
 
       <button
@@ -426,7 +426,7 @@
         @click="navigateToTab('testcases')"
       >
         <span class="material-symbols-outlined">play_arrow</span>
-        Test Cases
+        Test case
       </button>
       <button
         class="tab-button"
@@ -434,7 +434,7 @@
         @click="navigateToTab('database')"
       >
         <span class="material-symbols-outlined">storage</span>
-        Database
+        Cơ sở dữ liệu
       </button>
       <button
         class="tab-button"
@@ -450,7 +450,7 @@
         @click="navigateToTab('tasks')"
       >
         <span class="material-symbols-outlined">view_kanban</span>
-        Tasks
+        Công việc
       </button>
       <button
         class="tab-button"
@@ -458,7 +458,7 @@
         @click="navigateToTab('output')"
       >
         <span class="material-symbols-outlined">output</span>
-        Logs
+        Nhật ký
       </button>
     </div>
 
@@ -1859,7 +1859,7 @@ export default {
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   display: flex;
   align-items: center;
@@ -1899,7 +1899,7 @@ export default {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(26, 54, 93, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(10, 10, 10, 0.1), transparent);
   animation: shimmerSweep 2.5s infinite;
   pointer-events: none;
   z-index: 1;
@@ -2084,9 +2084,9 @@ export default {
   gap: 4px;
   margin-top: 4px;
   padding: 4px 8px;
-  background: rgba(26, 54, 93, 0.05);
+  background: rgba(10, 10, 10, 0.05);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(26, 54, 93, 0.1);
+  border: 1px solid rgba(10, 10, 10, 0.1);
 }
 
 /* Usecase Count Display ở header (góc trên bên phải) */
@@ -2095,9 +2095,9 @@ export default {
   align-items: baseline;
   gap: 2px;
   padding: 2px 6px;
-  background: rgba(26, 54, 93, 0.08);
+  background: rgba(10, 10, 10, 0.08);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(26, 54, 93, 0.15);
+  border: 1px solid rgba(10, 10, 10, 0.15);
   font-size: 0.75rem;
 }
 
@@ -2192,12 +2192,12 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
   transition: width 0.5s ease-in-out;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 2px 4px rgba(10, 10, 10, 0.3);
 }
 
 /* Shimmer effect for progress bar */
@@ -2223,9 +2223,9 @@ export default {
 
 .navigation-tabs {
   display: flex;
-  gap: 8px;
-  padding: 16px 24px;
-  background: white;
+  gap: 4px;
+  padding: 10px var(--gutter);
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   position: sticky;
@@ -2233,9 +2233,30 @@ export default {
   z-index: 5;
 }
 
+/* Một lề thống nhất cho mọi tab: các view tự đặt padding/max-width khác nhau (0–60px) nên trang nhìn lệch. */
 .router-view-container {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) 48px;
+}
+.router-view-container :deep(.project-detail-view),
+.router-view-container :deep(.testcase-management-view),
+.router-view-container :deep(.testcase-content),
+.router-view-container :deep(.database-management-view),
+.router-view-container :deep(.database-content),
+.router-view-container :deep(.uml-management-view),
+.router-view-container :deep(.uml-content),
+.router-view-container :deep(.log-management-view),
+.router-view-container :deep(.log-content),
+.router-view-container :deep(.tasks) {
+  padding: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+  background: transparent !important;
 }
 
 .tab-button {
@@ -2287,7 +2308,7 @@ export default {
 }
 
 .committed-testcases-header:hover {
-  background: rgba(26, 54, 93, 0.05);
+  background: rgba(10, 10, 10, 0.05);
 }
 
 .committed-testcases-header .toggle-icon {
@@ -2367,7 +2388,7 @@ export default {
 }
 
 .committed-testcase-item:hover {
-  background: rgba(26, 54, 93, 0.05);
+  background: rgba(10, 10, 10, 0.05);
 }
 
 /* Scrollbar cho committed testcases list */

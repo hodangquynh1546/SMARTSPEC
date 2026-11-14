@@ -1,0 +1,46 @@
+/* ==========================================================================
+   Lớp chuẩn hoá giao diện dùng chung (nạp cuối cùng).
+   Các view viết style riêng (scoped) nên cùng một thành phần mỗi nơi một kiểu; ở đây ép về một kiểu
+   duy nhất theo token WorkHub. Dùng !important có chủ ý vì phải thắng selector scoped.
+   ========================================================================== */
+
+/* Thẻ thống kê: phẳng, viền mảnh, không nhảy khi rê chuột */
+.stat-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: none !important;
+  padding: 20px !important;
+  transform: none !important;
+}
+.stat-card::before { display: none !important; }
+.stat-card:hover { box-shadow: var(--shadow) !important; border-color: var(--border-strong) !important; transform: none !important; }
+
+/* Thẻ nền trắng dùng chung */
+.modern-card, .toolbar-card, .filters-card, .actions-card, .search-card {
+  box-shadow: none !important;
+  border: 1px solid var(--border) !important;
+}
+.modern-card:hover { transform: none !important; box-shadow: var(--shadow) !important; }
+
+/* Không để mã/ID bị rớt dòng (UC-\n002) */
+td code, .id-cell, .uc-id, .usecase-id, .test-id { white-space: nowrap; }
+
+/* Nút, ô nhập: cùng bo góc/độ cao với WorkHub */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+input[type='text'], input[type='email'], input[type='password'], input[type='search'], input[type='number'],
+input[type='date'], select, textarea {
+  border-radius: var(--radius-field);
+}
+
+/* Cuộn mượt, chữ không tràn */
+html { scroll-behavior: smooth; }
+h1, h2, h3, h4 { overflow-wrap: anywhere; }
+img { max-width: 100%; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

@@ -24,7 +24,7 @@
 
       <div class="main-content">
         <header class="page-header">
-          <h1>HOME PAGE</h1>
+          <h1>Dự án</h1>
 
           <!-- Bulk Actions khi có project được chọn -->
           <div v-if="selectedProjects.length > 0" class="bulk-actions">
@@ -77,7 +77,7 @@
 
               <div v-if="isNotificationsVisible" class="notifications-dropdown">
                 <div class="dropdown-header">
-                  <h3>Project Invitations</h3>
+                  <h3>Lời mời tham gia dự án</h3>
                 </div>
                 <ul v-if="myInvitations.length > 0" class="invitations-list">
                   <li v-for="inv in myInvitations" :key="inv.id" class="invitation-item">
@@ -102,7 +102,7 @@
                   </li>
                 </ul>
                 <div v-else class="empty-invitations">
-                  <p>No pending invitations.</p>
+                  <p>Không có lời mời nào đang chờ.</p>
                 </div>
               </div>
             </div>
@@ -118,7 +118,7 @@
                 <input
                   v-model="searchQuery"
                   type="text"
-                  placeholder="Search projects..."
+                  placeholder="Tìm dự án..."
                   class="search-input"
                 />
               </div>
@@ -202,7 +202,7 @@
               </div>
             </div>
             <div class="filter-stats">
-              <span class="stat-text">{{ filteredProjects.length }} projects found</span>
+              <span class="stat-text">{{ filteredProjects.length }} dự án</span>
               <span v-if="languageFilter" class="language-badge" :class="languageFilter">
                 {{ languageLabel }}
               </span>
@@ -212,7 +212,7 @@
           <!-- Recent Projects -->
           <div v-if="currentView === 'recent-projects'" class="projects-view">
             <div class="section-header">
-              <h2>Recent Projects</h2>
+              <h2>Dự án gần đây</h2>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
@@ -236,8 +236,8 @@
               <div class="empty-icon">
                 <span class="material-symbols-outlined">folder_open</span>
               </div>
-              <h3>No Recent Projects</h3>
-              <p>Projects you've recently worked on will appear here</p>
+              <h3>Chưa có dự án gần đây</h3>
+              <p>Các dự án bạn làm việc gần đây sẽ hiện ở đây</p>
               <button class="btn-primary" @click="openNewProjectModal">
                 <span class="material-symbols-outlined">add</span>
                 Create New Project
@@ -248,7 +248,7 @@
           <!-- My Projects -->
           <div v-if="currentView === 'my-projects'" class="projects-view">
             <div class="section-header">
-              <h2>My Projects</h2>
+              <h2>Dự án của tôi</h2>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
@@ -272,8 +272,8 @@
               <div class="empty-icon">
                 <span class="material-symbols-outlined">create_new_folder</span>
               </div>
-              <h3>No Projects</h3>
-              <p>Create your first project to get started</p>
+              <h3>Chưa có dự án</h3>
+              <p>Tạo dự án đầu tiên để bắt đầu</p>
               <button class="btn-primary" @click="openNewProjectModal">
                 <span class="material-symbols-outlined">add</span>
                 Create New Project
@@ -284,7 +284,7 @@
           <!-- Shared Projects -->
           <div v-if="currentView === 'shared-projects'" class="projects-view">
             <div class="section-header">
-              <h2>Shared Projects</h2>
+              <h2>Dự án được chia sẻ</h2>
             </div>
             <div v-if="filteredProjects.length > 0" class="projects-grid">
               <ProjectCard
@@ -308,16 +308,16 @@
               <div class="empty-icon">
                 <span class="material-symbols-outlined">people</span>
               </div>
-              <h3>No Shared Projects</h3>
-              <p>Projects shared with you will appear here</p>
+              <h3>Chưa có dự án được chia sẻ</h3>
+              <p>Dự án được chia sẻ với bạn sẽ hiện ở đây</p>
             </div>
           </div>
 
           <!-- Trash -->
           <div v-if="currentView === 'trash'" class="projects-view">
             <div class="section-header">
-              <h2>Trashed Projects</h2>
-              <p>Projects moved to trash</p>
+              <h2>Dự án trong thùng rác</h2>
+              <p>Dự án đã chuyển vào thùng rác</p>
             </div>
             <div v-if="trashedProjects.length > 0" class="projects-grid">
               <ProjectCard
@@ -341,8 +341,8 @@
               <div class="empty-icon">
                 <span class="material-symbols-outlined">delete_outline</span>
               </div>
-              <h3>Trash is Empty</h3>
-              <p>No projects found in trash</p>
+              <h3>Thùng rác trống</h3>
+              <p>Không có dự án nào trong thùng rác</p>
             </div>
           </div>
         </div>
@@ -1254,10 +1254,8 @@ export default {
 
 <style scoped>
 .homepage {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 50%, var(--sunken) 100%);
-  background-size: 200% 200%;
-  animation: gradientShift 15s ease infinite;
+  font-family: var(--font-body);
+  background: var(--bg);
   min-height: 100vh;
   overflow: hidden;
 }
@@ -1279,7 +1277,7 @@ export default {
 
 .main-content {
   flex: 1;
-  background-color: var(--surface);
+  background-color: var(--bg);
   margin-left: 250px;
   display: flex;
   flex-direction: column;
@@ -1294,17 +1292,16 @@ export default {
 }
 
 .page-header {
-  padding: 24px 32px;
-  border-bottom: 2px solid var(--border);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  padding: 18px var(--gutter);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
-  min-height: 80px;
-  box-shadow: 0 2px 12px rgba(26, 54, 93, 0.08);
+  min-height: 72px;
+  box-shadow: none;
   position: relative;
-  animation: slideDown 0.4s ease-out;
 }
 
 @keyframes slideDown {
@@ -1319,25 +1316,16 @@ export default {
 }
 
 .page-header::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
-  border-radius: var(--radius-sm);
+  display: none;
 }
 
 .page-header h1 {
+  font-family: var(--font-display);
   font-size: 1.75rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 500;
+  color: var(--ink);
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 /* Bulk Actions */
@@ -1526,7 +1514,7 @@ export default {
 }
 
 .content-area {
-  padding: 0 30px 30px;
+  padding: 24px var(--gutter) 40px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -1540,11 +1528,11 @@ export default {
 
 /* Filter Section */
 .filter-section {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   padding: 24px;
   border-radius: var(--radius);
   margin-bottom: 32px;
-  box-shadow: 0 4px 20px rgba(26, 54, 93, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(10, 10, 10, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1555,7 +1543,7 @@ export default {
 }
 
 .filter-section:hover {
-  box-shadow: 0 6px 28px rgba(26, 54, 93, 0.15), 0 0 0 1px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 6px 28px rgba(10, 10, 10, 0.15), 0 0 0 1px rgba(10, 10, 10, 0.1);
 }
 
 @keyframes fadeInUp {
@@ -1597,19 +1585,19 @@ export default {
   width: 300px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .search-input:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 4px 12px rgba(10, 10, 10, 0.1);
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 16px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.15), 0 4px 16px rgba(10, 10, 10, 0.2);
   background: var(--surface);
   transform: translateY(-1px);
 }

@@ -4,7 +4,7 @@ import axiosClient from "@/utils/axiosClient";
 // ==================== SEQUENCE DIAGRAM API ====================
 // ==================== SEQUENCE DIAGRAM API ====================
 export const getSequenceDiagrams = (versionId) =>
-    axiosClient.get(`/api/sequence-diagram/versions/${versionId}/sequence-diagrams`); // Đổi endpoint
+    axiosClient.get(`/api/sequence-diagram/versions/${versionId}/`);
 
 export const getSequenceDiagramById = (ucId) =>
     axiosClient.get(`/api/sequence-diagram/sequence-diagrams/${ucId}`); // Đổi endpoint

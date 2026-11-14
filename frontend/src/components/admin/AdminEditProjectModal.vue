@@ -219,7 +219,7 @@ const saveEdit = () => {
 .form-group textarea:focus,
 .form-group select:focus {
   border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
 }
 
 @keyframes fadeIn {

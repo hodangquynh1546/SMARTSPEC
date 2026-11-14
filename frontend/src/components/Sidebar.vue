@@ -19,10 +19,10 @@
             </router-link>
             SMART SPEC
           </h2>
-          <p>Generate professional software documentation using AI</p>
+          <p>Tạo tài liệu đặc tả phần mềm chuyên nghiệp bằng AI</p>
         </div>
         <button class="new-project-btn" @click="$emit('new')">
-          <i class="fa-solid fa-plus"></i> New Project
+          <i class="fa-solid fa-plus"></i> Dự án mới
         </button>
       </div>
 
@@ -36,7 +36,7 @@
               @click.prevent="navigate('recent-projects')"
             >
               <i class="fa-solid fa-clock"></i>
-              Recent
+              Gần đây
             </a>
           </li>
           <li>
@@ -47,7 +47,7 @@
               @click.prevent="navigate('my-projects')"
             >
               <i class="fa-brands fa-space-awesome"></i>
-              Projects
+              Dự án của tôi
             </a>
           </li>
           <li>
@@ -58,7 +58,7 @@
               @click.prevent="navigate('shared-projects')"
             >
               <i class="fa-regular fa-star"></i>
-              Shared
+              Được chia sẻ
             </a>
           </li>
           <li>
@@ -69,7 +69,7 @@
               @click.prevent="navigate('trash')"
             >
               <i class="fa-solid fa-trash-can"></i>
-              Trashed
+              Thùng rác
             </a>
           </li>
         </ul>
@@ -100,19 +100,19 @@
         <transition name="fade-slide">
           <div v-if="showUserMenu" class="user-menu">
             <ul class="menu-list">
-              <li><span class="material-symbols-outlined">help</span> Help</li>
+              <li><span class="material-symbols-outlined">help</span> Trợ giúp</li>
               <li @click.stop="$emit('open-personal')">
-                <span class="material-symbols-outlined">settings</span> Settings
+                <span class="material-symbols-outlined">settings</span> Tài khoản
               </li>
               <li @click.stop="$router.push('/connect-claude')">
                 <span class="material-symbols-outlined">hub</span> Kết nối Claude
               </li>
               <li @click.stop="openModelSelection">
-                <span class="material-symbols-outlined">smart_toy</span> Model Selection
+                <span class="material-symbols-outlined">smart_toy</span> Chọn mô hình AI
               </li>
               <hr />
               <li @click.stop="handleLogout">
-                <span class="material-symbols-outlined">logout</span> Logout
+                <span class="material-symbols-outlined">logout</span> Đăng xuất
               </li>
             </ul>
           </div>
@@ -305,16 +305,15 @@ export default {
   position: fixed;
   height: 100vh;
   width: 250px;
-  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   display: flex;
   flex-direction: column;
-  padding: 20px 16px 0 0;
-  border-radius: 0 0px var(--radius) 0;
+  padding: 20px 16px 0 16px;
+  border-radius: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-right: 2px solid var(--border);
+  border-right: 1px solid var(--border);
   z-index: 30;
-  box-shadow: 4px 0 20px rgba(26, 54, 93, 0.08);
-  animation: slideInLeft 0.4s ease-out;
+  box-shadow: none;
 }
 
 @keyframes slideInLeft {
@@ -358,7 +357,7 @@ export default {
   gap: 8px;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   border: none;
   padding: 14px 16px;
@@ -368,7 +367,7 @@ export default {
   margin-bottom: 30px;
   width: 100%;
   font-weight: 600;
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.25);
+  box-shadow: var(--shadow);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -407,8 +406,8 @@ export default {
 
 .new-project-btn:hover {
   transform: translateY(-3px);
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
+  background: var(--ink);
+  box-shadow: var(--shadow);
 }
 
 .navigation ul {
@@ -443,7 +442,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -453,16 +452,14 @@ export default {
 
 .navigation a:hover {
   color: var(--ink);
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  background-color: var(--sunken);
 }
 
 .navigation a.active {
-  background-color:#909095ff;
-  font-weight: 700;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.3);
-  transform: translateX(4px);
+  background-color: var(--ink);
+  font-weight: 600;
+  color: var(--ink-text);
+  box-shadow: none;
 }
 
 .navigation a.active::before {
@@ -523,7 +520,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
   font-size: 14px;
   font-weight: 600;

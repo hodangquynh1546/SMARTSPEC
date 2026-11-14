@@ -775,10 +775,10 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ink), var(--ink));
+  background: var(--ink);
   border-radius: var(--radius-sm);
   transition: width 0.5s ease-in-out;
-  box-shadow: 0 2px 4px rgba(26, 54, 93, 0.3);
+  box-shadow: 0 2px 4px rgba(10, 10, 10, 0.3);
 }
 
 /* GENERAL MODAL STYLES */
@@ -807,10 +807,10 @@ export default {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   padding: 28px;
   border-radius: var(--radius);
-  box-shadow: 0 20px 60px rgba(26, 54, 93, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(10, 10, 10, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   width: 90%;
   max-width: 650px;
   display: flex;
@@ -827,7 +827,7 @@ export default {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 50%, var(--ink) 100%);
+  background: var(--ink);
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -868,13 +868,13 @@ export default {
   left: 0;
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   border-radius: var(--radius-sm);
 }
 
 .modal-header h2 {
   font-size: 24px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -884,7 +884,7 @@ export default {
 }
 
 .progress-indicator {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--ink-soft) 100%);
+  background: var(--sunken);
   color: var(--ink);
   padding: 4px 12px;
   border-radius: var(--radius-field);
@@ -892,12 +892,12 @@ export default {
   font-weight: 600;
   display: inline-block;
   margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.15);
-  border: 1px solid rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
+  border: 1px solid rgba(10, 10, 10, 0.1);
 }
 
 .close-btn {
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
+  background: var(--sunken);
   border: none;
   font-size: 24px;
   color: var(--muted);
@@ -939,21 +939,21 @@ export default {
   border-radius: var(--radius-field);
   font-size: 14px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .form-group input:hover,
 .form-group textarea:hover {
   border-color: var(--border-strong);
-  box-shadow: 0 2px 8px rgba(26, 54, 93, 0.1);
+  box-shadow: 0 2px 8px rgba(10, 10, 10, 0.1);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.15), 0 4px 12px rgba(26, 54, 93, 0.2);
+  box-shadow: 0 0 0 4px rgba(10, 10, 10, 0.15), 0 4px 12px rgba(10, 10, 10, 0.2);
   background: var(--surface);
   transform: translateY(-1px);
 }
@@ -1158,7 +1158,7 @@ export default {
   border-radius: var(--radius);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
@@ -1171,7 +1171,7 @@ export default {
   top: 0;
   bottom: 0;
   width: 0;
-  background: linear-gradient(135deg, rgba(26, 54, 93, 0.1) 0%, rgba(45, 74, 138, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.06);
   transition: width 0.3s ease;
 }
 
@@ -1181,14 +1181,14 @@ export default {
 
 .lang-option:hover {
   border-color: var(--ink);
-  box-shadow: 0 4px 16px rgba(26, 54, 93, 0.2);
+  box-shadow: var(--shadow);
   transform: translateY(-2px);
 }
 
 .lang-option.selected {
   border-color: var(--ink);
-  background: linear-gradient(135deg, var(--sunken) 0%, var(--sunken) 100%);
-  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.25), 0 0 0 3px rgba(26, 54, 93, 0.1);
+  background: var(--sunken);
+  box-shadow: 0 6px 20px rgba(10, 10, 10, 0.25), 0 0 0 3px rgba(10, 10, 10, 0.1);
   transform: translateY(-2px);
 }
 
@@ -1248,31 +1248,31 @@ export default {
 }
 
 .cancel-btn {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   border: 2px solid var(--border);
   color: var(--text);
 }
 
 .cancel-btn:hover {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--sunken) 100%);
+  background: var(--bg);
   border-color: var(--border-strong);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .create-btn {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   color: white;
 }
 
 .create-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink) 100%);
+  background: var(--ink);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(26, 54, 93, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .create-btn:disabled {
-  background: linear-gradient(135deg, var(--muted) 0%, var(--muted) 100%);
+  background: var(--muted);
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;

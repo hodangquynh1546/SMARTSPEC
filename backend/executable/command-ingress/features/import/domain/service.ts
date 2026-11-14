@@ -126,7 +126,7 @@ export class ImportService {
         default: c.default != null ? String(c.default) : undefined,
         related_usecase_ids: asArray(c.related_usecase_ids).map(String), primary_key_order: c.primary_key_order ?? null,
       }));
-      const table = { name: str(t.name), description: str(t.description), columns, position: { x: (ti % 4) * 320, y: Math.floor(ti / 4) * 280 } };
+      const table = { name: str(t.name), description: str(t.description), columns, position: { x: (ti % 3) * 440, y: Math.floor(ti / 3) * 340 } };
       try {
         this.tableRules.validateTableStructure(table as any);
       } catch (e: any) {
